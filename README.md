@@ -1,1 +1,2 @@
 # easygoolFrontend
+Validación cambios commit
