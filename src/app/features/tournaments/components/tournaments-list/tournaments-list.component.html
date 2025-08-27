@@ -1,17 +1,20 @@
 <div class="tournaments-container">
   <!-- Header Section -->
-  <div class="header-actions">
-    <div class="header-content">
-      <h2 class="mb-0">Torneos</h2>
-    </div>
-    
-    <div class="search-actions">
-      <div class="search-container">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar torneos...</mat-label>
-          <input matInput [formControl]="searchControl" placeholder="Nombre, categoría, ubicación...">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+  <div class="tournaments-header">
+    <div class="header-actions">
+      <div class="header-content">
+        <h1 class="page-title">Torneos</h1>
+        <p class="page-subtitle">Gestiona y organiza todos tus torneos futbolísticos</p>
+      </div>
+      
+      <div class="search-actions">
+        <div class="search-container">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar torneos...</mat-label>
+            <input matInput [formControl]="searchControl" placeholder="Nombre, categoría, ubicación...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
       </div>
     </div>
   </div>

@@ -7,55 +7,59 @@
 
 // Header Section
 .tournaments-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   margin-bottom: var(--spacing-xl);
-  gap: var(--spacing-lg);
-
-  .header-content {
-    text-align: center;
-    margin-bottom: var(--spacing-lg);
+  
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
     
-    .page-title {
-      font-size: 2.5rem;
-      font-weight: 500;
-      color: var(--primary-color);
-      margin: 0 0 var(--spacing-sm);
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    .header-content {
+      flex: 1;
+      
+      .page-title {
+        font-size: 2.5rem;
+        font-weight: 500;
+        color: var(--primary-color);
+        margin: 0 0 var(--spacing-sm);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin: 0;
+      }
     }
     
-    .page-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      margin: 0;
+    .search-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-shrink: 0;
+      
+      .search-container {
+        .search-field {
+          width: 300px;
+          
+          .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+          }
+        }
+      }
     }
   }
+}
 
-  .search-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-shrink: 0;
+.add-tournament-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
 
-    .search-field {
-      width: 300px;
-      
-      .mat-mdc-form-field-subscript-wrapper {
-        display: none;
-      }
-    }
-
-    .add-tournament-btn {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      box-shadow: var(--shadow-md);
-      transition: all 0.3s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-      }
-    }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
   }
 }
 

@@ -1,16 +1,69 @@
 <div class="dashboard-home">
-  <!-- Welcome Section -->
-  <div class="welcome-section" *ngIf="currentUser$ | async as user">
-    <div class="welcome-content">
-      <h1 class="welcome-title">
-        ¡Bienvenido, {{ user.firstName }}! ⚽
-      </h1>
-      <p class="welcome-subtitle">
-        Gestiona tu mundo futbolístico desde aquí
-      </p>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <!-- Date Filter -->
+    <div class="date-filter-container">
+      <mat-card class="filter-card">
+        <mat-card-content>
+          <div class="filter-content">
+            <h3 class="filter-title">
+              <mat-icon>date_range</mat-icon>
+              Filtrar por Fecha
+            </h3>
+            <div class="date-inputs">
+              <mat-form-field appearance="outline" class="date-field">
+                <mat-label>Fecha Desde</mat-label>
+                <input matInput [matDatepicker]="startPicker" [formControl]="startDateControl">
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="date-field">
+                <mat-label>Fecha Hasta</mat-label>
+                <input matInput [matDatepicker]="endPicker" [formControl]="endDateControl">
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+              </mat-form-field>
+              
+              <button mat-raised-button color="primary" class="filter-button" (click)="applyDateFilter()">
+                <mat-icon>filter_alt</mat-icon>
+                Aplicar
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-    <div class="welcome-avatar">
-      <img [src]="user.avatar || 'assets/logo.png'" [alt]="user.firstName + ' ' + user.lastName">
+
+    <!-- Charts Grid -->
+    <div class="charts-grid">
+      <!-- Line Chart - Partidos por Fecha -->
+      <mat-card class="chart-card">
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #matchesChart width="400" height="200"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Donut Chart - Goleadores -->
+      <mat-card class="chart-card">
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas #goalscorersChart width="400" height="200"></canvas>
+          </div>
+          
+          <!-- Legend -->
+          <div class="chart-legend">
+            <div *ngFor="let scorer of topScorers" class="legend-item">
+              <div class="legend-color" [style.background-color]="scorer.color"></div>
+              <span class="legend-label">{{ scorer.name }}</span>
+              <span class="legend-value">{{ scorer.goals }} goles</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </div>
 
