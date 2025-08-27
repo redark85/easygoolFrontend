@@ -1,0 +1,146 @@
+<div class="tournaments-container">
+  <!-- Header Section -->
+  <div class="header-actions">
+    <div class="header-content">
+      <h2 class="mb-0">Torneos</h2>
+    </div>
+    
+    <div class="search-actions">
+      <div class="search-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar torneos...</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Nombre, categoría, ubicación...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando torneos...</p>
+  </div>
+
+  <!-- Tournaments Grid -->
+  <div class="tournaments-grid" *ngIf="!isLoading">
+    <!-- No Results -->
+    <div class="no-results" *ngIf="filteredTournaments.length === 0">
+      <mat-icon class="no-results-icon">sports_soccer</mat-icon>
+      <h3>No se encontraron torneos</h3>
+      <p>Intenta ajustar tu búsqueda o crear un nuevo torneo</p>
+      <button mat-raised-button 
+              color="primary" 
+              (click)="createTournament()">
+        <mat-icon>add</mat-icon>
+        Crear Torneo
+      </button>
+    </div>
+
+    <!-- Tournament Cards -->
+    <div class="row" *ngIf="filteredTournaments.length > 0">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3" 
+           *ngFor="let tournament of filteredTournaments; trackBy: trackByTournamentId">
+        <mat-card class="tournament-card" 
+                  (click)="viewTournamentDetails(tournament)"
+                  [attr.aria-label]="'Ver detalles de ' + tournament.name">
+          
+          <!-- Tournament Image -->
+          <div class="card-image-container">
+            <img mat-card-image 
+                 [src]="tournament.image" 
+                 [alt]="tournament.name"
+                 class="tournament-image"
+                 loading="lazy">
+            
+            <!-- Status Chip -->
+            <mat-chip-set class="status-chip-container">
+              <mat-chip [class]="getStatusClass(tournament.status)">
+                {{ getStatusText(tournament.status) }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <!-- Card Content -->
+          <mat-card-content class="tournament-content">
+            <div class="tournament-info">
+              <h3 class="tournament-name">{{ tournament.name }}</h3>
+              <p class="tournament-season">{{ tournament.season }}</p>
+              <p class="tournament-description">{{ tournament.description }}</p>
+              
+              <!-- Tournament Details -->
+              <div class="tournament-details">
+                <div class="detail-item">
+                  <mat-icon class="detail-icon">groups</mat-icon>
+                  <span>{{ tournament.teamsCount }} equipos</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon class="detail-icon">sports_soccer</mat-icon>
+                  <span>{{ tournament.matchesCount }} partidos</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon class="detail-icon">location_on</mat-icon>
+                  <span>{{ tournament.location }}</span>
+                </div>
+              </div>
+
+              <!-- Date Range -->
+              <div class="tournament-dates">
+                <mat-icon class="date-icon">event</mat-icon>
+                <span class="date-text">{{ getDateRange(tournament) }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+
+          <!-- Card Actions -->
+          <mat-card-actions class="tournament-actions">
+            <button mat-button 
+                    color="primary"
+                    (click)="viewTournamentDetails(tournament); $event.stopPropagation()">
+              <mat-icon>visibility</mat-icon>
+              Ver Detalles
+            </button>
+            <button mat-icon-button 
+                    class="more-actions-btn"
+                    [matMenuTriggerFor]="actionsMenu"
+                    (click)="$event.stopPropagation()"
+                    matTooltip="Más acciones">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            
+            <!-- Actions Menu -->
+            <mat-menu #actionsMenu="matMenu">
+              <button mat-menu-item (click)="editTournament(tournament)">
+                <mat-icon>edit</mat-icon>
+                <span>Editar</span>
+              </button>
+              <button mat-menu-item (click)="duplicateTournament(tournament)">
+                <mat-icon>content_copy</mat-icon>
+                <span>Duplicar</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item 
+                      class="delete-action"
+                      (click)="deleteTournament(tournament)">
+                <mat-icon>delete</mat-icon>
+                <span>Eliminar</span>
+              </button>
+            </mat-menu>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="!isLoading && filteredTournaments.length > 0">
+    <p class="summary-text">
+      Mostrando {{ filteredTournaments.length }} de {{ tournaments.length }} torneos
+    </p>
+  </div>
+
+  <!-- Fixed FAB Button -->
+  <button mat-fab class="fab-fixed" (click)="createTournament()" matTooltip="Crear nuevo torneo">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

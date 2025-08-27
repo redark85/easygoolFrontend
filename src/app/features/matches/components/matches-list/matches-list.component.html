@@ -1,0 +1,172 @@
+<div class="matches-container">
+  <!-- Header Section -->
+  <div class="matches-header">
+    <div class="header-actions">
+      <div class="header-content">
+        <h1 class="page-title">Partidos</h1>
+        <p class="page-subtitle">Sigue todos los partidos en tiempo real</p>
+      </div>
+      
+      <div class="search-actions">
+        <div class="search-container">
+          <mat-form-field appearance="outline">
+            <mat-label>Buscar partidos...</mat-label>
+            <input matInput [formControl]="searchControl" placeholder="Equipos, torneo o estadio">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando partidos...</p>
+  </div>
+
+  <!-- Matches by Date Groups -->
+  <div class="matches-content" *ngIf="!isLoading">
+    <mat-accordion multi="true" class="matches-accordion">
+      <mat-expansion-panel 
+        *ngFor="let group of filteredMatchGroups; trackBy: trackByGroupDate"
+        [expanded]="shouldExpandByDefault(group)"
+        [ngClass]="getPanelClass(group)"
+        class="date-panel">
+        
+        <!-- Panel Header -->
+        <mat-expansion-panel-header class="panel-header">
+          <mat-panel-title class="panel-title">
+            <div class="date-info">
+              <span class="date-text">{{ group.displayDate }}</span>
+              <mat-chip-set class="date-chips">
+                <mat-chip 
+                  *ngIf="getLiveMatchesCount(group.matches) > 0"
+                  [matBadge]="getLiveMatchesCount(group.matches)"
+                  matBadgeColor="accent"
+                  matBadgeSize="small"
+                  color="accent">
+                  <mat-icon>radio_button_checked</mat-icon>
+                  EN VIVO
+                </mat-chip>
+                <mat-chip class="matches-count">
+                  {{ group.matches.length }} {{ group.matches.length === 1 ? 'partido' : 'partidos' }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <!-- Panel Content - Matches List -->
+        <div class="matches-grid">
+          <mat-card 
+            *ngFor="let match of group.matches; trackBy: trackByMatchId"
+            class="match-card"
+            [ngClass]="{'live-match': isLiveMatch(match.status)}"
+            (click)="viewMatchDetails(match.id)">
+            
+            <!-- Live indicator -->
+            <div class="live-indicator" *ngIf="isLiveMatch(match.status)">
+              <div class="pulse-dot"></div>
+            </div>
+
+            <mat-card-content class="match-content">
+              <!-- Teams and Score -->
+              <div class="match-main">
+                <!-- Home Team -->
+                <div class="team home-team">
+                  <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo">
+                  <div class="team-info">
+                    <span class="team-name">{{ match.homeTeam.shortName }}</span>
+                    <span class="team-full-name">{{ match.homeTeam.name }}</span>
+                  </div>
+                </div>
+
+                <!-- Score Section -->
+                <div class="score-section">
+                  <div class="score" *ngIf="match.status !== MatchStatus.SCHEDULED">
+                    <span class="home-score">{{ match.score.homeScore }}</span>
+                    <span class="score-separator">-</span>
+                    <span class="away-score">{{ match.score.awayScore }}</span>
+                  </div>
+                  <div class="vs-text" *ngIf="match.status === MatchStatus.SCHEDULED">
+                    VS
+                  </div>
+                  
+                  <!-- Match Status -->
+                  <mat-chip 
+                    [color]="getStatusChipColor(match.status)"
+                    class="status-chip"
+                    [ngClass]="{'live-chip': isLiveMatch(match.status)}">
+                    {{ getStatusText(match) }}
+                  </mat-chip>
+                </div>
+
+                <!-- Away Team -->
+                <div class="team away-team">
+                  <div class="team-info">
+                    <span class="team-name">{{ match.awayTeam.shortName }}</span>
+                    <span class="team-full-name">{{ match.awayTeam.name }}</span>
+                  </div>
+                  <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo">
+                </div>
+              </div>
+
+              <!-- Match Details -->
+              <div class="match-details">
+                <div class="detail-item">
+                  <mat-icon class="detail-icon">emoji_events</mat-icon>
+                  <span class="detail-text">{{ match.tournament }}</span>
+                  <span class="detail-round" *ngIf="match.round">- {{ match.round }}</span>
+                </div>
+                
+                <div class="detail-item">
+                  <mat-icon class="detail-icon">location_on</mat-icon>
+                  <span class="detail-text">{{ match.venue }}</span>
+                </div>
+                
+                <div class="detail-item" *ngIf="match.status === MatchStatus.SCHEDULED">
+                  <mat-icon class="detail-icon">schedule</mat-icon>
+                  <span class="detail-text">{{ formatTime(match.date) }}</span>
+                </div>
+
+                <div class="detail-item" *ngIf="match.referee">
+                  <mat-icon class="detail-icon">sports</mat-icon>
+                  <span class="detail-text">{{ match.referee }}</span>
+                </div>
+              </div>
+
+              <!-- Half Time Score -->
+              <div class="half-time-score" *ngIf="match.status === MatchStatus.FINISHED && match.score.halfTimeHome !== undefined">
+                <span class="ht-label">Descanso:</span>
+                <span class="ht-score">{{ match.score.halfTimeHome }} - {{ match.score.halfTimeAway }}</span>
+              </div>
+            </mat-card-content>
+
+            <!-- Action Menu -->
+            <div class="match-actions">
+              <button 
+                mat-icon-button 
+                (click)="editMatch(match.id); $event.stopPropagation()"
+                matTooltip="Editar partido">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </mat-card>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <!-- No Results Message -->
+    <div class="no-results" *ngIf="filteredMatchGroups.length === 0">
+      <mat-icon class="no-results-icon">sports_soccer</mat-icon>
+      <h3>No se encontraron partidos</h3>
+      <p>Intenta con otros términos de búsqueda o verifica los filtros aplicados.</p>
+    </div>
+  </div>
+
+  <!-- Fixed FAB Button -->
+  <button mat-fab class="fab-fixed" (click)="createMatch()" matTooltip="Agregar nuevo partido">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

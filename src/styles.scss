@@ -29,14 +29,14 @@
   --referee-black: #2C2C2C;      // Negro árbitro
   --ball-pattern: #000000;       // Patrón balón
   --grass-shadow: #1F5F1F;       // Sombra césped
-  
+
   // Breakpoints responsivos
   --mobile: 576px;
   --tablet: 768px;
   --desktop: 992px;
   --large: 1200px;
   --xlarge: 1400px;
-  
+
   // Espaciados reutilizables
   --spacing-xs: 0.25rem;    // 4px
   --spacing-sm: 0.5rem;     // 8px
@@ -44,13 +44,17 @@
   --spacing-lg: 1.5rem;     // 24px
   --spacing-xl: 2rem;       // 32px
   --spacing-xxl: 3rem;      // 48px
-  
+
   // Componentes layout
   --sidebar-width: 280px;
   --sidebar-collapsed: 60px;
+
+  // FAB Button shared styles
+  --fab-size: 56px;
+  --fab-size-small: 40px;
   --header-height: 64px;
   --footer-height: 48px;
-  
+
   // Bordes y sombras
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
@@ -58,7 +62,7 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
   --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
   --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
-  
+
   // Transiciones
   --transition-fast: 0.15s ease-in-out;
   --transition-normal: 0.3s ease-in-out;
@@ -70,9 +74,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
 
 // Global styles con colores del logo
-html, body { 
-  height: 100%; 
-  margin: 0; 
+html, body {
+  height: 100%;
+  margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   color: var(--text-primary);
   background-color: var(--background-light);
@@ -91,18 +95,162 @@ html, body {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: white;
-}
-.btn-primary-custom:hover {
-  background-color: var(--primary-dark);
-  border-color: var(--primary-dark);
+
+  &:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+  }
 }
 
 .btn-secondary-custom {
   background-color: var(--secondary-color);
   border-color: var(--secondary-color);
   color: white;
+
+  &:hover {
+    background-color: var(--secondary-dark);
+    border-color: var(--secondary-dark);
+  }
 }
-.btn-secondary-custom:hover {
-  background-color: var(--secondary-dark);
-  border-color: var(--secondary-dark);
+
+// Shared FAB Button Styles
+.fab-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: var(--fab-size);
+  margin-bottom: var(--spacing-lg);
+
+  .fab-button {
+    width: var(--fab-size);
+    height: var(--fab-size);
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--primary-dark);
+      transform: scale(1.1);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    // Small variant
+    &.fab-small {
+      width: var(--fab-size-small);
+      height: var(--fab-size-small);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+// Fixed FAB Button (floating)
+.fab-fixed {
+  position: fixed !important;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  width: var(--fab-size);
+  height: var(--fab-size);
+  border-radius: 50%;
+  background-color: #1976D2 !important;
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #1565C0 !important;
+    transform: scale(1.1);
+    box-shadow: 0 12px 28px rgba(25, 118, 210, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  @media (max-width: 768px) {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+// Header with search only (no FAB)
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+
+  .header-content {
+    flex: 1;
+  }
+
+  .search-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .search-container {
+      mat-form-field {
+        width: 300px;
+
+        @media (max-width: 768px) {
+          width: 250px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--spacing-md);
+
+    .header-content {
+      text-align: center;
+      width: 100%;
+    }
+
+    .search-actions {
+      width: 100%;
+      justify-content: center;
+
+      .search-container mat-form-field {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+  }
 }

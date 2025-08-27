@@ -16,7 +16,7 @@ export const dashboardRoutes: Routes = [
       },
       {
         path: 'matches',
-        loadComponent: () => import('./components/home/home.component').then(c => c.HomeComponent) // Placeholder
+        loadChildren: () => import('../matches/matches.routes').then(r => r.MATCHES_ROUTES)
       },
       {
         path: 'teams',
@@ -28,7 +28,7 @@ export const dashboardRoutes: Routes = [
       },
       {
         path: 'tournaments',
-        loadComponent: () => import('./components/home/home.component').then(c => c.HomeComponent) // Placeholder
+        loadChildren: () => import('../tournaments/tournaments.routes').then(r => r.TOURNAMENTS_ROUTES)
       },
       {
         path: 'stats',
