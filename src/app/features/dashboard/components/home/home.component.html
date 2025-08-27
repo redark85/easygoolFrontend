@@ -1,0 +1,112 @@
+<div class="dashboard-home">
+  <!-- Welcome Section -->
+  <div class="welcome-section" *ngIf="currentUser$ | async as user">
+    <div class="welcome-content">
+      <h1 class="welcome-title">
+        ¡Bienvenido, {{ user.firstName }}! ⚽
+      </h1>
+      <p class="welcome-subtitle">
+        Gestiona tu mundo futbolístico desde aquí
+      </p>
+    </div>
+    <div class="welcome-avatar">
+      <img [src]="user.avatar || 'assets/logo.png'" [alt]="user.firstName + ' ' + user.lastName">
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <mat-card *ngFor="let card of dashboardCards" [class]="getCardClass(card.color)">
+      <mat-card-content class="card-content">
+        <div class="card-header">
+          <div class="card-icon">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+          <div class="card-trend" *ngIf="card.trend">
+            <mat-icon [class]="card.trend.isPositive ? 'trend-up' : 'trend-down'">
+              {{ card.trend.isPositive ? 'trending_up' : 'trending_down' }}
+            </mat-icon>
+            <span class="trend-value">{{ card.trend.value }}%</span>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <h3 class="card-value">{{ card.value }}</h3>
+          <p class="card-title">{{ card.title }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+    <!-- Recent Activities -->
+    <mat-card class="activities-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Actividad Reciente
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="activities-list">
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [class]="activity.color">
+              <mat-icon>{{ activity.icon }}</mat-icon>
+            </div>
+            <div class="activity-content">
+              <h4 class="activity-title">{{ activity.title }}</h4>
+              <p class="activity-description">{{ activity.description }}</p>
+              <span class="activity-time">{{ activity.time }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-button color="primary">Ver Todas</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Quick Actions -->
+    <mat-card class="actions-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>flash_on</mat-icon>
+          Acciones Rápidas
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="actions-grid">
+          <button mat-raised-button color="primary" class="action-button">
+            <mat-icon>add</mat-icon>
+            <span>Nuevo Partido</span>
+          </button>
+          
+          <button mat-raised-button color="accent" class="action-button">
+            <mat-icon>group_add</mat-icon>
+            <span>Agregar Equipo</span>
+          </button>
+          
+          <button mat-raised-button class="action-button">
+            <mat-icon>person_add</mat-icon>
+            <span>Registrar Jugador</span>
+          </button>
+          
+          <button mat-raised-button color="warn" class="action-button">
+            <mat-icon>emoji_events</mat-icon>
+            <span>Crear Torneo</span>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Football Field Decoration -->
+  <div class="field-decoration">
+    <div class="field-lines"></div>
+    <div class="center-circle"></div>
+  </div>
+</div>

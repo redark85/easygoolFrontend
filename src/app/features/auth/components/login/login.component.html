@@ -1,0 +1,86 @@
+<div class="auth-container">
+  <!-- Left Sidebar -->
+  <div class="auth-sidebar">
+    <mat-card class="auth-card">
+      <!-- Logo -->
+      <div class="logo-section">
+        <img src="assets/logo.png" alt="EasyGool Logo" class="logo">
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email o usuario</mat-label>
+          <input matInput 
+                 type="email" 
+                 formControlName="email"
+                 placeholder="Ingresa tu email">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            {{ getErrorMessage('email') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput 
+                 [type]="hidePassword ? 'password' : 'text'"
+                 formControlName="password"
+                 placeholder="Ingresa tu contraseña">
+          <button mat-icon-button 
+                  matSuffix 
+                  type="button"
+                  (click)="hidePassword = !hidePassword"
+                  [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            {{ getErrorMessage('password') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Forgot Password -->
+        <div class="form-options">
+          <button mat-button type="button" class="forgot-password">
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+        <!-- Submit Button -->
+        <button mat-raised-button 
+                type="submit"
+                class="auth-button full-width"
+                [disabled]="loading || loginForm.invalid">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">Iniciar Sesión</span>
+          <span *ngIf="loading">Iniciando sesión...</span>
+        </button>
+
+        <!-- Register Link -->
+        <div class="register-link">
+          <span>¿Nuevo en EasyGool? </span>
+          <button mat-button 
+                  type="button"
+                  class="link-button"
+                  (click)="navigateToRegister()">
+            ¡Regístrate!
+          </button>
+        </div>
+      </form>
+    </mat-card>
+  </div>
+
+  <!-- Right Wallpaper -->
+  <div class="auth-wallpaper">
+    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+  </div>
+</div>

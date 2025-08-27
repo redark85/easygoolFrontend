@@ -6,8 +6,9 @@
 // Angular Material CSS
 @use '@angular/material/prebuilt-themes/indigo-pink.css';
 
-// Colores basados en el logo de EasyGool
+// Colores basados en el logo de EasyGool + Temática Futbolística
 :root {
+  // Colores base del logo (mantener)
   --primary-color: #1976D2;      // Azul principal del logo
   --secondary-color: #4CAF50;    // Verde complementario del logo
   --primary-light: #42A5F5;      // Azul claro
@@ -19,6 +20,49 @@
   --text-secondary: #757575;     // Texto secundario
   --background-light: #FAFAFA;   // Fondo claro
   --background-dark: #303030;    // Fondo oscuro
+
+  // Temática futbolística
+  --field-green: #228B22;        // Verde césped
+  --field-green-light: #32CD32;  // Verde césped claro
+  --line-white: #FFFFFF;         // Líneas del campo
+  --goal-yellow: #FFD700;        // Porterías/trofeos
+  --referee-black: #2C2C2C;      // Negro árbitro
+  --ball-pattern: #000000;       // Patrón balón
+  --grass-shadow: #1F5F1F;       // Sombra césped
+  
+  // Breakpoints responsivos
+  --mobile: 576px;
+  --tablet: 768px;
+  --desktop: 992px;
+  --large: 1200px;
+  --xlarge: 1400px;
+  
+  // Espaciados reutilizables
+  --spacing-xs: 0.25rem;    // 4px
+  --spacing-sm: 0.5rem;     // 8px
+  --spacing-md: 1rem;       // 16px
+  --spacing-lg: 1.5rem;     // 24px
+  --spacing-xl: 2rem;       // 32px
+  --spacing-xxl: 3rem;      // 48px
+  
+  // Componentes layout
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 60px;
+  --header-height: 64px;
+  --footer-height: 48px;
+  
+  // Bordes y sombras
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+  
+  // Transiciones
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
 }
 
 // Material Icons

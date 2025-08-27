@@ -1,0 +1,47 @@
+<div class="dashboard-layout" [class.sidebar-collapsed]="sidebarCollapsed && !isMobile">
+  <mat-sidenav-container class="sidenav-container">
+    <!-- Sidebar -->
+    <mat-sidenav 
+      #sidenav
+      class="sidenav"
+      [class.collapsed]="sidebarCollapsed && !isMobile"
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="sidenavOpened"
+      [fixedInViewport]="isMobile"
+      [fixedTopGap]="0"
+      [fixedBottomGap]="0">
+      
+      <app-sidebar 
+        [isCollapsed]="sidebarCollapsed"
+        [isMobile]="isMobile"
+        (toggleSidebar)="onToggleSidebar()"
+        (closeSidebar)="onCloseMobileSidebar()">
+      </app-sidebar>
+    </mat-sidenav>
+
+    <!-- Main Content -->
+    <mat-sidenav-content class="main-content" [class.sidebar-collapsed]="sidebarCollapsed && !isMobile">
+      <!-- Header -->
+      <app-header 
+        [isMobile]="isMobile"
+        [sidebarCollapsed]="sidebarCollapsed"
+        (toggleSidebar)="onToggleSidebar()"
+        (toggleMobileSidebar)="onToggleMobileSidebar()">
+      </app-header>
+
+      <!-- Page Content -->
+      <main class="page-content">
+        <div class="content-wrapper">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <!-- Mobile Overlay -->
+  <div 
+    *ngIf="isMobile && sidenavOpened" 
+    class="mobile-overlay"
+    (click)="onCloseMobileSidebar()">
+  </div>
+</div>

@@ -1,0 +1,148 @@
+.dashboard-layout {
+  height: 100vh;
+  overflow: hidden;
+  
+  .sidenav-container {
+    height: 100%;
+    
+    .sidenav {
+      width: var(--sidebar-width);
+      border-right: none;
+      box-shadow: none;
+      transition: width var(--transition-normal) ease-in-out;
+      
+      &.mat-drawer-side {
+        border-right: none;
+      }
+      
+      // Collapsed state
+      &.collapsed {
+        width: var(--sidebar-collapsed) !important;
+        min-width: var(--sidebar-collapsed) !important;
+        max-width: var(--sidebar-collapsed) !important;
+      }
+    }
+    
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: var(--background-light);
+      margin-left: 0;
+      transition: margin-left var(--transition-normal) ease-in-out;
+      
+      .page-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: var(--spacing-lg);
+        
+        .content-wrapper {
+          max-width: 1400px;
+          margin: 0 auto;
+          height: 100%;
+        }
+      }
+    }
+  }
+  
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .dashboard-layout {
+    .sidenav-container {
+      .main-content {
+        .page-content {
+          padding: var(--spacing-md);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-layout {
+    .sidenav-container {
+      .main-content {
+        .page-content {
+          padding: var(--spacing-sm);
+        }
+      }
+    }
+  }
+}
+
+// Smooth transitions and layout adjustments
+.sidenav-container {
+  .sidenav {
+    transition: width var(--transition-normal) ease-in-out;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    transition: all var(--transition-normal) ease-in-out;
+  }
+}
+
+// Force layout recalculation when sidebar collapses
+.dashboard-layout {
+  .sidenav-container {
+    .main-content {
+      margin-left: var(--sidebar-width);
+      width: calc(100vw - var(--sidebar-width));
+    }
+  }
+  
+  &.sidebar-collapsed {
+    .sidenav-container .main-content {
+      margin-left: var(--sidebar-collapsed);
+      width: calc(100vw - var(--sidebar-collapsed));
+    }
+  }
+}
+
+// Mobile responsive override
+@media (max-width: 768px) {
+  .dashboard-layout {
+    .sidenav-container .main-content {
+      margin-left: 0 !important;
+      width: 100vw !important;
+    }
+  }
+}
+
+// Football field pattern background
+.page-content {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(90deg, transparent 0%, transparent 48%, rgba(255, 255, 255, 0.02) 50%, transparent 52%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, transparent 48%, rgba(255, 255, 255, 0.02) 50%, transparent 52%, transparent 100%);
+    background-size: 100px 100px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .content-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+}

@@ -1,0 +1,127 @@
+<div class="sidebar-container" [class.collapsed]="isCollapsed" [class.mobile]="isMobile">
+  <!-- Logo Section -->
+  <div class="logo-section" (click)="isCollapsed ? onToggleSidebar() : null">
+    <div class="logo-content">
+      <img src="assets/logo.png" alt="EasyGool Logo" class="logo">
+      <div class="logo-text" *ngIf="!isCollapsed">
+        <h3>EasyGool</h3>
+      </div>
+    </div>
+    
+    <!-- Toggle Button -->
+    <button mat-icon-button 
+            class="toggle-btn"
+            (click)="onToggleSidebar()"
+            *ngIf="!isMobile"
+            [matTooltip]="isCollapsed ? 'Expandir sidebar' : 'Contraer sidebar'"
+            matTooltipPosition="right">
+      <mat-icon class="toggle-icon">chevron_left</mat-icon>
+    </button>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="nav-menu">
+    <mat-nav-list>
+      <!-- Dashboard Section -->
+      <div class="menu-section" *ngIf="!isCollapsed">
+        <span class="section-title">Dashboard</span>
+      </div>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/home"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Dashboard' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">dashboard</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Dashboard</span>
+      </mat-list-item>
+
+      <!-- Administrar Torneos Section -->
+      <div class="menu-section" *ngIf="!isCollapsed">
+        <span class="section-title">Administrar Torneos</span>
+      </div>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/tournaments"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Torneos' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">emoji_events</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Torneos</span>
+      </mat-list-item>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/matches"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Partidos' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">sports_soccer</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Partidos</span>
+      </mat-list-item>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/stats"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Estadísticas' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">analytics</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Estadísticas</span>
+      </mat-list-item>
+
+      <!-- Administrar Equipos Section -->
+      <div class="menu-section" *ngIf="!isCollapsed">
+        <span class="section-title">Administrar Equipos</span>
+      </div>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/teams"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Equipos' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">groups</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Equipos</span>
+      </mat-list-item>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/players"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Jugadores' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">person</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Jugadores</span>
+      </mat-list-item>
+      <mat-list-item 
+        class="nav-item"
+        routerLink="/dashboard/settings"
+        routerLinkActive="active"
+        [matTooltip]="isCollapsed ? 'Configuración' : ''"
+        matTooltipPosition="right">
+        <mat-icon matListItemIcon class="nav-icon">settings</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Configuración</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </nav>
+
+  <!-- User Section -->
+  <div class="user-section" *ngIf="currentUser$ | async as user">
+    <div class="user-info" *ngIf="!isCollapsed">
+      <div class="user-avatar">
+        <img [src]="user.avatar || 'assets/logo.png'" [alt]="user.firstName + ' ' + user.lastName">
+      </div>
+      <div class="user-details">
+        <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+        <span class="user-role">{{ user.role | titlecase }}</span>
+      </div>
+    </div>
+    
+    <!-- Logout Button -->
+    <button mat-icon-button 
+            class="logout-btn"
+            (click)="logout()"
+            [matTooltip]="isCollapsed ? 'Cerrar sesión' : ''"
+            matTooltipPosition="right">
+      <mat-icon>logout</mat-icon>
+      <span *ngIf="!isCollapsed" class="logout-text">Salir</span>
+    </button>
+  </div>
+</div>
