@@ -1,10 +1,10 @@
 <!-- EasyGool Frontend - Bootstrap + Material Design Integration -->
 
-<!-- Navbar con Bootstrap -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<!-- Navbar con Bootstrap y colores del logo -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="#">
-      <i class="material-icons me-2">dashboard</i>
+      <img src="assets/logo.png" alt="EasyGool Logo" width="32" height="32" class="me-2">
       EasyGool
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -31,7 +31,7 @@
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
-        <h1 class="display-4 fw-bold text-primary mb-3">
+        <h1 class="display-4 fw-bold text-primary-custom mb-3">
           Bienvenido a {{ title() }}
         </h1>
         <p class="lead mb-4">
@@ -39,18 +39,18 @@
           Disfruta de una experiencia de usuario excepcional con componentes elegantes y responsivos.
         </p>
         <div class="d-flex gap-3">
-          <button class="btn btn-primary btn-lg">
+          <button class="btn btn-primary-custom btn-lg">
             <i class="material-icons me-2">rocket_launch</i>
             Comenzar
           </button>
-          <button class="btn btn-outline-primary btn-lg">
+          <button class="btn btn-secondary-custom btn-lg">
             <i class="material-icons me-2">info</i>
             Más Info
           </button>
         </div>
       </div>
       <div class="col-lg-6 text-center">
-        <i class="material-icons text-primary" style="font-size: 200px;">web</i>
+        <i class="material-icons text-primary-custom" style="font-size: 200px;">web</i>
       </div>
     </div>
   </div>
@@ -69,7 +69,7 @@
       <div class="col-md-4">
         <div class="card h-100 shadow-sm">
           <div class="card-body text-center">
-            <i class="material-icons text-success mb-3" style="font-size: 48px;">speed</i>
+            <i class="material-icons text-secondary-custom mb-3" style="font-size: 48px;">speed</i>
             <h5 class="card-title">Rendimiento</h5>
             <p class="card-text">Optimizado para máxima velocidad y eficiencia en todas las operaciones.</p>
           </div>
@@ -78,7 +78,7 @@
       <div class="col-md-4">
         <div class="card h-100 shadow-sm">
           <div class="card-body text-center">
-            <i class="material-icons text-info mb-3" style="font-size: 48px;">security</i>
+            <i class="material-icons text-primary-custom mb-3" style="font-size: 48px;">security</i>
             <h5 class="card-title">Seguridad</h5>
             <p class="card-text">Protección avanzada de datos con las mejores prácticas de seguridad.</p>
           </div>
@@ -87,7 +87,7 @@
       <div class="col-md-4">
         <div class="card h-100 shadow-sm">
           <div class="card-body text-center">
-            <i class="material-icons text-warning mb-3" style="font-size: 48px;">devices</i>
+            <i class="material-icons text-secondary-custom mb-3" style="font-size: 48px;">devices</i>
             <h5 class="card-title">Responsive</h5>
             <p class="card-text">Diseño adaptable que funciona perfectamente en todos los dispositivos.</p>
           </div>
@@ -114,10 +114,10 @@
           </div>
           <div class="card-body">
             <div class="d-flex flex-wrap gap-2">
-              <button class="btn btn-primary">
+              <button class="btn btn-primary-custom">
                 <i class="material-icons me-1">add</i>Agregar
               </button>
-              <button class="btn btn-success">
+              <button class="btn btn-secondary-custom">
                 <i class="material-icons me-1">check</i>Confirmar
               </button>
               <button class="btn btn-danger">
@@ -137,12 +137,12 @@
           </div>
           <div class="card-body">
             <div class="d-flex flex-wrap gap-3 justify-content-center">
-              <i class="material-icons text-primary" style="font-size: 32px;">favorite</i>
-              <i class="material-icons text-success" style="font-size: 32px;">star</i>
+              <i class="material-icons text-primary-custom" style="font-size: 32px;">favorite</i>
+              <i class="material-icons text-secondary-custom" style="font-size: 32px;">star</i>
               <i class="material-icons text-warning" style="font-size: 32px;">notifications</i>
               <i class="material-icons text-danger" style="font-size: 32px;">error</i>
-              <i class="material-icons text-info" style="font-size: 32px;">info</i>
-              <i class="material-icons text-secondary" style="font-size: 32px;">settings</i>
+              <i class="material-icons text-primary-custom" style="font-size: 32px;">info</i>
+              <i class="material-icons text-secondary-custom" style="font-size: 32px;">settings</i>
             </div>
           </div>
         </div>

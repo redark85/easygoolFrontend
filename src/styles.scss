@@ -1,18 +1,64 @@
 /* You can add global styles to this file, and also import other style files */
 
-// Bootstrap CSS
+// Bootstrap CSS - debe ir primero
 @use 'bootstrap/scss/bootstrap';
 
 // Angular Material CSS
 @use '@angular/material/prebuilt-themes/indigo-pink.css';
 
+// Colores basados en el logo de EasyGool
+:root {
+  --primary-color: #1976D2;      // Azul principal del logo
+  --secondary-color: #4CAF50;    // Verde complementario del logo
+  --primary-light: #42A5F5;      // Azul claro
+  --primary-dark: #1565C0;       // Azul oscuro
+  --secondary-light: #66BB6A;    // Verde claro
+  --secondary-dark: #388E3C;     // Verde oscuro
+  --accent-color: #FF9800;       // Naranja de acento
+  --text-primary: #212121;       // Texto principal
+  --text-secondary: #757575;     // Texto secundario
+  --background-light: #FAFAFA;   // Fondo claro
+  --background-dark: #303030;    // Fondo oscuro
+}
+
 // Material Icons
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
 
-// Global styles
+// Global styles con colores del logo
 html, body { 
   height: 100%; 
   margin: 0; 
-  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: var(--text-primary);
+  background-color: var(--background-light);
+}
+
+// Clases de utilidad para colores del logo
+.text-primary-custom { color: var(--primary-color) !important; }
+.text-secondary-custom { color: var(--secondary-color) !important; }
+.bg-primary-custom { background-color: var(--primary-color) !important; }
+.bg-secondary-custom { background-color: var(--secondary-color) !important; }
+.border-primary-custom { border-color: var(--primary-color) !important; }
+.border-secondary-custom { border-color: var(--secondary-color) !important; }
+
+// Botones personalizados con colores del logo
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+.btn-primary-custom:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-secondary-custom {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: white;
+}
+.btn-secondary-custom:hover {
+  background-color: var(--secondary-dark);
+  border-color: var(--secondary-dark);
 }
