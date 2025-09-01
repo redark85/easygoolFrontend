@@ -18,7 +18,10 @@ export class StorageService {
   getItem<T>(key: string): T | null {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
+      if (item && item !== 'undefined') {
+        return JSON.parse(item);
+      }
+      return null;
     } catch (error) {
       console.error('Error reading from localStorage:', error);
       return null;

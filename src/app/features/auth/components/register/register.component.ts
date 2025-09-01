@@ -9,9 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../core/services';
 import { RegisterRequest } from '../../../../core/models';
+import { PhoneValidatorUtil } from '../../../../shared/utils';
 
 @Component({
   selector: 'app-register',
@@ -24,8 +24,7 @@ import { RegisterRequest } from '../../../../core/models';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule,
-    MatSelectModule
+    MatProgressSpinnerModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
@@ -38,11 +37,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   error: string | null = null;
   private destroy$ = new Subject<void>();
 
-  favoriteTeams = [
-    'Real Madrid', 'FC Barcelona', 'Atlético Madrid', 'Valencia CF',
-    'Sevilla FC', 'Real Betis', 'Athletic Bilbao', 'Real Sociedad',
-    'Villarreal CF', 'Celta de Vigo', 'Otro'
-  ];
 
   constructor(
     private fb: FormBuilder,
@@ -67,7 +61,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
-      favoriteTeam: ['']
+      phoneNumber: ['', [Validators.required, PhoneValidatorUtil.ecuadorianPhoneValidator()]]
     }, {
       validators: this.passwordMatchValidator
     });
@@ -76,7 +70,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private passwordMatchValidator(control: AbstractControl): {[key: string]: any} | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { 'passwordMismatch': true };
     }
@@ -89,7 +83,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .subscribe(state => {
         this.loading = state.loading;
         this.error = state.error;
-        
+
         if (state.isAuthenticated) {
           this.router.navigate(['/dashboard']);
         }
@@ -100,7 +94,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     if (this.registerForm.valid) {
       const registerData: RegisterRequest = this.registerForm.value;
       this.authService.register(registerData).subscribe({
-        error: (error) => {
+        error: (error: any) => {
           console.error('Register error:', error);
         }
       });
@@ -118,24 +112,28 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   getErrorMessage(fieldName: string): string {
     const control = this.registerForm.get(fieldName);
-    
+
     if (control?.hasError('required')) {
       return `${this.getFieldDisplayName(fieldName)} es requerido`;
     }
-    
+
     if (control?.hasError('email')) {
       return 'Email inválido';
     }
-    
+
     if (control?.hasError('minlength')) {
       const minLength = control.errors?.['minlength'].requiredLength;
       return `${this.getFieldDisplayName(fieldName)} debe tener al menos ${minLength} caracteres`;
     }
-    
+
     if (fieldName === 'confirmPassword' && this.registerForm.hasError('passwordMismatch')) {
       return 'Las contraseñas no coinciden';
     }
-    
+
+    if (fieldName === 'phoneNumber' && control?.hasError('ecuadorianPhone')) {
+      return PhoneValidatorUtil.getPhoneErrorMessage(control);
+    }
+
     return '';
   }
 
@@ -145,9 +143,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
       'lastName': 'Apellido',
       'email': 'Email',
       'password': 'Contraseña',
-      'confirmPassword': 'Confirmar contraseña'
+      'confirmPassword': 'Confirmar contraseña',
+      'phoneNumber': 'Teléfono'
     };
     return displayNames[fieldName] || fieldName;
+  }
+
+  // Método para permitir solo números en el campo de teléfono
+  onPhoneKeyPress(event: KeyboardEvent): boolean {
+    return PhoneValidatorUtil.allowOnlyNumbers(event);
+  }
+
+  // Método para formatear el teléfono mientras se escribe
+  onPhoneInput(event: any): void {
+    const input = event.target;
+    const formatted = PhoneValidatorUtil.formatEcuadorianPhone(input.value);
+    this.registerForm.patchValue({ phoneNumber: formatted });
   }
 
   navigateToLogin(): void {

@@ -89,15 +89,21 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Favorite Team -->
+        <!-- Phone Number -->
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Equipo Favorito (Opcional)</mat-label>
-          <mat-select formControlName="favoriteTeam">
-            <mat-option *ngFor="let team of favoriteTeams" [value]="team">
-              {{ team }}
-            </mat-option>
-          </mat-select>
-          <mat-icon matSuffix>sports_soccer</mat-icon>
+          <mat-label>Teléfono</mat-label>
+          <input matInput 
+                 type="tel" 
+                 formControlName="phoneNumber"
+                 placeholder="0987654321"
+                 maxlength="12"
+                 (keypress)="onPhoneKeyPress($event)"
+                 (input)="onPhoneInput($event)">
+          <mat-icon matSuffix>phone</mat-icon>
+          <mat-hint>Formato: 09XXXXXXXX (10 dígitos)</mat-hint>
+          <mat-error *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched">
+            {{ getErrorMessage('phoneNumber') }}
+          </mat-error>
         </mat-form-field>
 
         <!-- Submit Button -->

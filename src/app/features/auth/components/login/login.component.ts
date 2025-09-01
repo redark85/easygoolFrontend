@@ -34,7 +34,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   hidePassword = true;
   loading = false;
-  error: string | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -55,9 +54,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
+      userName: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -66,7 +64,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.loading = state.loading;
-        this.error = state.error;
         
         if (state.isAuthenticated) {
           this.router.navigate(['/dashboard']);
@@ -75,16 +72,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      const loginData: LoginRequest = this.loginForm.value;
-      this.authService.login(loginData).subscribe({
-        error: (error) => {
-          console.error('Login error:', error);
-        }
-      });
-    } else {
+    if (this.loginForm.invalid) {
       this.markFormGroupTouched();
+      return;
     }
+
+    const loginData: LoginRequest = this.loginForm.value;
+    this.authService.login(loginData).subscribe();
   }
 
   private markFormGroupTouched(): void {
@@ -98,15 +92,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     const control = this.loginForm.get(fieldName);
     
     if (control?.hasError('required')) {
-      return `${fieldName} es requerido`;
-    }
-    
-    if (control?.hasError('email')) {
-      return 'Email inválido';
+      return fieldName === 'userName' ? 'Usuario es requerido' : 'Contraseña es requerida';
     }
     
     if (control?.hasError('minlength')) {
-      return `${fieldName} debe tener al menos 6 caracteres`;
+      return 'La contraseña debe tener al menos 6 caracteres';
     }
     
     return '';

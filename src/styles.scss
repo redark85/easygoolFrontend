@@ -6,6 +6,9 @@
 // Angular Material CSS
 @use '@angular/material/prebuilt-themes/indigo-pink.css';
 
+// Custom Partials - Estilos reutilizables para componentes
+@use 'app/shared/styles/components';
+
 // Colores basados en el logo de EasyGool + Temática Futbolística
 :root {
   // Colores base del logo (mantener)
@@ -68,10 +71,6 @@
   --transition-normal: 0.3s ease-in-out;
   --transition-slow: 0.5s ease-in-out;
 }
-
-// Material Icons
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
 
 // Global styles con colores del logo
 html, body {

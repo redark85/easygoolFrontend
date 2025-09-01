@@ -1,8 +1,7 @@
 // Auth interfaces siguiendo principios SOLID - SRP
 export interface LoginRequest {
-  email: string;
+  userName: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface RegisterRequest {
@@ -11,14 +10,12 @@ export interface RegisterRequest {
   confirmPassword: string;
   firstName: string;
   lastName: string;
-  favoriteTeam?: string;
+  phoneNumber: string;
 }
 
 export interface AuthResponse {
-  user: User;
-  token: string;
-  refreshToken?: string;
-  expiresIn: number;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface TokenPayload {

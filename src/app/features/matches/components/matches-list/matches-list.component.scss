@@ -1,3 +1,5 @@
+@use '../../../../shared/styles/components' as *;
+
 // Variables
 :host {
   --match-card-height: 180px;
@@ -189,17 +191,10 @@
 
 // Match Card Styles
 .match-card {
+  @include c-card;
   position: relative;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  border-radius: var(--border-radius-md);
-  overflow: hidden;
   min-height: var(--match-card-height);
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-  }
   
   &.live-match {
     border: 2px solid var(--accent-color);
@@ -436,22 +431,6 @@
   p {
     margin: 0;
     font-size: 1rem;
-  }
-}
-
-// Animations
-@keyframes pulse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 

@@ -88,6 +88,24 @@
       }
 
       .auth-button {
+        // Contenedor para el spinner y el texto
+        .button-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px; // Espacio entre el spinner y el texto
+        }
+      }
+
+      // Se utiliza ::ng-deep para anular los estilos encapsulados de Angular Material
+      // y asegurar que el contenido del botón se muestre en una fila.
+      :host ::ng-deep .auth-button .mat-mdc-button-persistent-ripple {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .auth-button {
         background-color: #1976d2 !important;
         color: white !important;
         font-weight: 600;

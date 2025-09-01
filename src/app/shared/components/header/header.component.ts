@@ -10,7 +10,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -41,7 +41,7 @@ export class HeaderComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.currentUser$ = this.authService.getCurrentUser();
+    this.currentUser$ = this.authService.authState$.pipe(map(state => state.user));
   }
 
   ngOnInit(): void {}

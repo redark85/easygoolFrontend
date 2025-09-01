@@ -7,36 +7,31 @@
         <img src="assets/logo.png" alt="EasyGool Logo" class="logo">
       </div>
 
-      <!-- Error Message -->
-      <div *ngIf="error" class="error-message">
-        <mat-icon>error</mat-icon>
-        <span>{{ error }}</span>
-      </div>
 
       <!-- Login Form -->
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-        <!-- Email Field -->
+        <!-- Username Field -->
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email o usuario</mat-label>
-          <input matInput 
-                 type="email" 
-                 formControlName="email"
-                 placeholder="Ingresa tu email">
-          <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-            {{ getErrorMessage('email') }}
+          <mat-label>Usuario</mat-label>
+          <input matInput
+                 type="text"
+                 formControlName="userName"
+                 placeholder="Ingresa tu usuario">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched">
+            {{ getErrorMessage('userName') }}
           </mat-error>
         </mat-form-field>
 
         <!-- Password Field -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Contraseña</mat-label>
-          <input matInput 
+          <input matInput
                  [type]="hidePassword ? 'password' : 'text'"
                  formControlName="password"
                  placeholder="Ingresa tu contraseña">
-          <button mat-icon-button 
-                  matSuffix 
+          <button mat-icon-button
+                  matSuffix
                   type="button"
                   (click)="hidePassword = !hidePassword"
                   [attr.aria-label]="'Hide password'"
@@ -56,25 +51,27 @@
         </div>
 
         <!-- Submit Button -->
-        <button mat-raised-button 
+        <button mat-raised-button
                 type="submit"
                 class="auth-button full-width"
                 [disabled]="loading || loginForm.invalid">
-          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-          <span *ngIf="!loading">Iniciar Sesión</span>
-          <span *ngIf="loading">Iniciando sesión...</span>
+          <div class="button-content">
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+            <span *ngIf="!loading">Iniciar Sesión</span>
+            <span *ngIf="loading">Iniciando sesión...</span>
+          </div>
         </button>
 
         <!-- Register Link -->
-        <div class="register-link">
-          <span>¿Nuevo en EasyGool? </span>
-          <button mat-button 
-                  type="button"
-                  class="link-button"
-                  (click)="navigateToRegister()">
-            ¡Regístrate!
-          </button>
-        </div>
+<!--        <div class="register-link">-->
+<!--          <span>¿Nuevo en EasyGool? </span>-->
+<!--          <button mat-button -->
+<!--                  type="button"-->
+<!--                  class="link-button"-->
+<!--                  (click)="navigateToRegister()">-->
+<!--            ¡Regístrate!-->
+<!--          </button>-->
+<!--        </div>-->
       </form>
     </mat-card>
   </div>

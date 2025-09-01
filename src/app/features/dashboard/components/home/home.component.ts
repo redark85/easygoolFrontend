@@ -11,7 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../core/models';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -131,7 +131,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ];
 
   constructor(private authService: AuthService) {
-    this.currentUser$ = this.authService.getCurrentUser();
+    this.currentUser$ = this.authService.authState$.pipe(map(state => state.user));
   }
 
   ngOnInit(): void {
