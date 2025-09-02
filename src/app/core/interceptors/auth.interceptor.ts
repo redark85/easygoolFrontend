@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { StorageService } from '../services/storage.service';
+import { StorageService } from '@core/services';
 import { ToastService } from '../services/toast.service';
 import { AppConstants } from '../constants';
 
@@ -26,10 +26,10 @@ export class AuthInterceptor implements HttpInterceptor {
         headers: req.headers.set('Authorization', `Bearer ${token}`)
       });
     } else {
-      console.log('❌ No token or not API request:', { 
-        hasToken: !!token, 
-        isApi: this.isApiRequest(req.url), 
-        url: req.url 
+      console.log('❌ No token or not API request:', {
+        hasToken: !!token,
+        isApi: this.isApiRequest(req.url),
+        url: req.url
       });
     }
 

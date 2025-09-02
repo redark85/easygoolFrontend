@@ -9,8 +9,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { AuthService } from '../../../../core/services/auth.service';
-import { User } from '../../../../core/models';
+import { AuthService } from '@core/services';
+import { User } from '@core/models';
 import { Observable, map } from 'rxjs';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
@@ -60,11 +60,11 @@ interface MatchData {
 export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('matchesChart') matchesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('goalscorersChart') goalscorersChartRef!: ElementRef<HTMLCanvasElement>;
-  
+
   currentUser$: Observable<User | null>;
   startDateControl = new FormControl();
   endDateControl = new FormControl();
-  
+
   private matchesChart?: Chart;
   private goalscorersChart?: Chart;
 
@@ -139,7 +139,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
-    
+
     this.startDateControl.setValue(startDate);
     this.endDateControl.setValue(endDate);
   }
@@ -236,7 +236,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   applyDateFilter(): void {
     // Simulate filtering data based on date range
     console.log('Filtering from:', this.startDateControl.value, 'to:', this.endDateControl.value);
-    
+
     // Update charts with filtered data
     this.updateChartsWithFilteredData();
   }

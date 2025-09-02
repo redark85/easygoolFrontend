@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable, throwError, from } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import axios, { AxiosResponse, AxiosError } from 'axios';
-import { AppConstants } from '../constants';
-import { environment } from '../../../environments/environment';
-import { ToastService } from './toast.service';
-import { StorageService } from './storage.service';
+import {Injectable} from '@angular/core';
+import {from, Observable, throwError} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import axios, {AxiosError, AxiosResponse} from 'axios';
+import {AppConstants} from '../constants';
+import {environment} from '@env/environment';
+import {ToastService} from './toast.service';
+import {StorageService} from './storage.service';
 
 // Servicio base para APIs siguiendo principios SOLID - SRP
 @Injectable({
@@ -32,10 +32,10 @@ export class ApiService {
           console.log('🔑 Adding Bearer token to Axios request:', config.url);
           config.headers.Authorization = `Bearer ${token}`;
         } else {
-          console.log('❌ No token or not API request:', { 
-            hasToken: !!token, 
-            isApi: this.isApiRequest(config.url || ''), 
-            url: config.url 
+          console.log('❌ No token or not API request:', {
+            hasToken: !!token,
+            isApi: this.isApiRequest(config.url || ''),
+            url: config.url
           });
         }
         return config;
@@ -59,13 +59,11 @@ export class ApiService {
    * Verifica si la URL es una petición a nuestra API
    */
   private isApiRequest(url: string): boolean {
-    const isApi = url.includes('/api/') || url.includes('easygoolapis.somee.com');
-    return isApi;
+    return url.includes('/api/') || url.includes('easygoolapis.somee.com');
   }
 
   /**
    * Realiza petición GET
-   * @param endpoint - Endpoint relativo
    * @returns Observable con la respuesta
    */
   private getApiBaseUrl(): string {

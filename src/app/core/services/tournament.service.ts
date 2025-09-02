@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
-import { CreateTournamentRequest, Tournament, TournamentApiResponse } from '../../features/tournaments/models/tournament.interface';
+import { CreateTournamentRequest, Tournament, TournamentApiResponse } from '@features/tournaments/models/tournament.interface';
 import { ApiResponse } from '../models/api.interface';
 import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT } from '../config/endpoints';
 

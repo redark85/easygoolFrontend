@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 type ToastType = 'error' | 'success' | 'info' | 'warning';
 
@@ -41,7 +41,7 @@ export class ToastService {
         actionCallback();
         this.removeToast(toast);
       };
-      this.styleActionButton(actionButton, type);
+      this.styleActionButton(actionButton);
       toast.appendChild(actionButton);
     }
 
@@ -68,7 +68,7 @@ export class ToastService {
   }
 
   private styleToast(toast: HTMLElement, type: ToastType): void {
-    const styles = `
+    toast.style.cssText = `
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -90,11 +90,10 @@ export class ToastService {
       cursor: pointer;
       ${this.getTypeStyles(type)}
     `;
-    toast.style.cssText = styles;
   }
 
-  private styleActionButton(button: HTMLButtonElement, type: ToastType): void {
-    const styles = `
+  private styleActionButton(button: HTMLButtonElement): void {
+    button.style.cssText = `
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.5);
       color: white;
@@ -106,7 +105,6 @@ export class ToastService {
       outline: none;
       transition: background 0.2s ease;
     `;
-    button.style.cssText = styles;
     button.onmouseover = () => button.style.background = 'rgba(255, 255, 255, 0.3)';
     button.onmouseout = () => button.style.background = 'rgba(255, 255, 255, 0.2)';
   }

@@ -13,8 +13,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
-import { Match, MatchGroup, MatchStatus, MatchPeriod } from '../../../../core/models/match.model';
-import { MatchService } from '../../../../core/services/match.service';
+import { Match, MatchGroup, MatchStatus, MatchPeriod } from '@core/models/match.model';
+import { MatchService } from '@core/services';
 
 @Component({
   selector: 'app-matches-list',
@@ -47,7 +47,7 @@ export class MatchesListComponent implements OnInit, OnDestroy {
   filteredMatchGroups: MatchGroup[] = [];
   isLoading = false;
   searchControl = new FormControl('');
-  
+
   // Expose enums to template
   MatchStatus = MatchStatus;
   MatchPeriod = MatchPeriod;

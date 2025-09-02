@@ -4,8 +4,8 @@ import { RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Subject, takeUntil } from 'rxjs';
-import { SidebarComponent } from '../../../../shared/components/sidebar/sidebar.component';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
+import { SidebarComponent } from '@shared/components/sidebar/sidebar.component';
+import { HeaderComponent } from '@shared/components/header/header.component';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -44,7 +44,7 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(result => {
         this.isMobile = result.matches;
-        
+
         if (this.isMobile) {
           this.sidenavOpened = false;
           this.sidebarCollapsed = false;

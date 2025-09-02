@@ -8,8 +8,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
-import { AuthService } from '../../../core/services/auth.service';
-import { User } from '../../../core/models';
+import { AuthService } from '@core/services';
+import { User } from '@core/models';
 import { Observable, map } from 'rxjs';
 
 @Component({

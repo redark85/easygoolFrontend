@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, Router, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '@core/services';
 
 // Auth guard siguiendo SRP - Solo protección de rutas
 @Injectable({

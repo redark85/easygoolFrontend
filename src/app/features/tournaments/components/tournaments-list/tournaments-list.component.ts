@@ -14,7 +14,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Tournament, TournamentStatus } from '../../models/tournament.interface';
-import { TournamentService } from '../../../../core/services/tournament.service';
+import { TournamentService } from '@core/services';
 import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
 
 @Component({
@@ -43,7 +43,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   filteredTournaments: Tournament[] = [];
   isLoading = false;
   searchControl = new FormControl('');
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(

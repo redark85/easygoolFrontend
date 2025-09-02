@@ -10,8 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../../../../core/services/auth.service';
-import { LoginRequest } from '../../../../core/models';
+import { AuthService } from '@core/services';
+import { LoginRequest } from '@core/models';
 
 @Component({
   selector: 'app-login',
@@ -64,7 +64,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.loading = state.loading;
-        
+
         if (state.isAuthenticated) {
           this.router.navigate(['/dashboard']);
         }
@@ -90,15 +90,15 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   getErrorMessage(fieldName: string): string {
     const control = this.loginForm.get(fieldName);
-    
+
     if (control?.hasError('required')) {
       return fieldName === 'userName' ? 'Usuario es requerido' : 'Contraseña es requerida';
     }
-    
+
     if (control?.hasError('minlength')) {
       return 'La contraseña debe tener al menos 6 caracteres';
     }
-    
+
     return '';
   }
 

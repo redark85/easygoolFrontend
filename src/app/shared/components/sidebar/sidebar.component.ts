@@ -6,8 +6,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AuthService } from '../../../core/services/auth.service';
-import { User } from '../../../core/models';
+import { AuthService } from '@core/services';
+import { User } from '@core/models';
 import { Observable, map } from 'rxjs';
 
 interface MenuItem {
@@ -101,7 +101,7 @@ export class SidebarComponent implements OnInit {
 
   onMenuItemClick(item: MenuItem): void {
     this.router.navigate([item.route]);
-    
+
     // Cerrar sidebar en móvil después de navegar
     if (this.isMobile) {
       this.closeSidebar.emit();
