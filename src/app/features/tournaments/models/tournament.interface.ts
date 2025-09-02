@@ -15,10 +15,10 @@ export enum TournamentModality {
  * Enum para estado del torneo
  */
 export enum TournamentStatus {
-  Draft = 0,
-  Active = 1,
+  Active = 0,
+  Comming = 1,
   Completed = 2,
-  Cancelled = 3
+  Cancelled = 3 //eliminado puede ser
 }
 
 /**
