@@ -68,9 +68,13 @@ export class SidebarComponent implements OnInit {
     },
     {
       icon: 'emoji_events',
+      label: 'Ligas',
+      route: './leagues'
+    },
+    {
+      icon: 'military_tech',
       label: 'Torneos',
-      route: '/dashboard/tournaments',
-      tooltip: 'Gestión de torneos'
+      route: './tournaments'
     },
     {
       icon: 'analytics',

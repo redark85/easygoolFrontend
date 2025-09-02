@@ -274,6 +274,17 @@
 
     .more-actions-btn {
       color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+
+      mat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
       &:hover {
         color: var(--primary-color);
@@ -303,6 +314,18 @@
 
   mat-icon {
     color: #f44336 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+::ng-deep .mat-mdc-menu-item {
+  mat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
   }
 }
 

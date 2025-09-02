@@ -51,7 +51,7 @@
           <!-- Tournament Image -->
           <div class="card-image-container">
             <img mat-card-image 
-                 [src]="tournament.image" 
+                 [src]="tournament.imageUrl" 
                  [alt]="tournament.name"
                  class="tournament-image"
                  loading="lazy">
@@ -68,22 +68,21 @@
           <mat-card-content class="tournament-content">
             <div class="tournament-info">
               <h3 class="tournament-name">{{ tournament.name }}</h3>
-              <p class="tournament-season">{{ tournament.season }}</p>
               <p class="tournament-description">{{ tournament.description }}</p>
               
               <!-- Tournament Details -->
               <div class="tournament-details">
                 <div class="detail-item">
                   <mat-icon class="detail-icon">groups</mat-icon>
-                  <span>{{ tournament.teamsCount }} equipos</span>
+                  <span>{{ tournament.totalTeams }} equipos</span>
                 </div>
                 <div class="detail-item">
                   <mat-icon class="detail-icon">sports_soccer</mat-icon>
-                  <span>{{ tournament.matchesCount }} partidos</span>
+                  <span>{{ tournament.totalMatches }} partidos</span>
                 </div>
                 <div class="detail-item">
-                  <mat-icon class="detail-icon">location_on</mat-icon>
-                  <span>{{ tournament.location }}</span>
+                  <mat-icon class="detail-icon">person</mat-icon>
+                  <span>{{ tournament.manager.managerName }}</span>
                 </div>
               </div>
 

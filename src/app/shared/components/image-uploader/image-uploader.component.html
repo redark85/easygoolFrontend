@@ -1,0 +1,62 @@
+<div class="upload-container"
+     [class.dragging]="isDragging"
+     [class.disabled]="isDisabled"
+     [class.has-image]="previewUrl">
+
+  <ng-container *ngIf="!previewUrl; else imagePreview">
+    <div class="drop-zone">
+      <input type="file" #fileInput (change)="onFileSelected($event)"
+             accept="image/jpeg,image/png,image/gif,image/webp"
+             [disabled]="isDisabled" hidden>
+
+      <div class="upload-content">
+        <div class="upload-icon-container">
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+        </div>
+
+        <div class="upload-text">
+          <h4 class="upload-title">Subir imagen del torneo</h4>
+          <p class="upload-description">
+            Arrastra y suelta una imagen aquí o
+            <button type="button" class="upload-link" (click)="fileInput.click()" [disabled]="isDisabled">
+              Selecciona un archivo
+            </button>
+          </p>
+          <div class="upload-specs">
+            <span class="spec-item">
+              <mat-icon class="spec-icon">photo_size_select_actual</mat-icon>
+              JPG, PNG, GIF, WebP
+            </span>
+            <span class="spec-item">
+              <mat-icon class="spec-icon">storage</mat-icon>
+              Máximo {{ maxFileSizeMB }}MB
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #imagePreview>
+    <div class="preview-container">
+      <div class="preview-image-wrapper">
+        <img [src]="previewUrl" alt="Previsualización de imagen" class="preview-image">
+        <div class="preview-overlay">
+          <button mat-icon-button class="change-btn" (click)="fileInput.click()"
+                  [disabled]="isDisabled"
+                  matTooltip="Cambiar imagen">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="remove-btn" (click)="removeImage()"
+                  [disabled]="isDisabled"
+                  matTooltip="Eliminar imagen">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+      <input type="file" #fileInput (change)="onFileSelected($event)"
+             accept="image/jpeg,image/png,image/gif,image/webp"
+             [disabled]="isDisabled" hidden>
+    </div>
+  </ng-template>
+</div>

@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
+import { TournamentsListComponent } from './components/tournaments-list/tournaments-list.component';
 
-export const TOURNAMENTS_ROUTES: Routes = [
+export const tournamentsRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./components/tournaments-list/tournaments-list.component').then(m => m.TournamentsListComponent),
+    component: TournamentsListComponent,
     title: 'Torneos - EasyGool'
   }
 ];

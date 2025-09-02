@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,9 +11,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
-import { Tournament, TournamentStatus, TournamentFilters } from '../../../../core/models/tournament.model';
-import { TournamentService } from '../../../../core/services/tournament.service';
+import { Tournament, TournamentStatus } from '../../models/tournament.interface';
+import { TournamentService } from '../../services/tournament.service';
+import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
 
 @Component({
   selector: 'app-tournaments-list',
@@ -45,12 +46,9 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   
   private destroy$ = new Subject<void>();
 
-  // Enum para usar en template
-  TournamentStatus = TournamentStatus;
-
   constructor(
     private tournamentService: TournamentService,
-    private router: Router,
+    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -65,27 +63,19 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga todos los torneos
+   * Carga todos los torneos (mock data por ahora)
    */
   private loadTournaments(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    this.tournamentService.getAllTournaments()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (tournaments) => {
-          this.tournaments = tournaments;
-          this.filteredTournaments = tournaments;
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error loading tournaments:', error);
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        }
-      });
+    // Mock data temporal hasta implementar getAllTournaments
+    setTimeout(() => {
+      this.tournaments = [];
+      this.filteredTournaments = [];
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }, 1000);
   }
 
   /**
@@ -107,39 +97,58 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   /**
    * Filtra torneos por término de búsqueda
    */
-  private filterTournaments(searchTerm: string): void {
-    if (!searchTerm.trim()) {
-      this.filteredTournaments = this.tournaments;
-    } else {
-      const query = searchTerm.toLowerCase();
-      this.filteredTournaments = this.tournaments.filter(tournament =>
-        tournament.name.toLowerCase().includes(query) ||
-        tournament.description.toLowerCase().includes(query) ||
-        tournament.season.toLowerCase().includes(query)
-      );
-    }
+  private filterTournaments(query: string = ''): void {
+    const searchTerm = query.toLowerCase();
+    this.filteredTournaments = this.tournaments.filter(tournament =>
+      tournament.name.toLowerCase().includes(searchTerm) ||
+      tournament.description.toLowerCase().includes(searchTerm) ||
+      tournament.manager.managerName.toLowerCase().includes(searchTerm)
+    );
     this.cdr.detectChanges();
   }
 
   /**
-   * Navega a los detalles del torneo
+   * Abre modal para ver detalles del torneo
    */
   viewTournamentDetails(tournament: Tournament): void {
-    this.router.navigate(['/dashboard/tournaments', tournament.id]);
+    // TODO: Implementar modal de detalles del torneo
+    console.log('Ver detalles del torneo:', tournament.name);
   }
 
   /**
-   * Navega a crear nuevo torneo
+   * Abre modal para crear nuevo torneo
    */
   createTournament(): void {
-    this.router.navigate(['/dashboard/tournaments/create']);
+    const dialogRef = this.dialog.open(TournamentFormComponent, {
+      width: '800px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: { mode: 'create' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadTournaments(); // Recargar lista después de crear
+      }
+    });
   }
 
   /**
    * Edita un torneo existente
    */
   editTournament(tournament: Tournament): void {
-    this.router.navigate(['/dashboard/tournaments/edit', tournament.id]);
+    const dialogRef = this.dialog.open(TournamentFormComponent, {
+      width: '800px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: { mode: 'edit', tournament }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadTournaments(); // Recargar lista después de editar
+      }
+    });
   }
 
   /**
@@ -162,7 +171,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    * TrackBy function para optimizar el rendering
    */
   trackByTournamentId(index: number, tournament: Tournament): string {
-    return tournament.id;
+    return tournament.tournamentLink; // Usar tournamentLink como ID único
   }
 
   /**
@@ -170,13 +179,13 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    */
   getStatusClass(status: TournamentStatus): string {
     switch (status) {
-      case TournamentStatus.ACTIVE:
+      case TournamentStatus.Active:
         return 'status-active';
-      case TournamentStatus.FINISHED:
+      case TournamentStatus.Completed:
         return 'status-finished';
-      case TournamentStatus.UPCOMING:
+      case TournamentStatus.Draft:
         return 'status-upcoming';
-      case TournamentStatus.CANCELLED:
+      case TournamentStatus.Cancelled:
         return 'status-cancelled';
       default:
         return '';
@@ -188,13 +197,13 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    */
   getStatusText(status: TournamentStatus): string {
     switch (status) {
-      case TournamentStatus.ACTIVE:
+      case TournamentStatus.Active:
         return 'Activo';
-      case TournamentStatus.FINISHED:
+      case TournamentStatus.Completed:
         return 'Finalizado';
-      case TournamentStatus.UPCOMING:
-        return 'Próximo';
-      case TournamentStatus.CANCELLED:
+      case TournamentStatus.Draft:
+        return 'Borrador';
+      case TournamentStatus.Cancelled:
         return 'Cancelado';
       default:
         return 'Desconocido';
@@ -204,8 +213,8 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   /**
    * Formatea la fecha para mostrar
    */
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('es-ES', {
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

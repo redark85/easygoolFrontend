@@ -12,7 +12,13 @@ export const dashboardRoutes: Routes = [
       },
       {
         path: 'home',
-        loadComponent: () => import('./components/home/home.component').then(c => c.HomeComponent)
+        loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
+        title: 'Dashboard - EasyGool'
+      },
+      {
+        path: 'tournaments',
+        loadChildren: () => import('../tournaments/tournaments.routes').then(r => r.tournamentsRoutes),
+        title: 'Torneos - EasyGool'
       },
       {
         path: 'matches',
@@ -25,10 +31,6 @@ export const dashboardRoutes: Routes = [
       {
         path: 'players',
         loadComponent: () => import('./components/home/home.component').then(c => c.HomeComponent) // Placeholder
-      },
-      {
-        path: 'tournaments',
-        loadChildren: () => import('../tournaments/tournaments.routes').then(r => r.TOURNAMENTS_ROUTES)
       },
       {
         path: 'stats',

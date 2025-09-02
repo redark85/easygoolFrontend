@@ -18,7 +18,14 @@ export const routes: Routes = [
   // Dashboard routes (lazy loaded, protected)
   {
     path: 'dashboard',
-    loadChildren: () => import('./features/dashboard/dashboard.routes').then(r => r.dashboardRoutes),
+    loadChildren: () => import('./features/dashboard/dashboard.routes').then(m => m.dashboardRoutes),
+    canActivate: [AuthGuard]
+  },
+  
+  // Tournaments routes (lazy loaded, protected)
+  {
+    path: 'tournaments',
+    loadChildren: () => import('./features/tournaments/tournaments.routes').then(r => r.tournamentsRoutes),
     canActivate: [AuthGuard]
   },
   

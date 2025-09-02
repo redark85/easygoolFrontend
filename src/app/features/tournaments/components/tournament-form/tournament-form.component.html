@@ -1,0 +1,85 @@
+<div class="tournament-form-container">
+  <h2 mat-dialog-title>{{ dialogTitle }}</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="tournamentForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-grid">
+        <!-- Image Uploader -->
+        <div class="form-field-full">
+          <label class="image-label">Imagen del Torneo *</label>
+          <app-image-uploader (imageUploaded)="onImageUploaded($event)"></app-image-uploader>
+          <div class="error-message" *ngIf="!uploadedImage && tournamentForm.touched">
+            La imagen del torneo es obligatoria (máximo 1MB).
+          </div>
+        </div>
+
+        <!-- Tournament Name -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre del Torneo</mat-label>
+          <input matInput formControlName="name" placeholder="Ej: Copa Verano 2025">
+          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+        </mat-form-field>
+
+        <!-- Modality -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Modalidad</mat-label>
+          <mat-select formControlName="modality">
+            <mat-option *ngFor="let option of modalityOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error>{{ getErrorMessage('modality') }}</mat-error>
+        </mat-form-field>
+
+        <!-- Start Date -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput [matDatepicker]="startDatePicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startDatePicker></mat-datepicker>
+          <mat-error>{{ getErrorMessage('startDate') }}</mat-error>
+        </mat-form-field>
+
+        <!-- End Date -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Fecha de Fin</mat-label>
+          <input matInput [matDatepicker]="endDatePicker" formControlName="endDate">
+          <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endDatePicker></mat-datepicker>
+          <mat-error>{{ getErrorMessage('endDate') }}</mat-error>
+        </mat-form-field>
+
+        <!-- Description -->
+        <div class="form-field-full">
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción del Torneo</mat-label>
+            <textarea matInput formControlName="description" rows="4" 
+                      placeholder="Describe las reglas, premios, etc."></textarea>
+            <mat-error>{{ getErrorMessage('description') }}</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Form Level Errors -->
+      <div class="form-level-error" *ngIf="tournamentForm.hasError('dateRange')">
+        <mat-icon>error</mat-icon>
+        <span>La fecha de fin debe ser posterior a la fecha de inicio</span>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button (click)="onCancel()" [disabled]="isSubmitting">
+      Cancelar
+    </button>
+    <button mat-flat-button color="primary" (click)="onSubmit()" 
+            [disabled]="!isFormValid || isSubmitting">
+      <span *ngIf="!isSubmitting">{{ submitButtonText }}</span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Procesando...</span>
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>
