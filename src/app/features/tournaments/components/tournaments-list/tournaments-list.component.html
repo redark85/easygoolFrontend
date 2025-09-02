@@ -51,10 +51,11 @@
           <!-- Tournament Image -->
           <div class="card-image-container">
             <img mat-card-image 
-                 [src]="tournament.imageUrl" 
+                 [src]="tournament.imageUrl || 'assets/logo.png'" 
                  [alt]="tournament.name"
                  class="tournament-image"
-                 loading="lazy">
+                 loading="lazy"
+                 (error)="$event.target.src='assets/logo.png'">
             
             <!-- Status Chip -->
             <mat-chip-set class="status-chip-container">
@@ -79,10 +80,6 @@
                 <div class="detail-item">
                   <mat-icon class="detail-icon">sports_soccer</mat-icon>
                   <span>{{ tournament.totalMatches }} partidos</span>
-                </div>
-                <div class="detail-item">
-                  <mat-icon class="detail-icon">person</mat-icon>
-                  <span>{{ tournament.manager.managerName }}</span>
                 </div>
               </div>
 

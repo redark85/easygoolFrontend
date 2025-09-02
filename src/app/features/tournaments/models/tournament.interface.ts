@@ -47,17 +47,26 @@ export interface TournamentManager {
  * Interface para datos del torneo retornados por la API
  */
 export interface Tournament {
+  id: number;
   name: string;
   description: string;
   startDate: string; // ISO 8601 format
-  endDate: string;   // ISO 8601 format
-  imageUrl: string;
+  endDate?: string | null;
   status: TournamentStatus;
   totalTeams: number;
   totalMatches: number;
-  manager: TournamentManager;
-  tournamentLink: string;
-  hasPenaltyMode: boolean;
-  allowTeamRegistration: boolean;
+  imageUrl?: string | null;
   modality: TournamentModality;
+}
+
+/**
+ * Interface para response de la API de torneos
+ */
+export interface TournamentApiResponse {
+  records: number;
+  result: Tournament[];
+  succeed: boolean;
+  message: string | null;
+  messageId: string | null;
+  messageType: string | null;
 }

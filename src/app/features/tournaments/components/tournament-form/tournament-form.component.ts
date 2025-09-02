@@ -90,7 +90,7 @@ export class TournamentFormComponent implements OnInit {
       name: tournament.name,
       description: tournament.description,
       startDate: new Date(tournament.startDate),
-      endDate: new Date(tournament.endDate),
+      endDate: tournament.endDate ? new Date(tournament.endDate) : null,
       modality: tournament.modality
     });
     

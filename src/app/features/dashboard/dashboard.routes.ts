@@ -7,7 +7,7 @@ export const dashboardRoutes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'tournaments',
         pathMatch: 'full'
       },
       {

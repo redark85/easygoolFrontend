@@ -7,9 +7,9 @@
         <h3>EasyGool</h3>
       </div>
     </div>
-    
+
     <!-- Toggle Button -->
-    <button mat-icon-button 
+    <button mat-icon-button
             class="toggle-btn"
             (click)="onToggleSidebar()"
             *ngIf="!isMobile"
@@ -26,7 +26,7 @@
       <div class="menu-section" *ngIf="!isCollapsed">
         <span class="section-title">Dashboard</span>
       </div>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/home"
         routerLinkActive="active"
@@ -40,7 +40,7 @@
       <div class="menu-section" *ngIf="!isCollapsed">
         <span class="section-title">Administrar Torneos</span>
       </div>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/tournaments"
         routerLinkActive="active"
@@ -49,7 +49,7 @@
         <mat-icon matListItemIcon class="nav-icon">emoji_events</mat-icon>
         <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Torneos</span>
       </mat-list-item>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/matches"
         routerLinkActive="active"
@@ -58,7 +58,7 @@
         <mat-icon matListItemIcon class="nav-icon">sports_soccer</mat-icon>
         <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Partidos</span>
       </mat-list-item>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/stats"
         routerLinkActive="active"
@@ -72,7 +72,7 @@
       <div class="menu-section" *ngIf="!isCollapsed">
         <span class="section-title">Administrar Equipos</span>
       </div>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/teams"
         routerLinkActive="active"
@@ -81,7 +81,7 @@
         <mat-icon matListItemIcon class="nav-icon">groups</mat-icon>
         <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Equipos</span>
       </mat-list-item>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/players"
         routerLinkActive="active"
@@ -90,7 +90,7 @@
         <mat-icon matListItemIcon class="nav-icon">person</mat-icon>
         <span matListItemTitle *ngIf="!isCollapsed" class="nav-label">Jugadores</span>
       </mat-list-item>
-      <mat-list-item 
+      <mat-list-item
         class="nav-item"
         routerLink="/dashboard/settings"
         routerLinkActive="active"
@@ -110,12 +110,11 @@
       </div>
       <div class="user-details">
         <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
-        <span class="user-role">{{ user.role | titlecase }}</span>
       </div>
     </div>
-    
+
     <!-- Logout Button -->
-    <button mat-icon-button 
+    <button mat-icon-button
             class="logout-btn"
             (click)="logout()"
             [matTooltip]="isCollapsed ? 'Cerrar sesión' : ''"

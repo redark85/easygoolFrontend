@@ -21,8 +21,15 @@ export class AuthInterceptor implements HttpInterceptor {
     // Solo agregar token si existe y la request es a nuestra API
     let authReq = req;
     if (token && this.isApiRequest(req.url)) {
+      console.log('🔑 Adding Bearer token to request:', req.url);
       authReq = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${token}`)
+      });
+    } else {
+      console.log('❌ No token or not API request:', { 
+        hasToken: !!token, 
+        isApi: this.isApiRequest(req.url), 
+        url: req.url 
       });
     }
 
@@ -37,9 +44,10 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   private isApiRequest(url: string): boolean {
-    const apiBaseUrl = (import.meta as any).env.VITE_API_BASE_URL;
-    // Verificar si la URL es de nuestra API
-    return url.startsWith(apiBaseUrl);
+    // Verificar si la URL es de nuestra API (desarrollo usa proxy /api, producción usa URL completa)
+    const isApi = url.includes('/api/') || url.includes('easygoolapis.somee.com');
+    console.log('🔍 Checking if API request:', { url, isApi });
+    return isApi;
   }
 
   private handleHttpError(error: HttpErrorResponse): void {

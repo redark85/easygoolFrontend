@@ -14,7 +14,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Tournament, TournamentStatus } from '../../models/tournament.interface';
-import { TournamentService } from '../../services/tournament.service';
+import { TournamentService } from '../../../../core/services/tournament.service';
 import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
 
 @Component({
@@ -63,19 +63,29 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga todos los torneos (mock data por ahora)
+   * Carga todos los torneos del usuario
    */
   private loadTournaments(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    // Mock data temporal hasta implementar getAllTournaments
-    setTimeout(() => {
-      this.tournaments = [];
-      this.filteredTournaments = [];
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }, 1000);
+    this.tournamentService.getAllTournamentsByUser()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournaments: Tournament[]) => {
+          this.tournaments = tournaments;
+          this.filteredTournaments = tournaments;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error: any) => {
+          console.error('Error loading tournaments:', error);
+          this.tournaments = [];
+          this.filteredTournaments = [];
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   /**
@@ -101,8 +111,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
     const searchTerm = query.toLowerCase();
     this.filteredTournaments = this.tournaments.filter(tournament =>
       tournament.name.toLowerCase().includes(searchTerm) ||
-      tournament.description.toLowerCase().includes(searchTerm) ||
-      tournament.manager.managerName.toLowerCase().includes(searchTerm)
+      tournament.description.toLowerCase().includes(searchTerm)
     );
     this.cdr.detectChanges();
   }
@@ -170,8 +179,8 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   /**
    * TrackBy function para optimizar el rendering
    */
-  trackByTournamentId(index: number, tournament: Tournament): string {
-    return tournament.tournamentLink; // Usar tournamentLink como ID único
+  trackByTournamentId(index: number, tournament: Tournament): number {
+    return tournament.id; // Usar id como identificador único
   }
 
   /**
@@ -226,7 +235,14 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    */
   getDateRange(tournament: Tournament): string {
     const startDate = this.formatDate(tournament.startDate);
-    const endDate = this.formatDate(tournament.endDate);
+    const endDate = tournament.endDate ? this.formatDate(tournament.endDate) : 'Sin fecha fin';
     return `${startDate} - ${endDate}`;
+  }
+
+  /**
+   * Obtiene la imagen del torneo con fallback
+   */
+  getTournamentImage(tournament: Tournament): string {
+    return tournament.imageUrl || 'assets/logo.png';
   }
 }
