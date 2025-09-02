@@ -45,16 +45,6 @@
     }
   }
   
-  .mobile-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    backdrop-filter: blur(2px);
-  }
 }
 
 // Responsive adjustments
@@ -112,12 +102,17 @@
   }
 }
 
+// Eliminar backdrop overrides que causan conflictos
+// Los estilos globales en styles.scss manejan esto mejor
+
 // Mobile responsive override
 @media (max-width: 768px) {
   .dashboard-layout {
-    .sidenav-container .main-content {
-      margin-left: 0 !important;
-      width: 100vw !important;
+    .sidenav-container {
+      .main-content {
+        margin-left: 0 !important;
+        width: 100vw !important;
+      }
     }
   }
 }

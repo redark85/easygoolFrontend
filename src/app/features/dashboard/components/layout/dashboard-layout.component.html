@@ -9,7 +9,9 @@
       [opened]="sidenavOpened"
       [fixedInViewport]="isMobile"
       [fixedTopGap]="0"
-      [fixedBottomGap]="0">
+      [fixedBottomGap]="0"
+      [disableClose]="!isMobile"
+      [autoFocus]="false">
       
       <app-sidebar 
         [isCollapsed]="sidebarCollapsed"
@@ -38,10 +40,4 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
 
-  <!-- Mobile Overlay -->
-  <div 
-    *ngIf="isMobile && sidenavOpened" 
-    class="mobile-overlay"
-    (click)="onCloseMobileSidebar()">
-  </div>
 </div>

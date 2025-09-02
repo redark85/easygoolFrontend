@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -27,7 +27,10 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   sidenavOpened = true;
   private destroy$ = new Subject<void>();
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.observeBreakpoints();
@@ -51,12 +54,16 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
         } else {
           this.sidenavOpened = true;
         }
+        
+        // Forzar detección de cambios para actualizar la vista
+        this.cdr.detectChanges();
       });
   }
 
   onToggleSidebar(): void {
     if (this.isMobile) {
       this.sidenavOpened = !this.sidenavOpened;
+      this.cdr.detectChanges();
     } else {
       this.sidebarCollapsed = !this.sidebarCollapsed;
       // Force layout recalculation
@@ -69,10 +76,12 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   onCloseMobileSidebar(): void {
     if (this.isMobile) {
       this.sidenavOpened = false;
+      this.cdr.detectChanges();
     }
   }
 
   onToggleMobileSidebar(): void {
     this.sidenavOpened = !this.sidenavOpened;
+    this.cdr.detectChanges();
   }
 }
