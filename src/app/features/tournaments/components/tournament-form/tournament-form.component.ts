@@ -118,7 +118,7 @@ export class TournamentFormComponent implements OnInit {
         startDate: formValue.startDate.toISOString(),
         endDate: formValue.endDate ? formValue.endDate.toISOString() : null,
         modality: formValue.modality,
-        imageBase64: this.uploadedImage.base64,
+        imageBase64: this.uploadedImage.base64.split('base64,')[1],
         imageContentType: this.uploadedImage.contentType,
         hasPenaltyMode: false
       };
