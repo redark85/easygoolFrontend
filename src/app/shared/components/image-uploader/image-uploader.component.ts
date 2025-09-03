@@ -1,4 +1,4 @@
-import { Component, forwardRef, HostListener, Input, Output, EventEmitter } from '@angular/core';
+import { Component, forwardRef, HostListener, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -109,6 +109,9 @@ export class ImageUploaderComponent implements ControlValueAccessor {
   writeValue(value: ImageUploadData | null): void {
     if (value && value.base64) {
       this.previewUrl = value.base64;
+      // Forzar detección de cambios
+      setTimeout(() => {
+      }, 0);
     } else {
       this.previewUrl = null;
     }

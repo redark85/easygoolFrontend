@@ -1,13 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
-// Bootstrap CSS - debe ir primero
-@use 'bootstrap/scss/bootstrap';
-
-// Angular Material CSS
-@use '@angular/material/prebuilt-themes/indigo-pink.css';
-
-// Custom Partials - Estilos reutilizables para componentes
+// @use rules must be written before any other rules
 @use 'app/shared/styles/components';
+
+// Bootstrap CSS - usando @use en lugar de @import deprecated
+@use 'bootstrap/scss/bootstrap';
+@use '@angular/material/prebuilt-themes/indigo-pink.css';
 
 // Colores basados en el logo de EasyGool + Temática Futbolística
 :root {
@@ -385,7 +383,7 @@ html, body {
     opacity: 1 !important;
     visibility: visible !important;
     background-color: #2c3e50 !important;
-    background-image: url('/assets/sidebar.jpg') !important;
+    background-image: url('../public/assets/sidebar.jpg') !important;
     background-size: cover !important;
     background-position: center !important;
   }
@@ -525,4 +523,8 @@ html, body {
       }
     }
   }
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-title+.mat-mdc-dialog-content {
+  padding-top: 10px !important;
 }

@@ -46,7 +46,7 @@
            *ngFor="let tournament of filteredTournaments; trackBy: trackByTournamentId">
         <mat-card class="tournament-card" 
                   (click)="viewTournamentDetails(tournament)"
-                  [attr.aria-label]="'Ver detalles de ' + tournament.name">
+                  [attr.aria-label]="'Administrar equipos de ' + tournament.name">
           
           <!-- Tournament Image -->
           <div class="card-image-container">
@@ -96,8 +96,8 @@
             <button mat-button 
                     color="primary"
                     (click)="viewTournamentDetails(tournament); $event.stopPropagation()">
-              <mat-icon>visibility</mat-icon>
-              Ver Detalles
+              <mat-icon>groups</mat-icon>
+              Ver equipos
             </button>
             <button mat-icon-button 
                     class="more-actions-btn"
@@ -109,20 +109,21 @@
             
             <!-- Actions Menu -->
             <mat-menu #actionsMenu="matMenu">
-              <button mat-menu-item (click)="editTournament(tournament)">
+              <button mat-menu-item (click)="editTournament(tournament)" class="menu-item-hover">
                 <mat-icon>edit</mat-icon>
                 <span>Editar</span>
               </button>
-              <button mat-menu-item (click)="duplicateTournament(tournament)">
-                <mat-icon>content_copy</mat-icon>
-                <span>Duplicar</span>
-              </button>
+              
               <mat-divider></mat-divider>
+              
+              <!-- Status Change Buttons -->
               <button mat-menu-item 
-                      class="delete-action"
-                      (click)="deleteTournament(tournament)">
-                <mat-icon>delete</mat-icon>
-                <span>Eliminar</span>
+                      *ngFor="let option of getStatusOptions(tournament.status); trackBy: trackByOption"
+                      (click)="handleStatusAction(tournament, option); $event.stopPropagation()"
+                      (mousedown)="debugClick('mousedown', tournament, option)"
+                      [ngClass]="[getStatusMenuClass(option.value), 'menu-item-hover']">
+                <mat-icon>{{ getStatusIcon(option.value) }}</mat-icon>
+                <span>{{ option.label }}</span>
               </button>
             </mat-menu>
           </mat-card-actions>

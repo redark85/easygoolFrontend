@@ -22,17 +22,30 @@ export enum TournamentStatus {
 }
 
 /**
+ * Enum para tipos de estado del torneo (nuevo)
+ */
+export enum TournamentStatusType {
+  Active = 0,
+  Coming = 1,
+  Completed = 2,
+  Deleted = 3
+}
+
+/**
  * Interface para request de creación de torneo
  */
 export interface CreateTournamentRequest {
   name: string;
   description: string;
   startDate: string; // ISO 8601 format
-  endDate: string;   // ISO 8601 format
+  endDate: string; // ISO 8601 format
   imageBase64: string;
   imageContentType: string;
   hasPenaltyMode: boolean;
   modality: TournamentModality;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 /**
@@ -44,6 +57,23 @@ export interface TournamentManager {
 }
 
 /**
+ * Interface para request de actualización de torneo
+ */
+export interface UpdateTournamentRequest {
+  name: string;
+  description: string;
+  startDate: string; // ISO 8601 format
+  endDate: string; // ISO 8601 format
+  status: TournamentStatusType;
+  allowTeamRegistration: boolean;
+  imageBase64: string;
+  imageContentType: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+/**
  * Interface para datos del torneo retornados por la API
  */
 export interface Tournament {
@@ -51,12 +81,22 @@ export interface Tournament {
   name: string;
   description: string;
   startDate: string; // ISO 8601 format
-  endDate?: string | null;
+  endDate: string | null;
+  imageUrl: string | null;
+  modality: TournamentModality;
   status: TournamentStatus;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
   totalTeams: number;
   totalMatches: number;
-  imageUrl?: string | null;
-  modality: TournamentModality;
+}
+
+/**
+ * Interface para request de actualización de estado de torneo
+ */
+export interface UpdateTournamentStatusRequest {
+  status: TournamentStatusType;
 }
 
 /**

@@ -7,7 +7,11 @@
         <!-- Image Uploader -->
         <div class="form-field-full">
           <label class="image-label">Imagen del Torneo *</label>
-          <app-image-uploader (imageUploaded)="onImageUploaded($event)"></app-image-uploader>
+          <app-image-uploader 
+            [(ngModel)]="uploadedImage" 
+            [ngModelOptions]="{standalone: true}"
+            (imageUploaded)="onImageUploaded($event)">
+          </app-image-uploader>
           <div class="error-message" *ngIf="!uploadedImage && tournamentForm.touched">
             La imagen del torneo es obligatoria (máximo 1MB).
           </div>
@@ -48,6 +52,19 @@
           <mat-datepicker #endDatePicker></mat-datepicker>
           <mat-error>{{ getErrorMessage('endDate') }}</mat-error>
         </mat-form-field>
+
+        <!-- Location -->
+        <div class="form-field-full">
+          <mat-form-field appearance="outline">
+            <mat-label>Ubicación del Torneo</mat-label>
+            <input matInput formControlName="location" placeholder="Selecciona la ubicación" readonly>
+            <button mat-icon-button matSuffix type="button" (click)="openLocationModal()" 
+                    matTooltip="Seleccionar ubicación en el mapa">
+              <mat-icon>location_on</mat-icon>
+            </button>
+            <mat-error>{{ getErrorMessage('location') }}</mat-error>
+          </mat-form-field>
+        </div>
 
         <!-- Description -->
         <div class="form-field-full">

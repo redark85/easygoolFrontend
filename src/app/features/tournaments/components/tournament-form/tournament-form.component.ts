@@ -1,20 +1,21 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
+import { LocationMapComponent, LocationData } from '@shared/components/location-map/location-map.component';
 import { TournamentService } from '../../services/tournament.service';
-import { CreateTournamentRequest, TournamentModality, Tournament } from '../../models/tournament.interface';
+import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatus, TournamentStatusType } from '../../models/tournament.interface';
 import { dateRangeValidator } from '@shared/validators/date-range.validator';
 
 export interface TournamentFormData {
@@ -28,6 +29,7 @@ export interface TournamentFormData {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -40,14 +42,17 @@ export interface TournamentFormData {
     MatProgressSpinnerModule,
     ImageUploaderComponent
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './tournament-form.component.html',
   styleUrls: ['./tournament-form.component.scss']
 })
-export class TournamentFormComponent implements OnInit {
+export class TournamentFormComponent implements OnInit, AfterViewInit {
   tournamentForm!: FormGroup;
   isSubmitting = false;
   isEditMode = false;
+  tournament: Tournament | null = null;
   uploadedImage: ImageUploadData | null = null;
+  selectedLocationData: LocationData | null = null;
   
   modalityOptions = [
     { value: TournamentModality.Five, label: 'Fútbol Indoor (5 vs 5)' },
@@ -63,43 +68,62 @@ export class TournamentFormComponent implements OnInit {
     private fb: FormBuilder,
     private tournamentService: TournamentService,
     private dialogRef: MatDialogRef<TournamentFormComponent>,
+    private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: TournamentFormData
   ) {
     this.isEditMode = this.data?.mode === 'edit';
     this.initializeForm();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (this.isEditMode && this.data.tournament) {
-      this.patchForm(this.data.tournament);
+      await this.patchForm(this.data.tournament);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Forzar actualización del componente de imagen después de la vista
+    if (this.uploadedImage) {
+      setTimeout(() => {
+        // Trigger change detection para el componente de imagen
+      }, 100);
     }
   }
 
   private initializeForm(): void {
     this.tournamentForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.maxLength(500)]],
-      startDate: [null, Validators.required],
-      endDate: [null],
-      modality: [null, Validators.required]
-    }, { validators: dateRangeValidator });
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      modality: ['', Validators.required],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required],
+      location: ['', Validators.required]
+    }, { validators: [dateRangeValidator] });
   }
 
-  private patchForm(tournament: Tournament): void {
+  private async patchForm(tournament: Tournament): Promise<void> {
+    this.tournament = tournament;
     this.tournamentForm.patchValue({
       name: tournament.name,
       description: tournament.description,
+      modality: tournament.modality,
       startDate: new Date(tournament.startDate),
       endDate: tournament.endDate ? new Date(tournament.endDate) : null,
-      modality: tournament.modality
+      location: tournament.location || ''
     });
     
-    // Si hay imagen, configurarla
-    if (tournament.imageUrl) {
-      this.uploadedImage = {
-        base64: tournament.imageUrl,
-        contentType: 'image/jpeg'
-      };
+    // Si hay imagen URL, convertirla a base64 para el componente de imagen
+    if (tournament.imageUrl && tournament.imageUrl !== 'assets/logo.png') {
+      try {
+        const imageData = await this.convertImageUrlToBase64(tournament.imageUrl);
+        this.uploadedImage = {
+          base64: `data:image/${imageData.contentType};base64,${imageData.base64}`,
+          contentType: `image/${imageData.contentType}`
+        };
+      } catch (error) {
+        console.error('Error converting image URL to base64:', error);
+        this.uploadedImage = null;
+      }
     }
   }
 
@@ -112,26 +136,72 @@ export class TournamentFormComponent implements OnInit {
       this.isSubmitting = true;
 
       const formValue = this.tournamentForm.value;
-      const request: CreateTournamentRequest = {
-        name: formValue.name,
-        description: formValue.description,
-        startDate: formValue.startDate.toISOString(),
-        endDate: formValue.endDate ? formValue.endDate.toISOString() : null,
-        modality: formValue.modality,
-        imageBase64: this.uploadedImage.base64,
-        imageContentType: this.uploadedImage.contentType,
-        hasPenaltyMode: false
-      };
+      
+      // Limpiar imageBase64 removiendo el prefijo data URI
+      let cleanImageBase64 = this.uploadedImage.base64;
+      if (cleanImageBase64.includes(',')) {
+        cleanImageBase64 = cleanImageBase64.split(',')[1];
+      }
+      
+      // Limpiar imageContentType para enviar solo la extensión
+      let cleanImageContentType = this.uploadedImage.contentType;
+      if (cleanImageContentType.startsWith('image/')) {
+        cleanImageContentType = cleanImageContentType.replace('image/', '');
+      }
+      
+      if (this.isEditMode && this.data.tournament) {
+        // Modo edición - usar updateTournament
+        const updateData: UpdateTournamentRequest = {
+          name: formValue.name!,
+          description: formValue.description!,
+          startDate: formValue.startDate!.toISOString(),
+          endDate: formValue.endDate!.toISOString(),
+          status: this.mapTournamentStatusToStatusType(this.data.tournament.status),
+          allowTeamRegistration: this.data.tournament.status === TournamentStatus.Active,
+          imageBase64: cleanImageBase64,
+          imageContentType: cleanImageContentType,
+          location: formValue.location || '',
+          latitude: this.selectedLocationData?.latitude,
+          longitude: this.selectedLocationData?.longitude
+        };
 
-      this.tournamentService.createTournament(request).subscribe({
-        next: (response) => {
-          this.isSubmitting = false;
-          this.dialogRef.close(response);
-        },
-        error: () => {
-          this.isSubmitting = false;
-        }
-      });
+        this.tournamentService.updateTournament(this.data.tournament.id, updateData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            this.dialogRef.close(true);
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error updating tournament:', error);
+          }
+        });
+      } else {
+        // Modo creación - usar createTournament
+        const tournamentData: CreateTournamentRequest = {
+          name: formValue.name!,
+          description: formValue.description!,
+          startDate: formValue.startDate!.toISOString(),
+          endDate: formValue.endDate!.toISOString(),
+          imageBase64: cleanImageBase64,
+          imageContentType: cleanImageContentType,
+          hasPenaltyMode: false, // Default value
+          modality: formValue.modality!,
+          location: formValue.location || '',
+          latitude: this.selectedLocationData?.latitude,
+          longitude: this.selectedLocationData?.longitude
+        };
+
+        this.tournamentService.createTournament(tournamentData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            this.dialogRef.close(true);
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error creating tournament:', error);
+          }
+        });
+      }
     } else {
       this.markFormGroupTouched();
     }
@@ -172,5 +242,80 @@ export class TournamentFormComponent implements OnInit {
 
   get submitButtonText(): string {
     return this.isEditMode ? 'Actualizar' : 'Crear Torneo';
+  }
+
+  /**
+   * Abre el modal de selección de ubicación
+   */
+  openLocationModal(): void {
+    const currentLocation = this.tournamentForm.get('location')?.value;
+    const dialogRef = this.dialog.open(LocationMapComponent, {
+      width: '900px',
+      height: '800px',
+      maxHeight: '90vh',
+      data: {
+        initialLocation: this.selectedLocationData || (currentLocation ? {
+          address: currentLocation,
+          latitude: -0.1807,
+          longitude: -78.4678
+        } : null)
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: LocationData) => {
+      if (result) {
+        this.selectedLocationData = result;
+        this.tournamentForm.patchValue({
+          location: result.address
+        });
+      }
+    });
+  }
+
+  /**
+   * Convierte una URL de imagen a base64
+   */
+  private async convertImageUrlToBase64(imageUrl: string): Promise<{base64: string, contentType: string}> {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          const base64Data = base64String.split(',')[1]; // Remover el prefijo data:image/...;base64,
+          const contentType = blob.type.split('/')[1] || 'jpeg';
+          
+          resolve({
+            base64: base64Data,
+            contentType: contentType
+          });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting image URL to base64:', error);
+      return { base64: '', contentType: 'jpeg' };
+    }
+  }
+
+  /**
+   * Mapea TournamentStatus a TournamentStatusType
+   */
+  private mapTournamentStatusToStatusType(status: TournamentStatus): TournamentStatusType {
+    switch (status) {
+      case TournamentStatus.Active:
+        return TournamentStatusType.Active;
+      case TournamentStatus.Completed:
+        return TournamentStatusType.Completed;
+      case TournamentStatus.Draft:
+        return TournamentStatusType.Coming;
+      case TournamentStatus.Cancelled:
+        return TournamentStatusType.Deleted;
+      default:
+        return TournamentStatusType.Coming;
+    }
   }
 }

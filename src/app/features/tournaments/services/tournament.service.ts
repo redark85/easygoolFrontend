@@ -3,11 +3,12 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ApiService } from '@core/services/api.service';
+import { HttpClient } from '@angular/common/http';
 import { ToastService } from '@core/services/toast.service';
+import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
-import { TOURNAMENT_CREATE_ENDPOINT } from '@core/config/endpoints';
 
-import { CreateTournamentRequest, Tournament } from '../models/tournament.interface';
+import { CreateTournamentRequest, UpdateTournamentRequest, Tournament, TournamentApiResponse, TournamentStatusType, UpdateTournamentStatusRequest } from '../models/tournament.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -35,5 +36,73 @@ export class TournamentService {
         return response;
       })
     );
+  }
+
+  /**
+   * Obtiene todos los torneos del usuario
+   * @returns Observable con array de torneos
+   */
+  getAllTournamentsByUser(): Observable<Tournament[]> {
+    return this.apiService.get<TournamentApiResponse>(TOURNAMENT_GET_ALL_BY_USER_ENDPOINT).pipe(
+      map(response => response.result || [])
+    );
+  }
+
+  /**
+   * Actualiza un torneo existente
+   * @param id ID del torneo a actualizar
+   * @param data Datos del torneo a actualizar
+   * @returns Observable con la respuesta de la API
+   */
+  updateTournament(id: number, data: UpdateTournamentRequest): Observable<ApiResponse<Tournament>> {
+    return this.apiService.put<ApiResponse<Tournament>>(`${TOURNAMENT_UPDATE_ENDPOINT}/${id}`, data).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Torneo actualizado con éxito.');
+        } else {
+          this.toastService.showError(response.message || 'No se pudo actualizar el torneo.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Actualiza solo el estado de un torneo
+   * @param id ID del torneo a actualizar
+   * @param status Nuevo estado del torneo
+   * @returns Observable con la respuesta de la API
+   */
+  updateTournamentStatus(id: number, status: TournamentStatusType): Observable<ApiResponse<Tournament>> {
+    const statusData: UpdateTournamentStatusRequest = { status };
+    return this.apiService.put<ApiResponse<Tournament>>(`${TOURNAMENT_UPDATE_STATUS_ENDPOINT}/${id}`, statusData).pipe(
+      map(response => {
+        if (response.succeed) {
+          const statusText = this.getStatusText(status);
+          this.toastService.showSuccess(`Estado del torneo cambiado a: ${statusText}`);
+        } else {
+          this.toastService.showError(response.message || 'No se pudo actualizar el estado del torneo.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Obtiene el texto del estado para mostrar en mensajes
+   */
+  private getStatusText(status: TournamentStatusType): string {
+    switch (status) {
+      case TournamentStatusType.Active:
+        return 'Activo';
+      case TournamentStatusType.Coming:
+        return 'Próximo';
+      case TournamentStatusType.Completed:
+        return 'Completado';
+      case TournamentStatusType.Deleted:
+        return 'Eliminado';
+      default:
+        return 'Desconocido';
+    }
   }
 }

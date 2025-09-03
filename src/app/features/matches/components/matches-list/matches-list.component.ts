@@ -14,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { Match, MatchGroup, MatchStatus, MatchPeriod } from '@core/models/match.model';
-import { MatchService } from '@core/services';
+// import { MatchService } from '@core/services'; // Comentado temporalmente
 
 @Component({
   selector: 'app-matches-list',
@@ -38,7 +38,7 @@ import { MatchService } from '@core/services';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MatchesListComponent implements OnInit, OnDestroy {
-  private readonly matchService = inject(MatchService);
+  // private readonly matchService = inject(MatchService); // Comentado temporalmente
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
@@ -64,20 +64,29 @@ export class MatchesListComponent implements OnInit, OnDestroy {
 
   private loadMatches(): void {
     this.isLoading = true;
-    this.matchService.getMatchesGroupedByDate()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (groups) => {
-          this.matchGroups = groups;
-          this.filteredMatchGroups = groups;
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          console.error('Error loading matches:', error);
-          this.isLoading = false;
-        }
-      });
+    // Datos mock temporales hasta implementar MatchService
+    setTimeout(() => {
+      this.matchGroups = [];
+      this.filteredMatchGroups = [];
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }, 1000);
+    
+    // TODO: Implementar cuando MatchService esté disponible
+    // this.matchService.getMatchesGroupedByDate()
+    //   .pipe(takeUntil(this.destroy$))
+    //   .subscribe({
+    //     next: (groups: MatchGroup[]) => {
+    //       this.matchGroups = groups;
+    //       this.filteredMatchGroups = groups;
+    //       this.isLoading = false;
+    //       this.cdr.markForCheck();
+    //     },
+    //     error: (error: any) => {
+    //       console.error('Error loading matches:', error);
+    //       this.isLoading = false;
+    //     }
+    //   });
   }
 
   private setupSearch(): void {
