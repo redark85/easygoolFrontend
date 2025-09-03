@@ -297,7 +297,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
         return 'status-active';
       case TournamentStatus.Completed:
         return 'status-completed';
-      case TournamentStatus.Draft:
+      case TournamentStatus.Comming:
         return 'status-coming';
       case TournamentStatus.Cancelled:
         return 'status-deleted';
@@ -316,7 +316,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
         return 'Activo';
       case TournamentStatus.Completed:
         return 'Completado';
-      case TournamentStatus.Draft:
+      case TournamentStatus.Comming:
         return 'Próximo';
       case TournamentStatus.Cancelled:
         return 'Eliminado';
@@ -408,7 +408,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
         return TournamentStatusType.Active;
       case TournamentStatus.Completed:
         return TournamentStatusType.Completed;
-      case TournamentStatus.Draft:
+      case TournamentStatus.Comming:
         return TournamentStatusType.Coming;
       case TournamentStatus.Cancelled:
         return TournamentStatusType.Deleted;

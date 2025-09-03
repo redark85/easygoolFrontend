@@ -53,7 +53,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
   tournament: Tournament | null = null;
   uploadedImage: ImageUploadData | null = null;
   selectedLocationData: LocationData | null = null;
-  
+
   modalityOptions = [
     { value: TournamentModality.Five, label: 'Fútbol Indoor (5 vs 5)' },
     { value: TournamentModality.Six, label: 'Fútbol 6 vs 6' },
@@ -111,7 +111,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
       endDate: tournament.endDate ? new Date(tournament.endDate) : null,
       location: tournament.location || ''
     });
-    
+
     // Si hay imagen URL, convertirla a base64 para el componente de imagen
     if (tournament.imageUrl && tournament.imageUrl !== 'assets/logo.png') {
       try {
@@ -136,19 +136,19 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
       this.isSubmitting = true;
 
       const formValue = this.tournamentForm.value;
-      
+
       // Limpiar imageBase64 removiendo el prefijo data URI
       let cleanImageBase64 = this.uploadedImage.base64;
       if (cleanImageBase64.includes(',')) {
         cleanImageBase64 = cleanImageBase64.split(',')[1];
       }
-      
+
       // Limpiar imageContentType para enviar solo la extensión
       let cleanImageContentType = this.uploadedImage.contentType;
       if (cleanImageContentType.startsWith('image/')) {
         cleanImageContentType = cleanImageContentType.replace('image/', '');
       }
-      
+
       if (this.isEditMode && this.data.tournament) {
         // Modo edición - usar updateTournament
         const updateData: UpdateTournamentRequest = {
@@ -279,14 +279,14 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
-      
+
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result as string;
           const base64Data = base64String.split(',')[1]; // Remover el prefijo data:image/...;base64,
           const contentType = blob.type.split('/')[1] || 'jpeg';
-          
+
           resolve({
             base64: base64Data,
             contentType: contentType
@@ -310,7 +310,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
         return TournamentStatusType.Active;
       case TournamentStatus.Completed:
         return TournamentStatusType.Completed;
-      case TournamentStatus.Draft:
+      case TournamentStatus.Comming:
         return TournamentStatusType.Coming;
       case TournamentStatus.Cancelled:
         return TournamentStatusType.Deleted;
