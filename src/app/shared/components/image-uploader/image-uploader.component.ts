@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ToastService } from '@core/services/toast.service';
+import { convertCloudinaryToHttps } from '../../utils/url.utils';
 
 export interface ImageUploadData {
   base64: string;
@@ -106,9 +107,21 @@ export class ImageUploaderComponent implements ControlValueAccessor {
     return true;
   }
 
-  writeValue(value: ImageUploadData | null): void {
-    if (value && value.base64) {
-      this.previewUrl = value.base64;
+  async writeValue(value: ImageUploadData | string | null): Promise<void> {
+    if (value) {
+      if (typeof value === 'string') {
+        // Si es una URL, convertirla a base64 para evitar problemas CORS en producción
+        try {
+          const imageData = await this.convertUrlToBase64(value);
+          this.previewUrl = imageData.base64;
+        } catch (error) {
+          console.warn('Error loading image from URL, using URL directly:', error);
+          this.previewUrl = value; // Fallback a URL directa
+        }
+      } else if (value.base64) {
+        // Si ya es base64, usarlo directamente
+        this.previewUrl = value.base64;
+      }
       // Forzar detección de cambios
       setTimeout(() => {
       }, 0);
@@ -133,5 +146,63 @@ export class ImageUploaderComponent implements ControlValueAccessor {
     this.previewUrl = null;
     this.onChange(null);
     this.onTouched();
+  }
+
+  /**
+   * Maneja errores de carga de imagen
+   */
+  onImageError(event: Event): void {
+    console.warn('Error loading image:', event);
+    this.toastService.showError('Error al cargar la imagen');
+  }
+
+  /**
+   * Maneja la carga exitosa de imagen
+   */
+  onImageLoad(event: Event): void {
+    console.log('Image loaded successfully');
+  }
+
+  /**
+   * Convierte una URL de imagen a base64 para evitar problemas CORS en producción
+   */
+  private async convertUrlToBase64(imageUrl: string): Promise<{base64: string, contentType: string}> {
+    try {
+      // Convertir HTTP a HTTPS para evitar Mixed Content en producción
+      const httpsUrl = convertCloudinaryToHttps(imageUrl);
+      
+      // Agregar headers para evitar problemas CORS
+      const response = await fetch(httpsUrl, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          'Accept': 'image/*'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          const contentType = blob.type || 'image/jpeg';
+          
+          resolve({
+            base64: base64String,
+            contentType: contentType
+          });
+        };
+        reader.onerror = () => reject(new Error('Error reading blob as base64'));
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting image URL to base64:', error);
+      throw error;
+    }
   }
 }

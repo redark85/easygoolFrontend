@@ -40,7 +40,9 @@
   <ng-template #imagePreview>
     <div class="preview-container">
       <div class="preview-image-wrapper">
-        <img [src]="previewUrl" alt="Previsualización de imagen" class="preview-image">
+        <img [src]="previewUrl" alt="Previsualización de imagen" class="preview-image" 
+             (error)="onImageError($event)"
+             (load)="onImageLoad($event)">
         <div class="preview-overlay">
           <button mat-icon-button class="change-btn" (click)="fileInput.click()"
                   [disabled]="isDisabled"

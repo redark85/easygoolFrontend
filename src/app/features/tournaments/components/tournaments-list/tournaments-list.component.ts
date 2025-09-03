@@ -17,6 +17,7 @@ import { Tournament, TournamentStatus, TournamentStatusType, TournamentModality,
 import { TournamentService } from '../../services/tournament.service';
 import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 
@@ -330,7 +331,21 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    */
   private async convertImageUrlToBase64(imageUrl: string): Promise<{base64: string, contentType: string}> {
     try {
-      const response = await fetch(imageUrl);
+      // Convertir HTTP a HTTPS para evitar Mixed Content en producción
+      const httpsUrl = convertCloudinaryToHttps(imageUrl);
+      
+      const response = await fetch(httpsUrl, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          'Accept': 'image/*'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const blob = await response.blob();
 
       return new Promise((resolve, reject) => {
