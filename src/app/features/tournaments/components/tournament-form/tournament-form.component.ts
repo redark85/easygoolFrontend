@@ -15,7 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { LocationMapComponent, LocationData } from '@shared/components/location-map/location-map.component';
 import { TournamentService } from '../../services/tournament.service';
-import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatus, TournamentStatusType } from '../../models/tournament.interface';
+import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType } from '../../models/tournament.interface';
 import { dateRangeValidator } from '@shared/validators/date-range.validator';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
@@ -97,7 +97,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       modality: ['', Validators.required],
       startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
+      endDate: [''], // Removido Validators.required
       location: ['', Validators.required]
     }, { validators: [dateRangeValidator] });
   }
@@ -110,8 +110,19 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
       modality: tournament.modality,
       startDate: new Date(tournament.startDate),
       endDate: tournament.endDate ? new Date(tournament.endDate) : null,
-      location: tournament.location || ''
+      location: tournament.address?.address || ''
     });
+
+    // Si hay datos de dirección, inicializar selectedLocationData
+    if (tournament.address) {
+      this.selectedLocationData = {
+        address: tournament.address.address,
+        latitude: parseFloat(tournament.address.latitude) || 0,
+        longitude: parseFloat(tournament.address.longitude) || 0,
+        primaryStreet: tournament.address.mainStreet,
+        secondaryStreet: tournament.address.secondStreet
+      };
+    }
 
     // Si hay imagen URL, convertirla a base64 para el componente de imagen
     if (tournament.imageUrl && tournament.imageUrl !== 'assets/logo.png') {
@@ -122,8 +133,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
           contentType: `image/${imageData.contentType}`
         };
       } catch (error) {
-        console.error('Error converting image URL to base64:', error);
-        this.uploadedImage = null;
+        console.error('Error converting tournament image:', error);
       }
     }
   }
@@ -156,15 +166,26 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
           name: formValue.name!,
           description: formValue.description!,
           startDate: formValue.startDate!.toISOString(),
-          endDate: formValue.endDate!.toISOString(),
           status: this.mapTournamentStatusToStatusType(this.data.tournament.status),
-          allowTeamRegistration: this.data.tournament.status === TournamentStatus.Active,
+          allowTeamRegistration: this.data.tournament.status === TournamentStatusType.Active,
           imageBase64: cleanImageBase64,
           imageContentType: cleanImageContentType,
-          location: formValue.location || '',
-          latitude: this.selectedLocationData?.latitude,
-          longitude: this.selectedLocationData?.longitude
+          address: this.selectedLocationData ? {
+            address: formValue.location || '',
+            mainStreet: this.selectedLocationData.primaryStreet || '',
+            secondStreet: this.selectedLocationData.secondaryStreet || '',
+            latitude: this.selectedLocationData.latitude.toString() || '0',
+            longitude: this.selectedLocationData.longitude.toString() || '0'
+          } : undefined
         };
+
+        // Solo agregar endDate si no está vacío
+        if (formValue.endDate) {
+          updateData.endDate = formValue.endDate.toISOString();
+        }
+
+        console.log('Sending updateData:', updateData);
+        console.log('selectedLocationData at send:', this.selectedLocationData);
 
         this.tournamentService.updateTournament(this.data.tournament.id, updateData).subscribe({
           next: (response) => {
@@ -182,15 +203,26 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
           name: formValue.name!,
           description: formValue.description!,
           startDate: formValue.startDate!.toISOString(),
-          endDate: formValue.endDate!.toISOString(),
           imageBase64: cleanImageBase64,
           imageContentType: cleanImageContentType,
           hasPenaltyMode: false, // Default value
           modality: formValue.modality!,
-          location: formValue.location || '',
-          latitude: this.selectedLocationData?.latitude,
-          longitude: this.selectedLocationData?.longitude
+          address: this.selectedLocationData ? {
+            address: formValue.location || '',
+            mainStreet: this.selectedLocationData.primaryStreet || '',
+            secondStreet: this.selectedLocationData.secondaryStreet || '',
+            latitude: this.selectedLocationData.latitude.toString() || '0',
+            longitude: this.selectedLocationData.longitude.toString() || '0'
+          } : undefined
         };
+
+        // Solo agregar endDate si no está vacío
+        if (formValue.endDate) {
+          tournamentData.endDate = formValue.endDate.toISOString();
+        }
+
+        console.log('Sending tournamentData:', tournamentData);
+        console.log('selectedLocationData at create:', this.selectedLocationData);
 
         this.tournamentService.createTournament(tournamentData).subscribe({
           next: (response) => {
@@ -265,10 +297,12 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result: LocationData) => {
       if (result) {
+        console.log('LocationData received:', result);
         this.selectedLocationData = result;
         this.tournamentForm.patchValue({
           location: result.address
         });
+        console.log('selectedLocationData updated:', this.selectedLocationData);
       }
     });
   }
@@ -317,20 +351,10 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Mapea TournamentStatus a TournamentStatusType
+   * Mapea TournamentStatusType a TournamentStatusType (método simplificado)
    */
-  private mapTournamentStatusToStatusType(status: TournamentStatus): TournamentStatusType {
-    switch (status) {
-      case TournamentStatus.Active:
-        return TournamentStatusType.Active;
-      case TournamentStatus.Completed:
-        return TournamentStatusType.Completed;
-      case TournamentStatus.Comming:
-        return TournamentStatusType.Coming;
-      case TournamentStatus.Cancelled:
-        return TournamentStatusType.Deleted;
-      default:
-        return TournamentStatusType.Coming;
-    }
+  private mapTournamentStatusToStatusType(status: TournamentStatusType): TournamentStatusType {
+    // Como ya usamos TournamentStatusType unificado, simplemente retornamos el valor
+    return status;
   }
 }

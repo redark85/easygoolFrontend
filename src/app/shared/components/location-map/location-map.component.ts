@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
+import { Address } from '../../../features/tournaments/models/tournament.interface';
 
 declare let L: any;
 
@@ -160,6 +161,19 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.data?.initialLocation) {
       this.selectedLocation = this.data.initialLocation;
       this.searchQuery = this.data.initialLocation.address;
+      
+      // Asegurar que primaryStreet y secondaryStreet estén inicializados
+      if (!this.selectedLocation.primaryStreet && !this.selectedLocation.secondaryStreet) {
+        // Si no hay datos de calles, intentar extraer del address
+        const addressParts = this.selectedLocation.address.split(',').map((part: string) => part.trim());
+        if (addressParts.length > 1) {
+          this.selectedLocation.primaryStreet = addressParts[0];
+          this.selectedLocation.secondaryStreet = addressParts.slice(1).join(', ');
+        } else {
+          this.selectedLocation.primaryStreet = this.selectedLocation.address;
+          this.selectedLocation.secondaryStreet = '';
+        }
+      }
     }
   }
 
@@ -331,12 +345,57 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateSelectedLocation(lat: number, lng: number, displayName: string, addressDetails?: any): void {
+    console.log('AddressDetails received:', addressDetails);
+    
+    const fullStreet = addressDetails?.road || addressDetails?.pedestrian || '';
+    let mainStreet = fullStreet;
+    let secondaryStreet = addressDetails?.neighbourhood || addressDetails?.suburb || '';
+    
+    // Si no hay calle específica, extraer mainStreet del displayName
+    if (!mainStreet && displayName) {
+      const addressParts = displayName.split(',').map((part: string) => part.trim());
+      mainStreet = addressParts[0]; // Primer elemento como mainStreet
+      if (!secondaryStreet && addressParts.length > 1) {
+        secondaryStreet = addressParts[1]; // Segundo elemento como secondaryStreet
+      }
+    }
+    
+    // Procesar la calle principal para separar mainStreet y secondaryStreet
+    if (fullStreet) {
+      const streetParts = fullStreet.split(',').map((part: string) => part.trim());
+      if (streetParts.length > 1) {
+        // mainStreet = elemento 0 (primer elemento)
+        mainStreet = streetParts[0];
+        // Si no hay secondaryStreet desde el geocoding, usar elementos 1 en adelante
+        if (!secondaryStreet) {
+          secondaryStreet = streetParts.slice(1).join(', ');
+        }
+      }
+    }
+    
+    console.log('Processed streets - mainStreet:', mainStreet, 'secondaryStreet:', secondaryStreet);
+    
     this.selectedLocation = {
       address: displayName,
       latitude: lat,
       longitude: lng,
-      primaryStreet: addressDetails?.road || addressDetails?.pedestrian || '',
-      secondaryStreet: addressDetails?.neighbourhood || addressDetails?.suburb || ''
+      primaryStreet: mainStreet,
+      secondaryStreet: secondaryStreet
+    };
+  }
+
+  /**
+   * Convierte LocationData a formato Address para el DTO
+   */
+  getAddressData(): Address | null {
+    if (!this.selectedLocation) return null;
+    
+    return {
+      address: this.selectedLocation.address,
+      mainStreet: this.selectedLocation.primaryStreet || '',
+      secondStreet: this.selectedLocation.secondaryStreet || '',
+      latitude: this.selectedLocation.latitude.toString(),
+      longitude: this.selectedLocation.longitude.toString()
     };
   }
 

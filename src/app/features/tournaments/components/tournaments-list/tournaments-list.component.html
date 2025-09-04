@@ -6,7 +6,7 @@
         <h1 class="page-title">Torneos</h1>
         <p class="page-subtitle">Gestiona y organiza todos tus torneos futbolísticos</p>
       </div>
-      
+
       <div class="search-actions">
         <div class="search-container">
           <mat-form-field appearance="outline" class="search-field">
@@ -32,8 +32,8 @@
       <mat-icon class="no-results-icon">sports_soccer</mat-icon>
       <h3>No se encontraron torneos</h3>
       <p>Intenta ajustar tu búsqueda o crear un nuevo torneo</p>
-      <button mat-raised-button 
-              color="primary" 
+      <button mat-raised-button
+              color="primary"
               (click)="createTournament()">
         <mat-icon>add</mat-icon>
         Crear Torneo
@@ -42,21 +42,21 @@
 
     <!-- Tournament Cards -->
     <div class="row" *ngIf="filteredTournaments.length > 0">
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3" 
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3"
            *ngFor="let tournament of filteredTournaments; trackBy: trackByTournamentId">
-        <mat-card class="tournament-card" 
+        <mat-card class="tournament-card"
                   (click)="viewTournamentDetails(tournament)"
                   [attr.aria-label]="'Administrar equipos de ' + tournament.name">
-          
+
           <!-- Tournament Image -->
           <div class="card-image-container">
-            <img mat-card-image 
-                 [src]="tournament.imageUrl || 'assets/logo.png'" 
+            <img mat-card-image
+                 [src]="tournament.imageUrl || 'assets/logo.png'"
                  [alt]="tournament.name"
                  class="tournament-image"
                  loading="lazy"
                  (error)="$event.target.src='assets/logo.png'">
-            
+
             <!-- Status Chip -->
             <mat-chip-set class="status-chip-container">
               <mat-chip [class]="getStatusClass(tournament.status)">
@@ -70,7 +70,7 @@
             <div class="tournament-info">
               <h3 class="tournament-name">{{ tournament.name }}</h3>
               <p class="tournament-description">{{ tournament.description }}</p>
-              
+
               <!-- Tournament Details -->
               <div class="tournament-details">
                 <div class="detail-item">
@@ -93,37 +93,46 @@
 
           <!-- Card Actions -->
           <mat-card-actions class="tournament-actions">
-            <button mat-button 
+            <button mat-button
                     color="primary"
                     (click)="viewTournamentDetails(tournament); $event.stopPropagation()">
-              <mat-icon>groups</mat-icon>
-              Ver equipos
+              <mat-icon>emoji_events</mat-icon>
+              Administrar torneo
             </button>
-            <button mat-icon-button 
+            <button mat-icon-button
                     class="more-actions-btn"
                     [matMenuTriggerFor]="actionsMenu"
                     (click)="$event.stopPropagation()"
                     matTooltip="Más acciones">
               <mat-icon>more_vert</mat-icon>
             </button>
-            
+
             <!-- Actions Menu -->
             <mat-menu #actionsMenu="matMenu">
               <button mat-menu-item (click)="editTournament(tournament)" class="menu-item-hover">
                 <mat-icon>edit</mat-icon>
                 <span>Editar</span>
               </button>
-              
+
               <mat-divider></mat-divider>
-              
+
               <!-- Status Change Buttons -->
-              <button mat-menu-item 
+              <button mat-menu-item
                       *ngFor="let option of getStatusOptions(tournament.status); trackBy: trackByOption"
                       (click)="handleStatusAction(tournament, option); $event.stopPropagation()"
                       (mousedown)="debugClick('mousedown', tournament, option)"
-                      [ngClass]="[getStatusMenuClass(option.value), 'menu-item-hover']">
-                <mat-icon>{{ getStatusIcon(option.value) }}</mat-icon>
-                <span>{{ option.label }}</span>
+                      [ngClass]="[getStatusMenuClass(option.value), 'menu-item-hover']"
+                      [disabled]="isTournamentLoading(tournament.id)">
+                <div class="menu-item-content">
+                  <!-- Loading spinner específico para este item -->
+                  <mat-spinner *ngIf="isTournamentLoading(tournament.id)" 
+                              diameter="16" 
+                              class="menu-item-spinner">
+                  </mat-spinner>
+                  <!-- Ícono normal cuando no está cargando -->
+                  <mat-icon *ngIf="!isTournamentLoading(tournament.id)">{{ getStatusIcon(option.value) }}</mat-icon>
+                  <span>{{ option.label }}</span>
+                </div>
               </button>
             </mat-menu>
           </mat-card-actions>

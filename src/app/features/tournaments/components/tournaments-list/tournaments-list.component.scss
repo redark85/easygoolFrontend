@@ -498,6 +498,27 @@
   }
 }
 
+// Estilos para loading específico en menu items
+::ng-deep .mat-mdc-menu-panel {
+  .mat-mdc-menu-item {
+    .menu-item-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .menu-item-spinner {
+        margin-right: 4px;
+      }
+    }
+    
+    // Deshabilitar hover cuando está loading
+    &[disabled] {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+}
+
 // Animation for cards
 @keyframes fadeInUp {
   from {

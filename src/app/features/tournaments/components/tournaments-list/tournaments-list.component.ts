@@ -13,8 +13,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 
-import { Tournament, TournamentStatus, TournamentStatusType, TournamentModality, UpdateTournamentRequest } from '../../models/tournament.interface';
+import { Tournament, TournamentStatusType, TournamentModality, UpdateTournamentRequest } from '../../models/tournament.interface';
 import { TournamentService } from '../../services/tournament.service';
+import { TournamentStatusService } from '../../services/tournament-status.service';
 import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
@@ -47,11 +48,15 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   filteredTournaments: Tournament[] = [];
   isLoading = false;
   searchControl = new FormControl('');
+  
+  // Map para controlar loading específico por torneo
+  tournamentLoadingStates = new Map<number, boolean>();
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private tournamentService: TournamentService,
+    private tournamentStatusService: TournamentStatusService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
@@ -197,7 +202,15 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   /**
    * Cambia el estado de un torneo usando actualización completa
    */
-  async changeStatus(tournament: Tournament, newStatus: TournamentStatusType): Promise<void> {
+  async changeStatus(tournament: Tournament, newStatus: TournamentStatusType, useGlobalLoading: boolean = false): Promise<void> {
+    if (useGlobalLoading) {
+      // Activar loading global
+      this.isLoading = true;
+    } else {
+      // Activar loading específico para este torneo
+      this.tournamentLoadingStates.set(tournament.id, true);
+    }
+    this.cdr.detectChanges();
 
     try {
       // Convertir imagen URL a base64 si existe
@@ -215,27 +228,66 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
         name: tournament.name,
         description: tournament.description,
         startDate: tournament.startDate,
-        endDate: tournament.endDate || '',
-        location: tournament.location || '',
-        latitude: tournament.latitude,
-        longitude: tournament.longitude,
+        address: tournament.address,
         status: this.mapStatusTypeToBackend(newStatus),
         allowTeamRegistration: true,
         imageBase64: imageBase64,
         imageContentType: imageContentType
       };
 
+      // Solo agregar endDate si tiene valor
+      if (tournament.endDate && tournament.endDate.trim() !== '') {
+        updateRequest.endDate = tournament.endDate;
+      }
+
       this.tournamentService.updateTournament(tournament.id, updateRequest).subscribe({
         next: () => {
-          this.loadTournaments(); // Recargar lista después del cambio
+          if (useGlobalLoading) {
+            this.loadTournaments(); // Recargar lista después del cambio
+          } else {
+            // Actualizar solo el torneo específico sin recargar toda la lista
+            this.updateTournamentInList(tournament.id, newStatus);
+            this.tournamentLoadingStates.set(tournament.id, false);
+            this.cdr.detectChanges();
+          }
         },
         error: (error) => {
           console.error('Error changing tournament status:', error);
+          if (useGlobalLoading) {
+            this.isLoading = false;
+          } else {
+            this.tournamentLoadingStates.set(tournament.id, false);
+          }
+          this.cdr.detectChanges();
         }
       });
     } catch (error) {
       console.error('Error preparing tournament update:', error);
+      if (useGlobalLoading) {
+        this.isLoading = false;
+      } else {
+        this.tournamentLoadingStates.set(tournament.id, false);
+      }
+      this.cdr.detectChanges();
     }
+  }
+
+  /**
+   * Actualiza un torneo específico en la lista sin recargar toda la lista
+   */
+  private updateTournamentInList(tournamentId: number, newStatus: TournamentStatusType): void {
+    const tournamentIndex = this.tournaments.findIndex(t => t.id === tournamentId);
+    if (tournamentIndex !== -1) {
+      this.tournaments[tournamentIndex].status = newStatus;
+      this.filteredTournaments = [...this.tournaments];
+    }
+  }
+
+  /**
+   * Verifica si un torneo específico está en estado de loading
+   */
+  isTournamentLoading(tournamentId: number): boolean {
+    return this.tournamentLoadingStates.get(tournamentId) || false;
   }
 
   /**
@@ -257,8 +309,8 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Cambiar estado a Deleted en lugar de eliminar físicamente
-        this.changeStatus(tournament, TournamentStatusType.Deleted);
+        // Cambiar estado a Deleted usando loading global para eliminación
+        this.changeStatus(tournament, TournamentStatusType.Deleted, true);
       }
     });
   }
@@ -291,16 +343,15 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   /**
    * Obtiene la clase CSS para el estado del torneo basado en TournamentStatusType
    */
-  getStatusClass(status: TournamentStatus): string {
-    // Mapear TournamentStatus a TournamentStatusType para UI
+  getStatusClass(status: TournamentStatusType): string {
     switch (status) {
-      case TournamentStatus.Active:
+      case TournamentStatusType.Active:
         return 'status-active';
-      case TournamentStatus.Completed:
+      case TournamentStatusType.Completed:
         return 'status-completed';
-      case TournamentStatus.Comming:
+      case TournamentStatusType.Coming:
         return 'status-coming';
-      case TournamentStatus.Cancelled:
+      case TournamentStatusType.Deleted:
         return 'status-deleted';
       default:
         return '';
@@ -310,16 +361,15 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   /**
    * Obtiene el texto del estado del torneo basado en TournamentStatusType
    */
-  getStatusText(status: TournamentStatus): string {
-    // Mapear TournamentStatus a TournamentStatusType para UI
+  getStatusText(status: TournamentStatusType): string {
     switch (status) {
-      case TournamentStatus.Active:
+      case TournamentStatusType.Active:
         return 'Activo';
-      case TournamentStatus.Completed:
+      case TournamentStatusType.Completed:
         return 'Completado';
-      case TournamentStatus.Comming:
+      case TournamentStatusType.Coming:
         return 'Próximo';
-      case TournamentStatus.Cancelled:
+      case TournamentStatusType.Deleted:
         return 'Eliminado';
       default:
         return 'Desconocido';
@@ -379,53 +429,74 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
 
   /**
    * Mapea TournamentStatusType a valor del backend
+   * CORREGIDO: Los valores deben coincidir con el enum TournamentStatusType
    */
   private mapStatusTypeToBackend(statusType: TournamentStatusType): number {
-    switch (statusType) {
-      case TournamentStatusType.Coming:
-        return 0;
-      case TournamentStatusType.Active:
-        return 1;
-      case TournamentStatusType.Completed:
-        return 2;
-      case TournamentStatusType.Deleted:
-        return 3;
-      default:
-        return 0;
-    }
+    // Los valores del enum ya son correctos, solo retornamos el valor numérico
+    return statusType;
   }
 
   /**
-   * Obtiene las opciones de estado disponibles para un torneo
+   * Obtiene las opciones de estado disponibles para un torneo según reglas de negocio
+   * - Coming: puede cambiar a Active y Completed
+   * - Active: solo puede cambiar a Completed
+   * - Completed: solo puede cambiar a Active
+   * - Todos: siempre pueden ser eliminados
+   * - Nunca mostrar: cambio a Coming
    */
-  getStatusOptions(currentStatus: TournamentStatus): Array<{value: TournamentStatusType, label: string}> {
-
-    const allOptions = [
-      { value: TournamentStatusType.Active, label: 'Marcar como Activo' },
-      { value: TournamentStatusType.Coming, label: 'Marcar como Próximo' },
-      { value: TournamentStatusType.Completed, label: 'Marcar como Completado' },
-      { value: TournamentStatusType.Deleted, label: 'Eliminar' }
-    ];
-
-    // Filtrar la opción actual para no mostrarla en el menú
+  getStatusOptions(currentStatus: TournamentStatusType): Array<{value: TournamentStatusType, label: string}> {
     const currentStatusType = this.mapToStatusType(currentStatus);
-    const filteredOptions = allOptions.filter(option => option.value !== currentStatusType);
+    const availableOptions: Array<{value: TournamentStatusType, label: string}> = [];
 
-    return filteredOptions;
+    switch (currentStatusType) {
+      case TournamentStatusType.Coming:
+        // Coming puede cambiar a Active y Completed
+        availableOptions.push(
+          { value: TournamentStatusType.Active, label: 'Marcar como Activo' },
+          { value: TournamentStatusType.Completed, label: 'Marcar como Completado' }
+        );
+        break;
+
+      case TournamentStatusType.Active:
+        // Active solo puede cambiar a Completed
+        availableOptions.push(
+          { value: TournamentStatusType.Completed, label: 'Marcar como Completado' }
+        );
+        break;
+
+      case TournamentStatusType.Completed:
+        // Completed solo puede cambiar a Active
+        availableOptions.push(
+          { value: TournamentStatusType.Active, label: 'Marcar como Activo' }
+        );
+        break;
+
+      case TournamentStatusType.Deleted:
+        // Los torneos eliminados no deberían mostrar opciones de cambio de estado
+        // pero mantenemos la lógica por consistencia
+        break;
+    }
+
+    // Siempre agregar la opción de eliminar (excepto si ya está eliminado)
+    if (currentStatusType !== TournamentStatusType.Deleted) {
+      availableOptions.push({ value: TournamentStatusType.Deleted, label: 'Eliminar' });
+    }
+
+    return availableOptions;
   }
 
   /**
-   * Mapea TournamentStatus a TournamentStatusType
+   * Mapea TournamentStatusType a TournamentStatusType
    */
-  private mapToStatusType(status: TournamentStatus): TournamentStatusType {
+  private mapToStatusType(status: TournamentStatusType): TournamentStatusType {
     switch (status) {
-      case TournamentStatus.Active:
+      case TournamentStatusType.Active:
         return TournamentStatusType.Active;
-      case TournamentStatus.Completed:
+      case TournamentStatusType.Completed:
         return TournamentStatusType.Completed;
-      case TournamentStatus.Comming:
+      case TournamentStatusType.Coming:
         return TournamentStatusType.Coming;
-      case TournamentStatus.Cancelled:
+      case TournamentStatusType.Deleted:
         return TournamentStatusType.Deleted;
       default:
         return TournamentStatusType.Coming;

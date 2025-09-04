@@ -1,4 +1,15 @@
 /**
+ * Interface para dirección/ubicación
+ */
+export interface Address {
+  address: string;
+  mainStreet: string;
+  secondStreet: string;
+  latitude: string;
+  longitude: string;
+}
+
+/**
  * Enum para modalidad de torneo, basado en el enum de C#
  */
 export enum TournamentModality {
@@ -12,17 +23,8 @@ export enum TournamentModality {
 }
 
 /**
- * Enum para estado del torneo
- */
-export enum TournamentStatus {
-  Active = 0,
-  Comming = 1,
-  Completed = 2,
-  Cancelled = 3 //eliminado puede ser
-}
-
-/**
- * Enum para tipos de estado del torneo (nuevo)
+ * Enum para estado del torneo - Unificado
+ * Valores alineados con el backend
  */
 export enum TournamentStatusType {
   Active = 0,
@@ -38,14 +40,12 @@ export interface CreateTournamentRequest {
   name: string;
   description: string;
   startDate: string; // ISO 8601 format
-  endDate: string; // ISO 8601 format
+  endDate?: string; // ISO 8601 format - opcional
   imageBase64: string;
   imageContentType: string;
   hasPenaltyMode: boolean;
   modality: TournamentModality;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
+  address?: Address;
 }
 
 /**
@@ -63,14 +63,12 @@ export interface UpdateTournamentRequest {
   name: string;
   description: string;
   startDate: string; // ISO 8601 format
-  endDate: string; // ISO 8601 format
+  endDate?: string; // ISO 8601 format - opcional
   status: TournamentStatusType;
   allowTeamRegistration: boolean;
   imageBase64: string;
   imageContentType: string;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
+  address?: Address;
 }
 
 /**
@@ -84,10 +82,8 @@ export interface Tournament {
   endDate: string | null;
   imageUrl: string | null;
   modality: TournamentModality;
-  status: TournamentStatus;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
+  status: TournamentStatusType;
+  address?: Address;
   totalTeams: number;
   totalMatches: number;
 }
