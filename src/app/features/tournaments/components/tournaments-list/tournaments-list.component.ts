@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -58,7 +59,8 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
     private tournamentService: TournamentService,
     private tournamentStatusService: TournamentStatusService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -126,11 +128,10 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Administrar equipos del torneo
+   * Navega a la vista de administración del torneo (fases y grupos)
    */
   viewTournamentDetails(tournament: Tournament): void {
-    // TODO: Implementar modal de administración de equipos
-    console.log('Administrar equipos del torneo:', tournament.name);
+    this.router.navigate(['/dashboard/tournaments', tournament.id, 'manage']);
   }
 
   /**

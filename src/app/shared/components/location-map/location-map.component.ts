@@ -354,9 +354,17 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
     // Si no hay calle específica, extraer mainStreet del displayName
     if (!mainStreet && displayName) {
       const addressParts = displayName.split(',').map((part: string) => part.trim());
-      mainStreet = addressParts[0]; // Primer elemento como mainStreet
+      mainStreet = addressParts[0] || ''; // Primer elemento como mainStreet
       if (!secondaryStreet && addressParts.length > 1) {
-        secondaryStreet = addressParts[1]; // Segundo elemento como secondaryStreet
+        secondaryStreet = addressParts[1] || ''; // Segundo elemento como secondaryStreet
+      }
+    }
+    
+    // Fallback adicional para secondaryStreet si aún está vacío
+    if (!secondaryStreet && displayName) {
+      const addressParts = displayName.split(',').map((part: string) => part.trim());
+      if (addressParts.length > 1) {
+        secondaryStreet = addressParts[1] || '';
       }
     }
     

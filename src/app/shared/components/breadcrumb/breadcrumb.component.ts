@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -39,12 +40,14 @@ export class BreadcrumbComponent implements OnInit {
     'profile': { label: 'Perfil', icon: 'account_circle' },
     'auth': { label: 'Autenticación', icon: 'login' },
     'login': { label: 'Iniciar Sesión', icon: 'login' },
-    'register': { label: 'Registro', icon: 'person_add' }
+    'register': { label: 'Registro', icon: 'person_add' },
+    'manage': { label: 'Administrar', icon: 'settings' }
   };
 
   constructor(
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private titleService: Title
   ) {
     this.breadcrumbs$ = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -66,17 +69,29 @@ export class BreadcrumbComponent implements OnInit {
       
       const routeInfo = this.routeLabels[segment];
       if (routeInfo) {
+        let label = routeInfo.label;
+        
+        // Si es el segmento "manage" y hay un título personalizado, usar el nombre del torneo
+        if (segment === 'manage') {
+          const pageTitle = this.titleService.getTitle();
+          if (pageTitle && pageTitle.includes(' - EasyGool')) {
+            label = pageTitle.replace(' - EasyGool', '');
+          }
+        }
+        
         breadcrumbs.push({
-          label: routeInfo.label,
+          label: label,
           url: currentUrl,
           icon: index === 0 ? routeInfo.icon : undefined
         });
       } else {
-        // Fallback para segmentos no definidos
-        breadcrumbs.push({
-          label: this.capitalizeFirst(segment),
-          url: currentUrl
-        });
+        // Saltar segmentos numéricos (IDs) en el breadcrumb
+        if (!/^\d+$/.test(segment)) {
+          breadcrumbs.push({
+            label: this.capitalizeFirst(segment),
+            url: currentUrl
+          });
+        }
       }
     });
 

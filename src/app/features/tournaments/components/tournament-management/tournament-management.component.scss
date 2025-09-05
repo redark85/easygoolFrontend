@@ -1,0 +1,539 @@
+.tournament-management-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 20px;
+
+    .loading-text {
+      color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.6));
+      font-size: 16px;
+      margin: 0;
+    }
+  }
+
+  .management-content {
+    .tournament-banner {
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+
+      .banner-content {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        gap: 20px;
+
+        .tournament-avatar {
+          position: relative;
+          flex-shrink: 0;
+
+          .avatar-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          .status-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 28px;
+            height: 28px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+
+            .status-icon {
+              color: white;
+              font-size: 14px;
+              width: 14px;
+              height: 14px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              line-height: 1;
+              margin: 0;
+            }
+
+            &.status-completed {
+              background-color: #2196f3;
+            }
+
+            &.status-deleted {
+              background-color: #f44336;
+            }
+          }
+        }
+
+        .tournament-info {
+          flex: 1;
+          min-width: 0;
+
+          .tournament-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+
+            .tournament-name {
+              margin: 0;
+              font-size: 24px;
+              font-weight: 600;
+              color: var(--mdc-theme-on-surface, #333);
+              line-height: 1.2;
+            }
+
+            .modality-badge {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              padding: 4px 12px;
+              background-color: var(--mdc-theme-primary, #1976d2);
+              color: white;
+              border-radius: 16px;
+              font-size: 12px;
+              font-weight: 500;
+
+              .modality-icon {
+                font-size: 14px;
+              }
+            }
+          }
+
+          .tournament-description {
+            margin: 0;
+            color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.7));
+            font-size: 14px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+        }
+
+        .tournament-stats {
+          display: flex;
+          gap: 16px;
+          flex-shrink: 0;
+
+          .stat-compact {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--mdc-theme-on-surface, #333);
+
+            mat-icon {
+              font-size: 16px;
+              color: var(--mdc-theme-primary, #1976d2);
+            }
+
+            .stat-number {
+              font-weight: 600;
+              color: var(--mdc-theme-primary, #1976d2);
+            }
+
+            .stat-text {
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+
+    .phases-management-card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      mat-card-header {
+        padding: 24px 24px 0 24px;
+
+        .phases-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 16px;
+
+          .phases-title-section {
+            flex: 1;
+
+            mat-card-title {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              margin: 0 0 8px 0;
+              font-size: 20px;
+              font-weight: 600;
+              color: var(--mdc-theme-on-surface, #333);
+
+              mat-icon {
+                color: var(--mdc-theme-primary, #1976d2);
+                font-size: 24px;
+              }
+            }
+
+            mat-card-subtitle {
+              margin: 0;
+              color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.6));
+            }
+          }
+
+          // El botón FAB ahora usa la clase .fab-create-phase
+        }
+      }
+    }
+
+    // Fixed FAB Button para Nueva Fase
+    .fab-create-phase {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: linear-gradient(135deg, var(--mdc-theme-primary, #1976d2), var(--mdc-theme-secondary, #4caf50));
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+      }
+
+      mat-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
+    .phases-management-card {
+      mat-card-content {
+        padding: 24px;
+
+        .no-phases {
+          text-align: center;
+          padding: 40px 20px;
+
+          .no-phases-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.3));
+            margin-bottom: 16px;
+          }
+
+          h3 {
+            color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.7));
+            margin-bottom: 8px;
+          }
+
+          p {
+            color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.5));
+            margin-bottom: 20px;
+          }
+        }
+
+        .phases-accordion {
+          mat-expansion-panel {
+            margin-bottom: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            mat-expansion-panel-header {
+              padding: 16px 24px;
+              min-height: 72px;
+
+              .phase-header-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                min-height: 40px;
+
+                .phase-info {
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+
+                  .phase-icon {
+                    color: var(--mdc-theme-primary, #1976d2);
+                    font-size: 24px;
+                  }
+
+                  .phase-details {
+                    .phase-name {
+                      font-size: 16px;
+                      font-weight: 600;
+                      margin: 0;
+                      color: var(--mdc-theme-on-surface, #333);
+                    }
+
+                    .phase-type {
+                      font-size: 12px;
+                      color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.6));
+                      margin: 2px 0 0 0;
+                    }
+                  }
+                }
+
+                .phase-actions {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding-right: 12px;
+
+                  .groups-badge {
+                    background-color: var(--mdc-theme-primary, #1976d2);
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    white-space: nowrap;
+                    min-height: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  }
+                }
+              }
+            }
+
+            .phase-content {
+              padding: 16px 0;
+
+              .phase-actions {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 16px;
+                flex-wrap: wrap;
+
+                button {
+                  border-radius: 6px;
+                }
+              }
+
+              .groups-section {
+                margin-top: 16px;
+
+                .groups-title {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 16px;
+                  font-weight: 500;
+                  margin-bottom: 16px;
+                  color: var(--mdc-theme-on-surface, #333);
+
+                  mat-icon {
+                    color: var(--mdc-theme-primary, #1976d2);
+                  }
+                }
+
+                .no-groups {
+                  text-align: center;
+                  padding: 20px;
+                  background-color: var(--mdc-theme-surface, #f9f9f9);
+                  border-radius: 8px;
+
+                  .no-groups-icon {
+                    font-size: 32px;
+                    width: 32px;
+                    height: 32px;
+                    color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.3));
+                    margin-bottom: 12px;
+                  }
+
+                  p {
+                    color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.6));
+                    margin-bottom: 16px;
+                  }
+                }
+
+                .groups-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                  gap: 12px;
+
+                  .group-card {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 12px 16px;
+                    background-color: var(--mdc-theme-surface, #fff);
+                    border: 1px solid var(--mdc-theme-outline, #e0e0e0);
+                    border-radius: 8px;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                      border-color: var(--mdc-theme-primary, #1976d2);
+                    }
+
+                    .group-header {
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+
+                      .group-icon {
+                        color: var(--mdc-theme-primary, #1976d2);
+                        font-size: 18px;
+                      }
+
+                      .group-name {
+                        font-weight: 500;
+                        color: var(--mdc-theme-on-surface, #333);
+                      }
+                    }
+
+                    .group-actions {
+                      display: flex;
+                      gap: 4px;
+
+                      button {
+                        width: 32px;
+                        height: 32px;
+                        line-height: 32px;
+
+                        mat-icon {
+                          font-size: 16px;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .error-container {
+    text-align: center;
+    padding: 60px 20px;
+
+    .error-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: var(--mdc-theme-error, #f44336);
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.7));
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.5));
+      margin-bottom: 24px;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .tournament-management-container {
+    padding: 16px;
+
+    .management-content {
+      .tournament-banner {
+        .banner-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 16px;
+
+          .tournament-avatar {
+            align-self: center;
+          }
+
+          .tournament-info {
+            .tournament-header {
+              justify-content: center;
+              flex-direction: column;
+              gap: 8px;
+
+              .tournament-name {
+                font-size: 20px;
+              }
+            }
+          }
+
+          .tournament-stats {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+
+            .stat-compact {
+              justify-content: center;
+            }
+          }
+        }
+      }
+
+      .phases-management-card {
+        mat-card-header {
+          padding: 16px 16px 0 16px;
+
+          .phases-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+
+            .create-phase-btn {
+              width: 100%;
+            }
+          }
+        }
+
+        mat-card-content {
+          padding: 16px;
+
+          .phases-accordion {
+            .phase-panel {
+              .phase-content {
+                .phase-actions {
+                  flex-direction: column;
+
+                  button {
+                    width: 100%;
+                  }
+                }
+
+                .groups-section {
+                  .groups-grid {
+                    grid-template-columns: 1fr;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
