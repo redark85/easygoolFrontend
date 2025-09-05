@@ -69,7 +69,9 @@
           <mat-card-content class="tournament-content">
             <div class="tournament-info">
               <h3 class="tournament-name">{{ tournament.name }}</h3>
-              <p class="tournament-description">{{ tournament.description }}</p>
+              <p class="tournament-description" 
+                 [matTooltip]="tournament.description"
+                 matTooltipPosition="above">{{ tournament.description }}</p>
 
               <!-- Tournament Details -->
               <div class="tournament-details">
@@ -80,6 +82,16 @@
                 <div class="detail-item">
                   <mat-icon class="detail-icon">sports_soccer</mat-icon>
                   <span>{{ tournament.totalMatches }} partidos</span>
+                </div>
+                <div class="detail-item">
+                  <mat-icon class="detail-icon">{{ getModalityIcon(tournament.modality) }}</mat-icon>
+                  <span>{{ getModalityText(tournament.modality) }}</span>
+                </div>
+                <div class="detail-item" *ngIf="tournament.address?.address">
+                  <mat-icon class="detail-icon">place</mat-icon>
+                  <span [matTooltip]="tournament.address?.address || ''"
+                        matTooltipPosition="above"
+                        class="location-text">{{ tournament.address?.address }}</span>
                 </div>
               </div>
 

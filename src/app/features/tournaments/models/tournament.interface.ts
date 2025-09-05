@@ -96,6 +96,13 @@ export interface UpdateTournamentStatusRequest {
 }
 
 /**
+ * Interface para request de cambio de estado de torneo
+ */
+export interface ChangeStatusRequest {
+  status: TournamentStatusType;
+}
+
+/**
  * Interface para response de la API de torneos
  */
 export interface TournamentApiResponse {

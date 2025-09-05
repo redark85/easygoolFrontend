@@ -218,11 +218,9 @@
         color: var(--text-secondary);
         line-height: 1.4;
         margin: 0 0 var(--spacing-md);
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        -webkit-box-orient: vertical;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .tournament-details {
@@ -243,6 +241,30 @@
             width: 1rem;
             height: 1rem;
             color: var(--primary-color);
+          }
+        }
+
+        .detail-item {
+          .location-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+          }
+        }
+
+        .tournament-dates {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-xs);
+          margin-top: var(--spacing-sm);
+          color: var(--text-secondary);
+          font-size: 0.85rem;
+
+          .date-icon {
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
           }
         }
       }

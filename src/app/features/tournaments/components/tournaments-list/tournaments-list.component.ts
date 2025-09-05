@@ -135,6 +135,54 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Obtiene el ícono apropiado para la modalidad del torneo
+   */
+  getModalityIcon(modality: TournamentModality): string {
+    switch (modality) {
+      case TournamentModality.Five:
+        return 'sports_handball';
+      case TournamentModality.Six:
+        return 'sports_soccer';
+      case TournamentModality.Seven:
+        return 'sports_soccer';
+      case TournamentModality.Eight:
+        return 'sports';
+      case TournamentModality.Nine:
+        return 'sports';
+      case TournamentModality.Ten:
+        return 'stadium';
+      case TournamentModality.Eleven:
+        return 'stadium';
+      default:
+        return 'sports_soccer';
+    }
+  }
+
+  /**
+   * Obtiene el texto descriptivo para la modalidad del torneo
+   */
+  getModalityText(modality: TournamentModality): string {
+    switch (modality) {
+      case TournamentModality.Five:
+        return 'Fútbol 5 (Indoor)';
+      case TournamentModality.Six:
+        return 'Fútbol 6';
+      case TournamentModality.Seven:
+        return 'Fútbol 7';
+      case TournamentModality.Eight:
+        return 'Fútbol 8';
+      case TournamentModality.Nine:
+        return 'Fútbol 9';
+      case TournamentModality.Ten:
+        return 'Fútbol 10';
+      case TournamentModality.Eleven:
+        return 'Fútbol 11';
+      default:
+        return 'Modalidad desconocida';
+    }
+  }
+
+  /**
    * Abre modal para crear nuevo torneo
    */
   createTournament(): void {
@@ -201,76 +249,26 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cambia el estado de un torneo usando actualización completa
+   * Cambia el estado de un torneo usando el endpoint específico ChangeStatus
    */
-  async changeStatus(tournament: Tournament, newStatus: TournamentStatusType, useGlobalLoading: boolean = false): Promise<void> {
-    if (useGlobalLoading) {
-      // Activar loading global
-      this.isLoading = true;
-    } else {
-      // Activar loading específico para este torneo
-      this.tournamentLoadingStates.set(tournament.id, true);
-    }
+  changeStatus(tournament: Tournament, newStatus: TournamentStatusType): void {
+    // Activar loading específico para este torneo
+    this.tournamentLoadingStates.set(tournament.id, true);
     this.cdr.detectChanges();
 
-    try {
-      // Convertir imagen URL a base64 si existe
-      let imageBase64 = '';
-      let imageContentType = 'jpeg';
-
-      if (tournament.imageUrl) {
-        const imageData = await this.convertImageUrlToBase64(tournament.imageUrl);
-        imageBase64 = imageData.base64;
-        imageContentType = imageData.contentType;
-      }
-
-      // Preparar data completa para actualización
-      const updateRequest: UpdateTournamentRequest = {
-        name: tournament.name,
-        description: tournament.description,
-        startDate: tournament.startDate,
-        address: tournament.address,
-        status: this.mapStatusTypeToBackend(newStatus),
-        allowTeamRegistration: true,
-        imageBase64: imageBase64,
-        imageContentType: imageContentType
-      };
-
-      // Solo agregar endDate si tiene valor
-      if (tournament.endDate && tournament.endDate.trim() !== '') {
-        updateRequest.endDate = tournament.endDate;
-      }
-
-      this.tournamentService.updateTournament(tournament.id, updateRequest).subscribe({
-        next: () => {
-          if (useGlobalLoading) {
-            this.loadTournaments(); // Recargar lista después del cambio
-          } else {
-            // Actualizar solo el torneo específico sin recargar toda la lista
-            this.updateTournamentInList(tournament.id, newStatus);
-            this.tournamentLoadingStates.set(tournament.id, false);
-            this.cdr.detectChanges();
-          }
-        },
-        error: (error) => {
-          console.error('Error changing tournament status:', error);
-          if (useGlobalLoading) {
-            this.isLoading = false;
-          } else {
-            this.tournamentLoadingStates.set(tournament.id, false);
-          }
-          this.cdr.detectChanges();
-        }
-      });
-    } catch (error) {
-      console.error('Error preparing tournament update:', error);
-      if (useGlobalLoading) {
-        this.isLoading = false;
-      } else {
+    this.tournamentService.changeStatus(tournament.id, newStatus).subscribe({
+      next: () => {
+        // Actualizar solo el torneo específico sin recargar toda la lista
+        this.updateTournamentInList(tournament.id, newStatus);
         this.tournamentLoadingStates.set(tournament.id, false);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error changing tournament status:', error);
+        this.tournamentLoadingStates.set(tournament.id, false);
+        this.cdr.detectChanges();
       }
-      this.cdr.detectChanges();
-    }
+    });
   }
 
   /**
@@ -310,8 +308,25 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Cambiar estado a Deleted usando loading global para eliminación
-        this.changeStatus(tournament, TournamentStatusType.Deleted, true);
+        // Activar loading específico para este torneo
+        this.tournamentLoadingStates.set(tournament.id, true);
+        this.cdr.detectChanges();
+
+        // Usar el endpoint específico de eliminación
+        this.tournamentService.deleteTournament(tournament.id).subscribe({
+          next: () => {
+            // Remover el torneo de la lista local
+            this.tournaments = this.tournaments.filter(t => t.id !== tournament.id);
+            this.filteredTournaments = [...this.tournaments];
+            this.tournamentLoadingStates.delete(tournament.id);
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error deleting tournament:', error);
+            this.tournamentLoadingStates.set(tournament.id, false);
+            this.cdr.detectChanges();
+          }
+        });
       }
     });
   }
