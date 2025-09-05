@@ -4,8 +4,9 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { filter, map, startWith } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { filter, map, startWith, combineLatest, switchMap } from 'rxjs/operators';
+import { Observable, merge } from 'rxjs';
+import { TournamentStore } from '../../../core/store/tournament.store';
 
 interface BreadcrumbItem {
   label: string;
@@ -47,11 +48,18 @@ export class BreadcrumbComponent implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private titleService: Title
+    private titleService: Title,
+    private tournamentStore: TournamentStore
   ) {
-    this.breadcrumbs$ = this.router.events.pipe(
+    // Combinar eventos de navegación con cambios en el store del torneo
+    const navigationEvents$ = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
-      startWith(new NavigationEnd(0, this.router.url, this.router.url)),
+      startWith(new NavigationEnd(0, this.router.url, this.router.url))
+    );
+
+    const storeChanges$ = this.tournamentStore.getState$();
+
+    this.breadcrumbs$ = merge(navigationEvents$, storeChanges$).pipe(
       map(() => this.buildBreadcrumbs())
     );
   }
@@ -94,6 +102,22 @@ export class BreadcrumbComponent implements OnInit {
         }
       }
     });
+
+    // Verificar si estamos en una ruta de administración de torneo y actualizar el último breadcrumb
+    if (urlSegments.includes('manage') && urlSegments.includes('tournaments')) {
+      const currentTournamentName = this.tournamentStore.state.currentTournamentName;
+      if (currentTournamentName && breadcrumbs.length > 0) {
+        // Actualizar el último breadcrumb con el nombre del torneo desde el store
+        breadcrumbs[breadcrumbs.length - 1].label = currentTournamentName;
+      } else {
+        // Fallback al título de la página si el store no tiene el nombre
+        const pageTitle = this.titleService.getTitle();
+        if (pageTitle && pageTitle.includes(' - EasyGool') && breadcrumbs.length > 0) {
+          const tournamentName = pageTitle.replace(' - EasyGool', '');
+          breadcrumbs[breadcrumbs.length - 1].label = tournamentName;
+        }
+      }
+    }
 
     return breadcrumbs;
   }

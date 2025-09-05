@@ -20,6 +20,7 @@
           
           <!-- Status Badge sobre la imagen -->
           <div class="status-badge" 
+               [class]="getStatusClass(tournament.status)"
                [matTooltip]="getStatusText(tournament.status)"
                matTooltipPosition="above">
             <mat-icon class="status-icon">{{ getStatusIcon(tournament.status) }}</mat-icon>

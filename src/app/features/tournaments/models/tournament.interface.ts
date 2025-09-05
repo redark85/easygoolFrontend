@@ -113,3 +113,47 @@ export interface TournamentApiResponse {
   messageId: string | null;
   messageType: string | null;
 }
+
+/**
+ * Interface para el detalle completo de un torneo desde la API
+ */
+export interface TournamentDetail {
+  id: number;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  imageUrl: string;
+  status: TournamentStatusType;
+  totalTeams: number;
+  totalMatches: number;
+  manager: TournamentManager;
+  tournamentLink: string;
+  hasPenaltyMode: boolean;
+  allowTeamRegistration: boolean;
+  modality: TournamentModality;
+  address: AddressDetail;
+}
+
+/**
+ * Interface para la dirección con ID en el detalle del torneo
+ */
+export interface AddressDetail {
+  id: number;
+  address: string;
+  mainStreet: string;
+  secondStreet: string;
+  latitude: string;
+  longitude: string;
+}
+
+/**
+ * Interface para response de la API de detalle de torneo
+ */
+export interface TournamentDetailResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: TournamentDetail;
+}

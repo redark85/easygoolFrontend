@@ -70,6 +70,10 @@
               margin: 0;
             }
 
+            &.status-coming {
+              background-color: #ff9800; // Naranja para estado próximo
+            }
+
             &.status-completed {
               background-color: #2196f3;
             }

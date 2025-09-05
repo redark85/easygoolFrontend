@@ -14,10 +14,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Subject, takeUntil } from 'rxjs';
 
-import { Tournament, TournamentModality, TournamentStatusType } from '../../models/tournament.interface';
+import { Tournament, TournamentModality, TournamentStatusType, TournamentDetail } from '../../models/tournament.interface';
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { TournamentService } from '../../services/tournament.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { TournamentStore } from '../../../../core/store/tournament.store';
 
 @Component({
   selector: 'app-tournament-management',
@@ -40,7 +41,7 @@ import { ToastService } from '../../../../core/services/toast.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TournamentManagementComponent implements OnInit, OnDestroy {
-  tournament: Tournament | null = null;
+  tournament: TournamentDetail | null = null;
   phases: Phase[] = [];
   isLoading = false;
   tournamentId: number = 0;
@@ -53,7 +54,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     private titleService: Title,
     private tournamentService: TournamentService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private tournamentStore: TournamentStore
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +74,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Limpiar el store al salir del componente
+    this.tournamentStore.clearCurrentTournament();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -83,56 +87,52 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    // TODO: Implementar servicio para obtener torneo por ID
-    // Por ahora, simularemos la carga
-    setTimeout(() => {
-      // Mock data - reemplazar con servicio real
-      this.tournament = {
-        id: this.tournamentId,
-        name: 'Copa Primavera 2024',
-        description: 'Torneo de fútbol 7 para equipos amateur de la ciudad',
-        startDate: '2024-03-15T10:00:00Z',
-        endDate: '2024-03-30T18:00:00Z',
-        imageUrl: 'assets/logo.png',
-        modality: TournamentModality.Seven,
-        status: TournamentStatusType.Active,
-        address: {
-          address: 'Parque La Carolina, Quito, Ecuador',
-          mainStreet: 'Parque La Carolina',
-          secondStreet: 'Av. Eloy Alfaro',
-          latitude: '-0.1807',
-          longitude: '-78.4678'
-        },
-        totalTeams: 16,
-        totalMatches: 32
-      };
+    this.tournamentService.getTournamentById(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentData) => {
+          this.tournament = tournamentData;
+          
+          // Actualizar título de la página para el breadcrumb
+          this.titleService.setTitle(`${this.tournament.name} - EasyGool`);
+          
+          // Actualizar el store con la información del torneo
+          this.tournamentStore.setCurrentTournament(this.tournament.id, this.tournament.name);
 
-      // Actualizar título de la página para el breadcrumb
-      this.titleService.setTitle(`${this.tournament.name} - EasyGool`);
+          // TODO: Implementar carga de fases desde API
+          // Por ahora, mock data para fases
+          this.phases = [
+            {
+              id: 1,
+              name: 'Fase de Grupos',
+              phaseType: PhaseType.GroupStage,
+              groups: [
+                { id: 1, name: 'Grupo A' },
+                { id: 2, name: 'Grupo B' },
+                { id: 3, name: 'Grupo C' },
+                { id: 4, name: 'Grupo D' }
+              ]
+            },
+            {
+              id: 2,
+              name: 'Cuartos de Final',
+              phaseType: PhaseType.Knockout,
+              groups: []
+            }
+          ];
 
-      this.phases = [
-        {
-          id: 1,
-          name: 'Fase de Grupos',
-          phaseType: PhaseType.GroupStage,
-          groups: [
-            { id: 1, name: 'Grupo A' },
-            { id: 2, name: 'Grupo B' },
-            { id: 3, name: 'Grupo C' },
-            { id: 4, name: 'Grupo D' }
-          ]
+          this.isLoading = false;
+          this.cdr.detectChanges();
         },
-        {
-          id: 2,
-          name: 'Cuartos de Final',
-          phaseType: PhaseType.Knockout,
-          groups: []
+        error: (error) => {
+          console.error('Error loading tournament:', error);
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          // El error ya se maneja en el servicio con toast
+          // Redirigir a la lista de torneos
+          this.router.navigate(['/dashboard/tournaments']);
         }
-      ];
-
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }, 1000);
+      });
   }
 
   /**
@@ -197,6 +197,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     switch (status) {
       case TournamentStatusType.Active:
         return 'status-active';
+      case TournamentStatusType.Coming:
+        return 'status-coming';
       case TournamentStatusType.Completed:
         return 'status-completed';
       case TournamentStatusType.Deleted:
@@ -213,6 +215,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     switch (status) {
       case TournamentStatusType.Active:
         return 'Activo';
+      case TournamentStatusType.Coming:
+        return 'Próximo';
       case TournamentStatusType.Completed:
         return 'Completado';
       case TournamentStatusType.Deleted:
@@ -229,6 +233,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     switch (status) {
       case TournamentStatusType.Active:
         return 'check_circle';
+      case TournamentStatusType.Coming:
+        return 'schedule';
       case TournamentStatusType.Completed:
         return 'emoji_events';
       case TournamentStatusType.Deleted:

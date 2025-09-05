@@ -5,10 +5,10 @@ import { map } from 'rxjs/operators';
 import { ApiService } from '@core/services/api.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '@core/services/toast.service';
-import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT } from '@core/config/endpoints';
+import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
 
-import { CreateTournamentRequest, UpdateTournamentRequest, Tournament, TournamentApiResponse, TournamentStatusType, UpdateTournamentStatusRequest, ChangeStatusRequest } from '../models/tournament.interface';
+import { CreateTournamentRequest, UpdateTournamentRequest, Tournament, TournamentApiResponse, TournamentStatusType, UpdateTournamentStatusRequest, ChangeStatusRequest, TournamentDetailResponse, TournamentDetail } from '../models/tournament.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +45,23 @@ export class TournamentService {
   getAllTournamentsByUser(): Observable<Tournament[]> {
     return this.apiService.get<TournamentApiResponse>(TOURNAMENT_GET_ALL_BY_USER_ENDPOINT).pipe(
       map(response => response.result || [])
+    );
+  }
+
+  /**
+   * Obtiene el detalle de un torneo por ID
+   * @param id ID del torneo a obtener
+   * @returns Observable con el detalle del torneo
+   */
+  getTournamentById(id: number): Observable<TournamentDetail> {
+    return this.apiService.get<TournamentDetailResponse>(`${TOURNAMENT_GET_BY_ID_ENDPOINT}?id=${id}`).pipe(
+      map(response => {
+        if (!response.succeed) {
+          this.toastService.showError(response.message || 'No se pudo obtener el detalle del torneo.');
+          throw new Error(response.message || 'Error al obtener torneo');
+        }
+        return response.result;
+      })
     );
   }
 
