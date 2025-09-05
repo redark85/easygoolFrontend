@@ -67,6 +67,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '1',
     homeTeam: MOCK_TEAMS[0], // Real Madrid
     awayTeam: MOCK_TEAMS[1], // Barcelona
+    homeScore: 2,
+    awayScore: 1,
     score: { homeScore: 2, awayScore: 1, halfTimeHome: 1, halfTimeAway: 0 },
     status: MatchStatus.LIVE,
     period: MatchPeriod.SECOND_HALF,
@@ -82,6 +84,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '2',
     homeTeam: MOCK_TEAMS[2], // Atlético Madrid
     awayTeam: MOCK_TEAMS[3], // Valencia
+    homeScore: 3,
+    awayScore: 1,
     score: { homeScore: 3, awayScore: 1, halfTimeHome: 2, halfTimeAway: 0 },
     status: MatchStatus.FINISHED,
     period: MatchPeriod.FINISHED,
@@ -96,6 +100,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '3',
     homeTeam: MOCK_TEAMS[4], // Sevilla
     awayTeam: MOCK_TEAMS[5], // Betis
+    homeScore: 0,
+    awayScore: 0,
     score: { homeScore: 0, awayScore: 0 },
     status: MatchStatus.HALF_TIME,
     period: MatchPeriod.HALF_TIME,
@@ -111,6 +117,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '4',
     homeTeam: MOCK_TEAMS[6], // Athletic Bilbao
     awayTeam: MOCK_TEAMS[7], // Real Sociedad
+    homeScore: 1,
+    awayScore: 2,
     score: { homeScore: 1, awayScore: 2, halfTimeHome: 0, halfTimeAway: 1 },
     status: MatchStatus.FINISHED,
     period: MatchPeriod.FINISHED,
@@ -127,6 +135,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '5',
     homeTeam: MOCK_TEAMS[1], // Barcelona
     awayTeam: MOCK_TEAMS[4], // Sevilla
+    homeScore: null,
+    awayScore: null,
     score: { homeScore: 0, awayScore: 0 },
     status: MatchStatus.SCHEDULED,
     period: MatchPeriod.NOT_STARTED,
@@ -140,6 +150,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '6',
     homeTeam: MOCK_TEAMS[3], // Valencia
     awayTeam: MOCK_TEAMS[0], // Real Madrid
+    homeScore: null,
+    awayScore: null,
     score: { homeScore: 0, awayScore: 0 },
     status: MatchStatus.SCHEDULED,
     period: MatchPeriod.NOT_STARTED,
@@ -155,6 +167,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '7',
     homeTeam: MOCK_TEAMS[5], // Betis
     awayTeam: MOCK_TEAMS[2], // Atlético Madrid
+    homeScore: 1,
+    awayScore: 3,
     score: { homeScore: 1, awayScore: 3, halfTimeHome: 1, halfTimeAway: 1 },
     status: MatchStatus.FINISHED,
     period: MatchPeriod.FINISHED,
@@ -169,6 +183,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '8',
     homeTeam: MOCK_TEAMS[7], // Real Sociedad
     awayTeam: MOCK_TEAMS[6], // Athletic Bilbao
+    homeScore: 2,
+    awayScore: 0,
     score: { homeScore: 2, awayScore: 0, halfTimeHome: 1, halfTimeAway: 0 },
     status: MatchStatus.FINISHED,
     period: MatchPeriod.FINISHED,
@@ -185,6 +201,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '9',
     homeTeam: MOCK_TEAMS[0], // Real Madrid
     awayTeam: MOCK_TEAMS[2], // Atlético Madrid
+    homeScore: null,
+    awayScore: null,
     score: { homeScore: 0, awayScore: 0 },
     status: MatchStatus.SCHEDULED,
     period: MatchPeriod.NOT_STARTED,
@@ -198,6 +216,8 @@ export const MOCK_MATCHES: Match[] = [
     id: '10',
     homeTeam: MOCK_TEAMS[1], // Barcelona
     awayTeam: MOCK_TEAMS[4], // Sevilla
+    homeScore: null,
+    awayScore: null,
     score: { homeScore: 0, awayScore: 0 },
     status: MatchStatus.SCHEDULED,
     period: MatchPeriod.NOT_STARTED,

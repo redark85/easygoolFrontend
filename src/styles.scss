@@ -22,6 +22,43 @@
   --background-light: #FAFAFA;   // Fondo claro
   --background-dark: #303030;    // Fondo oscuro
 
+  // Estados de torneo y elementos
+  --status-active: #4CAF50;      // Verde para activo
+  --status-completed: #2196F3;   // Azul info para completado
+  --status-coming: #FF9800;      // Naranja para próximo
+  --status-deleted: #F44336;     // Rojo para eliminado
+  --status-unknown: #9E9E9E;     // Gris para desconocido
+
+  // Colores de UI comunes
+  --success-color: #4CAF50;      // Verde éxito
+  --info-color: #2196F3;        // Azul información
+  --warning-color: #FF9800;     // Naranja advertencia
+  --error-color: #F44336;       // Rojo error
+  --disabled-color: #9E9E9E;    // Gris deshabilitado
+
+  // Colores de bordes y divisores
+  --border-light: #E0E0E0;      // Borde claro
+  --border-medium: #BDBDBD;     // Borde medio
+  --border-dark: #757575;       // Borde oscuro
+  --divider-color: #E0E0E0;     // Color divisor
+
+  // Colores de fondo adicionales
+  --surface-color: #FFFFFF;     // Superficie blanca
+  --surface-variant: #F5F5F5;   // Superficie variante
+  --overlay-light: rgba(0, 0, 0, 0.1);   // Overlay claro
+  --overlay-medium: rgba(0, 0, 0, 0.3);  // Overlay medio
+  --overlay-dark: rgba(0, 0, 0, 0.5);    // Overlay oscuro
+  --overlay-heavy: rgba(0, 0, 0, 0.7);   // Overlay pesado
+
+  // Colores específicos del sidebar
+  --sidebar-bg: #2C3E50;        // Fondo sidebar
+  --sidebar-bg-collapsed: #34495E; // Fondo sidebar colapsado
+  --sidebar-text: #FFFFFF;      // Texto sidebar
+  --sidebar-text-muted: rgba(255, 255, 255, 0.7); // Texto sidebar atenuado
+  --sidebar-border: rgba(255, 255, 255, 0.1);     // Borde sidebar
+  --sidebar-hover: rgba(255, 255, 255, 0.1);      // Hover sidebar
+  --sidebar-active: rgba(255, 255, 255, 0.2);     // Activo sidebar
+
   // Temática futbolística
   --field-green: #228B22;        // Verde césped
   --field-green-light: #32CD32;  // Verde césped claro
@@ -171,7 +208,7 @@ html, body {
   width: var(--fab-size);
   height: var(--fab-size);
   border-radius: 50%;
-  background-color: #1976D2 !important;
+  background-color: var(--primary-color) !important;
   color: white;
   border: none;
   box-shadow: var(--shadow-lg);
@@ -182,7 +219,7 @@ html, body {
   cursor: pointer;
 
   &:hover {
-    background-color: #1565C0 !important;
+    background-color: var(--primary-dark) !important;
     transform: scale(1.1);
     box-shadow: 0 12px 28px rgba(25, 118, 210, 0.4);
   }
@@ -301,7 +338,7 @@ html, body {
     .dialog-actions {
       padding: 1.5rem 0 0 0;
       gap: 0.75rem;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--divider-color);
       margin-top: 1rem;
 
       button {
@@ -310,12 +347,12 @@ html, body {
         font-weight: 500;
 
         &[mat-stroked-button] {
-          border-color: #ddd;
-          color: #666;
+          border-color: var(--border-light);
+          color: var(--text-secondary);
 
           &:hover:not([disabled]) {
-            background: #f5f5f5;
-            border-color: #bbb;
+            background: var(--surface-variant);
+            border-color: var(--border-medium);
           }
         }
 
@@ -323,8 +360,8 @@ html, body {
           background: var(--primary-color);
 
           &:disabled {
-            background: #e0e0e0;
-            color: #9e9e9e;
+            background: var(--border-light);
+            color: var(--disabled-color);
           }
         }
       }
@@ -382,7 +419,7 @@ html, body {
     z-index: 9999 !important;
     opacity: 1 !important;
     visibility: visible !important;
-    background-color: #2c3e50 !important;
+    background-color: var(--sidebar-bg) !important;
     background-image: url('../public/assets/sidebar.jpg') !important;
     background-size: cover !important;
     background-position: center !important;
@@ -391,12 +428,12 @@ html, body {
 
 ::ng-deep .mat-sidenav-backdrop {
   z-index: 9998 !important;
-  background-color: rgba(0, 0, 0, 0.5) !important;
+  background-color: var(--overlay-dark) !important;
   opacity: 1 !important;
 }
 
 ::ng-deep .cdk-overlay-backdrop {
-  background-color: rgba(0, 0, 0, 0.5) !important;
+  background-color: var(--overlay-dark) !important;
   opacity: 1 !important;
 }
 
@@ -409,7 +446,7 @@ html, body {
 // Asegurar visibilidad completa en móviles
 @media (max-width: 768px) {
   ::ng-deep .mat-sidenav {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 8px 32px var(--overlay-medium) !important;
     border-right: none !important;
     transform: none !important;
     opacity: 1 !important;

@@ -1,24 +1,23 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Title } from '@angular/platform-browser';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatBadgeModule } from '@angular/material/badge';
-import { Subject, takeUntil } from 'rxjs';
-
-import { Tournament, TournamentModality, TournamentStatusType, TournamentDetail } from '../../models/tournament.interface';
-import { Phase, Group, PhaseType } from '../../models/phase.interface';
-import { TournamentService } from '../../services/tournament.service';
-import { ToastService } from '../../../../core/services/toast.service';
-import { TournamentStore } from '../../../../core/store/tournament.store';
+import { MatDividerModule } from '@angular/material/divider';
+import { Subject, takeUntil, switchMap, filter } from 'rxjs';
+import { TournamentService } from '@features/tournaments/services/tournament.service';
+import { TournamentDetail, TournamentStatusType, TournamentModality } from '@features/tournaments/models/tournament.interface';
+import { Phase, Group, PhaseType } from '@features/tournaments/models/phase.interface';
+import { Team } from '@features/tournaments/models/team.interface';
+import { Title } from '@angular/platform-browser';
+import { TournamentStore } from '@core/store/tournament.store';
+import { ToastService } from '@core/services/toast.service';
 
 @Component({
   selector: 'app-tournament-management',
@@ -30,7 +29,6 @@ import { TournamentStore } from '../../../../core/store/tournament.store';
     MatIconModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatTabsModule,
     MatExpansionModule,
     MatDividerModule,
     MatTooltipModule,
@@ -43,6 +41,7 @@ import { TournamentStore } from '../../../../core/store/tournament.store';
 export class TournamentManagementComponent implements OnInit, OnDestroy {
   tournament: TournamentDetail | null = null;
   phases: Phase[] = [];
+  teams: Team[] = [];
   isLoading = false;
   tournamentId: number = 0;
 
@@ -337,33 +336,90 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     console.log('Crear grupo en fase:', phase.name);
   }
 
-  /**
-   * Edita un grupo existente
-   */
-  editGroup(group: Group): void {
-    // TODO: Implementar modal para editar grupo
-    console.log('Editar grupo:', group.name);
-  }
+/**
+ * Edita un grupo existente
+ */
+editGroup(group: Group): void {
+  // TODO: Implementar modal para editar grupo
+  console.log('Editar grupo:', group.name);
+}
 
-  /**
-   * Elimina un grupo
-   */
-  deleteGroup(group: Group): void {
-    // TODO: Implementar confirmación y eliminación
-    console.log('Eliminar grupo:', group.name);
-  }
+/**
+ * Elimina un grupo
+ */
+deleteGroup(group: Group): void {
+  // TODO: Implementar confirmación y eliminación
+  console.log('Eliminar grupo:', group.name);
+}
 
-  /**
-   * TrackBy function para fases
-   */
-  trackByPhaseId(index: number, phase: Phase): number {
-    return phase.id || index;
-  }
+// Team management methods
+createTeam(): void {
+  console.log('Create team clicked');
+  // TODO: Implement team creation modal
+}
 
-  /**
-   * TrackBy function para grupos
-   */
-  trackByGroupId(index: number, group: Group): number {
-    return group.id || index;
-  }
+editTeam(team: Team): void {
+  console.log('Edit team:', team);
+  // TODO: Implement team editing modal
+}
+
+deleteTeam(team: Team): void {
+  console.log('Delete team:', team);
+  // TODO: Implement team deletion confirmation
+}
+
+/**
+ * TrackBy function para fases
+ */
+trackByPhaseId(index: number, phase: Phase): number {
+  return phase.id || 0;
+}
+
+/**
+ * TrackBy function para grupos
+ */
+trackByGroupId(index: number, group: Group): number {
+  return group.id || 0;
+}
+
+/**
+ * TrackBy function para equipos
+ */
+trackByTeamId(index: number, team: Team): number {
+  return team.tournamentId || index;
+}
+
+// Initialize mock teams data
+private initializeMockTeams(): void {
+  this.teams = [
+    {
+      tournamentId: this.tournamentId,
+      name: 'Real Madrid FC',
+      shortName: 'RMA',
+      logoBase64: '',
+      logoContentType: 'image/png'
+    },
+    {
+      tournamentId: this.tournamentId,
+      name: 'FC Barcelona',
+      shortName: 'BAR',
+      logoBase64: '',
+      logoContentType: 'image/png'
+    },
+    {
+      tournamentId: this.tournamentId,
+      name: 'Atlético Madrid',
+      shortName: 'ATM',
+      logoBase64: '',
+      logoContentType: 'image/png'
+    },
+    {
+      tournamentId: this.tournamentId,
+      name: 'Valencia CF',
+      shortName: 'VAL',
+      logoBase64: '',
+      logoContentType: 'image/png'
+    }
+  ];
+}
 }

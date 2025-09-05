@@ -3,6 +3,7 @@ export interface Team {
   name: string;
   shortName: string;
   logo: string;
+  logoUrl?: string;
   color: string;
 }
 
@@ -36,10 +37,12 @@ export interface Match {
   id: string;
   homeTeam: Team;
   awayTeam: Team;
+  homeScore: number | null;
+  awayScore: number | null;
   score: MatchScore;
   status: MatchStatus;
   period: MatchPeriod;
-  minute?: number;
+  minute?: number | null;
   date: Date;
   venue: string;
   tournament: string;

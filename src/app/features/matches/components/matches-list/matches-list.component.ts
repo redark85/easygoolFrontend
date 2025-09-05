@@ -66,8 +66,8 @@ export class MatchesListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     // Datos mock temporales hasta implementar MatchService
     setTimeout(() => {
-      this.matchGroups = [];
-      this.filteredMatchGroups = [];
+      this.matchGroups = this.getMockMatchGroups();
+      this.filteredMatchGroups = this.matchGroups;
       this.isLoading = false;
       this.cdr.markForCheck();
     }, 1000);
@@ -211,5 +211,159 @@ export class MatchesListComponent implements OnInit, OnDestroy {
 
   shouldExpandByDefault(group: MatchGroup): boolean {
     return group.isToday || group.matches.some(match => this.isLiveMatch(match.status));
+  }
+
+  private getMockMatchGroups(): MatchGroup[] {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    return [
+      {
+        date: this.formatDate(yesterday),
+        displayDate: 'Ayer',
+        isToday: false,
+        isTomorrow: false,
+        isYesterday: true,
+        matches: [
+          {
+            id: '1',
+            homeTeam: {
+              id: '1',
+              name: 'Real Madrid FC',
+              shortName: 'RMA',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#FFFFFF'
+            },
+            awayTeam: {
+              id: '2',
+              name: 'FC Barcelona',
+              shortName: 'BAR',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#004D98'
+            },
+            homeScore: 2,
+            awayScore: 1,
+            score: { homeScore: 2, awayScore: 1, halfTimeHome: 1, halfTimeAway: 0 },
+            date: new Date(yesterday.getTime() + 20 * 60 * 60 * 1000), // 8:00 PM
+            status: MatchStatus.FINISHED,
+            tournament: 'Liga EasyGool',
+            venue: 'Estadio Santiago Bernabéu',
+            minute: null,
+            period: MatchPeriod.FINISHED
+          }
+        ]
+      },
+      {
+        date: this.formatDate(today),
+        displayDate: 'Hoy',
+        isToday: true,
+        isTomorrow: false,
+        isYesterday: false,
+        matches: [
+          {
+            id: '2',
+            homeTeam: {
+              id: '3',
+              name: 'Atlético Madrid',
+              shortName: 'ATM',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#CB3524'
+            },
+            awayTeam: {
+              id: '4',
+              name: 'Valencia CF',
+              shortName: 'VAL',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#FF6600'
+            },
+            homeScore: 1,
+            awayScore: 0,
+            score: { homeScore: 1, awayScore: 0 },
+            date: new Date(today.getTime() + 15 * 60 * 60 * 1000), // 3:00 PM
+            status: MatchStatus.LIVE,
+            tournament: 'Liga EasyGool',
+            venue: 'Wanda Metropolitano',
+            minute: 67,
+            period: MatchPeriod.SECOND_HALF
+          },
+          {
+            id: '3',
+            homeTeam: {
+              id: '5',
+              name: 'Sevilla FC',
+              shortName: 'SEV',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#D50000'
+            },
+            awayTeam: {
+              id: '6',
+              name: 'Real Betis',
+              shortName: 'BET',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#00A651'
+            },
+            homeScore: 0,
+            awayScore: 0,
+            score: { homeScore: 0, awayScore: 0 },
+            date: new Date(today.getTime() + 18 * 60 * 60 * 1000), // 6:00 PM
+            status: MatchStatus.SCHEDULED,
+            tournament: 'Liga EasyGool',
+            venue: 'Ramón Sánchez-Pizjuán',
+            minute: null,
+            period: MatchPeriod.NOT_STARTED
+          }
+        ]
+      },
+      {
+        date: this.formatDate(tomorrow),
+        displayDate: 'Mañana',
+        isToday: false,
+        isTomorrow: true,
+        isYesterday: false,
+        matches: [
+          {
+            id: '4',
+            homeTeam: {
+              id: '7',
+              name: 'Athletic Bilbao',
+              shortName: 'ATH',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#EE2523'
+            },
+            awayTeam: {
+              id: '8',
+              name: 'Real Sociedad',
+              shortName: 'RSO',
+              logo: 'assets/team-1.jpg',
+              logoUrl: 'assets/team-1.jpg',
+              color: '#004C99'
+            },
+            homeScore: null,
+            awayScore: null,
+            score: { homeScore: 0, awayScore: 0 },
+            date: new Date(tomorrow.getTime() + 16 * 60 * 60 * 1000), // 4:00 PM
+            status: MatchStatus.SCHEDULED,
+            tournament: 'Liga EasyGool',
+            venue: 'San Mamés',
+            minute: null,
+            period: MatchPeriod.NOT_STARTED
+          }
+        ]
+      }
+    ];
+  }
+
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 }
