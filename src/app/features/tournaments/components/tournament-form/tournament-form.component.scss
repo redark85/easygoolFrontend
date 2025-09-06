@@ -1,6 +1,66 @@
-@use '../../../../../styles.scss' as styles;
-
-@include styles.modal-layout('tournament-form-container');
+:host {
+  .modal-container {
+    padding: 24px;
+    min-width: 400px;
+    max-width: 600px;
+    
+    h2[mat-dialog-title] {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 0 0 20px 0;
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      font-weight: 500;
+      
+      .ball-icon {
+        font-size: 1.5rem;
+        padding-top: 5px;
+      }
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      
+      .form-field-full {
+        grid-column: 1 / -1;
+      }
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        
+        .form-field {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+    
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 0 0 0;
+      
+      button {
+        min-width: 100px;
+        
+        &[mat-raised-button] {
+          position: relative;
+          
+          .button-spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+        }
+      }
+    }
+  }
+}
 
 .tournament-form-container {
   .image-label {
