@@ -306,7 +306,7 @@ html, body {
   }
 }
 
-// Modal Layout Compartido - EasyGool
+// Modal Layout Compartido - EasyGool con Bootstrap
 @mixin modal-layout($container-class: 'modal-container') {
   .#{$container-class} {
     padding: 1.5rem;
@@ -329,6 +329,59 @@ html, body {
       }
     }
 
+    // Bootstrap container para formularios
+    .container-fluid {
+      padding: 0;
+      margin-bottom: 1.5rem;
+
+      .row {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+
+        [class*="col-"] {
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
+      }
+
+      // Estilos para mat-form-field con Bootstrap
+      mat-form-field {
+        &.w-100 {
+          width: 100%;
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+          margin-top: 0.5rem;
+        }
+      }
+
+      // Labels para image uploaders
+      .image-label {
+        display: block;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      // Error messages
+      .error-message {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--error-color);
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+
+        mat-icon {
+          font-size: 1rem;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+    }
+
+    // Compatibilidad con form-grid legacy (deprecated)
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -349,6 +402,11 @@ html, body {
         .mat-mdc-form-field-subscript-wrapper {
           margin-top: 0.5rem;
         }
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
       }
     }
 
@@ -400,14 +458,21 @@ html, body {
     @media (max-width: 768px) {
       padding: 1rem;
 
-      .form-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
       h2[mat-dialog-title] {
         font-size: 1.25rem;
         margin-bottom: 1rem;
+      }
+
+      .container-fluid {
+        .row {
+          margin-left: -0.25rem;
+          margin-right: -0.25rem;
+
+          [class*="col-"] {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+          }
+        }
       }
     }
   }

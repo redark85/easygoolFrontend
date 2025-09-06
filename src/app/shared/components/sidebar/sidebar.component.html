@@ -23,22 +23,22 @@
   <nav class="nav-menu">
     <mat-nav-list>
       <!-- Dashboard Section -->
-      <div class="menu-section" *ngIf="!isCollapsed || isMobile">
-        <span class="section-title">Dashboard</span>
+      <div class="menu-section">
+        <span class="section-title" *ngIf="!isCollapsed || isMobile">Dashboard</span>
       </div>
       <mat-list-item
         class="nav-item"
         routerLink="/dashboard/home"
         routerLinkActive="active"
-        [matTooltip]="isCollapsed ? 'Dashboard' : ''"
+        [matTooltip]="isCollapsed && !isMobile ? 'Dashboard' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">dashboard</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Dashboard</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Dashboard</span>
       </mat-list-item>
 
       <!-- Administrar Torneos Section -->
-      <div class="menu-section" *ngIf="!isCollapsed || isMobile">
-        <span class="section-title">Administrar Torneos</span>
+      <div class="menu-section">
+        <span class="section-title" *ngIf="!isCollapsed || isMobile">Administrar Torneos</span>
       </div>
       <mat-list-item
         class="nav-item"
@@ -47,7 +47,7 @@
         [matTooltip]="isCollapsed && !isMobile ? 'Torneos' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">emoji_events</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Torneos</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Torneos</span>
       </mat-list-item>
       <mat-list-item
         class="nav-item"
@@ -56,7 +56,7 @@
         [matTooltip]="isCollapsed && !isMobile ? 'Partidos' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">sports_soccer</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Partidos</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Partidos</span>
       </mat-list-item>
       <mat-list-item
         class="nav-item"
@@ -65,12 +65,12 @@
         [matTooltip]="isCollapsed && !isMobile ? 'Estadísticas' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">analytics</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Estadísticas</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Estadísticas</span>
       </mat-list-item>
 
       <!-- Administrar Equipos Section -->
-      <div class="menu-section" *ngIf="!isCollapsed || isMobile">
-        <span class="section-title">Administrar Equipos</span>
+      <div class="menu-section">
+        <span class="section-title" *ngIf="!isCollapsed || isMobile">Administrar Equipos</span>
       </div>
       <mat-list-item
         class="nav-item"
@@ -79,7 +79,7 @@
         [matTooltip]="isCollapsed && !isMobile ? 'Equipos' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">groups</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Equipos</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Equipos</span>
       </mat-list-item>
       <mat-list-item
         class="nav-item"
@@ -88,7 +88,7 @@
         [matTooltip]="isCollapsed && !isMobile ? 'Jugadores' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">person</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Jugadores</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Jugadores</span>
       </mat-list-item>
       <mat-list-item
         class="nav-item"
@@ -97,7 +97,7 @@
         [matTooltip]="isCollapsed && !isMobile ? 'Configuración' : ''"
         matTooltipPosition="right">
         <mat-icon matListItemIcon class="nav-icon">settings</mat-icon>
-        <span matListItemTitle *ngIf="!isCollapsed || isMobile" class="nav-label">Configuración</span>
+        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Configuración</span>
       </mat-list-item>
     </mat-nav-list>
   </nav>

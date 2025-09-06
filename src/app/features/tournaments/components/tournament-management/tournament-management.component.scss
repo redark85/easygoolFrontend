@@ -257,7 +257,7 @@
 
           .phase-card {
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: none;
             overflow: visible;
             position: relative;
 
@@ -396,17 +396,17 @@
                   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                   overflow: visible;
                   position: relative;
-                  
+
                   // Espacio específico para badges
                   ::ng-deep .mat-expansion-panel-header {
                     padding-right: 60px !important;
                     min-height: 48px !important;
                   }
-                  
+
                   ::ng-deep .mat-expansion-panel-header-description {
                     margin-right: 0 !important;
                   }
-                  
+
                   ::ng-deep .mat-content {
                     min-height: 48px !important;
                     height: auto !important;

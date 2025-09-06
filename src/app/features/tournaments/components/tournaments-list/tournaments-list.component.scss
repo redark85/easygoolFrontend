@@ -8,16 +8,16 @@
 // Header Section
 .tournaments-header {
   margin-bottom: var(--spacing-xl);
-  
+
   .header-actions {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--spacing-lg);
-    
+
     .header-content {
       flex: 1;
-      
+
       .page-title {
         font-size: 2.5rem;
         font-weight: 500;
@@ -25,24 +25,24 @@
         margin: 0 0 var(--spacing-sm);
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
       }
-      
+
       .page-subtitle {
         font-size: 1.1rem;
         color: var(--text-secondary);
         margin: 0;
       }
     }
-    
+
     .search-actions {
       display: flex;
       align-items: center;
       gap: var(--spacing-md);
       flex-shrink: 0;
-      
+
       .search-container {
         .search-field {
           width: 300px;
-          
+
           .mat-mdc-form-field-subscript-wrapper {
             display: none;
           }
@@ -53,9 +53,9 @@
 }
 
 .add-tournament-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: all 0.3s ease !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -110,7 +110,7 @@
 .tournaments-grid {
   .row {
     margin: 0 -var(--spacing-sm);
-    
+
     > div {
       padding: 0 var(--spacing-sm);
       margin-bottom: var(--spacing-lg);
@@ -165,7 +165,7 @@
         font-weight: 600;
         font-size: 0.75rem;
         border-radius: var(--border-radius-md);
-        
+
         &.status-active {
           background-color: var(--secondary-color);
           color: white;
@@ -340,7 +340,7 @@
 // Menu Actions
 ::ng-deep .delete-action {
   color: #f44336 !important;
-  
+
   mat-icon {
     color: #f44336 !important;
   }
@@ -355,11 +355,11 @@
 ::ng-deep .tournament-card {
   .card-image-container {
     background-color: white !important;
-    
+
     .mat-mdc-card-image {
       background-color: white !important;
     }
-    
+
     img {
       background-color: white !important;
     }
@@ -369,11 +369,11 @@
 // Estilos para botones de estado en el menú
 ::ng-deep .status-menu-active {
   color: var(--secondary-color) !important;
-  
-  mat-icon { 
-    color: var(--secondary-color) !important; 
+
+  mat-icon {
+    color: var(--secondary-color) !important;
   }
-  
+
   &:hover {
     background-color: rgba(76, 175, 80, 0.08) !important;
   }
@@ -381,11 +381,11 @@
 
 ::ng-deep .status-menu-coming {
   color: #ff9800 !important;
-  
-  mat-icon { 
-    color: #ff9800 !important; 
+
+  mat-icon {
+    color: #ff9800 !important;
   }
-  
+
   &:hover {
     background-color: rgba(255, 152, 0, 0.08) !important;
   }
@@ -393,11 +393,11 @@
 
 ::ng-deep .status-menu-completed {
   color: #2196f3 !important;
-  
-  mat-icon { 
-    color: #2196f3 !important; 
+
+  mat-icon {
+    color: #2196f3 !important;
   }
-  
+
   &:hover {
     background-color: rgba(33, 150, 243, 0.08) !important;
   }
@@ -405,11 +405,11 @@
 
 ::ng-deep .status-menu-deleted {
   color: #f44336 !important;
-  
-  mat-icon { 
-    color: #f44336 !important; 
+
+  mat-icon {
+    color: #f44336 !important;
   }
-  
+
   &:hover {
     background-color: rgba(244, 67, 54, 0.08) !important;
   }
@@ -527,12 +527,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      
+
       .menu-item-spinner {
         margin-right: 4px;
       }
     }
-    
+
     // Deshabilitar hover cuando está loading
     &[disabled] {
       opacity: 0.6;

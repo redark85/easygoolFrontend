@@ -153,9 +153,16 @@
       padding: 1.5rem;
 
       .auth-form {
-        .name-row {
-          flex-direction: column;
-          gap: 0.5rem;
+        .container-fluid {
+          .row {
+            margin-left: -0.25rem;
+            margin-right: -0.25rem;
+
+            [class*="col-"] {
+              padding-left: 0.25rem;
+              padding-right: 0.25rem;
+            }
+          }
         }
       }
     }

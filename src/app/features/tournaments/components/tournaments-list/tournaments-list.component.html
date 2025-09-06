@@ -69,7 +69,7 @@
           <mat-card-content class="tournament-content">
             <div class="tournament-info">
               <h3 class="tournament-name">{{ tournament.name }}</h3>
-              <p class="tournament-description" 
+              <p class="tournament-description"
                  [matTooltip]="tournament.description"
                  matTooltipPosition="above">{{ tournament.description }}</p>
 
@@ -137,8 +137,8 @@
                       [disabled]="isTournamentLoading(tournament.id)">
                 <div class="menu-item-content">
                   <!-- Loading spinner específico para este item -->
-                  <mat-spinner *ngIf="isTournamentLoading(tournament.id)" 
-                              diameter="16" 
+                  <mat-spinner *ngIf="isTournamentLoading(tournament.id)"
+                              diameter="16"
                               class="menu-item-spinner">
                   </mat-spinner>
                   <!-- Ícono normal cuando no está cargando -->
@@ -161,7 +161,7 @@
   </div>
 
   <!-- Fixed FAB Button -->
-  <button mat-fab class="fab-fixed" (click)="createTournament()" matTooltip="Crear nuevo torneo">
+  <button mat-fab class="fab-fixed add-tournament-btn" (click)="createTournament()" matTooltip="Crear nuevo torneo">
     <mat-icon>add</mat-icon>
   </button>
 </div>

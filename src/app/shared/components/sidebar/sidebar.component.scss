@@ -508,6 +508,11 @@
   }
 }
 
+// Clase helper para ocultar elementos
+.hidden {
+  display: none !important;
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .sidebar-container {
@@ -540,12 +545,19 @@
       visibility: visible !important;
     }
     
-    // Override collapsed styles for mobile - show all elements
-    .nav-label, .section-title {
-      display: block !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      color: white !important;
+    // En móvil, siempre mostrar todos los elementos
+    &.collapsed,
+    &:not(.collapsed) {
+      .nav-label, .section-title {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        color: white !important;
+      }
+      
+      .nav-label.hidden {
+        display: block !important;
+      }
     }
     
     .nav-item {
@@ -568,19 +580,28 @@
         font-weight: 500 !important;
         opacity: 1 !important;
         visibility: visible !important;
+        
+        &.hidden {
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
       }
     }
     
     .menu-section {
+      display: block !important;
       text-align: left !important;
       padding: var(--spacing-md) var(--spacing-md) var(--spacing-xs) !important;
       
       .section-title {
+        display: block !important;
         color: white !important;
         opacity: 0.8 !important;
         font-size: 0.75rem !important;
         font-weight: 600 !important;
         text-transform: uppercase !important;
+        visibility: visible !important;
       }
     }
     

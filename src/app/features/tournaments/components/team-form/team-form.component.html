@@ -3,47 +3,57 @@
 
   <mat-dialog-content>
     <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" novalidate>
-      <div class="form-grid">
+      <div class="container-fluid">
         <!-- Logo Upload Section -->
-        <div class="form-field-full">
-          <label class="image-label">Logo del Equipo *</label>
-          <app-image-uploader
-            formControlName="logo"
-            [maxFileSizeMB]="2"
-            (imageUploaded)="onImageUploaded($event)">
-          </app-image-uploader>
-          <div class="error-message" *ngIf="logoErrors">
-            <mat-icon>error</mat-icon>
-            {{ logoErrors }}
+        <div class="row mb-3">
+          <div class="col-12">
+            <label class="image-label">Logo del Equipo *</label>
+            <app-image-uploader
+              formControlName="logo"
+              [maxFileSizeMB]="2"
+              (imageUploaded)="onImageUploaded($event)">
+            </app-image-uploader>
+            <div class="error-message" *ngIf="logoErrors">
+              <mat-icon>error</mat-icon>
+              {{ logoErrors }}
+            </div>
           </div>
         </div>
 
         <!-- Team Name -->
-        <mat-form-field appearance="outline" class="form-field-full">
-          <mat-label>Nombre del Equipo</mat-label>
-          <input
-            matInput
-            formControlName="name"
-            placeholder="Ej: Real Madrid Club de Fútbol"
-            maxlength="50">
-          <mat-icon matSuffix>sports_soccer</mat-icon>
-          <mat-hint>Nombre completo del equipo (2-50 caracteres)</mat-hint>
-          <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
-        </mat-form-field>
+        <div class="row mb-3">
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nombre del Equipo</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="Ej: Real Madrid Club de Fútbol"
+                maxlength="50">
+              <mat-icon matSuffix>sports_soccer</mat-icon>
+              <mat-hint>Nombre completo del equipo (2-50 caracteres)</mat-hint>
+              <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
 
         <!-- Short Name -->
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Nombre Corto</mat-label>
-          <input
-            matInput
-            formControlName="shortName"
-            placeholder="Ej: RMA"
-            maxlength="10"
-            style="text-transform: uppercase;">
-          <mat-icon matSuffix>label</mat-icon>
-          <mat-hint>Abreviación del equipo en mayúsculas (2-10 caracteres)</mat-hint>
-          <mat-error *ngIf="shortNameErrors">{{ shortNameErrors }}</mat-error>
-        </mat-form-field>
+        <div class="row mb-3">
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nombre Corto</mat-label>
+              <input
+                matInput
+                formControlName="shortName"
+                placeholder="Ej: RMA"
+                maxlength="10"
+                style="text-transform: uppercase;">
+              <mat-icon matSuffix>label</mat-icon>
+              <mat-hint>Abreviación del equipo en mayúsculas (2-10 caracteres)</mat-hint>
+              <mat-error *ngIf="shortNameErrors">{{ shortNameErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
       </div>
     </form>
   </mat-dialog-content>
