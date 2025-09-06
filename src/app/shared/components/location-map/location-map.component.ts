@@ -159,19 +159,26 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.data?.initialLocation) {
-      this.selectedLocation = this.data.initialLocation;
+      this.selectedLocation = { ...this.data.initialLocation };
       this.searchQuery = this.data.initialLocation.address;
       
-      // Asegurar que primaryStreet y secondaryStreet estén inicializados
+      // Mapear desde Address interface si viene del backend
       if (!this.selectedLocation.primaryStreet && !this.selectedLocation.secondaryStreet) {
-        // Si no hay datos de calles, intentar extraer del address
-        const addressParts = this.selectedLocation.address.split(',').map((part: string) => part.trim());
-        if (addressParts.length > 1) {
-          this.selectedLocation.primaryStreet = addressParts[0];
-          this.selectedLocation.secondaryStreet = addressParts.slice(1).join(', ');
+        // Intentar mapear desde mainStreet/secondStreet si existen
+        const addressData = this.data.initialLocation as any;
+        if (addressData.mainStreet || addressData.secondStreet) {
+          this.selectedLocation.primaryStreet = addressData.mainStreet || '';
+          this.selectedLocation.secondaryStreet = addressData.secondStreet || '';
         } else {
-          this.selectedLocation.primaryStreet = this.selectedLocation.address;
-          this.selectedLocation.secondaryStreet = '';
+          // Si no hay datos de calles, intentar extraer del address
+          const addressParts = this.selectedLocation.address.split(',').map((part: string) => part.trim());
+          if (addressParts.length > 1) {
+            this.selectedLocation.primaryStreet = addressParts[0];
+            this.selectedLocation.secondaryStreet = addressParts.slice(1).join(', ');
+          } else {
+            this.selectedLocation.primaryStreet = this.selectedLocation.address;
+            this.selectedLocation.secondaryStreet = '';
+          }
         }
       }
     }

@@ -22,6 +22,10 @@ import { TeamModalService, TeamModalResult } from '../../services/team-modal.ser
 import { TeamService } from '../../services/team.service';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { PhaseFormComponent } from '../phase-form/phase-form.component';
+import { GroupFormComponent } from '../group-form/group-form.component';
+import { PhaseFormData, PhaseModalResult, CreatePhaseRequest, UpdatePhaseRequest } from '../../models/phase-form.interface';
+import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest } from '../../models/group-form.interface';
 
 @Component({
   selector: 'app-tournament-management',
@@ -297,16 +301,63 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    * Crea una nueva fase
    */
   createPhase(): void {
-    // TODO: Implementar modal para crear fase
-    console.log('Crear nueva fase');
+    if (!this.tournament) return;
+
+    const dialogData: PhaseFormData = {
+      tournamentId: this.tournament.id,
+      isEdit: false
+    };
+
+    const dialogRef = this.dialog.open(PhaseFormComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: 'none',
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: PhaseModalResult | undefined) => {
+      if (result && result.action === 'create') {
+        // TODO: Implementar servicio para crear fase
+        const createData = result.data as CreatePhaseRequest;
+        this.toastService.showSuccess(`Fase "${createData.name}" creada exitosamente`);
+        // this.loadTournamentData(); // Descomentar cuando esté el servicio
+        console.log('Crear fase:', createData);
+      }
+    });
   }
 
   /**
    * Edita una fase existente
    */
   editPhase(phase: Phase): void {
-    // TODO: Implementar modal para editar fase
-    console.log('Editar fase:', phase.name);
+    if (!this.tournament) return;
+
+    const dialogData: PhaseFormData = {
+      phase: phase,
+      tournamentId: this.tournament.id,
+      isEdit: true
+    };
+
+    const dialogRef = this.dialog.open(PhaseFormComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: 'none',
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: PhaseModalResult | undefined) => {
+      if (result && result.action === 'update') {
+        // TODO: Implementar servicio para actualizar fase
+        const updateData = result.data as UpdatePhaseRequest;
+        this.toastService.showSuccess(`Fase "${updateData.name}" actualizada exitosamente`);
+        // this.loadTournamentData(); // Descomentar cuando esté el servicio
+        console.log('Actualizar fase:', updateData);
+      }
+    });
   }
 
   /**
@@ -321,16 +372,65 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    * Crea un nuevo grupo en una fase
    */
   createGroup(phase: Phase): void {
-    // TODO: Implementar modal para crear grupo
-    console.log('Crear grupo en fase:', phase.name);
+    if (!this.tournament) return;
+
+    const dialogData: GroupFormData = {
+      phaseId: phase.id,
+      tournamentId: this.tournament.id,
+      isEdit: false
+    };
+
+    const dialogRef = this.dialog.open(GroupFormComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: 'none',
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: GroupModalResult | undefined) => {
+      if (result && result.action === 'create') {
+        // TODO: Implementar servicio para crear grupo
+        const createData = result.data as CreateGroupRequest;
+        this.toastService.showSuccess(`Grupo "${createData.name}" creado exitosamente en ${phase.name}`);
+        // this.loadTournamentData(); // Descomentar cuando esté el servicio
+        console.log('Crear grupo:', createData, 'en fase:', phase.name);
+      }
+    });
   }
 
 /**
  * Edita un grupo existente
  */
 editGroup(group: Group): void {
-  // TODO: Implementar modal para editar grupo
-  console.log('Editar grupo:', group.name);
+  if (!this.tournament) return;
+
+  const dialogData: GroupFormData = {
+    group: group,
+    phaseId: group.phaseId || 0, // Asumiendo que Group tiene phaseId
+    tournamentId: this.tournament.id,
+    isEdit: true
+  };
+
+  const dialogRef = this.dialog.open(GroupFormComponent, {
+    width: '500px',
+    maxWidth: '90vw',
+    height: 'auto',
+    maxHeight: 'none',
+    data: dialogData,
+    disableClose: true
+  });
+
+  dialogRef.afterClosed().subscribe((result: GroupModalResult | undefined) => {
+    if (result && result.action === 'update') {
+      // TODO: Implementar servicio para actualizar grupo
+      const updateData = result.data as UpdateGroupRequest;
+      this.toastService.showSuccess(`Grupo "${updateData.name}" actualizado exitosamente`);
+      // this.loadTournamentData(); // Descomentar cuando esté el servicio
+      console.log('Actualizar grupo:', updateData);
+    }
+  });
 }
 
 /**

@@ -1,0 +1,9 @@
+@use '../../../../../styles.scss' as styles;
+
+:host {
+  @include styles.modal-layout;
+}
+
+.spacer {
+  height: 20px;
+}

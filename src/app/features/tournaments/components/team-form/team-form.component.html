@@ -21,8 +21,8 @@
         <!-- Team Name -->
         <mat-form-field appearance="outline" class="form-field-full">
           <mat-label>Nombre del Equipo</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             formControlName="name"
             placeholder="Ej: Real Madrid Club de Fútbol"
             maxlength="50">
@@ -34,8 +34,8 @@
         <!-- Short Name -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Nombre Corto</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             formControlName="shortName"
             placeholder="Ej: RMA"
             maxlength="10"
@@ -44,34 +44,20 @@
           <mat-hint>Abreviación del equipo en mayúsculas (2-10 caracteres)</mat-hint>
           <mat-error *ngIf="shortNameErrors">{{ shortNameErrors }}</mat-error>
         </mat-form-field>
-
-        <!-- Placeholder field for height consistency -->
-        <div class="form-field">
-          <!-- Empty space to match tournament-form height -->
-        </div>
-
-        <!-- Placeholder fields to match tournament-form structure -->
-        <div class="form-field-full height-spacer">
-          <!-- Additional spacing to match tournament form height -->
-        </div>
-
-        <div class="form-field-full height-spacer">
-          <!-- Additional spacing to match tournament form height -->
-        </div>
       </div>
     </form>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="dialog-actions">
-    <button 
-      mat-stroked-button 
+    <button
+      mat-stroked-button
       (click)="onCancel()"
       [disabled]="isSubmitting">
       Cancelar
     </button>
-    
-    <button 
-      mat-flat-button 
+
+    <button
+      mat-flat-button
       color="primary"
       (click)="onSubmit()"
       [disabled]="teamForm.invalid || isSubmitting">

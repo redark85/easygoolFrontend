@@ -769,15 +769,24 @@
 
   .teams-actions {
     .fab-create-team {
-      background-color: var(--mdc-theme-primary, #1976d2);
+      background: var(--accent-color, #ff6b35);
       color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       transition: all 0.3s ease;
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
+      min-height: 56px;
 
       &:hover {
-        background-color: var(--mdc-theme-primary-dark, #1565c0);
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
       }
     }
   }

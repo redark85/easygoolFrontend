@@ -10,63 +10,63 @@
 // Colores basados en el logo de EasyGool + Temática Futbolística
 :root {
   // Colores base del logo (mantener)
-  --primary-color: #1976D2;      // Azul principal del logo
-  --secondary-color: #4CAF50;    // Verde complementario del logo
-  --primary-light: #42A5F5;      // Azul claro
-  --primary-dark: #1565C0;       // Azul oscuro
-  --secondary-light: #66BB6A;    // Verde claro
-  --secondary-dark: #388E3C;     // Verde oscuro
-  --accent-color: #FF9800;       // Naranja de acento
-  --text-primary: #212121;       // Texto principal
-  --text-secondary: #757575;     // Texto secundario
-  --background-light: #FAFAFA;   // Fondo claro
-  --background-dark: #303030;    // Fondo oscuro
+  --primary-color: #1976D2; // Azul principal del logo
+  --secondary-color: #4CAF50; // Verde complementario del logo
+  --primary-light: #42A5F5; // Azul claro
+  --primary-dark: #1565C0; // Azul oscuro
+  --secondary-light: #66BB6A; // Verde claro
+  --secondary-dark: #388E3C; // Verde oscuro
+  --accent-color: #FF9800; // Naranja de acento
+  --text-primary: #212121; // Texto principal
+  --text-secondary: #757575; // Texto secundario
+  --background-light: #FAFAFA; // Fondo claro
+  --background-dark: #303030; // Fondo oscuro
 
   // Estados de torneo y elementos
-  --status-active: #4CAF50;      // Verde para activo
-  --status-completed: #2196F3;   // Azul info para completado
-  --status-coming: #FF9800;      // Naranja para próximo
-  --status-deleted: #F44336;     // Rojo para eliminado
-  --status-unknown: #9E9E9E;     // Gris para desconocido
+  --status-active: #4CAF50; // Verde para activo
+  --status-completed: #2196F3; // Azul info para completado
+  --status-coming: #FF9800; // Naranja para próximo
+  --status-deleted: #F44336; // Rojo para eliminado
+  --status-unknown: #9E9E9E; // Gris para desconocido
 
   // Colores de UI comunes
-  --success-color: #4CAF50;      // Verde éxito
-  --info-color: #2196F3;        // Azul información
-  --warning-color: #FF9800;     // Naranja advertencia
-  --error-color: #F44336;       // Rojo error
-  --disabled-color: #9E9E9E;    // Gris deshabilitado
+  --success-color: #4CAF50; // Verde éxito
+  --info-color: #2196F3; // Azul información
+  --warning-color: #FF9800; // Naranja advertencia
+  --error-color: #F44336; // Rojo error
+  --disabled-color: #9E9E9E; // Gris deshabilitado
 
   // Colores de bordes y divisores
-  --border-light: #E0E0E0;      // Borde claro
-  --border-medium: #BDBDBD;     // Borde medio
-  --border-dark: #757575;       // Borde oscuro
-  --divider-color: #E0E0E0;     // Color divisor
+  --border-light: #E0E0E0; // Borde claro
+  --border-medium: #BDBDBD; // Borde medio
+  --border-dark: #757575; // Borde oscuro
+  --divider-color: #E0E0E0; // Color divisor
 
   // Colores de fondo adicionales
-  --surface-color: #FFFFFF;     // Superficie blanca
-  --surface-variant: #F5F5F5;   // Superficie variante
-  --overlay-light: rgba(0, 0, 0, 0.1);   // Overlay claro
-  --overlay-medium: rgba(0, 0, 0, 0.3);  // Overlay medio
-  --overlay-dark: rgba(0, 0, 0, 0.5);    // Overlay oscuro
-  --overlay-heavy: rgba(0, 0, 0, 0.7);   // Overlay pesado
+  --surface-color: #FFFFFF; // Superficie blanca
+  --surface-variant: #F5F5F5; // Superficie variante
+  --overlay-light: rgba(0, 0, 0, 0.1); // Overlay claro
+  --overlay-medium: rgba(0, 0, 0, 0.3); // Overlay medio
+  --overlay-dark: rgba(0, 0, 0, 0.5); // Overlay oscuro
+  --overlay-heavy: rgba(0, 0, 0, 0.7); // Overlay pesado
 
   // Colores específicos del sidebar
-  --sidebar-bg: #2C3E50;        // Fondo sidebar
+  --sidebar-bg: #2C3E50; // Fondo sidebar
   --sidebar-bg-collapsed: #34495E; // Fondo sidebar colapsado
-  --sidebar-text: #FFFFFF;      // Texto sidebar
+  --sidebar-text: #FFFFFF; // Texto sidebar
   --sidebar-text-muted: rgba(255, 255, 255, 0.7); // Texto sidebar atenuado
-  --sidebar-border: rgba(255, 255, 255, 0.1);     // Borde sidebar
-  --sidebar-hover: rgba(255, 255, 255, 0.1);      // Hover sidebar
-  --sidebar-active: rgba(255, 255, 255, 0.2);     // Activo sidebar
+  --sidebar-border: rgba(255, 255, 255, 0.1); // Borde sidebar
+  --sidebar-hover: rgba(255, 255, 255, 0.1); // Hover sidebar
+  --sidebar-active: rgba(255, 255, 255, 0.2); // Activo sidebar
 
   // Temática futbolística
-  --field-green: #228B22;        // Verde césped
-  --field-green-light: #32CD32;  // Verde césped claro
-  --line-white: #FFFFFF;         // Líneas del campo
-  --goal-yellow: #FFD700;        // Porterías/trofeos
-  --referee-black: #2C2C2C;      // Negro árbitro
-  --ball-pattern: #000000;       // Patrón balón
-  --grass-shadow: #1F5F1F;       // Sombra césped
+  --field-green: #228B22; // Verde césped
+  --field-green-light: #32CD32; // Verde césped claro
+  --line-white: #FFFFFF; // Líneas del campo
+  --goal-yellow: #FFD700; // Porterías/trofeos
+  --referee-black: #2C2C2C; // Negro árbitro
+  --ball-pattern: #000000; // Patrón balón
+  --grass-shadow: #1F5F1F; // Sombra césped
 
   // Breakpoints responsivos
   --mobile: 576px;
@@ -76,12 +76,12 @@
   --xlarge: 1400px;
 
   // Espaciados reutilizables
-  --spacing-xs: 0.25rem;    // 4px
-  --spacing-sm: 0.5rem;     // 8px
-  --spacing-md: 1rem;       // 16px
-  --spacing-lg: 1.5rem;     // 24px
-  --spacing-xl: 2rem;       // 32px
-  --spacing-xxl: 3rem;      // 48px
+  --spacing-xs: 0.25rem; // 4px
+  --spacing-sm: 0.5rem; // 8px
+  --spacing-md: 1rem; // 16px
+  --spacing-lg: 1.5rem; // 24px
+  --spacing-xl: 2rem; // 32px
+  --spacing-xxl: 3rem; // 48px
 
   // Componentes layout
   --sidebar-width: 280px;
@@ -97,9 +97,9 @@
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
 
   // Transiciones
   --transition-fast: 0.15s ease-in-out;
@@ -117,12 +117,29 @@ html, body {
 }
 
 // Clases de utilidad para colores del logo
-.text-primary-custom { color: var(--primary-color) !important; }
-.text-secondary-custom { color: var(--secondary-color) !important; }
-.bg-primary-custom { background-color: var(--primary-color) !important; }
-.bg-secondary-custom { background-color: var(--secondary-color) !important; }
-.border-primary-custom { border-color: var(--primary-color) !important; }
-.border-secondary-custom { border-color: var(--secondary-color) !important; }
+.text-primary-custom {
+  color: var(--primary-color) !important;
+}
+
+.text-secondary-custom {
+  color: var(--secondary-color) !important;
+}
+
+.bg-primary-custom {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-secondary-custom {
+  background-color: var(--secondary-color) !important;
+}
+
+.border-primary-custom {
+  border-color: var(--primary-color) !important;
+}
+
+.border-secondary-custom {
+  border-color: var(--secondary-color) !important;
+}
 
 // Botones personalizados con colores del logo
 .btn-primary-custom {
@@ -172,7 +189,7 @@ html, body {
     &:hover {
       background-color: var(--primary-dark);
       transform: scale(1.1);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
     }
 
     &:active {
@@ -323,11 +340,11 @@ html, body {
       }
 
       .form-field {
-        width: 100%;
+        grid-column: 1 / -1;
       }
 
       mat-form-field {
-        width: 100%;
+        grid-column: 1 / -1;
 
         .mat-mdc-form-field-subscript-wrapper {
           margin-top: 0.5rem;
@@ -562,6 +579,10 @@ html, body {
   }
 }
 
-.mat-mdc-dialog-container .mat-mdc-dialog-title+.mat-mdc-dialog-content {
+.mat-mdc-dialog-container .mat-mdc-dialog-title + .mat-mdc-dialog-content {
   padding-top: 10px !important;
+}
+
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  max-height: 100% !important;
 }
