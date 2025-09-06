@@ -1,4 +1,5 @@
 export interface Team {
+  id: number;
   tournamentId: number;
   name: string;
   shortName: string;

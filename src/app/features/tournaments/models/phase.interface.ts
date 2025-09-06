@@ -1,3 +1,5 @@
+import { Team } from './team.interface';
+
 /**
  * Enum para tipos de fase
  */
@@ -10,7 +12,7 @@ export enum PhaseType {
  * Interface para fase de torneo
  */
 export interface Phase {
-  id?: number;
+  id: number;
   name: string;
   phaseType: PhaseType;
   tournamentId?: number;
@@ -21,9 +23,10 @@ export interface Phase {
  * Interface para grupo dentro de una fase
  */
 export interface Group {
-  id?: number;
+  id: number;
   name: string;
-  phaseId?: number;
+  phaseId: number;
+  teams?: Team[];
 }
 
 /**

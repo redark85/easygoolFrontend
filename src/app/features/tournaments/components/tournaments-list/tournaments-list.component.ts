@@ -564,4 +564,5 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   getTournamentImage(tournament: Tournament): string {
     return tournament.imageUrl || 'assets/logo.png';
   }
+
 }

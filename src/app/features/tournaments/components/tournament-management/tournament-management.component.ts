@@ -14,10 +14,14 @@ import { Subject, takeUntil, switchMap, filter } from 'rxjs';
 import { TournamentService } from '@features/tournaments/services/tournament.service';
 import { TournamentDetail, TournamentStatusType, TournamentModality } from '@features/tournaments/models/tournament.interface';
 import { Phase, Group, PhaseType } from '@features/tournaments/models/phase.interface';
-import { Team } from '@features/tournaments/models/team.interface';
+import { Team, CreateTeamRequest, UpdateTeamRequest } from '@features/tournaments/models/team.interface';
 import { Title } from '@angular/platform-browser';
 import { TournamentStore } from '@core/store/tournament.store';
 import { ToastService } from '@core/services/toast.service';
+import { TeamModalService, TeamModalResult } from '../../services/team-modal.service';
+import { TeamService } from '../../services/team.service';
+import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-tournament-management',
@@ -54,7 +58,10 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     private tournamentService: TournamentService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
-    private tournamentStore: TournamentStore
+    private tournamentStore: TournamentStore,
+    private teamModalService: TeamModalService,
+    private teamService: TeamService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -98,27 +105,9 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           // Actualizar el store con la información del torneo
           this.tournamentStore.setCurrentTournament(this.tournament.id, this.tournament.name);
 
-          // TODO: Implementar carga de fases desde API
-          // Por ahora, mock data para fases
-          this.phases = [
-            {
-              id: 1,
-              name: 'Fase de Grupos',
-              phaseType: PhaseType.GroupStage,
-              groups: [
-                { id: 1, name: 'Grupo A' },
-                { id: 2, name: 'Grupo B' },
-                { id: 3, name: 'Grupo C' },
-                { id: 4, name: 'Grupo D' }
-              ]
-            },
-            {
-              id: 2,
-              name: 'Cuartos de Final',
-              phaseType: PhaseType.Knockout,
-              groups: []
-            }
-          ];
+          // Initialize mock data
+          this.initializeMockTeams();
+          this.initializeMockPhases();
 
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -354,18 +343,143 @@ deleteGroup(group: Group): void {
 
 // Team management methods
 createTeam(): void {
-  console.log('Create team clicked');
-  // TODO: Implement team creation modal
+  const tournament = this.tournament;
+  if (!tournament) return;
+
+  this.teamModalService.openCreateTeamModal(tournament.id)
+    .subscribe((result: TeamModalResult | undefined) => {
+      if (result && result.action === 'create') {
+        this.teamService.createTeam(result.data as CreateTeamRequest).subscribe({
+          next: (createdTeam) => {
+            this.toastService.showSuccess(`Equipo "${createdTeam.name}" creado exitosamente`);
+            this.loadTournamentData();
+          },
+          error: (error) => {
+            this.toastService.showError(`Error al crear equipo: ${error.message}`);
+          }
+        });
+      }
+    });
 }
 
 editTeam(team: Team): void {
-  console.log('Edit team:', team);
-  // TODO: Implement team editing modal
+  const tournament = this.tournament;
+  if (!tournament) return;
+
+  this.teamModalService.openEditTeamModal(team, tournament.id)
+    .subscribe((result: TeamModalResult | undefined) => {
+      if (result && result.action === 'update') {
+        this.teamService.updateTeam(result.data as UpdateTeamRequest).subscribe({
+          next: (updatedTeam) => {
+            this.toastService.showSuccess(`Equipo "${updatedTeam.name}" actualizado exitosamente`);
+            this.loadTournamentData();
+          },
+          error: (error) => {
+            this.toastService.showError(`Error al actualizar equipo: ${error.message}`);
+          }
+        });
+      }
+    });
 }
 
 deleteTeam(team: Team): void {
-  console.log('Delete team:', team);
-  // TODO: Implement team deletion confirmation
+  const dialogData: ConfirmationDialogData = {
+    title: 'Eliminar Equipo',
+    message: `¿Estás seguro de que deseas eliminar el equipo <strong>${team.name}</strong>?<br><br>Esta acción no se puede deshacer.`,
+    confirmText: 'Eliminar',
+    cancelText: 'Cancelar',
+    type: 'danger',
+    icon: 'delete_forever'
+  };
+
+  const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+    width: '480px',
+    maxWidth: '90vw',
+    data: dialogData,
+    disableClose: true
+  });
+
+  dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+    if (confirmed) {
+      this.teamService.deleteTeam(team.id).subscribe({
+        next: () => {
+          this.toastService.showSuccess(`Equipo "${team.name}" eliminado exitosamente`);
+          // TODO: Actualizar la lista de equipos
+          this.loadTournamentData();
+        },
+        error: (error) => {
+          this.toastService.showError(`Error al eliminar equipo: ${error.message}`);
+        }
+      });
+    }
+  });
+}
+
+/**
+ * Agregar equipo a un grupo
+ */
+addTeamToGroup(phaseId: number, groupId: number): void {
+  const tournament = this.tournament;
+  if (!tournament) return;
+
+  this.teamModalService.openCreateTeamModal(tournament.id)
+    .subscribe((result: TeamModalResult | undefined) => {
+      if (result && result.action === 'create') {
+        this.teamService.createTeam(result.data as CreateTeamRequest).subscribe({
+          next: (createdTeam) => {
+            this.toastService.showSuccess(`Equipo "${createdTeam.name}" creado exitosamente`);
+            // Asignar el equipo al grupo
+            this.teamService.assignTeamToGroup(createdTeam.id, groupId).subscribe({
+              next: () => {
+                this.toastService.showSuccess(`Equipo asignado al grupo exitosamente`);
+                this.loadTournamentData();
+              },
+              error: (error) => {
+                this.toastService.showError(`Error al asignar equipo al grupo: ${error.message}`);
+              }
+            });
+          },
+          error: (error) => {
+            this.toastService.showError(`Error al crear equipo: ${error.message}`);
+          }
+        });
+      }
+    });
+}
+
+/**
+ * Quitar equipo de un grupo
+ */
+removeTeamFromGroup(team: Team, group: Group): void {
+  const dialogData: ConfirmationDialogData = {
+    title: 'Quitar Equipo del Grupo',
+    message: `¿Estás seguro de que deseas quitar el equipo <strong>${team.name}</strong> del grupo <strong>${group.name}</strong>?`,
+    confirmText: 'Quitar',
+    cancelText: 'Cancelar',
+    type: 'warning',
+    icon: 'remove_circle'
+  };
+
+  const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+    width: '480px',
+    maxWidth: '90vw',
+    data: dialogData,
+    disableClose: true
+  });
+
+  dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+    if (confirmed) {
+      this.teamService.removeTeamFromGroup(team.id).subscribe({
+        next: () => {
+          this.toastService.showSuccess(`Equipo "${team.name}" removido del grupo exitosamente`);
+          this.loadTournamentData();
+        },
+        error: (error) => {
+          this.toastService.showError(`Error al remover equipo del grupo: ${error.message}`);
+        }
+      });
+    }
+  });
 }
 
 /**
@@ -393,6 +507,7 @@ trackByTeamId(index: number, team: Team): number {
 private initializeMockTeams(): void {
   this.teams = [
     {
+      id: 1,
       tournamentId: this.tournamentId,
       name: 'Real Madrid FC',
       shortName: 'RMA',
@@ -400,6 +515,7 @@ private initializeMockTeams(): void {
       logoContentType: 'image/png'
     },
     {
+      id: 2,
       tournamentId: this.tournamentId,
       name: 'FC Barcelona',
       shortName: 'BAR',
@@ -407,6 +523,7 @@ private initializeMockTeams(): void {
       logoContentType: 'image/png'
     },
     {
+      id: 3,
       tournamentId: this.tournamentId,
       name: 'Atlético Madrid',
       shortName: 'ATM',
@@ -414,11 +531,50 @@ private initializeMockTeams(): void {
       logoContentType: 'image/png'
     },
     {
+      id: 4,
       tournamentId: this.tournamentId,
       name: 'Valencia CF',
       shortName: 'VAL',
       logoBase64: '',
       logoContentType: 'image/png'
+    }
+  ];
+}
+
+// Initialize mock phases data
+private initializeMockPhases(): void {
+  this.phases = [
+    {
+      id: 1,
+      name: 'Fase de Grupos',
+      phaseType: PhaseType.GroupStage,
+      groups: [
+        {
+          id: 1,
+          name: 'Grupo A',
+          phaseId: 1,
+          teams: this.teams.slice(0, 2)
+        },
+        {
+          id: 2,
+          name: 'Grupo B',
+          phaseId: 1,
+          teams: this.teams.slice(2, 4)
+        }
+      ]
+    },
+    {
+      id: 2,
+      name: 'Eliminatorias',
+      phaseType: PhaseType.Knockout,
+      groups: [
+        {
+          id: 3,
+          name: 'Cuartos de Final',
+          phaseId: 2,
+          teams: []
+        }
+      ]
     }
   ];
 }

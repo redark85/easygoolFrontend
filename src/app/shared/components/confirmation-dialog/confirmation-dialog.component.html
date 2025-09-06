@@ -1,0 +1,33 @@
+<div class="confirmation-dialog" [ngClass]="dialogClass">
+  <div class="dialog-header">
+    <div class="icon-container">
+      <mat-icon [ngClass]="'icon-' + data.type">{{ data.icon }}</mat-icon>
+    </div>
+    <h2 mat-dialog-title>{{ data.title }}</h2>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <p [innerHTML]="data.message"></p>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button 
+      type="button"
+      mat-stroked-button 
+      (click)="onCancel()"
+      class="cancel-button">
+      <mat-icon>close</mat-icon>
+      {{ data.cancelText }}
+    </button>
+    
+    <button 
+      type="button"
+      mat-raised-button 
+      [color]="data.type === 'danger' ? 'warn' : 'primary'"
+      (click)="onConfirm()"
+      class="confirm-button">
+      <mat-icon>{{ data.type === 'danger' ? 'delete' : 'check' }}</mat-icon>
+      {{ data.confirmText }}
+    </button>
+  </div>
+</div>
