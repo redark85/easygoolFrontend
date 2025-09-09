@@ -1,0 +1,519 @@
+.phases-groups-container {
+  padding: 0;
+  position: relative;
+}
+
+.phases-management-card {
+  margin: 0;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+
+  .mat-card-header {
+    padding: 16px 0;
+    margin-bottom: 16px;
+
+    .mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+
+      mat-icon {
+        font-size: 1.8rem;
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+    }
+
+    .mat-card-subtitle {
+      margin-top: 4px;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+  }
+}
+
+// Floating Action Button
+.fab-create-phase {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  mat-icon {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+// No Phases State
+.no-phases {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+
+  .no-phases-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    color: var(--border-color);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+// Phases Cards
+.phases-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.phase-card {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .phase-card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 16px 20px;
+
+    .phase-header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .phase-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .phase-icon {
+        font-size: 2rem;
+        width: 2rem;
+        height: 2rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .phase-details {
+        .phase-name {
+          margin: 0 0 4px 0;
+          font-size: 1.3rem;
+          font-weight: 600;
+        }
+
+        .phase-type-chip {
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          font-size: 0.8rem;
+          font-weight: 500;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+
+          &.phase-type-1 { background: rgba(76, 175, 80, 0.3); }
+          &.phase-type-2 { background: rgba(255, 152, 0, 0.3); }
+          &.phase-type-3 { background: rgba(244, 67, 54, 0.3); }
+        }
+      }
+    }
+
+    .phase-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .groups-count-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .phase-actions-inline {
+        display: flex;
+        gap: 4px;
+
+        .phase-action-btn {
+          color: rgba(255, 255, 255, 0.9);
+          transition: all 0.2s ease;
+
+          &:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+          }
+
+          mat-icon {
+            font-size: 1.2rem;
+            width: 1.2rem;
+            height: 1.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  .phase-card-content {
+    padding: 20px;
+  }
+}
+
+// No Groups State
+.no-groups {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+
+  .no-groups-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: var(--border-color);
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+// Groups Grid - 3 columns layout
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.group-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .group-header {
+    background: var(--surface-color);
+    border-radius: 8px 8px 0 0;
+    padding: 12px 16px;
+
+    .group-title-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .group-icon {
+        font-size: 1.2rem;
+        width: 1.2rem;
+        height: 1.2rem;
+        color: var(--primary-color);
+      }
+
+      .group-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .group-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .teams-count-chip {
+        background: var(--primary-color);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 4px 8px;
+        height: auto;
+        min-height: auto;
+
+        mat-icon {
+          font-size: 0.9rem;
+          width: 0.9rem;
+          height: 0.9rem;
+          margin-right: 4px;
+        }
+      }
+
+      .group-actions-inline {
+        display: flex;
+        gap: 2px;
+
+        .group-action-btn {
+          transition: all 0.2s ease;
+          padding: 4px;
+          width: 28px;
+          height: 28px;
+          line-height: 28px;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.05);
+          }
+
+          mat-icon {
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .group-content {
+    padding: 16px;
+  }
+
+  // Ensure panels expand independently
+  &.mat-expanded {
+    .group-header {
+      border-radius: 8px 8px 0 0;
+    }
+  }
+}
+
+// No Teams in Group State
+.no-teams-in-group {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-secondary);
+
+  .no-teams-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--border-color);
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0 0 16px 0;
+    font-size: 0.9rem;
+  }
+
+  .add-first-team-btn {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(0.8);
+
+    mat-icon {
+      font-size: 1.2rem;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
+}
+
+// Teams in Group
+.teams-in-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.team-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--hover-color);
+    border-color: var(--primary-color);
+  }
+
+  .team-avatar {
+    .team-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border-color);
+    }
+  }
+
+  .team-info {
+    flex: 1;
+
+    .team-name {
+      margin: 0 0 2px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .team-short-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+  }
+
+  .team-actions {
+    .remove-team-btn {
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+
+      mat-icon {
+        font-size: 1.1rem;
+        width: 1.1rem;
+        height: 1.1rem;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .phases-groups-container {
+    padding: 0 8px;
+  }
+
+  .fab-create-phase {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .phase-card {
+    .phase-card-header {
+      padding: 12px 16px;
+
+      .phase-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .phase-stats {
+        align-self: flex-end;
+      }
+    }
+
+    .phase-card-content {
+      padding: 16px;
+    }
+  }
+
+  .group-panel {
+    .group-header {
+      .group-stats {
+        .group-actions-inline {
+          gap: 0;
+        }
+      }
+    }
+  }
+
+  .team-item {
+    padding: 10px;
+    gap: 10px;
+
+    .team-avatar .team-logo {
+      width: 35px;
+      height: 35px;
+    }
+
+    .team-info {
+      .team-name {
+        font-size: 0.95rem;
+      }
+
+      .team-short-name {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .no-phases {
+    padding: 40px 16px;
+
+    .no-phases-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .phase-card {
+    .phase-card-header {
+      .phase-info {
+        .phase-icon {
+          font-size: 1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+
+        .phase-details {
+          .phase-name {
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+}

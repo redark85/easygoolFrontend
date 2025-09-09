@@ -1,0 +1,265 @@
+<div class="statistics-management-container">
+  <mat-card class="statistics-management-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>analytics</mat-icon>
+        Estadísticas del Torneo
+      </mat-card-title>
+      <mat-card-subtitle>
+        Visualiza las estadísticas y rendimiento de tu torneo
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- View Selection Tabs -->
+      <div class="view-tabs-container">
+        <mat-tab-group [(selectedIndex)]="selectedView" 
+                       (selectedIndexChange)="onViewChange($event)"
+                       class="view-tabs">
+          <mat-tab label="General">
+            <!-- General Tournament Statistics -->
+            <div class="general-stats-content">
+              <div class="stats-overview">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <mat-icon>sports_soccer</mat-icon>
+                  </div>
+                  <div class="stat-info">
+                    <h3 class="stat-value">{{ tournamentStatistics.totalMatches }}</h3>
+                    <p class="stat-label">Total Partidos</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon completed">
+                    <mat-icon>check_circle</mat-icon>
+                  </div>
+                  <div class="stat-info">
+                    <h3 class="stat-value">{{ tournamentStatistics.completedMatches }}</h3>
+                    <p class="stat-label">Partidos Jugados</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon goals">
+                    <mat-icon>sports_score</mat-icon>
+                  </div>
+                  <div class="stat-info">
+                    <h3 class="stat-value">{{ tournamentStatistics.totalGoals }}</h3>
+                    <p class="stat-label">Total Goles</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon average">
+                    <mat-icon>trending_up</mat-icon>
+                  </div>
+                  <div class="stat-info">
+                    <h3 class="stat-value">{{ formatDecimal(tournamentStatistics.averageGoalsPerMatch) }}</h3>
+                    <p class="stat-label">Promedio Goles/Partido</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Highlights -->
+              <div class="highlights-section" *ngIf="tournamentStatistics.topScorer || tournamentStatistics.mostWins">
+                <h3 class="section-title">
+                  <mat-icon>star</mat-icon>
+                  Destacados
+                </h3>
+
+                <div class="highlights-grid">
+                  <mat-card class="highlight-card" *ngIf="tournamentStatistics.topScorer">
+                    <mat-card-header>
+                      <div class="highlight-icon top-scorer">
+                        <mat-icon>sports_score</mat-icon>
+                      </div>
+                      <div class="highlight-content">
+                        <mat-card-title>Máximo Goleador</mat-card-title>
+                        <mat-card-subtitle>{{ tournamentStatistics.topScorer.team.name }}</mat-card-subtitle>
+                      </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <div class="highlight-value">{{ tournamentStatistics.topScorer.goals }} goles</div>
+                    </mat-card-content>
+                  </mat-card>
+
+                  <mat-card class="highlight-card" *ngIf="tournamentStatistics.mostWins">
+                    <mat-card-header>
+                      <div class="highlight-icon most-wins">
+                        <mat-icon>emoji_events</mat-icon>
+                      </div>
+                      <div class="highlight-content">
+                        <mat-card-title>Más Victorias</mat-card-title>
+                        <mat-card-subtitle>{{ tournamentStatistics.mostWins.team.name }}</mat-card-subtitle>
+                      </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <div class="highlight-value">{{ tournamentStatistics.mostWins.wins }} victorias</div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="progress-section" *ngIf="tournamentStatistics.totalMatches > 0">
+                <h3 class="section-title">
+                  <mat-icon>timeline</mat-icon>
+                  Progreso del Torneo
+                </h3>
+                <div class="progress-info">
+                  <span>{{ tournamentStatistics.completedMatches }} de {{ tournamentStatistics.totalMatches }} partidos completados</span>
+                  <span class="progress-percentage">{{ ((tournamentStatistics.completedMatches / tournamentStatistics.totalMatches) * 100).toFixed(1) }}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" 
+                       [style.width.%]="(tournamentStatistics.completedMatches / tournamentStatistics.totalMatches) * 100">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Equipos">
+            <!-- Team Statistics Table -->
+            <div class="teams-stats-content">
+              <div class="no-stats" *ngIf="teamStatistics.length === 0">
+                <mat-icon class="no-stats-icon">groups</mat-icon>
+                <h3>No hay estadísticas disponibles</h3>
+                <p>Las estadísticas aparecerán cuando se jueguen partidos</p>
+              </div>
+
+              <div class="teams-table" *ngIf="teamStatistics.length > 0">
+                <h3 class="section-title">
+                  <mat-icon>leaderboard</mat-icon>
+                  Tabla de Posiciones
+                </h3>
+
+                <div class="table-container">
+                  <div class="table-header">
+                    <div class="col-pos">Pos</div>
+                    <div class="col-team">Equipo</div>
+                    <div class="col-matches">PJ</div>
+                    <div class="col-wins">G</div>
+                    <div class="col-draws">E</div>
+                    <div class="col-losses">P</div>
+                    <div class="col-goals-for">GF</div>
+                    <div class="col-goals-against">GC</div>
+                    <div class="col-goal-diff">DG</div>
+                    <div class="col-points">Pts</div>
+                  </div>
+
+                  <div class="table-body">
+                    <div class="table-row" 
+                         *ngFor="let stat of teamStatistics; trackBy: trackByTeamId; let i = index"
+                         [class]="getPositionClass(getTeamPosition(i))">
+                      <div class="col-pos">
+                        <span class="position-number">{{ getTeamPosition(i) }}</span>
+                      </div>
+                      <div class="col-team">
+                        <div class="team-info">
+                          <img [src]="stat.team.logoBase64 ? 'data:' + stat.team.logoContentType + ';base64,' + stat.team.logoBase64 : 'assets/logo.png'"
+                               [alt]="stat.team.name"
+                               class="team-logo-small"
+                               (error)="$event.target.src='assets/logo.png'">
+                          <div class="team-details">
+                            <span class="team-name">{{ stat.team.name }}</span>
+                            <span class="team-short">{{ stat.team.shortName }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-matches">{{ stat.matchesPlayed }}</div>
+                      <div class="col-wins">{{ stat.wins }}</div>
+                      <div class="col-draws">{{ stat.draws }}</div>
+                      <div class="col-losses">{{ stat.losses }}</div>
+                      <div class="col-goals-for">{{ stat.goalsFor }}</div>
+                      <div class="col-goals-against">{{ stat.goalsAgainst }}</div>
+                      <div class="col-goal-diff" [class.positive]="stat.goalDifference > 0" [class.negative]="stat.goalDifference < 0">
+                        {{ stat.goalDifference > 0 ? '+' : '' }}{{ stat.goalDifference }}
+                      </div>
+                      <div class="col-points">
+                        <span class="points-value">{{ stat.points }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Por Fases">
+            <!-- Phase Statistics -->
+            <div class="phases-stats-content">
+              <div class="no-phases" *ngIf="phases.length === 0">
+                <mat-icon class="no-phases-icon">timeline</mat-icon>
+                <h3>No hay fases configuradas</h3>
+                <p>Las estadísticas por fase aparecerán cuando se configuren las fases</p>
+              </div>
+
+              <div class="phases-stats" *ngIf="phases.length > 0">
+                <mat-card class="phase-stat-card" 
+                          *ngFor="let phase of phases; trackBy: trackByPhaseId">
+                  <mat-card-header>
+                    <mat-card-title>
+                      <mat-icon>timeline</mat-icon>
+                      {{ phase.name }}
+                    </mat-card-title>
+                  </mat-card-header>
+
+                  <mat-card-content>
+                    <div class="phase-stats-grid">
+                      <div class="phase-stat-item">
+                        <mat-icon class="stat-icon">sports_soccer</mat-icon>
+                        <div class="stat-details">
+                          <span class="stat-value">{{ getPhaseStatistics(phase).totalMatches }}</span>
+                          <span class="stat-label">Total Partidos</span>
+                        </div>
+                      </div>
+
+                      <div class="phase-stat-item">
+                        <mat-icon class="stat-icon completed">check_circle</mat-icon>
+                        <div class="stat-details">
+                          <span class="stat-value">{{ getPhaseStatistics(phase).completedMatches }}</span>
+                          <span class="stat-label">Completados</span>
+                        </div>
+                      </div>
+
+                      <div class="phase-stat-item">
+                        <mat-icon class="stat-icon goals">sports_score</mat-icon>
+                        <div class="stat-details">
+                          <span class="stat-value">{{ getPhaseStatistics(phase).totalGoals }}</span>
+                          <span class="stat-label">Total Goles</span>
+                        </div>
+                      </div>
+
+                      <div class="phase-stat-item">
+                        <mat-icon class="stat-icon average">trending_up</mat-icon>
+                        <div class="stat-details">
+                          <span class="stat-value">{{ formatDecimal(getPhaseStatistics(phase).averageGoalsPerMatch) }}</span>
+                          <span class="stat-label">Promedio Goles</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Phase Progress -->
+                    <div class="phase-progress" *ngIf="getPhaseStatistics(phase).totalMatches > 0">
+                      <div class="progress-info">
+                        <span>Progreso: {{ getPhaseStatistics(phase).completedMatches }}/{{ getPhaseStatistics(phase).totalMatches }}</span>
+                        <span class="progress-percentage">{{ ((getPhaseStatistics(phase).completedMatches / getPhaseStatistics(phase).totalMatches) * 100).toFixed(1) }}%</span>
+                      </div>
+                      <div class="progress-bar">
+                        <div class="progress-fill" 
+                             [style.width.%]="(getPhaseStatistics(phase).completedMatches / getPhaseStatistics(phase).totalMatches) * 100">
+                        </div>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,140 @@
+<div class="teams-management-container">
+  <mat-card class="teams-management-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>groups</mat-icon>
+        Equipos del Torneo
+      </mat-card-title>
+      <mat-card-subtitle>
+        Administra los equipos participantes en tu torneo
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Floating Action Button for Teams -->
+      <button mat-fab
+              class="fab-create-team"
+              (click)="createTeam()"
+              matTooltip="Nuevo Equipo">
+        <mat-icon>add</mat-icon>
+      </button>
+
+      <!-- No Teams Message -->
+      <div class="no-teams" *ngIf="teams.length === 0">
+        <mat-icon class="no-teams-icon">groups</mat-icon>
+        <h3>No hay equipos registrados</h3>
+        <p>Comienza agregando el primer equipo a tu torneo</p>
+      </div>
+
+      <!-- Teams Grid -->
+      <div *ngIf="teams.length > 0" class="teams-grid">
+        <mat-card *ngFor="let team of teams; trackBy: trackByTeamId" class="team-card">
+          <!-- Team Header -->
+          <mat-card-header class="team-card-header">
+            <div class="team-avatar">
+              <img [src]="team.logoBase64 ? 'data:' + team.logoContentType + ';base64,' + team.logoBase64 : 'assets/logo.png'"
+                   [alt]="team.name"
+                   class="team-logo"
+                   (error)="$event.target.src='assets/logo.png'">
+            </div>
+
+            <div class="team-header-content">
+              <div class="team-info">
+                <h3 class="team-name" [matTooltip]="team.name">{{ team.name }}</h3>
+                <p class="team-short-name">{{ team.shortName }}</p>
+                <mat-chip class="team-status-chip"
+                         [color]="getTeamStatusColor(team.status)"
+                         [class]="getTeamStatusClass(team.status)">
+                  {{ getTeamStatusText(team.status) }}
+                </mat-chip>
+              </div>
+
+              <div class="team-actions">
+                <button mat-icon-button
+                        (click)="editTeam(team)"
+                        matTooltip="Editar Equipo"
+                        class="team-action-btn edit-btn">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        color="warn"
+                        (click)="deleteTeam(team)"
+                        matTooltip="Eliminar Equipo"
+                        class="team-action-btn delete-btn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-card-header>
+
+          <!-- Team Content -->
+          <mat-card-content class="team-card-content">
+            <div class="team-details">
+              <!-- Team Description -->
+              <div class="team-description" *ngIf="team.description">
+                <mat-icon class="detail-icon">description</mat-icon>
+                <span>{{ team.description }}</span>
+              </div>
+
+              <!-- Team Foundation Date -->
+              <div class="team-foundation" *ngIf="team.foundationDate">
+                <mat-icon class="detail-icon">event</mat-icon>
+                <span>Fundado: {{ team.foundationDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+
+              <!-- Team City -->
+              <div class="team-city" *ngIf="team.city">
+                <mat-icon class="detail-icon">location_city</mat-icon>
+                <span>{{ team.city }}</span>
+              </div>
+
+              <!-- Team Stadium -->
+              <div class="team-stadium" *ngIf="team.stadium">
+                <mat-icon class="detail-icon">stadium</mat-icon>
+                <span>{{ team.stadium }}</span>
+              </div>
+
+              <!-- Team Colors -->
+              <div class="team-colors" *ngIf="team.primaryColor || team.secondaryColor">
+                <mat-icon class="detail-icon">palette</mat-icon>
+                <div class="colors-display">
+                  <div class="color-sample primary-color"
+                       [style.background-color]="team.primaryColor"
+                       [matTooltip]="'Color primario: ' + team.primaryColor"
+                       *ngIf="team.primaryColor">
+                  </div>
+                  <div class="color-sample secondary-color"
+                       [style.background-color]="team.secondaryColor"
+                       [matTooltip]="'Color secundario: ' + team.secondaryColor"
+                       *ngIf="team.secondaryColor">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+
+          <!-- Team Footer -->
+          <mat-card-actions class="team-card-actions">
+            <div class="team-stats">
+              <div class="stat-item">
+                <mat-icon class="stat-icon">sports_soccer</mat-icon>
+                <span class="stat-label">Partidos</span>
+                <span class="stat-value">0</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon class="stat-icon">emoji_events</mat-icon>
+                <span class="stat-label">Victorias</span>
+                <span class="stat-value">0</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon class="stat-icon">sports_score</mat-icon>
+                <span class="stat-label">Goles</span>
+                <span class="stat-value">0</span>
+              </div>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
