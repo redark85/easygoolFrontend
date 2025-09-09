@@ -111,8 +111,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           // Actualizar el store con la información del torneo
           this.tournamentStore.setCurrentTournament(this.tournamentId, this.tournament.name);
 
-          // Initialize mock data
-          this.initializeMockTeams();
+          // Cargar datos reales del backend
+          this.loadTeams();
           this.loadPhases();
 
           this.isLoading = false;
@@ -203,6 +203,23 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Carga los equipos del torneo desde la API
+   */
+  private loadTeams(): void {
+    this.teamService.getTeamsByTournament(this.tournamentId).subscribe({
+      next: (teams) => {
+        this.teams = teams;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading teams:', error);
+        this.teams = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
    * Carga las fases del torneo desde la API
    */
   private loadPhases(): void {
@@ -213,8 +230,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading phases:', error);
-        // Fallback a datos mock si falla la API
-        this.initializeMockPhases();
+        this.phases = [];
+        this.cdr.detectChanges();
       }
     });
   }
@@ -612,79 +629,5 @@ trackByTeamId(index: number, team: Team): number {
   return team.tournamentId || index;
 }
 
-// Initialize mock teams data
-private initializeMockTeams(): void {
-  this.teams = [
-    {
-      id: 1,
-      tournamentId: this.tournamentId,
-      name: 'Real Madrid FC',
-      shortName: 'RMA',
-      logoBase64: '',
-      logoContentType: 'image/png'
-    },
-    {
-      id: 2,
-      tournamentId: this.tournamentId,
-      name: 'FC Barcelona',
-      shortName: 'BAR',
-      logoBase64: '',
-      logoContentType: 'image/png'
-    },
-    {
-      id: 3,
-      tournamentId: this.tournamentId,
-      name: 'Atlético Madrid',
-      shortName: 'ATM',
-      logoBase64: '',
-      logoContentType: 'image/png'
-    },
-    {
-      id: 4,
-      tournamentId: this.tournamentId,
-      name: 'Valencia CF',
-      shortName: 'VAL',
-      logoBase64: '',
-      logoContentType: 'image/png'
-    }
-  ];
-}
 
-// Initialize mock phases data
-private initializeMockPhases(): void {
-  this.phases = [
-    {
-      id: 1,
-      name: 'Fase de Grupos',
-      phaseType: PhaseType.GroupStage,
-      grups: [
-        {
-          id: 1,
-          name: 'Grupo A',
-          phaseId: 1,
-          teams: this.teams.slice(0, 2)
-        },
-        {
-          id: 2,
-          name: 'Grupo B',
-          phaseId: 1,
-          teams: this.teams.slice(2, 4)
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Eliminatorias',
-      phaseType: PhaseType.Knockout,
-      grups: [
-        {
-          id: 3,
-          name: 'Cuartos de Final',
-          phaseId: 2,
-          teams: []
-        }
-      ]
-    }
-  ];
-}
 }
