@@ -1,16 +1,20 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
-import { Subject, takeUntil, switchMap, filter } from 'rxjs';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDialogModule } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TournamentService } from '@features/tournaments/services/tournament.service';
 import { TournamentDetail, TournamentStatusType, TournamentModality } from '@features/tournaments/models/tournament.interface';
 import { Phase, Group, PhaseType } from '@features/tournaments/models/phase.interface';
@@ -25,6 +29,10 @@ import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/com
 import { MatDialog } from '@angular/material/dialog';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
+import { PhasesGroupsManagementComponent } from '../phases-groups-management/phases-groups-management.component';
+import { TeamsManagementComponent } from '../teams-management/teams-management.component';
+import { MatchesManagementComponent } from '../matches-management/matches-management.component';
+import { StatisticsManagementComponent } from '../statistics-management/statistics-management.component';
 import { PhaseFormData, PhaseModalResult, CreatePhaseRequest, UpdatePhaseRequest } from '../../models/phase-form.interface';
 import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest } from '../../models/group-form.interface';
 
@@ -38,11 +46,19 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
     MatIconModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatExpansionModule,
     MatDividerModule,
     MatTooltipModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatExpansionModule,
+    MatTabsModule,
+    MatMenuModule,
+    MatDialogModule,
+    PhasesGroupsManagementComponent,
+    TeamsManagementComponent,
+    MatchesManagementComponent,
+    StatisticsManagementComponent
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   templateUrl: './tournament-management.component.html',
   styleUrls: ['./tournament-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -53,6 +69,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   teams: Team[] = [];
   isLoading = false;
   tournamentId: number = 0;
+  selectedTabIndex: number = 0;
 
   private destroy$ = new Subject<void>();
 
@@ -629,5 +646,38 @@ trackByTeamId(index: number, team: Team): number {
   return team.tournamentId || index;
 }
 
+  /**
+   * Maneja la actualización de fases desde el componente hijo
+   */
+  onPhasesUpdated(phases: Phase[]): void {
+    this.phases = phases;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja la actualización de equipos desde el componente hijo
+   */
+  onTeamsUpdated(teams: Team[]): void {
+    this.teams = teams;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja eventos desde el componente de partidos
+   */
+  onMatchesUpdated(matches: any[]): void {
+    // TODO: Implementar lógica de actualización de partidos
+    console.log('Matches updated:', matches);
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja eventos desde el componente de estadísticas
+   */
+  onStatisticsUpdated(statistics: any): void {
+    // TODO: Implementar lógica de actualización de estadísticas
+    console.log('Statistics updated:', statistics);
+    this.cdr.detectChanges();
+  }
 
 }

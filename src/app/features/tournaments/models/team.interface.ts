@@ -5,6 +5,13 @@ export interface Team {
   shortName: string;
   logoBase64: string;
   logoContentType: string;
+  status?: number;
+  description?: string;
+  foundationDate?: Date;
+  city?: string;
+  stadium?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
 }
 
 export interface CreateTeamRequest {
