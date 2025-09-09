@@ -16,7 +16,8 @@ export interface Phase {
   name: string;
   phaseType: PhaseType;
   tournamentId?: number;
-  grups?: Group[]; // Nota: API usa 'grups' no 'groups'
+  groups?: Group[];
+  knockoutTeams?: Team[]; // Solo para fases de eliminatorias
 }
 
 /**
@@ -26,6 +27,7 @@ export interface Group {
   id: number;
   name: string;
   phaseId: number;
+  countTeams: number;
   teams?: Team[];
 }
 
