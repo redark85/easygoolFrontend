@@ -323,10 +323,16 @@
   }
 }
 
+/* Solución para el problema de los paneles vacíos */
+.group-panel:not(.mat-expanded) .mat-expansion-panel-content {
+  visibility: hidden;
+  height: 0;
+  padding: 0;
+}
+
 // No Teams in Group State
 .no-teams-in-group {
   text-align: center;
-  padding: 30px 20px;
   color: var(--text-secondary);
 
   .no-teams-icon {
@@ -334,7 +340,6 @@
     width: 2.5rem;
     height: 2.5rem;
     color: var(--border-color);
-    margin-bottom: 12px;
   }
 
   p {

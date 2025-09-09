@@ -74,7 +74,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       width: '600px',
       maxWidth: '90vw',
       disableClose: true,
-      data: { 
+      data: {
         mode: 'create',
         isEdit: false,
         tournamentId: this.tournamentId
@@ -96,7 +96,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       width: '600px',
       maxWidth: '90vw',
       disableClose: true,
-      data: { 
+      data: {
         mode: 'edit',
         isEdit: true,
         phase: phase,
@@ -144,7 +144,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       width: '600px',
       maxWidth: '90vw',
       disableClose: true,
-      data: { 
+      data: {
         mode: 'create',
         isEdit: false,
         phaseId: phase.id
@@ -166,7 +166,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       width: '600px',
       maxWidth: '90vw',
       disableClose: true,
-      data: { 
+      data: {
         mode: 'edit',
         isEdit: true,
         group: group,

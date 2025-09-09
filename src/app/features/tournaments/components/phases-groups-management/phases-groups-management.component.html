@@ -88,105 +88,94 @@
             </div>
 
             <!-- Groups Grid - 3 columns with expansion panels -->
-            <div *ngIf="phase.groups && phase.groups.length > 0" class="groups-grid">
-              <mat-expansion-panel *ngFor="let group of phase.groups; trackBy: trackByGroupId; let i = index"
-                                   class="group-panel"
-                                   [expanded]="expandedGroupIndex === i"
-                                   (opened)="expandedGroupIndex = i"
-                                   (closed)="expandedGroupIndex = -1">
-                <mat-expansion-panel-header class="group-header">
-                  <mat-panel-title>
-                    <div class="group-title-content">
-                      <mat-icon class="group-icon">group_work</mat-icon>
-                      <span class="group-name" [matTooltip]="group.name">{{ group.name }}</span>
+            <div *ngIf="phase.groups && phase.groups.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+              <div *ngFor="let group of phase.groups; trackBy: trackByGroupId; let i = index" class="col mb-4">
+                <mat-expansion-panel class="group-panel"
+                                     [expanded]="expandedGroupIndex === i"
+                                     (opened)="expandedGroupIndex = i">
+                  <mat-expansion-panel-header class="group-header">
+                    <mat-panel-title>
+                      <div class="group-title-content">
+                        <mat-icon class="group-icon">group_work</mat-icon>
+                        <span class="group-name" [matTooltip]="group.name">{{ group.name }}</span>
+                      </div>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      <div class="group-stats">
+                        <mat-chip class="teams-count-chip"
+                                  [matTooltip]="(group.teams?.length || 0) === 1 ? '1 equipo' : (group.teams?.length || 0) + ' equipos'">
+                          <mat-icon>groups</mat-icon>
+                          {{ group.teams?.length || 0 }}
+                        </mat-chip>
+
+                        <div class="group-actions-inline">
+                          <button mat-icon-button
+                                  color="primary"
+                                  (click)="addTeamToGroup(phase.id, group.id); $event.stopPropagation()"
+                                  matTooltip="Agregar Equipo"
+                                  class="group-action-btn">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  (click)="editGroup(group); $event.stopPropagation()"
+                                  matTooltip="Editar Grupo"
+                                  class="group-action-btn">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  color="warn"
+                                  (click)="deleteGroup(group); $event.stopPropagation()"
+                                  matTooltip="Eliminar Grupo"
+                                  class="group-action-btn">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+
+                  <div class="group-content">
+                    <div class="no-teams-in-group" *ngIf="!group.teams || group.teams.length === 0">
+                      <mat-icon class="no-teams-icon">groups</mat-icon>
+                      <p>No hay equipos en este grupo</p>
                     </div>
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    <div class="group-stats">
-                      <mat-chip class="teams-count-chip"
-                               [matTooltip]="(group.teams?.length || 0) === 1 ? '1 equipo' : (group.teams?.length || 0) + ' equipos'">
-                        <mat-icon>groups</mat-icon>
-                        {{ group.teams?.length || 0 }}
-                      </mat-chip>
 
-                      <!-- Group Action Buttons -->
-                      <div class="group-actions-inline">
-                        <button mat-icon-button
-                                color="primary"
-                                (click)="addTeamToGroup(phase.id, group.id); $event.stopPropagation()"
-                                matTooltip="Agregar Equipo"
-                                class="group-action-btn">
-                          <mat-icon>add</mat-icon>
-                        </button>
-                        <button mat-icon-button
-                                (click)="editGroup(group); $event.stopPropagation()"
-                                matTooltip="Editar Grupo"
-                                class="group-action-btn">
-                          <mat-icon>edit</mat-icon>
-                        </button>
-                        <button mat-icon-button
-                                color="warn"
-                                (click)="deleteGroup(group); $event.stopPropagation()"
-                                matTooltip="Eliminar Grupo"
-                                class="group-action-btn">
-                          <mat-icon>delete</mat-icon>
-                        </button>
-                      </div>
-                    </div>
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+                    <div class="teams-in-group" *ngIf="group.teams && group.teams.length > 0">
+                      <div class="team-item"
+                           *ngFor="let team of group.teams; trackBy: trackByTeamId">
+                        <div class="team-avatar">
+                          <img [src]="team.logoBase64 ? 'data:' + team.logoContentType + ';base64,' + team.logoBase64 : 'assets/logo.png'"
+                               [alt]="team.name"
+                               class="team-logo"
+                               (error)="$event.target.src='assets/logo.png'">
+                        </div>
 
-                <!-- Group Content - Teams -->
-                <div class="group-content">
-                  <!-- No Teams Message -->
-                  <div class="no-teams-in-group" *ngIf="!group.teams || group.teams.length === 0">
-                    <mat-icon class="no-teams-icon">groups</mat-icon>
-                    <p>No hay equipos en este grupo</p>
-                    <button mat-fab
-                            color="primary"
-                            (click)="addTeamToGroup(phase.id, group.id)"
-                            matTooltip="Agregar Primer Equipo"
-                            class="add-first-team-btn">
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
+                        <div class="team-info">
+                          <h5 class="team-name">{{ team.name }}</h5>
+                          <span class="team-short-name">{{ team.shortName }}</span>
+                        </div>
 
-                  <!-- Teams List -->
-                  <div class="teams-in-group" *ngIf="group.teams && group.teams.length > 0">
-                    <div class="team-item"
-                         *ngFor="let team of group.teams; trackBy: trackByTeamId">
-                      <div class="team-avatar">
-                        <img [src]="team.logoBase64 ? 'data:' + team.logoContentType + ';base64,' + team.logoBase64 : 'assets/logo.png'"
-                             [alt]="team.name"
-                             class="team-logo"
-                             (error)="$event.target.src='assets/logo.png'">
-                      </div>
-
-                      <div class="team-info">
-                        <h5 class="team-name">{{ team.name }}</h5>
-                        <span class="team-short-name">{{ team.shortName }}</span>
-                      </div>
-
-                      <div class="team-actions">
-                        <button mat-icon-button
-                                color="accent"
-                                (click)="disqualifyTeam(team, group)"
-                                matTooltip="Descalificar equipo"
-                                class="disqualify-team-btn">
-                          <mat-icon>block</mat-icon>
-                        </button>
-                        <button mat-icon-button
-                                color="warn"
-                                (click)="removeTeamFromGroup(team, group)"
-                                matTooltip="Quitar del grupo"
-                                class="remove-team-btn">
-                          <mat-icon>remove_circle</mat-icon>
-                        </button>
+                        <div class="team-actions">
+                          <button mat-icon-button
+                                  color="accent"
+                                  (click)="disqualifyTeam(team, group)"
+                                  matTooltip="Descalificar equipo"
+                                  class="disqualify-team-btn">
+                            <mat-icon>block</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  color="warn"
+                                  (click)="removeTeamFromGroup(team, group)"
+                                  matTooltip="Quitar del grupo"
+                                  class="remove-team-btn">
+                            <mat-icon>remove_circle</mat-icon>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </mat-expansion-panel>
+                </mat-expansion-panel>
+              </div>
             </div>
           </mat-card-content>
         </mat-card>

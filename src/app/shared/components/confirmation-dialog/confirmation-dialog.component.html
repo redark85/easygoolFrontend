@@ -11,18 +11,18 @@
   </div>
 
   <div mat-dialog-actions class="dialog-actions">
-    <button 
+    <button
       type="button"
-      mat-stroked-button 
+      mat-stroked-button
       (click)="onCancel()"
       class="cancel-button">
       <mat-icon>close</mat-icon>
       {{ data.cancelText }}
     </button>
-    
-    <button 
+
+    <button
       type="button"
-      mat-raised-button 
+      mat-raised-button
       [color]="data.type === 'danger' ? 'warn' : 'primary'"
       (click)="onConfirm()"
       class="confirm-button">
