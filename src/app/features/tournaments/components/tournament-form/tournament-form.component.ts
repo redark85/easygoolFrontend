@@ -11,11 +11,16 @@ import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { LocationMapComponent, LocationData } from '@shared/components/location-map/location-map.component';
 import { TournamentService } from '../../services/tournament.service';
+import { PhaseService } from '../../services/phase.service';
 import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType } from '../../models/tournament.interface';
+import { Phase, CreatePhaseRequest, CreateGroupRequest, PhaseType } from '../../models/phase.interface';
 import { dateRangeValidator } from '@shared/validators/date-range.validator';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
@@ -41,6 +46,9 @@ export interface TournamentFormData {
     MatIconModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    MatExpansionModule,
+    MatCardModule,
+    MatChipsModule,
     ImageUploaderComponent
   ],
   providers: [provideNativeDateAdapter()],
@@ -49,11 +57,22 @@ export interface TournamentFormData {
 })
 export class TournamentFormComponent implements OnInit, AfterViewInit {
   tournamentForm!: FormGroup;
+  phaseForm!: FormGroup;
+  groupForm!: FormGroup;
   isSubmitting = false;
   isEditMode = false;
   tournament: Tournament | null = null;
   uploadedImage: ImageUploadData | null = null;
   selectedLocationData: LocationData | null = null;
+  
+  // Phase and Group management
+  showPhaseSection = false;
+  createdTournamentId: number | null = null;
+  phases: Phase[] = [];
+  selectedPhaseId: number | null = null;
+  phaseTypeOptions: Array<{value: number, label: string, description: string}> = [];
+  isCreatingPhase = false;
+  isCreatingGroup = false;
 
   modalityOptions = [
     { value: TournamentModality.Five, label: 'Fútbol Indoor (5 vs 5)' },
@@ -68,12 +87,16 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private tournamentService: TournamentService,
+    private phaseService: PhaseService,
     private dialogRef: MatDialogRef<TournamentFormComponent>,
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: TournamentFormData
   ) {
     this.isEditMode = this.data?.mode === 'edit';
     this.initializeForm();
+    this.initializePhaseForm();
+    this.initializeGroupForm();
+    this.phaseTypeOptions = this.phaseService.getPhaseTypeOptions();
   }
 
   async ngOnInit(): Promise<void> {
@@ -100,6 +123,19 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
       endDate: [''], // Removido Validators.required
       location: ['', Validators.required]
     }, { validators: [dateRangeValidator] });
+  }
+
+  private initializePhaseForm(): void {
+    this.phaseForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      phaseType: ['', Validators.required]
+    });
+  }
+
+  private initializeGroupForm(): void {
+    this.groupForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]]
+    });
   }
 
   private async patchForm(tournament: Tournament): Promise<void> {
@@ -227,7 +263,13 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
         this.tournamentService.createTournament(tournamentData).subscribe({
           next: (response) => {
             this.isSubmitting = false;
-            this.dialogRef.close(true);
+            if (response.succeed && response.result) {
+              this.createdTournamentId = response.result.id;
+              this.showPhaseSection = true;
+              this.loadPhases();
+            } else {
+              this.dialogRef.close(true);
+            }
           },
           error: (error) => {
             this.isSubmitting = false;
@@ -356,5 +398,163 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
   private mapTournamentStatusToStatusType(status: TournamentStatusType): TournamentStatusType {
     // Como ya usamos TournamentStatusType unificado, simplemente retornamos el valor
     return status;
+  }
+
+  /**
+   * Carga las fases del torneo creado
+   */
+  private loadPhases(): void {
+    if (!this.createdTournamentId) return;
+    
+    this.phaseService.getPhasesByTournament(this.createdTournamentId).subscribe({
+      next: (phases) => {
+        this.phases = phases;
+      },
+      error: (error) => {
+        console.error('Error loading phases:', error);
+      }
+    });
+  }
+
+  /**
+   * Crea una nueva fase
+   */
+  onCreatePhase(): void {
+    if (this.phaseForm.valid && this.createdTournamentId) {
+      this.isCreatingPhase = true;
+      
+      const phaseData: CreatePhaseRequest = {
+        name: this.phaseForm.value.name,
+        phaseType: this.phaseForm.value.phaseType
+      };
+
+      this.phaseService.createPhase(this.createdTournamentId, phaseData).subscribe({
+        next: (response) => {
+          this.isCreatingPhase = false;
+          if (response.succeed) {
+            this.phaseForm.reset();
+            this.loadPhases();
+          }
+        },
+        error: (error) => {
+          this.isCreatingPhase = false;
+          console.error('Error creating phase:', error);
+        }
+      });
+    } else {
+      this.markPhaseFormTouched();
+    }
+  }
+
+  /**
+   * Crea un nuevo grupo para la fase seleccionada
+   */
+  onCreateGroup(): void {
+    if (this.groupForm.valid && this.selectedPhaseId) {
+      this.isCreatingGroup = true;
+      
+      const groupData: CreateGroupRequest = {
+        name: this.groupForm.value.name
+      };
+
+      this.phaseService.createGroup(this.selectedPhaseId, groupData).subscribe({
+        next: (response) => {
+          this.isCreatingGroup = false;
+          if (response.succeed) {
+            this.groupForm.reset();
+            this.loadPhases(); // Recargar para mostrar el nuevo grupo
+          }
+        },
+        error: (error) => {
+          this.isCreatingGroup = false;
+          console.error('Error creating group:', error);
+        }
+      });
+    } else {
+      this.markGroupFormTouched();
+    }
+  }
+
+  /**
+   * Selecciona una fase para crear grupos
+   */
+  onSelectPhase(phaseId: number): void {
+    this.selectedPhaseId = phaseId;
+  }
+
+  /**
+   * Marca todos los campos del formulario de fase como tocados
+   */
+  private markPhaseFormTouched(): void {
+    Object.keys(this.phaseForm.controls).forEach(key => {
+      this.phaseForm.get(key)?.markAsTouched();
+    });
+  }
+
+  /**
+   * Marca todos los campos del formulario de grupo como tocados
+   */
+  private markGroupFormTouched(): void {
+    Object.keys(this.groupForm.controls).forEach(key => {
+      this.groupForm.get(key)?.markAsTouched();
+    });
+  }
+
+  /**
+   * Obtiene el mensaje de error para campos de fase
+   */
+  getPhaseErrorMessage(fieldName: string): string {
+    const field = this.phaseForm.get(fieldName);
+    if (field?.hasError('required')) {
+      return 'Este campo es obligatorio';
+    }
+    if (field?.hasError('minlength')) {
+      const minLength = field.errors?.['minlength']?.requiredLength;
+      return `Mínimo ${minLength} caracteres`;
+    }
+    return '';
+  }
+
+  /**
+   * Obtiene el mensaje de error para campos de grupo
+   */
+  getGroupErrorMessage(fieldName: string): string {
+    const field = this.groupForm.get(fieldName);
+    if (field?.hasError('required')) {
+      return 'Este campo es obligatorio';
+    }
+    if (field?.hasError('minlength')) {
+      const minLength = field.errors?.['minlength']?.requiredLength;
+      return `Mínimo ${minLength} caracteres`;
+    }
+    return '';
+  }
+
+  /**
+   * Finaliza la configuración del torneo y cierra el modal
+   */
+  onFinishTournamentSetup(): void {
+    this.dialogRef.close(true);
+  }
+
+  /**
+   * Obtiene el texto del tipo de fase
+   */
+  getPhaseTypeText(phaseType: number): string {
+    return this.phaseService.getPhaseTypeText(phaseType);
+  }
+
+  /**
+   * TrackBy function para optimizar el rendimiento de la lista de fases
+   */
+  trackByPhaseId(index: number, phase: Phase): number {
+    return phase.id;
+  }
+
+  /**
+   * TrackBy function para optimizar el rendimiento de la lista de grupos
+   */
+  trackByGroupId(index: number, group: any): number {
+    return group.id;
   }
 }

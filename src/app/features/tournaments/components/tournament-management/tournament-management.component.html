@@ -109,10 +109,10 @@
                 
                 <div class="phase-stats">
                   <mat-icon class="groups-count-icon" 
-                            matBadge="{{ phase.groups?.length || 0 }}" 
+                            matBadge="{{ phase.grups?.length || 0 }}" 
                             matBadgeColor="accent"
                             matBadgeSize="small"
-                            matTooltip="{{ (phase.groups?.length || 0) === 1 ? '1 grupo' : (phase.groups?.length || 0) + ' grupos' }}">
+                            matTooltip="{{ (phase.grups?.length || 0) === 1 ? '1 grupo' : (phase.grups?.length || 0) + ' grupos' }}">
                     group_work
                   </mat-icon>
                   
@@ -146,7 +146,7 @@
             <!-- Phase Content -->
             <mat-card-content class="phase-card-content">
               <!-- No Groups Message -->
-              <div class="no-groups" *ngIf="!phase.groups || phase.groups.length === 0">
+              <div class="no-groups" *ngIf="!phase.grups || phase.grups.length === 0">
                 <mat-icon class="no-groups-icon">group_work</mat-icon>
                 <p>No hay grupos en esta fase</p>
                 <button mat-stroked-button 
@@ -158,8 +158,8 @@
               </div>
 
               <!-- Groups Accordion -->
-              <div *ngIf="phase.groups && phase.groups.length > 0" class="groups-grid">
-                <mat-expansion-panel *ngFor="let group of phase.groups; trackBy: trackByGroupId" 
+              <div *ngIf="phase.grups && phase.grups.length > 0" class="groups-grid">
+                <mat-expansion-panel *ngFor="let group of phase.grups; trackBy: trackByGroupId" 
                                      class="group-panel">
                   <mat-expansion-panel-header class="group-header">
                     <mat-panel-title>

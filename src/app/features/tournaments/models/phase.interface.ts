@@ -16,7 +16,7 @@ export interface Phase {
   name: string;
   phaseType: PhaseType;
   tournamentId?: number;
-  groups?: Group[];
+  grups?: Group[]; // Nota: API usa 'grups' no 'groups'
 }
 
 /**

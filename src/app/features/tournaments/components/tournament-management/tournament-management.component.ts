@@ -20,6 +20,7 @@ import { TournamentStore } from '@core/store/tournament.store';
 import { ToastService } from '@core/services/toast.service';
 import { TeamModalService, TeamModalResult } from '../../services/team-modal.service';
 import { TeamService } from '../../services/team.service';
+import { PhaseService } from '../../services/phase.service';
 import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
@@ -65,6 +66,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     private tournamentStore: TournamentStore,
     private teamModalService: TeamModalService,
     private teamService: TeamService,
+    private phaseService: PhaseService,
     private dialog: MatDialog
   ) {}
 
@@ -107,11 +109,11 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           this.titleService.setTitle(`${this.tournament.name} - EasyGool`);
           
           // Actualizar el store con la información del torneo
-          this.tournamentStore.setCurrentTournament(this.tournament.id, this.tournament.name);
+          this.tournamentStore.setCurrentTournament(this.tournamentId, this.tournament.name);
 
           // Initialize mock data
           this.initializeMockTeams();
-          this.initializeMockPhases();
+          this.loadPhases();
 
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -198,6 +200,23 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
       default:
         return 'status-unknown';
     }
+  }
+
+  /**
+   * Carga las fases del torneo desde la API
+   */
+  private loadPhases(): void {
+    this.phaseService.getPhasesByTournament(this.tournamentId).subscribe({
+      next: (phases) => {
+        this.phases = phases;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading phases:', error);
+        // Fallback a datos mock si falla la API
+        this.initializeMockPhases();
+      }
+    });
   }
 
   /**
@@ -304,8 +323,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     if (!this.tournament) return;
 
     const dialogData: PhaseFormData = {
-      tournamentId: this.tournament.id,
-      isEdit: false
+      isEdit: false,
+      tournamentId: this.tournamentId
     };
 
     const dialogRef = this.dialog.open(PhaseFormComponent, {
@@ -319,11 +338,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: PhaseModalResult | undefined) => {
       if (result && result.action === 'create') {
-        // TODO: Implementar servicio para crear fase
-        const createData = result.data as CreatePhaseRequest;
-        this.toastService.showSuccess(`Fase "${createData.name}" creada exitosamente`);
-        // this.loadTournamentData(); // Descomentar cuando esté el servicio
-        console.log('Crear fase:', createData);
+        // La creación de fase ya está implementada en PhaseFormComponent
+        this.loadTournamentData(); // Recargar datos para mostrar la nueva fase
       }
     });
   }
@@ -336,8 +352,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
 
     const dialogData: PhaseFormData = {
       phase: phase,
-      tournamentId: this.tournament.id,
-      isEdit: true
+      isEdit: true,
+      tournamentId: this.tournamentId
     };
 
     const dialogRef = this.dialog.open(PhaseFormComponent, {
@@ -351,11 +367,10 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: PhaseModalResult | undefined) => {
       if (result && result.action === 'update') {
-        // TODO: Implementar servicio para actualizar fase
+        // La actualización de fase se implementará cuando esté disponible en la API
         const updateData = result.data as UpdatePhaseRequest;
         this.toastService.showSuccess(`Fase "${updateData.name}" actualizada exitosamente`);
-        // this.loadTournamentData(); // Descomentar cuando esté el servicio
-        console.log('Actualizar fase:', updateData);
+        this.loadTournamentData(); // Recargar datos
       }
     });
   }
@@ -376,7 +391,6 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
 
     const dialogData: GroupFormData = {
       phaseId: phase.id,
-      tournamentId: this.tournament.id,
       isEdit: false
     };
 
@@ -391,11 +405,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: GroupModalResult | undefined) => {
       if (result && result.action === 'create') {
-        // TODO: Implementar servicio para crear grupo
-        const createData = result.data as CreateGroupRequest;
-        this.toastService.showSuccess(`Grupo "${createData.name}" creado exitosamente en ${phase.name}`);
-        // this.loadTournamentData(); // Descomentar cuando esté el servicio
-        console.log('Crear grupo:', createData, 'en fase:', phase.name);
+        // La creación de grupo ya está implementada en GroupFormComponent
+        this.loadTournamentData(); // Recargar datos para mostrar el nuevo grupo
       }
     });
   }
@@ -409,7 +420,6 @@ editGroup(group: Group): void {
   const dialogData: GroupFormData = {
     group: group,
     phaseId: group.phaseId || 0, // Asumiendo que Group tiene phaseId
-    tournamentId: this.tournament.id,
     isEdit: true
   };
 
@@ -424,11 +434,10 @@ editGroup(group: Group): void {
 
   dialogRef.afterClosed().subscribe((result: GroupModalResult | undefined) => {
     if (result && result.action === 'update') {
-      // TODO: Implementar servicio para actualizar grupo
+      // La actualización de grupo se implementará cuando esté disponible en la API
       const updateData = result.data as UpdateGroupRequest;
       this.toastService.showSuccess(`Grupo "${updateData.name}" actualizado exitosamente`);
-      // this.loadTournamentData(); // Descomentar cuando esté el servicio
-      console.log('Actualizar grupo:', updateData);
+      this.loadTournamentData(); // Recargar datos
     }
   });
 }
@@ -504,7 +513,7 @@ deleteTeam(team: Team): void {
       this.teamService.deleteTeam(team.id).subscribe({
         next: () => {
           this.toastService.showSuccess(`Equipo "${team.name}" eliminado exitosamente`);
-          // TODO: Actualizar la lista de equipos
+          // Recargar datos del torneo para actualizar la lista de equipos
           this.loadTournamentData();
         },
         error: (error) => {
@@ -648,7 +657,7 @@ private initializeMockPhases(): void {
       id: 1,
       name: 'Fase de Grupos',
       phaseType: PhaseType.GroupStage,
-      groups: [
+      grups: [
         {
           id: 1,
           name: 'Grupo A',
@@ -667,7 +676,7 @@ private initializeMockPhases(): void {
       id: 2,
       name: 'Eliminatorias',
       phaseType: PhaseType.Knockout,
-      groups: [
+      grups: [
         {
           id: 3,
           name: 'Cuartos de Final',

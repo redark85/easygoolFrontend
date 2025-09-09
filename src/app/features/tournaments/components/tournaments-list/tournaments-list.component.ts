@@ -18,7 +18,7 @@ import { Tournament, TournamentStatusType, TournamentModality, UpdateTournamentR
 import { TournamentService } from '../../services/tournament.service';
 import { TournamentStatusService } from '../../services/tournament-status.service';
 import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
@@ -293,7 +293,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    * Elimina un torneo con confirmación (cambio a estado Deleted)
    */
   deleteTournament(tournament: Tournament): void {
-    const dialogData: ConfirmDialogData = {
+    const dialogData: ConfirmationDialogData = {
       title: 'Eliminar Torneo',
       message: `¿Estás seguro de que deseas eliminar el torneo "${tournament.name}"? Esta acción no se puede deshacer.`,
       confirmText: 'Eliminar',
@@ -301,7 +301,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
       type: 'danger'
     };
 
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '450px',
       data: dialogData
     });

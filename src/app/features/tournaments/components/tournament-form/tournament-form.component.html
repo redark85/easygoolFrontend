@@ -91,6 +91,133 @@
         </div>
       </div>
 
+      <!-- Phase and Group Management Section -->
+      <div *ngIf="showPhaseSection" class="phase-section">
+        <div class="section-header">
+          <h3><mat-icon>sports_soccer</mat-icon> Configuración de Fases y Grupos</h3>
+          <p class="section-description">Configura las fases y grupos para tu torneo</p>
+        </div>
+
+        <!-- Create Phase Form -->
+        <mat-card class="phase-form-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>add_circle</mat-icon>
+              Crear Nueva Fase
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="phaseForm" class="container-fluid">
+              <div class="row">
+                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Nombre de la Fase</mat-label>
+                    <input matInput formControlName="name" placeholder="Ej: Fase de Grupos">
+                    <mat-error>{{ getPhaseErrorMessage('name') }}</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 col-12">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Tipo de Fase</mat-label>
+                    <mat-select formControlName="phaseType">
+                      <mat-option *ngFor="let option of phaseTypeOptions" [value]="option.value">
+                        <div class="phase-option">
+                          <strong>{{ option.label }}</strong>
+                          <small>{{ option.description }}</small>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                    <mat-error>{{ getPhaseErrorMessage('phaseType') }}</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-flat-button color="primary" (click)="onCreatePhase()" 
+                    [disabled]="!phaseForm.valid || isCreatingPhase">
+              <span *ngIf="!isCreatingPhase">
+                <mat-icon>add</mat-icon>
+                Crear Fase
+              </span>
+              <span *ngIf="isCreatingPhase" class="loading-content">
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                Creando...
+              </span>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <!-- Existing Phases -->
+        <div *ngIf="phases.length > 0" class="phases-list">
+          <h4><mat-icon>list</mat-icon> Fases Creadas</h4>
+          <mat-accordion>
+            <mat-expansion-panel *ngFor="let phase of phases; trackBy: trackByPhaseId">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>{{ phase.phaseType === 0 ? 'groups' : 'emoji_events' }}</mat-icon>
+                  {{ phase.name }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  <mat-chip [color]="phase.phaseType === 0 ? 'primary' : 'accent'" selected>
+                    {{ getPhaseTypeText(phase.phaseType) }}
+                  </mat-chip>
+                  <span class="group-count">{{ phase.grups?.length || 0 }} grupos</span>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <!-- Groups in this phase -->
+              <div class="phase-content">
+                <div *ngIf="phase.grups && phase.grups.length > 0" class="groups-grid">
+                  <mat-card *ngFor="let group of phase.grups; trackBy: trackByGroupId" class="group-card">
+                    <mat-card-header>
+                      <mat-card-title>{{ group.name }}</mat-card-title>
+                      <mat-card-subtitle>{{ group.teams?.length || 0 }} equipos</mat-card-subtitle>
+                    </mat-card-header>
+                  </mat-card>
+                </div>
+
+                <!-- Create Group Form -->
+                <mat-card class="create-group-card">
+                  <mat-card-header>
+                    <mat-card-title>
+                      <mat-icon>group_add</mat-icon>
+                      Crear Grupo
+                    </mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <form [formGroup]="groupForm" class="container-fluid">
+                      <div class="row">
+                        <div class="col-12">
+                          <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Nombre del Grupo</mat-label>
+                            <input matInput formControlName="name" placeholder="Ej: Grupo A">
+                            <mat-error>{{ getGroupErrorMessage('name') }}</mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </form>
+                  </mat-card-content>
+                  <mat-card-actions align="end">
+                    <button mat-flat-button color="accent" (click)="onSelectPhase(phase.id); onCreateGroup()" 
+                            [disabled]="!groupForm.valid || isCreatingGroup">
+                      <span *ngIf="!isCreatingGroup">
+                        <mat-icon>add</mat-icon>
+                        Crear Grupo
+                      </span>
+                      <span *ngIf="isCreatingGroup" class="loading-content">
+                        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                        Creando...
+                      </span>
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+      </div>
+
       <!-- Form Level Errors -->
       <div class="form-level-error" *ngIf="tournamentForm.hasError('dateRange')">
         <mat-icon>error</mat-icon>
@@ -104,13 +231,21 @@
     <button mat-stroked-button (click)="onCancel()" [disabled]="isSubmitting">
       Cancelar
     </button>
-    <button mat-flat-button color="primary" (click)="onSubmit()" 
+    
+    <!-- Botón para crear/editar torneo (solo se muestra si no está en modo de configuración de fases) -->
+    <button *ngIf="!showPhaseSection" mat-flat-button color="primary" (click)="onSubmit()" 
             [disabled]="!isFormValid || isSubmitting">
       <span *ngIf="!isSubmitting">{{ submitButtonText }}</span>
       <span *ngIf="isSubmitting" class="loading-content">
         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
         <span>Procesando...</span>
       </span>
+    </button>
+    
+    <!-- Botón para finalizar configuración (solo se muestra en modo de configuración de fases) -->
+    <button *ngIf="showPhaseSection" mat-flat-button color="primary" (click)="onFinishTournamentSetup()">
+      <mat-icon>check_circle</mat-icon>
+      Finalizar Configuración
     </button>
   </mat-dialog-actions>
 </div>

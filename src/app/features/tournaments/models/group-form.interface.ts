@@ -12,7 +12,6 @@ export interface UpdateGroupRequest {
 export interface GroupFormData {
   group?: Group;
   phaseId: number;
-  tournamentId: number;
   isEdit: boolean;
 }
 

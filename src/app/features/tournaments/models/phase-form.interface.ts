@@ -14,8 +14,8 @@ export interface UpdatePhaseRequest {
 
 export interface PhaseFormData {
   phase?: Phase;
-  tournamentId: number;
   isEdit: boolean;
+  tournamentId?: number; // Opcional: para cuando no se puede obtener de la ruta
 }
 
 export interface PhaseModalResult {

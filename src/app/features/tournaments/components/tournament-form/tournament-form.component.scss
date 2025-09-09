@@ -99,4 +99,177 @@
       color: #f44336;
     }
   }
+
+  // Phase and Group Management Styles
+  .phase-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e0e0e0;
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 2rem;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0 0 0.5rem 0;
+
+        mat-icon {
+          font-size: 1.75rem;
+          width: 1.75rem;
+          height: 1.75rem;
+        }
+      }
+
+      .section-description {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.875rem;
+        margin: 0;
+      }
+    }
+
+    .phase-form-card {
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+
+        mat-icon {
+          font-size: 1.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+        }
+      }
+
+      .phase-option {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        strong {
+          font-weight: 500;
+        }
+
+        small {
+          color: rgba(0, 0, 0, 0.6);
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .phases-list {
+      h4 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin: 0 0 1rem 0;
+
+        mat-icon {
+          font-size: 1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+      }
+
+      mat-expansion-panel {
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        mat-panel-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          mat-icon {
+            color: var(--primary-color);
+          }
+        }
+
+        mat-panel-description {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          .group-count {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.875rem;
+          }
+        }
+
+        .phase-content {
+          padding: 1rem 0;
+
+          .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+
+            .group-card {
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              transition: box-shadow 0.2s ease;
+
+              &:hover {
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+              }
+
+              mat-card-title {
+                font-size: 1rem;
+                color: var(--primary-color);
+              }
+
+              mat-card-subtitle {
+                font-size: 0.875rem;
+                color: rgba(0, 0, 0, 0.6);
+              }
+            }
+          }
+
+          .create-group-card {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            box-shadow: none;
+
+            mat-card-title {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              color: var(--secondary-color);
+
+              mat-icon {
+                font-size: 1.25rem;
+                width: 1.25rem;
+                height: 1.25rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    mat-progress-spinner {
+      ::ng-deep circle {
+        stroke: currentColor;
+      }
+    }
+  }
 }

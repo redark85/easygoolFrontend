@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '@core/services/toast.service';
+import { PhaseService } from '../../services/phase.service';
 import { GroupFormData, CreateGroupRequest, UpdateGroupRequest } from '../../models/group-form.interface';
 
 @Component({
@@ -35,7 +36,8 @@ export class GroupFormComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<GroupFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: GroupFormData,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private phaseService: PhaseService
   ) {
     this.isEdit = data.isEdit;
     this.groupForm = this.createForm();
@@ -84,23 +86,38 @@ export class GroupFormComponent implements OnInit {
       const formValue = this.groupForm.value;
       
       if (this.isEdit && this.data.group) {
+        // TODO: Implementar actualización de grupo cuando esté disponible en la API
         const updateData: UpdateGroupRequest = {
           id: this.data.group.id,
           name: formValue.name.trim()
         };
         
+        this.toastService.showWarning('Funcionalidad de edición no disponible aún');
+        this.isSubmitting = false;
         this.dialogRef.close({
           action: 'update',
           data: updateData
         });
       } else {
+        // Crear nuevo grupo usando la API
         const createData: CreateGroupRequest = {
           name: formValue.name.trim()
         };
         
-        this.dialogRef.close({
-          action: 'create',
-          data: createData
+        this.phaseService.createGroup(this.data.phaseId, createData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            if (response.succeed) {
+              this.dialogRef.close({
+                action: 'create',
+                data: response.result
+              });
+            }
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error creating group:', error);
+          }
         });
       }
     } else {

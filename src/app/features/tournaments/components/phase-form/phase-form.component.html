@@ -48,11 +48,12 @@
       type="submit"
       (click)="onSubmit()"
       [disabled]="phaseForm.invalid || isSubmitting">
-      <mat-spinner
+      <mat-progress-spinner
         *ngIf="isSubmitting"
         diameter="20"
+        mode="indeterminate"
         class="button-spinner">
-      </mat-spinner>
+      </mat-progress-spinner>
       <span *ngIf="!isSubmitting">
         {{ isEdit ? 'Actualizar' : 'Crear' }} Fase
       </span>

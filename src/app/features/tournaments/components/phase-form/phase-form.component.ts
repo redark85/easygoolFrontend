@@ -1,7 +1,10 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '@core/services/toast.service';
+import { PhaseService } from '../../services/phase.service';
 import { PhaseFormData, CreatePhaseRequest, UpdatePhaseRequest, PhaseType } from '../../models/phase-form.interface';
 
 @Component({
@@ -28,10 +32,12 @@ import { PhaseFormData, CreatePhaseRequest, UpdatePhaseRequest, PhaseType } from
   templateUrl: './phase-form.component.html',
   styleUrls: ['./phase-form.component.scss']
 })
-export class PhaseFormComponent implements OnInit {
+export class PhaseFormComponent implements OnInit, OnDestroy {
   phaseForm: FormGroup;
   isEdit: boolean;
   isSubmitting = false;
+  tournamentId: number | null = null;
+  private destroy$ = new Subject<void>();
 
   phaseTypeOptions = [
     { value: PhaseType.GroupStage, label: 'Fase de Grupos' },
@@ -42,16 +48,41 @@ export class PhaseFormComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<PhaseFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PhaseFormData,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private phaseService: PhaseService,
+    private route: ActivatedRoute
   ) {
     this.isEdit = data.isEdit;
     this.phaseForm = this.createForm();
   }
 
   ngOnInit(): void {
+    // Priorizar tournamentId del data (prop) sobre el de la ruta
+    if (this.data.tournamentId) {
+      this.tournamentId = this.data.tournamentId;
+    } else {
+      // Intentar obtener tournamentId de la ruta como fallback
+      this.route.params
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(params => {
+          const id = +params['id'];
+          if (id && !isNaN(id)) {
+            this.tournamentId = id;
+          } else {
+            this.toastService.showError('ID de torneo inválido');
+            this.dialogRef.close();
+          }
+        });
+    }
+
     if (this.isEdit && this.data.phase) {
       this.patchForm();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private createForm(): FormGroup {
@@ -103,25 +134,46 @@ export class PhaseFormComponent implements OnInit {
       const formValue = this.phaseForm.value;
       
       if (this.isEdit && this.data.phase) {
+        // TODO: Implementar actualización de fase cuando esté disponible en la API
         const updateData: UpdatePhaseRequest = {
           id: this.data.phase.id,
           name: formValue.name.trim(),
           phaseType: formValue.phaseType
         };
         
+        this.toastService.showWarning('Funcionalidad de edición no disponible aún');
+        this.isSubmitting = false;
         this.dialogRef.close({
           action: 'update',
           data: updateData
         });
       } else {
+        // Crear nueva fase usando la API
         const createData: CreatePhaseRequest = {
           name: formValue.name.trim(),
           phaseType: formValue.phaseType
         };
         
-        this.dialogRef.close({
-          action: 'create',
-          data: createData
+        if (!this.tournamentId) {
+          this.toastService.showError('ID de torneo no disponible');
+          this.isSubmitting = false;
+          return;
+        }
+
+        this.phaseService.createPhase(this.tournamentId, createData).subscribe({
+          next: (response) => {
+            this.isSubmitting = false;
+            if (response.succeed) {
+              this.dialogRef.close({
+                action: 'create',
+                data: response.result
+              });
+            }
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error creating phase:', error);
+          }
         });
       }
     } else {
