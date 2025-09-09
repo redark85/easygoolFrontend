@@ -88,18 +88,15 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.route.params
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        const id = +params['id'];
-        if (id && !isNaN(id)) {
-          this.tournamentId = id;
-          this.loadTournamentData();
-        } else {
-          this.toastService.showError('ID de torneo inválido');
-          this.router.navigate(['/dashboard/tournaments']);
-        }
-      });
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.tournamentId = +params['id'];
+      if (this.tournamentId) {
+        this.loadTournamentData();
+      } else {
+        this.toastService.showError('ID de torneo inválido');
+        this.router.navigate(['/dashboard/tournaments']);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -107,6 +104,22 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     this.tournamentStore.clearCurrentTournament();
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Maneja la actualización de fases desde el componente hijo
+   */
+  onPhasesUpdated(phases: Phase[]): void {
+    this.phases = phases;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja la actualización de equipos desde el componente hijo
+   */
+  onTeamsUpdated(teams: Team[]): void {
+    this.teams = teams;
+    this.cdr.detectChanges();
   }
 
   /**
@@ -647,22 +660,6 @@ trackByTeamId(index: number, team: Team): number {
 }
 
   /**
-   * Maneja la actualización de fases desde el componente hijo
-   */
-  onPhasesUpdated(phases: Phase[]): void {
-    this.phases = phases;
-    this.cdr.detectChanges();
-  }
-
-  /**
-   * Maneja la actualización de equipos desde el componente hijo
-   */
-  onTeamsUpdated(teams: Team[]): void {
-    this.teams = teams;
-    this.cdr.detectChanges();
-  }
-
-  /**
    * Maneja eventos desde el componente de partidos
    */
   onMatchesUpdated(matches: any[]): void {
@@ -675,9 +672,21 @@ trackByTeamId(index: number, team: Team): number {
    * Maneja eventos desde el componente de estadísticas
    */
   onStatisticsUpdated(statistics: any): void {
-    // TODO: Implementar lógica de actualización de estadísticas
-    console.log('Statistics updated:', statistics);
+    console.log('Statistics updated');
     this.cdr.detectChanges();
+  }
+
+  /**
+   * Copia el enlace de registro del torneo al portapapeles
+   */
+  copyRegistrationLink(): void {
+    if (this.tournament?.tournamentLink) {
+      navigator.clipboard.writeText(this.tournament.tournamentLink).then(() => {
+        this.toastService.showSuccess('Enlace copiado al portapapeles');
+      }).catch(() => {
+        this.toastService.showError('Error al copiar el enlace');
+      });
+    }
   }
 
 }

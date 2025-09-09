@@ -41,10 +41,13 @@ import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/com
   styleUrls: ['./phases-groups-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PhasesGroupsManagementComponent implements OnInit, OnDestroy {
+export class PhasesGroupsManagementComponent implements OnInit {
   @Input() tournamentId!: number;
   @Input() phases: Phase[] = [];
   @Output() phasesUpdated = new EventEmitter<Phase[]>();
+
+  // Control de expansión de grupos
+  expandedGroupIndex: number = -1;
 
   private destroy$ = new Subject<void>();
 
@@ -214,9 +217,19 @@ export class PhasesGroupsManagementComponent implements OnInit, OnDestroy {
   /**
    * Remueve un equipo de un grupo
    */
-  removeTeamFromGroup(team: Team, group: Group): void {
-    // TODO: Implementar remoción de equipo del grupo
-    console.log('Remover equipo del grupo:', { team: team.id, group: group.id });
+  removeTeamFromGroup(team: any, group: any): void {
+    // TODO: Implementar lógica para remover equipo del grupo
+    console.log('Remove team from group:', team, group);
+  }
+
+  /**
+   * Descalifica un equipo del torneo
+   * @param team Equipo a descalificar
+   * @param group Grupo del equipo
+   */
+  disqualifyTeam(team: any, group: any): void {
+    // TODO: Implementar lógica para descalificar equipo
+    console.log('Disqualify team:', team, group);
   }
 
   /**

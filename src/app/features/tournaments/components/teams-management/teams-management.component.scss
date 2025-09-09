@@ -296,13 +296,36 @@
   }
 }
 
+// Fixed FAB Button - Unified styles
+.fab-fixed {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
 // Responsive Design
 @media (max-width: 768px) {
   .teams-management-container {
     padding: 0 8px;
   }
 
-  .fab-create-team {
+  .fab-fixed {
     bottom: 16px;
     right: 16px;
   }

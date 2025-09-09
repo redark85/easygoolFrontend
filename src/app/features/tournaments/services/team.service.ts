@@ -1,22 +1,33 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
+import { ApiService } from '@core/services/api.service';
+import { ToastService } from '@core/services/toast.service';
+import { 
+  TEAM_GET_ALL_TEAMS_ENDPOINT,
+  TEAM_CREATE_ENDPOINT,
+  TEAM_UPDATE_ENDPOINT,
+  TEAM_DELETE_ENDPOINT,
+  TEAM_ASSIGN_TO_GROUP_ENDPOINT,
+  TEAM_REMOVE_FROM_GROUP_ENDPOINT
+} from '@core/config/endpoints';
 import { 
   Team, 
   CreateTeamRequest, 
   UpdateTeamRequest, 
   TeamApiResponse 
 } from '../models/team.interface';
+import { ApiResponse } from '@core/models/api.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeamService {
-  private readonly apiUrl = `${environment.apiBaseUrl}/teams`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private apiService: ApiService,
+    private toastService: ToastService
+  ) {}
 
   /**
    * Obtiene todos los equipos de un torneo
@@ -24,15 +35,12 @@ export class TeamService {
    * @returns Observable con la lista de equipos
    */
   getTeamsByTournament(tournamentId: number): Observable<Team[]> {
-    const url = `${this.apiUrl}/tournament/${tournamentId}`;
-    
-    return this.http.get<TeamApiResponse>(url, {
-      headers: this.getHeaders()
-    }).pipe(
+    return this.apiService.get<TeamApiResponse>(`${TEAM_GET_ALL_TEAMS_ENDPOINT}/${tournamentId}`).pipe(
       map(response => {
         if (response.succeed && response.result) {
           return response.result;
         }
+        this.toastService.showError(response.message || 'Error al obtener equipos');
         throw new Error(response.message || 'Error al obtener equipos');
       }),
       catchError(this.handleError)
@@ -45,15 +53,12 @@ export class TeamService {
    * @returns Observable con el equipo
    */
   getTeamById(teamId: number): Observable<Team> {
-    const url = `${this.apiUrl}/${teamId}`;
-    
-    return this.http.get<{ result: Team; succeed: boolean; message: string }>(url, {
-      headers: this.getHeaders()
-    }).pipe(
+    return this.apiService.get<ApiResponse<Team>>(`${TEAM_GET_ALL_TEAMS_ENDPOINT}/${teamId}`).pipe(
       map(response => {
         if (response.succeed && response.result) {
           return response.result;
         }
+        this.toastService.showError(response.message || 'Error al obtener equipo');
         throw new Error(response.message || 'Error al obtener equipo');
       }),
       catchError(this.handleError)
@@ -66,15 +71,13 @@ export class TeamService {
    * @returns Observable con el equipo creado
    */
   createTeam(teamData: CreateTeamRequest): Observable<Team> {
-    return this.http.post<{ result: Team; succeed: boolean; message: string }>(
-      this.apiUrl, 
-      teamData, 
-      { headers: this.getHeaders() }
-    ).pipe(
+    return this.apiService.post<ApiResponse<Team>>(TEAM_CREATE_ENDPOINT, teamData).pipe(
       map(response => {
         if (response.succeed && response.result) {
+          this.toastService.showSuccess(response.message || 'Equipo creado con éxito');
           return response.result;
         }
+        this.toastService.showError(response.message || 'Error al crear equipo');
         throw new Error(response.message || 'Error al crear equipo');
       }),
       catchError(this.handleError)
@@ -87,17 +90,13 @@ export class TeamService {
    * @returns Observable con el equipo actualizado
    */
   updateTeam(teamData: UpdateTeamRequest): Observable<Team> {
-    const url = `${this.apiUrl}/${teamData.id}`;
-    
-    return this.http.put<{ result: Team; succeed: boolean; message: string }>(
-      url, 
-      teamData, 
-      { headers: this.getHeaders() }
-    ).pipe(
+    return this.apiService.put<ApiResponse<Team>>(`${TEAM_UPDATE_ENDPOINT}/${teamData.id}`, teamData).pipe(
       map(response => {
         if (response.succeed && response.result) {
+          this.toastService.showSuccess(response.message || 'Equipo actualizado con éxito');
           return response.result;
         }
+        this.toastService.showError(response.message || 'Error al actualizar equipo');
         throw new Error(response.message || 'Error al actualizar equipo');
       }),
       catchError(this.handleError)
@@ -110,15 +109,13 @@ export class TeamService {
    * @returns Observable con el resultado de la operación
    */
   deleteTeam(teamId: number): Observable<boolean> {
-    const url = `${this.apiUrl}/${teamId}`;
-    
-    return this.http.delete<{ succeed: boolean; message: string }>(url, {
-      headers: this.getHeaders()
-    }).pipe(
+    return this.apiService.delete<ApiResponse<any>>(`${TEAM_DELETE_ENDPOINT}/${teamId}`).pipe(
       map(response => {
         if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipo eliminado con éxito');
           return true;
         }
+        this.toastService.showError(response.message || 'Error al eliminar equipo');
         throw new Error(response.message || 'Error al eliminar equipo');
       }),
       catchError(this.handleError)
@@ -132,16 +129,14 @@ export class TeamService {
    * @returns Observable con el resultado de la operación
    */
   assignTeamToGroup(teamId: number, groupId: number): Observable<boolean> {
-    const url = `${this.apiUrl}/${teamId}/assign-group`;
     const body = { groupId };
-    
-    return this.http.post<{ succeed: boolean; message: string }>(url, body, {
-      headers: this.getHeaders()
-    }).pipe(
+    return this.apiService.post<ApiResponse<any>>(`${TEAM_ASSIGN_TO_GROUP_ENDPOINT}/${teamId}`, body).pipe(
       map(response => {
         if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipo asignado al grupo con éxito');
           return true;
         }
+        this.toastService.showError(response.message || 'Error al asignar equipo al grupo');
         throw new Error(response.message || 'Error al asignar equipo al grupo');
       }),
       catchError(this.handleError)
@@ -154,15 +149,13 @@ export class TeamService {
    * @returns Observable con el resultado de la operación
    */
   removeTeamFromGroup(teamId: number): Observable<boolean> {
-    const url = `${this.apiUrl}/${teamId}/remove-group`;
-    
-    return this.http.post<{ succeed: boolean; message: string }>(url, {}, {
-      headers: this.getHeaders()
-    }).pipe(
+    return this.apiService.post<ApiResponse<any>>(`${TEAM_REMOVE_FROM_GROUP_ENDPOINT}/${teamId}`, {}).pipe(
       map(response => {
         if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipo removido del grupo con éxito');
           return true;
         }
+        this.toastService.showError(response.message || 'Error al remover equipo del grupo');
         throw new Error(response.message || 'Error al remover equipo del grupo');
       }),
       catchError(this.handleError)
@@ -177,17 +170,12 @@ export class TeamService {
    * @returns Observable con el resultado de la validación
    */
   validateTeamName(name: string, tournamentId: number, excludeTeamId?: number): Observable<boolean> {
-    const url = `${this.apiUrl}/validate-name`;
-    const params: any = { name, tournamentId };
-    
+    let endpoint = `${TEAM_GET_ALL_TEAMS_ENDPOINT}/validate-name?name=${encodeURIComponent(name)}&tournamentId=${tournamentId}`;
     if (excludeTeamId) {
-      params.excludeTeamId = excludeTeamId;
+      endpoint += `&excludeTeamId=${excludeTeamId}`;
     }
     
-    return this.http.get<{ isAvailable: boolean }>(url, {
-      headers: this.getHeaders(),
-      params
-    }).pipe(
+    return this.apiService.get<{ isAvailable: boolean }>(endpoint).pipe(
       map(response => response.isAvailable),
       catchError(this.handleError)
     );
@@ -201,31 +189,15 @@ export class TeamService {
    * @returns Observable con el resultado de la validación
    */
   validateTeamShortName(shortName: string, tournamentId: number, excludeTeamId?: number): Observable<boolean> {
-    const url = `${this.apiUrl}/validate-short-name`;
-    const params: any = { shortName, tournamentId };
-    
+    let endpoint = `${TEAM_GET_ALL_TEAMS_ENDPOINT}/validate-short-name?shortName=${encodeURIComponent(shortName)}&tournamentId=${tournamentId}`;
     if (excludeTeamId) {
-      params.excludeTeamId = excludeTeamId;
+      endpoint += `&excludeTeamId=${excludeTeamId}`;
     }
     
-    return this.http.get<{ isAvailable: boolean }>(url, {
-      headers: this.getHeaders(),
-      params
-    }).pipe(
+    return this.apiService.get<{ isAvailable: boolean }>(endpoint).pipe(
       map(response => response.isAvailable),
       catchError(this.handleError)
     );
-  }
-
-  /**
-   * Obtiene los headers HTTP necesarios
-   * @returns HttpHeaders configurados
-   */
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
   }
 
   /**

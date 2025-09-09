@@ -1,11 +1,13 @@
 export interface Team {
   id: number;
-  tournamentId: number;
+  tournamentId?: number;
   name: string;
   shortName: string;
-  logoBase64: string;
-  logoContentType: string;
+  logoUrl?: string;
+  logoBase64?: string;
+  logoContentType?: string;
   status?: number;
+  totalPlayers?: number;
   description?: string;
   foundationDate?: Date;
   city?: string;
@@ -32,10 +34,10 @@ export interface UpdateTeamRequest {
 }
 
 export interface TeamApiResponse {
-  records: number;
-  result: Team[];
   succeed: boolean;
-  message: string | null;
-  messageId: string | null;
-  messageType: string | null;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: Team[];
+  records: number;
 }

@@ -56,6 +56,18 @@
             <span class="stat-text">{{ getDateRange() }}</span>
           </div>
         </div>
+
+        <!-- Tournament Registration Link -->
+        <div class="tournament-actions" *ngIf="tournament.tournamentLink">
+          <button type="button"
+                  class="registration-link"
+                  matTooltip="Enlace para registrarse al torneo"
+                  matTooltipPosition="below"
+                  (click)="copyRegistrationLink()">
+            <mat-icon>content_copy</mat-icon>
+            <span>Copiar enlace</span>
+          </button>
+        </div>
       </div>
     </div>
 

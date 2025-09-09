@@ -13,9 +13,9 @@
     <mat-card-content>
       <!-- Floating Action Button for Phases -->
       <button mat-fab
-              class="fab-create-phase"
+              class="fab-fixed add-phase-btn"
               (click)="createPhase()"
-              matTooltip="Nueva Fase">
+              matTooltip="Crear nueva fase">
         <mat-icon>add</mat-icon>
       </button>
 
@@ -89,9 +89,11 @@
 
             <!-- Groups Grid - 3 columns with expansion panels -->
             <div *ngIf="phase.grups && phase.grups.length > 0" class="groups-grid">
-              <mat-expansion-panel *ngFor="let group of phase.grups; trackBy: trackByGroupId"
+              <mat-expansion-panel *ngFor="let group of phase.grups; trackBy: trackByGroupId; let i = index"
                                    class="group-panel"
-                                   [expanded]="false">
+                                   [expanded]="expandedGroupIndex === i"
+                                   (opened)="expandedGroupIndex = i"
+                                   (closed)="expandedGroupIndex = -1">
                 <mat-expansion-panel-header class="group-header">
                   <mat-panel-title>
                     <div class="group-title-content">
@@ -167,11 +169,18 @@
 
                       <div class="team-actions">
                         <button mat-icon-button
+                                color="accent"
+                                (click)="disqualifyTeam(team, group)"
+                                matTooltip="Descalificar equipo"
+                                class="disqualify-team-btn">
+                          <mat-icon>block</mat-icon>
+                        </button>
+                        <button mat-icon-button
                                 color="warn"
                                 (click)="removeTeamFromGroup(team, group)"
                                 matTooltip="Quitar del grupo"
                                 class="remove-team-btn">
-                          <mat-icon>remove</mat-icon>
+                          <mat-icon>remove_circle</mat-icon>
                         </button>
                       </div>
                     </div>

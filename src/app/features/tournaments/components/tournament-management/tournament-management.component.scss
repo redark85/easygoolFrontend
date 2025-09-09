@@ -135,31 +135,63 @@
 
         .tournament-stats {
           display: flex;
-          gap: 16px;
-          flex-shrink: 0;
+          gap: 24px;
+          align-items: center;
 
           .stat-compact {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 12px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--mdc-theme-on-surface, #333);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
 
             mat-icon {
-              font-size: 16px;
-              color: var(--mdc-theme-primary, #1976d2);
+              font-size: 1.2rem;
+              width: 1.2rem;
+              height: 1.2rem;
+              color: var(--primary-color);
             }
 
             .stat-number {
               font-weight: 600;
-              color: var(--mdc-theme-primary, #1976d2);
+              color: var(--text-primary);
             }
 
             .stat-text {
               font-weight: 500;
+            }
+          }
+        }
+
+        .tournament-actions {
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+
+          .registration-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+
+            &:hover {
+              background: var(--primary-dark);
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            mat-icon {
+              font-size: 1.1rem;
+              width: 1.1rem;
+              height: 1.1rem;
             }
           }
         }

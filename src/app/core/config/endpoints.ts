@@ -19,6 +19,7 @@ export const PHASE_GET_BY_TOURNAMENT_ENDPOINT = '/api/Phase/GetAllPhases';
 export const GROUP_CREATE_ENDPOINT = '/api/Tournament/CreateTournamentGroup';
 
 // Team Endpoints
+export const TEAM_GET_ALL_TEAMS_ENDPOINT = '/api/Team/GetAllTeams';
 export const TEAM_GET_BY_TOURNAMENT_ENDPOINT = '/api/Team/GetByTournament';
 export const TEAM_CREATE_ENDPOINT = '/api/Team/CreateTeam';
 export const TEAM_UPDATE_ENDPOINT = '/api/Team/UpdateTeam';
@@ -49,6 +50,7 @@ export const EndpointsConfig = {
   GROUP_CREATE_ENDPOINT,
   
   // Team
+  TEAM_GET_ALL_TEAMS_ENDPOINT,
   TEAM_GET_BY_TOURNAMENT_ENDPOINT,
   TEAM_CREATE_ENDPOINT,
   TEAM_UPDATE_ENDPOINT,
