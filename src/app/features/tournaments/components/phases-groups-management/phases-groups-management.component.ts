@@ -17,10 +17,9 @@ import { Team } from '../../models/team.interface';
 import { PhaseService } from '../../services/phase.service';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { PhaseFormData, PhaseModalResult } from '../../models/phase-form.interface';
 import { GroupFormData, GroupModalResult } from '../../models/group-form.interface';
-import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-phases-groups-management',
@@ -115,23 +114,30 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * Elimina una fase
    */
   deletePhase(phase: Phase): void {
-    const dialogData: ConfirmationDialogData = {
+    Swal.fire({
       title: 'Eliminar Fase',
-      message: `¿Estás seguro de que deseas eliminar la fase "${phase.name}"? Esta acción eliminará también todos los grupos asociados.`,
-      confirmText: 'Eliminar',
-      cancelText: 'Cancelar',
-      type: 'danger'
-    };
+      text: `¿Estás seguro de que deseas eliminar la fase "${phase.name}"? Esta acción eliminará también todos los grupos asociados.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // TODO: Implementar eliminación de fase
+        console.log('Eliminar fase:', phase);
+        this.phasesUpdated.emit();
 
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '450px',
-      data: dialogData
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // TODO: Implementar eliminación de fase cuando esté disponible en el API
-        console.log('Eliminar fase:', phase.id);
+        // Mostrar mensaje de éxito
+        Swal.fire({
+          title: '¡Eliminada!',
+          text: 'La fase ha sido eliminada correctamente.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       }
     });
   }
@@ -185,23 +191,30 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * Elimina un grupo
    */
   deleteGroup(group: Group): void {
-    const dialogData: ConfirmationDialogData = {
+    Swal.fire({
       title: 'Eliminar Grupo',
-      message: `¿Estás seguro de que deseas eliminar el grupo "${group.name}"?`,
-      confirmText: 'Eliminar',
-      cancelText: 'Cancelar',
-      type: 'danger'
-    };
+      text: `¿Estás seguro de que deseas eliminar el grupo "${group.name}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // TODO: Implementar eliminación de grupo
+        console.log('Eliminar grupo:', group);
+        this.phasesUpdated.emit();
 
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '450px',
-      data: dialogData
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // TODO: Implementar eliminación de grupo cuando esté disponible en el API
-        console.log('Eliminar grupo:', group.id);
+        // Mostrar mensaje de éxito
+        Swal.fire({
+          title: '¡Eliminado!',
+          text: 'El grupo ha sido eliminado correctamente.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       }
     });
   }

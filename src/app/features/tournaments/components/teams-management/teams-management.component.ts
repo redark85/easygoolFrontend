@@ -15,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Team } from '../../models/team.interface';
 import { TeamService } from '../../services/team.service';
 import { TeamFormComponent } from '../team-form/team-form.component';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import Swal from 'sweetalert2';
 
 export interface TeamFormData {
   mode: 'create' | 'edit';
@@ -113,27 +113,43 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
    * Elimina un equipo después de confirmación
    */
   deleteTeam(team: Team): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Eliminar Equipo',
-        message: `¿Estás seguro de que deseas eliminar el equipo "${team.name}"?`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar',
-        type: 'danger'
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+    Swal.fire({
+      title: 'Eliminar Equipo',
+      text: `¿Estás seguro de que deseas eliminar el equipo "${team.name}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
         this.teamService.deleteTeam(team.id).pipe(
           takeUntil(this.destroy$)
         ).subscribe({
           next: () => {
             this.refreshTeams();
+            
+            // Mostrar mensaje de éxito
+            Swal.fire({
+              title: '¡Eliminado!',
+              text: 'El equipo ha sido eliminado correctamente.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
           },
           error: (error) => {
             console.error('Error deleting team:', error);
+            
+            // Mostrar mensaje de error
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo eliminar el equipo. Inténtalo de nuevo.',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
           }
         });
       }

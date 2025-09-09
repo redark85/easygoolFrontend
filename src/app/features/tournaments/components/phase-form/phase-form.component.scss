@@ -14,24 +14,7 @@
       font-weight: 500;
     }
     
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      
-      .form-field-full {
-        grid-column: 1 / -1;
-      }
-      
-      @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        
-        .form-field {
-          grid-column: 1 / -1;
-        }
-      }
-    }
+    // Form grid removed - now using Bootstrap Grid System
     
     .dialog-actions {
       display: flex;

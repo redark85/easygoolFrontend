@@ -5,32 +5,42 @@
   </h2>
 
   <mat-dialog-content>
-    <form [formGroup]="phaseForm" class="form-grid">
-      <!-- Nombre de la Fase -->
-      <mat-form-field appearance="outline" class="form-field-full">
-        <mat-label>Nombre de la Fase</mat-label>
-        <input
-          matInput
-          formControlName="name"
-          placeholder="Ej: Fase de Grupos A"
-          maxlength="50">
-        <mat-icon matSuffix>sports_soccer</mat-icon>
-        <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
-      </mat-form-field>
+    <form [formGroup]="phaseForm" novalidate>
+      <div class="container-fluid">
+        <!-- Nombre de la Fase -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nombre de la Fase</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="Ej: Fase de Grupos A"
+                maxlength="50">
+              <mat-icon matSuffix>sports_soccer</mat-icon>
+              <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
 
-      <!-- Tipo de Fase -->
-      <mat-form-field appearance="outline" class="form-field-full">
-        <mat-label>Tipo de Fase</mat-label>
-        <mat-select formControlName="phaseType">
-          <mat-option
-            *ngFor="let option of phaseTypeOptions"
-            [value]="option.value">
-            {{ option.label }}
-          </mat-option>
-        </mat-select>
-        <mat-icon matSuffix>category</mat-icon>
-        <mat-error *ngIf="phaseTypeErrors">{{ phaseTypeErrors }}</mat-error>
-      </mat-form-field>
+        <!-- Tipo de Fase -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Tipo de Fase</mat-label>
+              <mat-select formControlName="phaseType">
+                <mat-option
+                  *ngFor="let option of phaseTypeOptions"
+                  [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+              <mat-error *ngIf="phaseTypeErrors">{{ phaseTypeErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
     </form>
   </mat-dialog-content>
 

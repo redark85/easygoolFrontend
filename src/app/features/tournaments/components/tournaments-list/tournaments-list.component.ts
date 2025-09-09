@@ -18,7 +18,7 @@ import { Tournament, TournamentStatusType, TournamentModality, UpdateTournamentR
 import { TournamentService } from '../../services/tournament.service';
 import { TournamentStatusService } from '../../services/tournament-status.service';
 import { TournamentFormComponent } from '../tournament-form/tournament-form.component';
-import { ConfirmationDialogComponent, ConfirmationDialogData } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import Swal from 'sweetalert2';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
@@ -293,21 +293,18 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    * Elimina un torneo con confirmación (cambio a estado Deleted)
    */
   deleteTournament(tournament: Tournament): void {
-    const dialogData: ConfirmationDialogData = {
+    Swal.fire({
       title: 'Eliminar Torneo',
-      message: `¿Estás seguro de que deseas eliminar el torneo "${tournament.name}"? Esta acción no se puede deshacer.`,
-      confirmText: 'Eliminar',
-      cancelText: 'Cancelar',
-      type: 'danger'
-    };
-
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '450px',
-      data: dialogData
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      text: `¿Estás seguro de que deseas eliminar el torneo "${tournament.name}"? Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
         // Activar loading específico para este torneo
         this.tournamentLoadingStates.set(tournament.id, true);
         this.cdr.detectChanges();
@@ -320,11 +317,28 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
             this.filteredTournaments = [...this.tournaments];
             this.tournamentLoadingStates.delete(tournament.id);
             this.cdr.detectChanges();
+
+            // Mostrar mensaje de éxito
+            Swal.fire({
+              title: '¡Eliminado!',
+              text: 'El torneo ha sido eliminado correctamente.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
           },
           error: (error) => {
             console.error('Error deleting tournament:', error);
             this.tournamentLoadingStates.set(tournament.id, false);
             this.cdr.detectChanges();
+
+            // Mostrar mensaje de error
+            Swal.fire({
+              title: 'Error',
+              text: 'No se pudo eliminar el torneo. Inténtalo de nuevo.',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
           }
         });
       }

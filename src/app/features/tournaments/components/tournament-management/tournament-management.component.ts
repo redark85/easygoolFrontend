@@ -25,7 +25,7 @@ import { ToastService } from '@core/services/toast.service';
 import { TeamModalService, TeamModalResult } from '../../services/team-modal.service';
 import { TeamService } from '../../services/team.service';
 import { PhaseService } from '../../services/phase.service';
-import { ConfirmationDialogComponent, ConfirmationDialogData } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
+import Swal from 'sweetalert2';
 import { MatDialog } from '@angular/material/dialog';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
@@ -539,32 +539,43 @@ editTeam(team: Team): void {
 }
 
 deleteTeam(team: Team): void {
-  const dialogData: ConfirmationDialogData = {
+  Swal.fire({
     title: 'Eliminar Equipo',
-    message: `¿Estás seguro de que deseas eliminar el equipo <strong>${team.name}</strong>?<br><br>Esta acción no se puede deshacer.`,
-    confirmText: 'Eliminar',
-    cancelText: 'Cancelar',
-    type: 'danger',
-    icon: 'delete_forever'
-  };
-
-  const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-    width: '480px',
-    maxWidth: '90vw',
-    data: dialogData,
-    disableClose: true
-  });
-
-  dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-    if (confirmed) {
+    html: `¿Estás seguro de que deseas eliminar el equipo <strong>${team.name}</strong>?<br><br>Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Eliminar',
+    cancelButtonText: 'Cancelar',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
       this.teamService.deleteTeam(team.id).subscribe({
         next: () => {
           this.toastService.showSuccess(`Equipo "${team.name}" eliminado exitosamente`);
           // Recargar datos del torneo para actualizar la lista de equipos
           this.loadTournamentData();
+
+          // Mostrar mensaje de éxito adicional
+          Swal.fire({
+            title: '¡Eliminado!',
+            text: 'El equipo ha sido eliminado correctamente.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
         },
         error: (error) => {
           this.toastService.showError(`Error al eliminar equipo: ${error.message}`);
+          
+          // Mostrar mensaje de error
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo eliminar el equipo. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
         }
       });
     }
@@ -607,31 +618,42 @@ addTeamToGroup(phaseId: number, groupId: number): void {
  * Quitar equipo de un grupo
  */
 removeTeamFromGroup(team: Team, group: Group): void {
-  const dialogData: ConfirmationDialogData = {
+  Swal.fire({
     title: 'Quitar Equipo del Grupo',
-    message: `¿Estás seguro de que deseas quitar el equipo <strong>${team.name}</strong> del grupo <strong>${group.name}</strong>?`,
-    confirmText: 'Quitar',
-    cancelText: 'Cancelar',
-    type: 'warning',
-    icon: 'remove_circle'
-  };
-
-  const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-    width: '480px',
-    maxWidth: '90vw',
-    data: dialogData,
-    disableClose: true
-  });
-
-  dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-    if (confirmed) {
+    html: `¿Estás seguro de que deseas quitar el equipo <strong>${team.name}</strong> del grupo <strong>${group.name}</strong>?`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#ff9800',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Quitar',
+    cancelButtonText: 'Cancelar',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
       this.teamService.removeTeamFromGroup(team.id).subscribe({
         next: () => {
           this.toastService.showSuccess(`Equipo "${team.name}" removido del grupo exitosamente`);
           this.loadTournamentData();
+
+          // Mostrar mensaje de éxito
+          Swal.fire({
+            title: '¡Removido!',
+            text: 'El equipo ha sido removido del grupo correctamente.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
         },
         error: (error) => {
           this.toastService.showError(`Error al remover equipo del grupo: ${error.message}`);
+          
+          // Mostrar mensaje de error
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo remover el equipo del grupo. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
         }
       });
     }
