@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -9,7 +9,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { ToastService } from '@core/services/toast.service';
+import { TeamService } from '../../services/team.service';
 import { CreateTeamRequest, UpdateTeamRequest, Team } from '../../models/team.interface';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 export interface TeamFormData {
   team?: Team;
@@ -34,14 +37,16 @@ export interface TeamFormData {
   templateUrl: './team-form.component.html',
   styleUrls: ['./team-form.component.scss']
 })
-export class TeamFormComponent implements OnInit {
+export class TeamFormComponent implements OnInit, OnDestroy {
   teamForm: FormGroup;
   isEdit: boolean;
   isSubmitting = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private toastService: ToastService,
+    private teamService: TeamService,
     public dialogRef: MatDialogRef<TeamFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TeamFormData
   ) {
@@ -53,6 +58,11 @@ export class TeamFormComponent implements OnInit {
     if (this.isEdit && this.data.team) {
       this.populateForm(this.data.team);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private createForm(): FormGroup {
@@ -108,19 +118,43 @@ export class TeamFormComponent implements OnInit {
         tournamentId: this.data.tournamentId,
         name: formValue.name,
         shortName: formValue.shortName.toUpperCase(),
-        logoBase64: logoData?.base64 || '',
-        logoContentType: logoData?.contentType || ''
+        logoBase64: logoData?.base64 ? this.cleanBase64(logoData.base64) : '',
+        logoContentType: logoData?.contentType ? this.extractFileExtension(logoData.contentType) : ''
       };
-      this.dialogRef.close({ action: 'update', data: updateRequest });
+
+      this.teamService.updateTeam(updateRequest).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (team) => {
+          this.isSubmitting = false;
+          this.dialogRef.close({ success: true, team });
+        },
+        error: (error) => {
+          console.error('Error updating team:', error);
+          this.isSubmitting = false;
+        }
+      });
     } else {
       const createRequest: CreateTeamRequest = {
         tournamentId: this.data.tournamentId,
         name: formValue.name,
         shortName: formValue.shortName.toUpperCase(),
-        logoBase64: logoData.base64,
-        logoContentType: logoData.contentType
+        logoBase64: this.cleanBase64(logoData.base64),
+        logoContentType: this.extractFileExtension(logoData.contentType)
       };
-      this.dialogRef.close({ action: 'create', data: createRequest });
+
+      this.teamService.createTeam(createRequest).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (team) => {
+          this.isSubmitting = false;
+          this.dialogRef.close({ success: true, team });
+        },
+        error: (error) => {
+          console.error('Error creating team:', error);
+          this.isSubmitting = false;
+        }
+      });
     }
   }
 
@@ -168,5 +202,39 @@ export class TeamFormComponent implements OnInit {
       if (control.errors['required']) return 'El logo del equipo es requerido';
     }
     return '';
+  }
+
+  /**
+   * Limpia el base64 removiendo prefijos como "data:image/jpeg;base64,"
+   */
+  private cleanBase64(base64String: string): string {
+    if (!base64String) return '';
+    
+    // Remover prefijo data:image/...;base64, si existe
+    const base64Prefix = base64String.indexOf(',');
+    if (base64Prefix !== -1) {
+      return base64String.substring(base64Prefix + 1);
+    }
+    
+    return base64String;
+  }
+
+  /**
+   * Extrae solo la extensión del contentType (ej: "image/jpeg" -> "jpg")
+   */
+  private extractFileExtension(contentType: string): string {
+    if (!contentType) return '';
+    
+    // Mapeo de content types a extensiones
+    const contentTypeMap: { [key: string]: string } = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg', 
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/webp': 'webp'
+    };
+    
+    const normalizedContentType = contentType.toLowerCase();
+    return contentTypeMap[normalizedContentType] || 'jpg'; // Default a jpg si no se encuentra
   }
 }

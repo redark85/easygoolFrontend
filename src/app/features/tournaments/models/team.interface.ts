@@ -1,13 +1,16 @@
 export interface Team {
   id: number;
-  tournamentId?: number;
   name: string;
   shortName: string;
   logoUrl?: string;
+  status: number;
+  totalPlayers: number;
+  urlRegistration: string;
+  phaseTeamId: number;
+  // Campos adicionales para compatibilidad
+  tournamentId?: number;
   logoBase64?: string;
   logoContentType?: string;
-  status?: number;
-  totalPlayers?: number;
   description?: string;
   foundationDate?: Date;
   city?: string;
@@ -34,10 +37,10 @@ export interface UpdateTeamRequest {
 }
 
 export interface TeamApiResponse {
-  succeed: boolean;
-  message: string;
-  messageId: string;
-  messageType: number;
-  result: Team[];
   records: number;
+  result: Team[];
+  succeed: boolean;
+  message: string | null;
+  messageId: string | null;
+  messageType: string | null;
 }

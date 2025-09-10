@@ -28,7 +28,8 @@
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Tipo de Fase</mat-label>
-              <mat-select formControlName="phaseType">
+              <mat-select formControlName="phaseType" 
+                         (selectionChange)="onPhaseTypeChange($event)">
                 <mat-option
                   *ngFor="let option of phaseTypeOptions"
                   [value]="option.value">

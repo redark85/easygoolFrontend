@@ -4,10 +4,10 @@ import { map } from 'rxjs/operators';
 
 import { ApiService } from '@core/services/api.service';
 import { ToastService } from '@core/services/toast.service';
-import { PHASE_CREATE_ENDPOINT, PHASE_GET_BY_TOURNAMENT_ENDPOINT, GROUP_CREATE_ENDPOINT } from '@core/config/endpoints';
+import { PHASE_CREATE_ENDPOINT, PHASE_GET_BY_TOURNAMENT_ENDPOINT, PHASE_UPDATE_ENDPOINT, PHASE_DELETE_ENDPOINT, GROUP_CREATE_ENDPOINT, GROUP_UPDATE_ENDPOINT, GROUP_DELETE_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
 
-import { Phase, CreatePhaseRequest, Group, CreateGroupRequest } from '../models/phase.interface';
+import { Phase, CreatePhaseRequest, UpdatePhaseRequest, Group, CreateGroupRequest } from '../models/phase.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -58,6 +58,45 @@ export class PhaseService {
   }
 
   /**
+   * Actualiza una fase existente
+   * @param phaseId ID de la fase a actualizar
+   * @param data Datos de la fase a actualizar
+   * @returns Observable con la respuesta de la API
+   */
+  updatePhase(phaseId: number, data: UpdatePhaseRequest): Observable<ApiResponse<Phase>> {
+    const endpoint = `${PHASE_UPDATE_ENDPOINT}/${phaseId}`;
+    return this.apiService.put<ApiResponse<Phase>>(endpoint, data).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Fase actualizada con éxito.');
+        } else {
+          this.toastService.showError(response.message || 'No se pudo actualizar la fase.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Elimina una fase existente
+   * @param phaseId ID de la fase a eliminar
+   * @returns Observable con la respuesta de la API
+   */
+  deletePhase(phaseId: number): Observable<ApiResponse<any>> {
+    const endpoint = `${PHASE_DELETE_ENDPOINT}/${phaseId}`;
+    return this.apiService.delete<ApiResponse<any>>(endpoint).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Fase eliminada con éxito.');
+        } else {
+          this.toastService.showError(response.message || 'No se pudo eliminar la fase.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
    * Crea un nuevo grupo para una fase específica
    * @param phaseId ID de la fase
    * @param data Datos del grupo a crear
@@ -71,6 +110,45 @@ export class PhaseService {
           this.toastService.showSuccess(response.message || 'Grupo creado con éxito.');
         } else {
           this.toastService.showError(response.message || 'No se pudo crear el grupo.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Actualiza un grupo existente
+   * @param groupId ID del grupo a actualizar
+   * @param data Datos del grupo a actualizar
+   * @returns Observable con la respuesta de la API
+   */
+  updateGroup(groupId: number, data: { name: string }): Observable<ApiResponse<Group>> {
+    const endpoint = `${GROUP_UPDATE_ENDPOINT}/${groupId}`;
+    return this.apiService.put<ApiResponse<Group>>(endpoint, data).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Grupo actualizado con éxito.');
+        } else {
+          this.toastService.showError(response.message || 'No se pudo actualizar el grupo.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Elimina un grupo existente
+   * @param groupId ID del grupo a eliminar
+   * @returns Observable con la respuesta de la API
+   */
+  deleteGroup(groupId: number): Observable<ApiResponse<any>> {
+    const endpoint = `${GROUP_DELETE_ENDPOINT}/${groupId}`;
+    return this.apiService.delete<ApiResponse<any>>(endpoint).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Grupo eliminado con éxito.');
+        } else {
+          this.toastService.showError(response.message || 'No se pudo eliminar el grupo.');
         }
         return response;
       })

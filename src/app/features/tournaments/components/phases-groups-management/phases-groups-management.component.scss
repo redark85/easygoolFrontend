@@ -274,21 +274,35 @@
         display: flex;
         gap: 2px;
 
-        .group-action-btn {
+        .action-button-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
           transition: all 0.2s ease;
-          padding: 4px;
-          width: 28px;
-          height: 28px;
-          line-height: 28px;
 
           &:hover {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
           }
 
-          mat-icon {
-            font-size: 1rem;
-            width: 1rem;
-            height: 1rem;
+          .group-action-btn {
+            transition: all 0.2s ease;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            min-width: 24px;
+            border-radius: 50%;
+
+            mat-icon {
+              font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+            }
           }
         }
       }
@@ -509,6 +523,111 @@
   }
 }
 
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+
+  mat-progress-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+}
+
+// Knockout Teams Grid
+.knockout-teams-grid {
+  margin-top: 16px;
+
+  .team-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+      border-color: var(--primary-color);
+    }
+
+    .team-card-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .team-info-knockout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+
+      .team-avatar-knockout {
+        .team-logo-knockout {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid var(--border-color);
+        }
+      }
+
+      .team-details-knockout {
+        flex: 1;
+
+        .team-name-knockout {
+          margin: 0 0 4px 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          line-height: 1.2;
+        }
+
+        .team-short-name-knockout {
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+      }
+    }
+
+    .team-actions-knockout {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+
+      .remove-team-knockout-btn {
+        transition: all 0.2s ease;
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.1);
+          color: #f44336;
+        }
+
+        mat-icon {
+          font-size: 1.1rem;
+          width: 1.1rem;
+          height: 1.1rem;
+        }
+      }
+    }
+  }
+}
+
 @media (max-width: 480px) {
   .no-phases {
     padding: 40px 16px;
@@ -536,6 +655,35 @@
         .phase-details {
           .phase-name {
             font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .knockout-teams-grid {
+    .team-card {
+      .team-card-content {
+        padding: 12px;
+      }
+
+      .team-info-knockout {
+        gap: 10px;
+
+        .team-avatar-knockout {
+          .team-logo-knockout {
+            width: 40px;
+            height: 40px;
+          }
+        }
+
+        .team-details-knockout {
+          .team-name-knockout {
+            font-size: 0.95rem;
+          }
+
+          .team-short-name-knockout {
+            font-size: 0.8rem;
           }
         }
       }

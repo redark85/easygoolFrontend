@@ -165,33 +165,54 @@
 
         .tournament-actions {
           display: flex;
-          align-items: center;
-          margin-left: auto;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 12px;
+
+          .registration-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .registration-toggle {
+              .toggle-label {
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--primary-color, #1976d2);
+                margin-left: 8px;
+              }
+
+              &.mat-mdc-slide-toggle.mat-checked .mdc-switch__track {
+                background-color: var(--accent-color, #4caf50);
+              }
+
+              &.mat-mdc-slide-toggle.mat-checked .mdc-switch__handle {
+                background-color: var(--accent-color, #4caf50);
+              }
+            }
+          }
 
           .registration-link {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
-            background: var(--primary-color);
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
             border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 
             &:hover {
-              background: var(--primary-dark);
-              transform: translateY(-1px);
-              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
             }
 
             mat-icon {
-              font-size: 1.1rem;
-              width: 1.1rem;
-              height: 1.1rem;
+              font-size: 18px;
             }
           }
         }

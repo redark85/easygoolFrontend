@@ -14,9 +14,13 @@ export const TOURNAMENT_DELETE_ENDPOINT = '/api/Tournament/DeleteTournament';
 // Phase Endpoints
 export const PHASE_CREATE_ENDPOINT = '/api/Phase/CreatePhase';
 export const PHASE_GET_BY_TOURNAMENT_ENDPOINT = '/api/Phase/GetAllPhases';
+export const PHASE_UPDATE_ENDPOINT = '/api/Phase/UpdatePhase';
+export const PHASE_DELETE_ENDPOINT = '/api/Phase/DeletePhase';
 
 // Group Endpoints
 export const GROUP_CREATE_ENDPOINT = '/api/Tournament/CreateTournamentGroup';
+export const GROUP_UPDATE_ENDPOINT = '/api/Group/UpdateGroup';
+export const GROUP_DELETE_ENDPOINT = '/api/Group/DeleteGroup';
 
 // Team Endpoints
 export const TEAM_GET_ALL_TEAMS_ENDPOINT = '/api/Team/GetAllTeams';
@@ -45,9 +49,13 @@ export const EndpointsConfig = {
   // Phase
   PHASE_CREATE_ENDPOINT,
   PHASE_GET_BY_TOURNAMENT_ENDPOINT,
+  PHASE_UPDATE_ENDPOINT,
+  PHASE_DELETE_ENDPOINT,
   
   // Group
   GROUP_CREATE_ENDPOINT,
+  GROUP_UPDATE_ENDPOINT,
+  GROUP_DELETE_ENDPOINT,
   
   // Team
   TEAM_GET_ALL_TEAMS_ENDPOINT,

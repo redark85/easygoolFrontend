@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '@core/services/toast.service';
 import { PhaseService } from '../../services/phase.service';
 import { PhaseFormData, CreatePhaseRequest, UpdatePhaseRequest, PhaseType } from '../../models/phase-form.interface';
+import { UpdatePhaseRequest as PhaseUpdateRequest } from '../../models/phase.interface';
 
 @Component({
   selector: 'app-phase-form',
@@ -33,7 +34,7 @@ import { PhaseFormData, CreatePhaseRequest, UpdatePhaseRequest, PhaseType } from
   styleUrls: ['./phase-form.component.scss']
 })
 export class PhaseFormComponent implements OnInit, OnDestroy {
-  phaseForm: FormGroup;
+  phaseForm!: FormGroup;
   isEdit: boolean;
   isSubmitting = false;
   tournamentId: number | null = null;
@@ -53,7 +54,7 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute
   ) {
     this.isEdit = data.isEdit;
-    this.phaseForm = this.createForm();
+    this.initializeForm();
   }
 
   ngOnInit(): void {
@@ -78,6 +79,11 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
     if (this.isEdit && this.data.phase) {
       this.patchForm();
     }
+
+    // Suscribirse a cambios del formulario para debugging
+    this.phaseForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
+      console.log('Form value changed:', value);
+    });
   }
 
   ngOnDestroy(): void {
@@ -85,8 +91,8 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private createForm(): FormGroup {
-    return this.fb.group({
+  private initializeForm(): void {
+    this.phaseForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       phaseType: [PhaseType.GroupStage, [Validators.required]]
     });
@@ -94,10 +100,35 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
 
   private patchForm(): void {
     if (this.data.phase) {
+      console.log('Patching form with phase data:', this.data.phase);
+      console.log('Phase type from data:', this.data.phase.phaseType, typeof this.data.phase.phaseType);
+      
+      // Asegurar que phaseType sea exactamente el mismo tipo que las opciones
+      const phaseTypeValue = Number(this.data.phase.phaseType);
+      
+      // Usar patchValue con emitEvent: false para evitar triggers automáticos
       this.phaseForm.patchValue({
         name: this.data.phase.name,
-        phaseType: this.data.phase.phaseType
-      });
+        phaseType: phaseTypeValue
+      }, { emitEvent: false });
+
+      // Forzar la actualización del control de phaseType si es necesario
+      setTimeout(() => {
+        const currentValue = this.phaseForm.get('phaseType')?.value;
+        if (currentValue !== phaseTypeValue) {
+          console.log('Correcting phaseType value from', currentValue, 'to', phaseTypeValue);
+          this.phaseForm.get('phaseType')?.setValue(phaseTypeValue, { emitEvent: false });
+        }
+      }, 0);
+
+      // Verificar que el valor se haya establecido correctamente
+      console.log('Form value after patch:', this.phaseForm.value);
+      console.log('PhaseType control value:', this.phaseForm.get('phaseType')?.value);
+      console.log('Converted phaseType value:', phaseTypeValue);
+      
+      // Verificar que el valor coincida con alguna opción
+      const matchingOption = this.phaseTypeOptions.find(opt => opt.value === phaseTypeValue);
+      console.log('Matching option found:', matchingOption);
     }
   }
 
@@ -132,16 +163,18 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
       this.isSubmitting = true;
 
       const formValue = this.phaseForm.value;
-      
+      console.log('Form value on submit:', formValue);
+      console.log('Original phase data:', this.data.phase);
+
       if (this.isEdit && this.data.phase) {
-        // TODO: Implementar actualización de fase cuando esté disponible en la API
-        const updateData: UpdatePhaseRequest = {
+        const updateData: PhaseUpdateRequest = {
           id: this.data.phase.id,
           name: formValue.name.trim(),
           phaseType: formValue.phaseType
         };
-        
-        this.toastService.showWarning('Funcionalidad de edición no disponible aún');
+
+        console.log('Update data being sent:', updateData);
+
         this.isSubmitting = false;
         this.dialogRef.close({
           action: 'update',
@@ -153,7 +186,7 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
           name: formValue.name.trim(),
           phaseType: formValue.phaseType
         };
-        
+
         if (!this.tournamentId) {
           this.toastService.showError('ID de torneo no disponible');
           this.isSubmitting = false;
@@ -184,5 +217,37 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  /**
+   * Función para comparar valores en el mat-select
+   * @param option1 Primera opción a comparar
+   * @param option2 Segunda opción a comparar
+   * @returns true si son iguales
+   */
+  comparePhaseTypes(option1: any, option2: any): boolean {
+    console.log('Comparing values:', option1, option2, 'Types:', typeof option1, typeof option2);
+    const result = Number(option1) === Number(option2);
+    console.log('Comparison result:', result);
+    return result;
+  }
+
+  /**
+   * Maneja el cambio de selección en el mat-select de tipo de fase
+   * @param event Evento de cambio de selección
+   */
+  onPhaseTypeChange(event: any): void {
+    console.log('PhaseType selection changed:', event);
+    console.log('Selected value:', event.value);
+    console.log('Form control value after change:', this.phaseForm.get('phaseType')?.value);
+    console.log('Complete form value:', this.phaseForm.value);
+    
+    // Forzar actualización del control si es necesario
+    if (this.phaseForm.get('phaseType')?.value !== event.value) {
+      console.log('Forcing form control update');
+      this.phaseForm.get('phaseType')?.setValue(event.value);
+      this.phaseForm.get('phaseType')?.markAsDirty();
+      this.phaseForm.get('phaseType')?.updateValueAndValidity();
+    }
   }
 }

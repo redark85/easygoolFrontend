@@ -40,6 +40,15 @@ export interface CreatePhaseRequest {
 }
 
 /**
+ * Interface para request de actualización de fase
+ */
+export interface UpdatePhaseRequest {
+  id: number;
+  name: string;
+  phaseType: PhaseType;
+}
+
+/**
  * Interface para request de creación de grupo
  */
 export interface CreateGroupRequest {

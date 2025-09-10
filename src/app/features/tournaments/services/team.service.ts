@@ -3,19 +3,20 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiService } from '@core/services/api.service';
 import { ToastService } from '@core/services/toast.service';
-import { 
+import {
   TEAM_GET_ALL_TEAMS_ENDPOINT,
+  TEAM_GET_BY_TOURNAMENT_ENDPOINT,
   TEAM_CREATE_ENDPOINT,
   TEAM_UPDATE_ENDPOINT,
   TEAM_DELETE_ENDPOINT,
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
   TEAM_REMOVE_FROM_GROUP_ENDPOINT
 } from '@core/config/endpoints';
-import { 
-  Team, 
-  CreateTeamRequest, 
-  UpdateTeamRequest, 
-  TeamApiResponse 
+import {
+  Team,
+  CreateTeamRequest,
+  UpdateTeamRequest,
+  TeamApiResponse
 } from '../models/team.interface';
 import { ApiResponse } from '@core/models/api.interface';
 
@@ -174,7 +175,7 @@ export class TeamService {
     if (excludeTeamId) {
       endpoint += `&excludeTeamId=${excludeTeamId}`;
     }
-    
+
     return this.apiService.get<{ isAvailable: boolean }>(endpoint).pipe(
       map(response => response.isAvailable),
       catchError(this.handleError)
@@ -193,7 +194,7 @@ export class TeamService {
     if (excludeTeamId) {
       endpoint += `&excludeTeamId=${excludeTeamId}`;
     }
-    
+
     return this.apiService.get<{ isAvailable: boolean }>(endpoint).pipe(
       map(response => response.isAvailable),
       catchError(this.handleError)
@@ -207,7 +208,7 @@ export class TeamService {
    */
   private handleError = (error: any): Observable<never> => {
     let errorMessage = 'Error desconocido';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Error del lado del cliente
       errorMessage = `Error: ${error.error.message}`;
@@ -231,7 +232,7 @@ export class TeamService {
         errorMessage = error.error?.message || `Error HTTP: ${error.status}`;
       }
     }
-    
+
     console.error('TeamService Error:', error);
     return throwError(() => new Error(errorMessage));
   };

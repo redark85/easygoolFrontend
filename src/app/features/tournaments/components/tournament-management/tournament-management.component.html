@@ -57,9 +57,23 @@
           </div>
         </div>
 
-        <!-- Tournament Registration Link -->
-        <div class="tournament-actions" *ngIf="tournament.tournamentLink">
+        <!-- Tournament Registration Controls -->
+        <div class="tournament-actions">
+          <!-- Switch para control de registro -->
+          <div class="registration-control">
+            <mat-slide-toggle
+              [(ngModel)]="registrationClosed"
+              (change)="onRegistrationToggleChange($event)"
+              [matTooltip]="registrationClosed ? 'Registro cerrado - Los equipos no pueden registrarse' : 'Registro abierto - Los equipos pueden registrarse'"
+              matTooltipPosition="below"
+              class="registration-toggle">
+              <span class="toggle-label">{{ registrationClosed ? 'Registro cerrado' : 'Registro abierto' }}</span>
+            </mat-slide-toggle>
+          </div>
+
+          <!-- Botón copiar enlace - Solo visible si registro está abierto -->
           <button type="button"
+                  *ngIf="tournament.tournamentLink && !registrationClosed"
                   class="registration-link"
                   matTooltip="Enlace para registrarse al torneo"
                   matTooltipPosition="below"

@@ -84,15 +84,14 @@ export class GroupFormComponent implements OnInit {
       this.isSubmitting = true;
 
       const formValue = this.groupForm.value;
-      
+
       if (this.isEdit && this.data.group) {
         // TODO: Implementar actualización de grupo cuando esté disponible en la API
         const updateData: UpdateGroupRequest = {
           id: this.data.group.id,
           name: formValue.name.trim()
         };
-        
-        this.toastService.showWarning('Funcionalidad de edición no disponible aún');
+
         this.isSubmitting = false;
         this.dialogRef.close({
           action: 'update',
@@ -103,7 +102,7 @@ export class GroupFormComponent implements OnInit {
         const createData: CreateGroupRequest = {
           name: formValue.name.trim()
         };
-        
+
         this.phaseService.createGroup(this.data.phaseId, createData).subscribe({
           next: (response) => {
             this.isSubmitting = false;

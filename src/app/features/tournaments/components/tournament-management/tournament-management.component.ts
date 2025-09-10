@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +14,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { TournamentService } from '@features/tournaments/services/tournament.service';
@@ -41,6 +43,7 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -53,6 +56,7 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
     MatTabsModule,
     MatMenuModule,
     MatDialogModule,
+    MatSlideToggleModule,
     PhasesGroupsManagementComponent,
     TeamsManagementComponent,
     MatchesManagementComponent,
@@ -70,6 +74,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   isLoading = false;
   tournamentId: number = 0;
   selectedTabIndex: number = 0;
+  registrationClosed = false; // Control para cerrar registro de equipos
 
   private destroy$ = new Subject<void>();
 
@@ -709,6 +714,17 @@ trackByTeamId(index: number, team: Team): number {
         this.toastService.showError('Error al copiar el enlace');
       });
     }
+  }
+
+  /**
+   * Maneja el cambio del switch de registro de equipos
+   * @param event Evento del slide toggle
+   */
+  onRegistrationToggleChange(event: any): void {
+    this.registrationClosed = event.checked;
+    const status = this.registrationClosed ? 'cerrado' : 'abierto';
+    this.toastService.showInfo(`Registro de equipos ${status}`);
+    this.cdr.detectChanges();
   }
 
 }

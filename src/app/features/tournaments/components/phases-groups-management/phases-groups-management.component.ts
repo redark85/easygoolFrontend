@@ -47,6 +47,9 @@ export class PhasesGroupsManagementComponent implements OnInit {
 
   // Control de expansión de grupos
   expandedGroupIndex: number = -1;
+  
+  // Loading states
+  isLoadingPhases = false;
 
   private destroy$ = new Subject<void>();
 
@@ -57,7 +60,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Component initialization
+    this.loadPhases();
   }
 
   ngOnDestroy(): void {
@@ -104,8 +107,18 @@ export class PhasesGroupsManagementComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result: PhaseModalResult) => {
-      if (result && result.action === 'update') {
-        this.refreshPhases();
+      if (result && result.action === 'update' && 'id' in result.data) {
+        // Update phase via API
+        this.phaseService.updatePhase(phase.id, result.data).subscribe({
+          next: (response) => {
+            if (response.succeed) {
+              this.refreshPhases();
+            }
+          },
+          error: (error) => {
+            console.error('Error updating phase:', error);
+          }
+        });
       }
     });
   }
@@ -126,17 +139,22 @@ export class PhasesGroupsManagementComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        // TODO: Implementar eliminación de fase
-        console.log('Eliminar fase:', phase);
-        this.phasesUpdated.emit();
-
-        // Mostrar mensaje de éxito
-        Swal.fire({
-          title: '¡Eliminada!',
-          text: 'La fase ha sido eliminada correctamente.',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
+        this.phaseService.deletePhase(phase.id).subscribe({
+          next: (response) => {
+            if (response.succeed) {
+              this.loadPhases();
+              Swal.fire({
+                title: '¡Eliminada!',
+                text: 'La fase ha sido eliminada correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting phase:', error);
+          }
         });
       }
     });
@@ -182,7 +200,17 @@ export class PhasesGroupsManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: GroupModalResult) => {
       if (result && result.action === 'update') {
-        this.refreshPhases();
+        // Update group via API
+        this.phaseService.updateGroup(group.id, { name: result.data.name }).subscribe({
+          next: (response) => {
+            if (response.succeed) {
+              this.refreshPhases();
+            }
+          },
+          error: (error) => {
+            console.error('Error updating group:', error);
+          }
+        });
       }
     });
   }
@@ -203,20 +231,42 @@ export class PhasesGroupsManagementComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        // TODO: Implementar eliminación de grupo
-        console.log('Eliminar grupo:', group);
-        this.phasesUpdated.emit();
-
-        // Mostrar mensaje de éxito
-        Swal.fire({
-          title: '¡Eliminado!',
-          text: 'El grupo ha sido eliminado correctamente.',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
+        this.phaseService.deleteGroup(group.id).subscribe({
+          next: (response) => {
+            if (response.succeed) {
+              this.loadPhases();
+              Swal.fire({
+                title: '¡Eliminado!',
+                text: 'El grupo ha sido eliminado correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting group:', error);
+          }
         });
       }
     });
+  }
+
+  /**
+   * Agrega un equipo a una fase (para fases de eliminatorias)
+   */
+  addTeamToPhase(phase: Phase): void {
+    // TODO: Implementar modal para seleccionar equipo y agregarlo a la fase de eliminatorias
+    console.log('Agregar equipo a la fase:', phase);
+  }
+
+  /**
+   * Asigna equipos aleatoriamente a los grupos de una fase
+   * @param phase Fase de grupos donde asignar equipos
+   */
+  assignTeamsRandomly(phase: Phase): void {
+    // TODO: Implementar lógica para asignar equipos disponibles aleatoriamente a los grupos
+    console.log('Asignar equipos aleatoriamente a la fase:', phase);
   }
 
   /**
@@ -236,6 +286,14 @@ export class PhasesGroupsManagementComponent implements OnInit {
   }
 
   /**
+   * Remueve un equipo de una fase (para fases de eliminatorias)
+   */
+  removeTeamFromPhase(team: any, phase: Phase): void {
+    // TODO: Implementar lógica para remover equipo de la fase de eliminatorias
+    console.log('Remove team from phase:', team, phase);
+  }
+
+  /**
    * Descalifica un equipo del torneo
    * @param team Equipo a descalificar
    * @param group Grupo del equipo
@@ -246,19 +304,32 @@ export class PhasesGroupsManagementComponent implements OnInit {
   }
 
   /**
-   * Refresca la lista de fases
+   * Carga las fases del torneo
    */
-  private refreshPhases(): void {
+  loadPhases(): void {
+    this.isLoadingPhases = true;
+    this.cdr.detectChanges();
+    
     this.phaseService.getPhasesByTournament(this.tournamentId).subscribe({
       next: (phases) => {
         this.phases = phases;
         this.phasesUpdated.emit(phases);
+        this.isLoadingPhases = false;
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error refreshing phases:', error);
+        console.error('Error loading phases:', error);
+        this.isLoadingPhases = false;
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  /**
+   * Refresca la lista de fases
+   */
+  private refreshPhases(): void {
+    this.loadPhases();
   }
 
   /**
@@ -308,5 +379,32 @@ export class PhasesGroupsManagementComponent implements OnInit {
    */
   trackByTeamId(index: number, team: Team): number {
     return team.id || index;
+  }
+
+  /**
+   * Valida si se puede eliminar una fase
+   * @param phase Fase a validar
+   * @returns true si se puede eliminar, false si no
+   */
+  canDeletePhase(phase: Phase): boolean {
+    if (phase.phaseType === PhaseType.Knockout) {
+      // Para fases de eliminatorias, verificar si hay equipos
+      return !phase.knockoutTeams || phase.knockoutTeams.length === 0;
+    } else {
+      // Para fases de grupos, verificar si algún grupo tiene equipos
+      if (!phase.groups || phase.groups.length === 0) {
+        return true;
+      }
+      return !phase.groups.some(group => group.teams && group.teams.length > 0);
+    }
+  }
+
+  /**
+   * Valida si se puede eliminar un grupo
+   * @param group Grupo a validar
+   * @returns true si se puede eliminar, false si no
+   */
+  canDeleteGroup(group: Group): boolean {
+    return !group.teams || group.teams.length === 0;
   }
 }
