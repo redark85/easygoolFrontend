@@ -81,7 +81,7 @@
                   <span class="badge bg-primary rounded-pill">{{ team.totalPlayers }}</span>
                 </div>
                 <div class="col-auto">
-                  <small class="text-muted">Grupo</small>
+                  <small class="text-muted">Aqui nombre de Manager y phone</small>   <!-- Obtiene del objeto Manager -->
                 </div>
               </div>
             </div>
@@ -121,30 +121,23 @@
                             class="text-danger">
                       <mat-icon>delete</mat-icon>
                     </button>
-                    <button mat-icon-button
-                            matTooltip="Subir excel"
+                    <button   *ngIf="!team.hasExcelUploaded" mat-icon-button
+                            matTooltip="Subir excel de registro de jugadores"
                             class="text-info">
                       <mat-icon>upload_file</mat-icon>
                     </button>
                     <button mat-icon-button
-                            matTooltip="Sancionar equipo"
+                            matTooltip="Descalificar equipo"
                             class="text-warning">
                       <mat-icon>gavel</mat-icon>
                     </button>
                     <button mat-icon-button
-                            *ngIf="team.urlRegistration"
+                            *ngIf="!team.hasUsedLink"
                             (click)="copyRegistrationUrl(team.urlRegistration)"
                             matTooltip="Copiar URL de registro"
                             class="text-secondary">
                       <mat-icon>link</mat-icon>
-                    </button>
-                    <button mat-icon-button
-                            (click)="copyTeamRegistrationUrl(team)"
-                            [matTooltip]="team.urlRegistration ? 'Copiar enlace de registro del equipo' : 'URL de registro no disponible'"
-                            class="text-info copy-link-btn"
-                            [disabled]="!team.urlRegistration">
-                      <mat-icon>content_copy</mat-icon>
-                    </button>
+                    </button>                  
                   </div>
                 </div>
               </div>

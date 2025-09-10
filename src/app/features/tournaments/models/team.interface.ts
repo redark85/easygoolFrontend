@@ -17,6 +17,15 @@ export interface Team {
   stadium?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  allowPlayerRegistration?: boolean;
+  hasExcelUploaded?: boolean;
+  manager? : Manager;
+  hasUsedLink? : boolean;
+}
+
+export interface Manager{
+  name: string;
+  phoneNumber: string;
 }
 
 export interface CreateTeamRequest {
