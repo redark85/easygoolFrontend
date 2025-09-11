@@ -4,5 +4,6 @@ export * from './user.service';
 export * from './storage.service';
 export * from './api.service';
 export * from './toast.service';
-export * from './tournament.service';
 export * from './loading.service';
+export * from './jwt.service';
+export * from './notification.service';

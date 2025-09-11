@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, startWith } from 'rxjs';
-import { Match, MatchGroup, MatchStatus, MatchPeriod } from '@core/models/match.model';
+import { Match, MatchGroup, MatchStatus, MatchPeriod } from '@features/tournaments/models/match.interface';
 // import { MatchService } from '@core/services'; // Comentado temporalmente
 
 @Component({

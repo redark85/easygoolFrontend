@@ -47,7 +47,7 @@
                     <div class="match-info">
                       <div class="match-date">
                         <mat-icon class="date-icon">event</mat-icon>
-                        <span>{{ formatMatchDateTime(match.dateTime) }}</span>
+                        <span>{{ formatMatchDateTime(match.date) }}</span>
                       </div>
                       <mat-chip class="match-status-chip"
                                [color]="getMatchStatusColor(match.status)"
@@ -79,14 +79,14 @@
                       <!-- Home Team -->
                       <div class="team home-team">
                         <div class="team-logo">
-                          <img [src]="match.homeTeam?.logoBase64 ? 'data:' + match.homeTeam?.logoContentType + ';base64,' + match.homeTeam?.logoBase64 : 'assets/logo.png'"
-                               [alt]="match.homeTeam?.name || 'Equipo Local'"
+                          <img [src]="match.homeTeam.logoBase64 ? 'data:' + match.homeTeam.logoContentType + ';base64,' + match.homeTeam.logoBase64 : 'assets/logo.png'"
+                               [alt]="match.homeTeam.name || 'Equipo Local'"
                                class="team-image"
                                (error)="$event.target.src='assets/logo.png'">
                         </div>
                         <div class="team-details">
-                          <h4 class="team-name">{{ match.homeTeam?.name || 'Equipo Local' }}</h4>
-                          <span class="team-short">{{ match.homeTeam?.shortName || 'LOCAL' }}</span>
+                          <h4 class="team-name">{{ match.homeTeam.name || 'Equipo Local' }}</h4>
+                          <span class="team-short">{{ match.homeTeam.shortName || 'LOCAL' }}</span>
                         </div>
                       </div>
 
@@ -103,12 +103,12 @@
                       <!-- Away Team -->
                       <div class="team away-team">
                         <div class="team-details">
-                          <h4 class="team-name">{{ match.awayTeam?.name || 'Equipo Visitante' }}</h4>
-                          <span class="team-short">{{ match.awayTeam?.shortName || 'VISIT' }}</span>
+                          <h4 class="team-name">{{ match.awayTeam.name || 'Equipo Visitante' }}</h4>
+                          <span class="team-short">{{ match.awayTeam.shortName || 'VISIT' }}</span>
                         </div>
                         <div class="team-logo">
-                          <img [src]="match.awayTeam?.logoBase64 ? 'data:' + match.awayTeam?.logoContentType + ';base64,' + match.awayTeam?.logoBase64 : 'assets/logo.png'"
-                               [alt]="match.awayTeam?.name || 'Equipo Visitante'"
+                          <img [src]="match.awayTeam.logoBase64 ? 'data:' + match.awayTeam.logoContentType + ';base64,' + match.awayTeam.logoBase64 : 'assets/logo.png'"
+                               [alt]="match.awayTeam.name || 'Equipo Visitante'"
                                class="team-image"
                                (error)="$event.target.src='assets/logo.png'">
                         </div>
@@ -132,7 +132,7 @@
                   </mat-card-content>
 
                   <!-- Match Footer -->
-                  <mat-card-actions class="match-card-actions" *ngIf="match.status === 3">
+                  <mat-card-actions class="match-card-actions" *ngIf="match.status === 'finished'">
                     <div class="match-stats">
                       <div class="stat-item">
                         <mat-icon class="stat-icon">timer</mat-icon>
@@ -147,7 +147,7 @@
                       <div class="stat-item">
                         <mat-icon class="stat-icon">sports_soccer</mat-icon>
                         <span class="stat-label">Goles</span>
-                        <span class="stat-value">{{ (match.homeTeamScore || 0) + (match.awayTeamScore || 0) }}</span>
+                        <span class="stat-value">{{ (match.homeScore || 0) + (match.awayScore || 0) }}</span>
                       </div>
                     </div>
                   </mat-card-actions>

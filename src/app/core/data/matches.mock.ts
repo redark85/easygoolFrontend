@@ -1,4 +1,4 @@
-import { Match, MatchStatus, MatchPeriod, Team } from '../models/match.model';
+import { Match, MatchStatus, MatchPeriod, Team } from '@features/tournaments/models/match.interface';
 
 // Teams data
 export const MOCK_TEAMS: Team[] = [

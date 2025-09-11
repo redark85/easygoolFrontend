@@ -11,7 +11,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Subject } from 'rxjs';
 
-import { Match } from '../../models/match.interface';
+import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
 
@@ -105,7 +105,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   /**
    * TrackBy function para optimizar el renderizado de partidos
    */
-  trackByMatchId(index: number, match: Match): number {
+  trackByMatchId(index: number, match: Match): string {
     return match.id;
   }
 
@@ -119,13 +119,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   /**
    * Obtiene el texto del estado del partido
    */
-  getMatchStatusText(status: number): string {
+  getMatchStatusText(status: MatchStatus): string {
     switch (status) {
-      case 1: return 'Programado';
-      case 2: return 'En Curso';
-      case 3: return 'Finalizado';
-      case 4: return 'Suspendido';
-      case 5: return 'Cancelado';
+      case MatchStatus.SCHEDULED: return 'Programado';
+      case MatchStatus.LIVE: return 'En Curso';
+      case MatchStatus.FINISHED: return 'Finalizado';
+      case MatchStatus.POSTPONED: return 'Suspendido';
+      case MatchStatus.CANCELLED: return 'Cancelado';
       default: return 'Desconocido';
     }
   }
@@ -133,13 +133,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   /**
    * Obtiene la clase CSS para el estado del partido
    */
-  getMatchStatusClass(status: number): string {
+  getMatchStatusClass(status: MatchStatus): string {
     switch (status) {
-      case 1: return 'status-scheduled';
-      case 2: return 'status-in-progress';
-      case 3: return 'status-finished';
-      case 4: return 'status-suspended';
-      case 5: return 'status-cancelled';
+      case MatchStatus.SCHEDULED: return 'status-scheduled';
+      case MatchStatus.LIVE: return 'status-in-progress';
+      case MatchStatus.FINISHED: return 'status-finished';
+      case MatchStatus.POSTPONED: return 'status-suspended';
+      case MatchStatus.CANCELLED: return 'status-cancelled';
       default: return 'status-unknown';
     }
   }
@@ -147,13 +147,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   /**
    * Obtiene el color del chip para el estado del partido
    */
-  getMatchStatusColor(status: number): 'primary' | 'accent' | 'warn' {
+  getMatchStatusColor(status: MatchStatus): 'primary' | 'accent' | 'warn' {
     switch (status) {
-      case 1: return 'primary';
-      case 2: return 'accent';
-      case 3: return 'primary';
-      case 4: return 'warn';
-      case 5: return 'warn';
+      case MatchStatus.SCHEDULED: return 'primary';
+      case MatchStatus.LIVE: return 'accent';
+      case MatchStatus.FINISHED: return 'primary';
+      case MatchStatus.POSTPONED: return 'warn';
+      case MatchStatus.CANCELLED: return 'warn';
       default: return 'accent';
     }
   }
@@ -181,7 +181,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Obtiene el resultado del partido
    */
   getMatchResult(match: Match): string {
-    if (match.status === 3) { // Finalizado
+    if (match.status === MatchStatus.FINISHED) { // Finalizado
       return `${match.homeScore || 0} - ${match.awayScore || 0}`;
     }
     return 'vs';

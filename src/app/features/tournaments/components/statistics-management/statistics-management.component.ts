@@ -12,7 +12,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { Subject } from 'rxjs';
 
 import { Team } from '../../models/team.interface';
-import { Match } from '../../models/match.interface';
+import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase } from '../../models/phase.interface';
 import { Tournament } from '../../models/tournament.interface';
 
@@ -106,7 +106,7 @@ export class StatisticsManagementComponent implements OnInit, OnDestroy {
     this.teamStatistics = this.teams.map(team => {
       const teamMatches = this.matches.filter(match => 
         (match.homeTeam?.id === team.id || match.awayTeam?.id === team.id) && 
-        match.status === 3 // Solo partidos finalizados
+        match.status === MatchStatus.FINISHED // Solo partidos finalizados
       );
 
       let wins = 0;
@@ -117,8 +117,8 @@ export class StatisticsManagementComponent implements OnInit, OnDestroy {
 
       teamMatches.forEach(match => {
         const isHome = match.homeTeam?.id === team.id;
-        const teamScore = isHome ? (match.homeTeamScore || 0) : (match.awayTeamScore || 0);
-        const opponentScore = isHome ? (match.awayTeamScore || 0) : (match.homeTeamScore || 0);
+        const teamScore = isHome ? (match.homeScore || 0) : (match.awayScore || 0);
+        const opponentScore = isHome ? (match.awayScore || 0) : (match.homeScore || 0);
 
         goalsFor += teamScore;
         goalsAgainst += opponentScore;
@@ -157,9 +157,9 @@ export class StatisticsManagementComponent implements OnInit, OnDestroy {
    * Calcula las estadísticas generales del torneo
    */
   private calculateTournamentStatistics(): void {
-    const completedMatches = this.matches.filter(match => match.status === 3);
+    const completedMatches = this.matches.filter(match => match.status === MatchStatus.FINISHED);
     const totalGoals = completedMatches.reduce((sum, match) => 
-      sum + (match.homeTeamScore || 0) + (match.awayTeamScore || 0), 0
+      sum + (match.homeScore || 0) + (match.awayScore || 0), 0
     );
 
     this.tournamentStatistics = {
@@ -212,9 +212,9 @@ export class StatisticsManagementComponent implements OnInit, OnDestroy {
    */
   getPhaseStatistics(phase: Phase): any {
     const phaseMatches = this.matches.filter(match => match.phaseId === phase.id);
-    const completedMatches = phaseMatches.filter(match => match.status === 3);
+    const completedMatches = phaseMatches.filter(match => match.status === MatchStatus.FINISHED);
     const totalGoals = completedMatches.reduce((sum, match) => 
-      sum + (match.homeTeamScore || 0) + (match.awayTeamScore || 0), 0
+      sum + (match.homeScore || 0) + (match.awayScore || 0), 0
     );
 
     return {
