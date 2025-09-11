@@ -544,7 +544,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        this.teamService.deleteTeam(team.id).pipe(
+        this.teamService.deleteTeam(team.phaseTeamId).pipe(
           takeUntil(this.destroy$)
         ).subscribe({
           next: () => {

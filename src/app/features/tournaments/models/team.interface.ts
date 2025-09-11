@@ -27,6 +27,7 @@ export interface Team {
   hasExcelUploaded?: boolean;
   manager? : Manager;
   hasUsedLink? : boolean;
+  tournamentTeamId : number;
 }
 
 export interface Manager{
