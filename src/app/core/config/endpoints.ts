@@ -27,9 +27,10 @@ export const TEAM_GET_ALL_TEAMS_ENDPOINT = '/api/Team/GetAllTeams';
 export const TEAM_GET_BY_TOURNAMENT_ENDPOINT = '/api/Team/GetByTournament';
 export const TEAM_CREATE_ENDPOINT = '/api/Team/CreateTeam';
 export const TEAM_UPDATE_ENDPOINT = '/api/Team/UpdateTeam';
-export const TEAM_DELETE_ENDPOINT = '/api/Team/DeleteTeam';
+export const TEAM_DELETE_ENDPOINT = '/api/Team/RemovePhaseTeam';
 export const TEAM_ASSIGN_TO_GROUP_ENDPOINT = '/api/Team/AssignToGroup';
 export const TEAM_REMOVE_FROM_GROUP_ENDPOINT = '/api/Team/RemoveFromGroup';
+export const TEAM_DISQUALIFY_ENDPOINT = '/api/Team/DisqualifyTeam';
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -64,5 +65,6 @@ export const EndpointsConfig = {
   TEAM_UPDATE_ENDPOINT,
   TEAM_DELETE_ENDPOINT,
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
-  TEAM_REMOVE_FROM_GROUP_ENDPOINT
+  TEAM_REMOVE_FROM_GROUP_ENDPOINT,
+  TEAM_DISQUALIFY_ENDPOINT
 };

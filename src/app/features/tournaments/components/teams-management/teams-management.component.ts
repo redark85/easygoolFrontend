@@ -324,6 +324,49 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Descalifica un equipo con confirmación
+   * @param team Equipo a descalificar
+   */
+  disqualifyTeam(team: Team): void {
+    Swal.fire({
+      title: '¿Descalificar equipo?',
+      html: `¿Estás seguro de que deseas descalificar al equipo <strong>"${team.name}"</strong>?<br><br>Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, descalificar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.teamService.disqualifyTeam(team.id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Equipo descalificado!',
+              text: `El equipo "${team.name}" ha sido descalificado exitosamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.refreshTeams();
+          },
+          error: (error) => {
+            Swal.fire({
+              title: 'Error',
+              text: error.message || 'No se pudo descalificar el equipo',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  /**
    * Método alternativo para copiar texto al portapapeles
    */
   private fallbackCopyTextToClipboard(text: string): void {

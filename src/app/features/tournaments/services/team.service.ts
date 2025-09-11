@@ -10,7 +10,8 @@ import {
   TEAM_UPDATE_ENDPOINT,
   TEAM_DELETE_ENDPOINT,
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
-  TEAM_REMOVE_FROM_GROUP_ENDPOINT
+  TEAM_REMOVE_FROM_GROUP_ENDPOINT,
+  TEAM_DISQUALIFY_ENDPOINT
 } from '@core/config/endpoints';
 import {
   Team,
@@ -158,6 +159,25 @@ export class TeamService {
         }
         this.toastService.showError(response.message || 'Error al remover equipo del grupo');
         throw new Error(response.message || 'Error al remover equipo del grupo');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Descalifica un equipo
+   * @param teamId ID del equipo a descalificar
+   * @returns Observable con el resultado de la operación
+   */
+  disqualifyTeam(teamId: number): Observable<boolean> {
+    return this.apiService.post<ApiResponse<any>>(`${TEAM_DISQUALIFY_ENDPOINT}/${teamId}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipo descalificado con éxito');
+          return true;
+        }
+        this.toastService.showError(response.message || 'Error al descalificar equipo');
+        throw new Error(response.message || 'Error al descalificar equipo');
       }),
       catchError(this.handleError)
     );
