@@ -11,7 +11,8 @@ import {
   TEAM_DELETE_ENDPOINT,
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
   TEAM_REMOVE_FROM_GROUP_ENDPOINT,
-  TEAM_DISQUALIFY_ENDPOINT
+  TEAM_DISQUALIFY_ENDPOINT,
+  TEAM_REMOVE_ENDPOINT
 } from '@core/config/endpoints';
 import {
   Team,
@@ -112,6 +113,25 @@ export class TeamService {
    */
   deleteTeam(teamId: number): Observable<boolean> {
     return this.apiService.delete<ApiResponse<any>>(`${TEAM_DELETE_ENDPOINT}/${teamId}`).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipo eliminado con éxito');
+          return true;
+        }
+        this.toastService.showError(response.message || 'Error al eliminar equipo');
+        throw new Error(response.message || 'Error al eliminar equipo');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Elimina un equipo
+   * @param teamId ID del equipo a eliminar
+   * @returns Observable con el resultado de la operación
+   */
+  removeTeam(tournamentTeamId: number): Observable<boolean> {
+    return this.apiService.delete<ApiResponse<any>>(`${TEAM_REMOVE_ENDPOINT}/${tournamentTeamId}`).pipe(
       map(response => {
         if (response.succeed) {
           this.toastService.showSuccess(response.message || 'Equipo eliminado con éxito');

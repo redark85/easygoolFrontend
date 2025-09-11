@@ -32,6 +32,8 @@ export const TEAM_ASSIGN_TO_GROUP_ENDPOINT = '/api/Team/AsignTeamGroup';
 export const TEAM_REMOVE_FROM_GROUP_ENDPOINT = '/api/Team/RemoveFromGroup';
 export const TEAM_DISQUALIFY_ENDPOINT = '/api/Team/DisqualifyTeam';
 export const TEAM_GET_WITHOUT_PHASE_ENDPOINT = '/api/Team/GetAllTeamsWithoutPhase';
+export const TEAM_REMOVE_ENDPOINT = '/api/Team/RemoveTeam';
+
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -68,5 +70,6 @@ export const EndpointsConfig = {
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
   TEAM_REMOVE_FROM_GROUP_ENDPOINT,
   TEAM_DISQUALIFY_ENDPOINT,
-  TEAM_GET_WITHOUT_PHASE_ENDPOINT
+  TEAM_GET_WITHOUT_PHASE_ENDPOINT,
+  TEAM_REMOVE_ENDPOINT
 };

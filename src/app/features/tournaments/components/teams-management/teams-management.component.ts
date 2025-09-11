@@ -187,7 +187,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        this.teamService.deleteTeam(team.id).pipe(
+        this.teamService.removeTeam(team.tournamentTeamId).pipe(
           takeUntil(this.destroy$)
         ).subscribe({
           next: () => {
