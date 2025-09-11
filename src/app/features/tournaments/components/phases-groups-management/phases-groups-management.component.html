@@ -66,7 +66,7 @@
                 <div class="phase-actions-inline">
                   <button mat-icon-button
                           color="primary"
-                          (click)="phase.phaseType === 1 ? addTeamToPhase(phase) : createGroup(phase)"
+                          (click)="phase.phaseType === 0 ? addGroup(phase.id) : addTeamToPhase(phase.id, phase.name)"
                           [matTooltip]="phase.phaseType === 1 ? 'Agregar Equipo' : 'Agregar Grupo'"
                           class="phase-action-btn">
                     <mat-icon>add</mat-icon>

@@ -51,6 +51,43 @@ export interface UpdateTeamRequest {
   logoContentType: string;
 }
 
+export interface Player {
+  tournamentTeamPlayerId: number;
+  name: string;
+  lastName: string;
+  identification: string;
+  photoUrl: string;
+  jerseyNumber: number;
+}
+
+export interface TeamWithoutPhase {
+  id: number;
+  name: string;
+  shortName: string;
+  logoUrl: string;
+  status: TeamStatus;
+  totalPlayers: number;
+  urlRegistration: string;
+  phaseTeamId: number;
+  allowPlayerRegistration: boolean;
+  hasExcelUploaded: boolean;
+  manager: {
+    managerName: string;
+    phoneNumber: string;
+  };
+  hasUsedLink: boolean;
+  players: Player[];
+}
+
+export interface TeamsWithoutPhaseResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: TeamWithoutPhase[];
+  records: number;
+}
+
 export interface TeamApiResponse {
   records: number;
   result: Team[];

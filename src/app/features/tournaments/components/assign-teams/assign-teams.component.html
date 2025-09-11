@@ -1,0 +1,129 @@
+<div class="assign-teams-dialog">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon class="title-icon">group_add</mat-icon>
+      {{ getModalTitle() }}
+    </h2>
+    <button mat-icon-button 
+            mat-dialog-close 
+            class="close-button"
+            matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="dialog-content">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-progress-spinner 
+        diameter="40" 
+        mode="indeterminate">
+      </mat-progress-spinner>
+      <p class="loading-text">Cargando equipos disponibles...</p>
+    </div>
+
+    <!-- Content when loaded -->
+    <div *ngIf="!isLoading">
+      
+      <!-- Select All Section -->
+      <div class="select-all-section" *ngIf="availableTeams.length > 0">
+        <mat-checkbox 
+          [(ngModel)]="selectAll"
+          (change)="onSelectAllChange($event.checked)"
+          class="select-all-checkbox">
+          Seleccionar todos los equipos activos
+        </mat-checkbox>
+        <div class="selection-info">
+          <span class="selected-count">{{ getSelectedCount() }} seleccionados</span>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="availableTeams.length > 0"></mat-divider>
+
+      <!-- No Teams Available -->
+      <div *ngIf="availableTeams.length === 0" class="no-teams">
+        <mat-icon class="no-teams-icon">groups_off</mat-icon>
+        <h3>No hay equipos disponibles</h3>
+        <p>Todos los equipos ya están asignados a otras fases o no hay equipos registrados en el torneo.</p>
+      </div>
+
+      <!-- Teams List -->
+      <div *ngIf="availableTeams.length > 0" class="teams-list">
+        <div *ngFor="let team of availableTeams; trackBy: trackByTeamId" 
+             class="team-item"
+             [class.disabled]="!canSelectTeam(team)">
+          
+          <div class="team-checkbox">
+            <mat-checkbox 
+              [checked]="isTeamSelected(team.id)"
+              [disabled]="!canSelectTeam(team)"
+              (change)="onTeamSelectionChange(team.id, $event.checked)">
+            </mat-checkbox>
+          </div>
+
+          <div class="team-avatar">
+            <img [src]="getTeamImageUrl(team)"
+                 [alt]="team.name"
+                 class="team-logo"
+                 (error)="$event.target.src='assets/default-team.jpg'">
+            
+            <!-- Status Badge -->
+            <div class="status-badge" 
+                 [class]="getTeamStatusClass(team.status)"
+                 [matTooltip]="getTeamStatusText(team.status)"
+                 *ngIf="team.status !== TeamStatus.Active">
+              <mat-icon class="status-icon">
+                {{ team.status === TeamStatus.Disqualified ? 'gavel' : 'delete' }}
+              </mat-icon>
+            </div>
+          </div>
+
+          <div class="team-info">
+            <div class="team-name">{{ team.name }}</div>
+            <div class="team-details">
+              <span class="team-short-name">{{ team.shortName }}</span>
+              <span class="team-players">
+                <mat-icon class="players-icon">people</mat-icon>
+                {{ team.totalPlayers }} jugadores
+              </span>
+            </div>
+            <div class="team-manager" *ngIf="team.manager">
+              <mat-icon class="manager-icon">person</mat-icon>
+              <span>{{ team.manager.managerName }}</span>
+              <span class="manager-phone" *ngIf="team.manager.phoneNumber">
+                - {{ team.manager.phoneNumber }}
+              </span>
+            </div>
+          </div>
+
+          <div class="team-status" *ngIf="team.status !== TeamStatus.Active">
+            <span class="status-chip" [class]="getTeamStatusClass(team.status)">
+              {{ getTeamStatusText(team.status) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button 
+            (click)="onCancel()"
+            class="cancel-button">
+      Cancelar
+    </button>
+    
+    <button mat-raised-button 
+            color="primary"
+            (click)="onConfirm()"
+            [disabled]="getSelectedCount() === 0 || isLoading"
+            class="confirm-button">
+      <mat-icon>add</mat-icon>
+      Agregar {{ getSelectedCount() }} equipo{{ getSelectedCount() !== 1 ? 's' : '' }}
+    </button>
+  </div>
+</div>

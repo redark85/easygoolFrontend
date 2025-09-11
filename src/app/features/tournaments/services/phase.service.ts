@@ -4,10 +4,11 @@ import { map } from 'rxjs/operators';
 
 import { ApiService } from '@core/services/api.service';
 import { ToastService } from '@core/services/toast.service';
-import { PHASE_CREATE_ENDPOINT, PHASE_GET_BY_TOURNAMENT_ENDPOINT, PHASE_UPDATE_ENDPOINT, PHASE_DELETE_ENDPOINT, GROUP_CREATE_ENDPOINT, GROUP_UPDATE_ENDPOINT, GROUP_DELETE_ENDPOINT } from '@core/config/endpoints';
+import { PHASE_CREATE_ENDPOINT, PHASE_GET_BY_TOURNAMENT_ENDPOINT, PHASE_UPDATE_ENDPOINT, PHASE_DELETE_ENDPOINT, GROUP_CREATE_ENDPOINT, GROUP_UPDATE_ENDPOINT, GROUP_DELETE_ENDPOINT, TEAM_GET_WITHOUT_PHASE_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
 
 import { Phase, CreatePhaseRequest, UpdatePhaseRequest, Group, CreateGroupRequest } from '../models/phase.interface';
+import { TeamWithoutPhase, TeamsWithoutPhaseResponse } from '../models/team.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -169,6 +170,24 @@ export class PhaseService {
       default:
         return 'Tipo desconocido';
     }
+  }
+
+  /**
+   * Obtiene todos los equipos que no están asignados a una fase específica
+   * @param phaseId ID de la fase
+   * @returns Observable con array de equipos sin fase
+   */
+  getTeamsWithoutPhase(phaseId: number): Observable<TeamWithoutPhase[]> {
+    const endpoint = `${TEAM_GET_WITHOUT_PHASE_ENDPOINT}/${phaseId}`;
+    return this.apiService.get<TeamsWithoutPhaseResponse>(endpoint).pipe(
+      map(response => {
+        if (!response.succeed) {
+          this.toastService.showError(response.message || 'No se pudieron obtener los equipos disponibles.');
+          return [];
+        }
+        return response.result || [];
+      })
+    );
   }
 
   /**

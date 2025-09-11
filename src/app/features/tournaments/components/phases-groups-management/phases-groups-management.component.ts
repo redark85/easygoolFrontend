@@ -17,6 +17,7 @@ import { Team } from '../../models/team.interface';
 import { PhaseService } from '../../services/phase.service';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
+import { AssignTeamsComponent, AssignTeamsDialogData, AssignTeamsResult } from '../assign-teams/assign-teams.component';
 import { PhaseFormData, PhaseModalResult } from '../../models/phase-form.interface';
 import { GroupFormData, GroupModalResult } from '../../models/group-form.interface';
 import Swal from 'sweetalert2';
@@ -216,6 +217,75 @@ export class PhasesGroupsManagementComponent implements OnInit {
   }
 
   /**
+   * Abre el modal para asignar equipos a una fase (Knockout)
+   * @param phaseId ID de la fase
+   * @param phaseName Nombre de la fase
+   */
+  addTeamToPhase(phaseId: number, phaseName: string): void {
+    const dialogData: AssignTeamsDialogData = {
+      phaseId: phaseId,
+      phaseName: phaseName,
+      phaseType: 1 // Knockout
+    };
+
+    const dialogRef = this.dialog.open(AssignTeamsComponent, {
+      width: '600px',
+      maxHeight: '80vh',
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: AssignTeamsResult) => {
+      if (result && result.success && result.selectedTeams.length > 0) {
+        // TODO: Implementar la asignación de equipos a la fase
+        console.log('Teams to assign to phase:', result.selectedTeams);
+        // Aquí se llamaría al servicio para asignar los equipos a la fase
+        this.refreshPhases();
+      }
+    });
+  }
+
+  /**
+   * Abre el modal para asignar equipos a un grupo (GroupStage)
+   * @param phaseId ID de la fase
+   * @param groupId ID del grupo
+   */
+  addTeamToGroup(phaseId: number, groupId: number): void {
+    // Encontrar la fase y el grupo
+    const phase = this.phases.find(p => p.id === phaseId);
+    const group = phase?.groups?.find(g => g.id === groupId);
+    
+    if (!phase || !group) {
+      console.error('Phase or group not found');
+      return;
+    }
+
+    const dialogData: AssignTeamsDialogData = {
+      phaseId: phaseId,
+      phaseName: phase.name,
+      phaseType: 0, // GroupStage
+      groupId: groupId,
+      groupName: group.name
+    };
+
+    const dialogRef = this.dialog.open(AssignTeamsComponent, {
+      width: '600px',
+      maxHeight: '80vh',
+      data: dialogData,
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: AssignTeamsResult) => {
+      if (result && result.success && result.selectedTeams.length > 0) {
+        // TODO: Implementar la asignación de equipos al grupo
+        console.log('Teams to assign to group:', result.selectedTeams);
+        // Aquí se llamaría al servicio para asignar los equipos al grupo
+        this.refreshPhases();
+      }
+    });
+  }
+
+  /**
    * Elimina un grupo
    */
   deleteGroup(group: Group): void {
@@ -252,12 +322,37 @@ export class PhasesGroupsManagementComponent implements OnInit {
     });
   }
 
+
   /**
-   * Agrega un equipo a una fase (para fases de eliminatorias)
+   * Abre el modal para crear un nuevo grupo
+   * @param phaseId ID de la fase donde crear el grupo
    */
-  addTeamToPhase(phase: Phase): void {
-    // TODO: Implementar modal para seleccionar equipo y agregarlo a la fase de eliminatorias
-    console.log('Agregar equipo a la fase:', phase);
+  addGroup(phaseId: number): void {
+    const dialogRef = this.dialog.open(GroupFormComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: { 
+        phaseId: phaseId,
+        isEdit: false
+      } as GroupFormData
+    });
+
+    dialogRef.afterClosed().subscribe((result: GroupModalResult) => {
+      if (result && result.action === 'create') {
+        // Create group via API
+        this.phaseService.createGroup(phaseId, { name: result.data.name }).subscribe({
+          next: (response) => {
+            if (response.succeed) {
+              this.refreshPhases();
+            }
+          },
+          error: (error) => {
+            console.error('Error creating group:', error);
+          }
+        });
+      }
+    });
   }
 
   /**
@@ -269,13 +364,6 @@ export class PhasesGroupsManagementComponent implements OnInit {
     console.log('Asignar equipos aleatoriamente a la fase:', phase);
   }
 
-  /**
-   * Agrega un equipo a un grupo
-   */
-  addTeamToGroup(phaseId: number, groupId: number): void {
-    // TODO: Implementar modal para seleccionar equipo y agregarlo al grupo
-    console.log('Agregar equipo al grupo:', { phaseId, groupId });
-  }
 
   /**
    * Remueve un equipo de un grupo
