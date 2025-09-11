@@ -45,7 +45,7 @@ export interface CreatePhaseRequest {
 export interface UpdatePhaseRequest {
   id: number;
   name: string;
-  phaseType: PhaseType;
+  phaseType?: PhaseType; // Opcional en actualizaciones
 }
 
 /**

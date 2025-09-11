@@ -51,7 +51,7 @@ export class GroupFormComponent implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(30)]]
+      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]]
     });
   }
 
@@ -73,7 +73,7 @@ export class GroupFormComponent implements OnInit {
         return 'El nombre debe tener al menos 1 caracter';
       }
       if (nameControl.errors['maxlength']) {
-        return 'El nombre no puede exceder 30 caracteres';
+        return 'El nombre no puede exceder 100 caracteres';
       }
     }
     return null;

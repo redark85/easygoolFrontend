@@ -70,14 +70,12 @@ export class TeamFormComponent implements OnInit, OnDestroy {
       name: ['', [
         Validators.required,
         Validators.minLength(2),
-        Validators.maxLength(50),
+        Validators.maxLength(100),
         Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s0-9]+$/)
       ]],
       shortName: ['', [
         Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(10),
-        Validators.pattern(/^[A-Z0-9]+$/)
+        Validators.maxLength(100)
       ]],
       logo: [null, this.isEdit ? [] : [Validators.required]]
     });
@@ -216,7 +214,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'El nombre del equipo es requerido';
       if (control.errors['minlength']) return 'El nombre debe tener al menos 2 caracteres';
-      if (control.errors['maxlength']) return 'El nombre no puede exceder 50 caracteres';
+      if (control.errors['maxlength']) return 'El nombre no puede exceder 100 caracteres';
       if (control.errors['pattern']) return 'El nombre solo puede contener letras, números y espacios';
     }
     return '';
@@ -226,9 +224,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     const control = this.shortNameControl;
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'El nombre corto es requerido';
-      if (control.errors['minlength']) return 'El nombre corto debe tener al menos 2 caracteres';
-      if (control.errors['maxlength']) return 'El nombre corto no puede exceder 10 caracteres';
-      if (control.errors['pattern']) return 'El nombre corto solo puede contener letras mayúsculas y números';
+      if (control.errors['maxlength']) return 'El nombre corto no puede exceder 100 caracteres';
     }
     return '';
   }

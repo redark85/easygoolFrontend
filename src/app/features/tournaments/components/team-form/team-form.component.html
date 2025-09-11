@@ -29,9 +29,9 @@
                 matInput
                 formControlName="name"
                 placeholder="Ej: Real Madrid Club de Fútbol"
-                maxlength="50">
+                maxlength="100">
               <mat-icon matSuffix>sports_soccer</mat-icon>
-              <mat-hint>Nombre completo del equipo (2-50 caracteres)</mat-hint>
+              <mat-hint>Nombre completo del equipo (2-100 caracteres)</mat-hint>
               <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
             </mat-form-field>
           </div>
@@ -46,10 +46,9 @@
                 matInput
                 formControlName="shortName"
                 placeholder="Ej: RMA"
-                maxlength="10"
-                style="text-transform: uppercase;">
+                maxlength="100">
               <mat-icon matSuffix>label</mat-icon>
-              <mat-hint>Abreviación del equipo en mayúsculas (2-10 caracteres)</mat-hint>
+              <mat-hint>Abreviación del equipo (máximo 100 caracteres)</mat-hint>
               <mat-error *ngIf="shortNameErrors">{{ shortNameErrors }}</mat-error>
             </mat-form-field>
           </div>

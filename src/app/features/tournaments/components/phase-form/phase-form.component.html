@@ -16,15 +16,15 @@
                 matInput
                 formControlName="name"
                 placeholder="Ej: Fase de Grupos A"
-                maxlength="50">
+                maxlength="100">
               <mat-icon matSuffix>sports_soccer</mat-icon>
               <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
             </mat-form-field>
           </div>
         </div>
 
-        <!-- Tipo de Fase -->
-        <div class="row mb-3">
+        <!-- Tipo de Fase - Solo mostrar en modo creación -->
+        <div class="row mb-3" *ngIf="!isEdit">
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Tipo de Fase</mat-label>
@@ -38,6 +38,20 @@
               </mat-select>
               <mat-icon matSuffix>category</mat-icon>
               <mat-error *ngIf="phaseTypeErrors">{{ phaseTypeErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Mostrar tipo de fase como información en modo edición -->
+        <div class="row mb-3" *ngIf="isEdit && data.phase">
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Tipo de Fase</mat-label>
+              <input matInput 
+                     [value]="getPhaseTypeLabel(data.phase.phaseType)" 
+                     readonly
+                     disabled>
+              <mat-icon matSuffix>category</mat-icon>
             </mat-form-field>
           </div>
         </div>

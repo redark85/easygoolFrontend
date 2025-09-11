@@ -93,7 +93,7 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     this.phaseForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       phaseType: [PhaseType.GroupStage, [Validators.required]]
     });
   }
@@ -142,7 +142,7 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
         return 'El nombre debe tener al menos 2 caracteres';
       }
       if (nameControl.errors['maxlength']) {
-        return 'El nombre no puede exceder 50 caracteres';
+        return 'El nombre no puede exceder 100 caracteres';
       }
     }
     return null;
@@ -169,8 +169,8 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
       if (this.isEdit && this.data.phase) {
         const updateData: PhaseUpdateRequest = {
           id: this.data.phase.id,
-          name: formValue.name.trim(),
-          phaseType: formValue.phaseType
+          name: formValue.name.trim()
+          // phaseType no se incluye en actualizaciones
         };
 
         console.log('Update data being sent:', updateData);
@@ -249,5 +249,15 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
       this.phaseForm.get('phaseType')?.markAsDirty();
       this.phaseForm.get('phaseType')?.updateValueAndValidity();
     }
+  }
+
+  /**
+   * Obtiene la etiqueta del tipo de fase
+   * @param phaseType Tipo de fase
+   * @returns Etiqueta del tipo de fase
+   */
+  getPhaseTypeLabel(phaseType: PhaseType): string {
+    const option = this.phaseTypeOptions.find(opt => opt.value === phaseType);
+    return option ? option.label : 'Desconocido';
   }
 }
