@@ -60,12 +60,19 @@
           <div class="row align-items-center py-3 border-bottom">
             <!-- Avatar y Info Principal -->
             <div class="col-md-3 d-flex align-items-center">
-              <div class="team-avatar me-3">
+              <div class="team-avatar me-3 position-relative">
                 <img [src]="team.logoUrl || 'assets/logo.png'"
                      [alt]="team.name"
                      class="team-logo rounded-circle"
                      (error)="$event.target.src='assets/logo.png'"
                      width="50" height="50">
+                
+                <!-- Status Badge sobre la imagen -->
+                <div [class]="getTeamStatusClass(team.status)"
+                     [matTooltip]="getTeamStatusText(team.status)"
+                     matTooltipPosition="above">
+                  <mat-icon class="status-icon">{{ getTeamStatusIcon(team.status) }}</mat-icon>
+                </div>
               </div>
               <div class="team-info">
                 <h5 class="mb-1 fw-bold">{{ team.name }}</h5>
@@ -128,8 +135,9 @@
                     </button>
                     <button mat-icon-button
                             (click)="disqualifyTeam(team)"
-                            matTooltip="Descalificar equipo"
-                            class="text-warning">
+                            [disabled]="!canDisqualifyTeam(team)"
+                            [matTooltip]="canDisqualifyTeam(team) ? 'Descalificar equipo' : 'Equipo ya descalificado'"
+                            [class]="canDisqualifyTeam(team) ? 'text-warning' : 'text-muted'">
                       <mat-icon>gavel</mat-icon>
                     </button>
                     <button mat-icon-button

@@ -16,7 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { Team } from '../../models/team.interface';
+import { Team, TeamStatus } from '../../models/team.interface';
 import { TeamService } from '../../services/team.service';
 import { TeamFormComponent } from '../team-form/team-form.component';
 import Swal from 'sweetalert2';
@@ -232,44 +232,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
     return team.id;
   }
 
-  /**
-   * Obtiene el texto del estado del equipo
-   */
-  getTeamStatusText(status: number | undefined): string {
-    if (status === undefined) return 'Sin estado';
-    switch (status) {
-      case 1: return 'Activo';
-      case 2: return 'Inactivo';
-      case 3: return 'Suspendido';
-      default: return 'Desconocido';
-    }
-  }
 
-  /**
-   * Obtiene la clase CSS para el estado del equipo
-   */
-  getTeamStatusClass(status: number | undefined): string {
-    if (status === undefined) return 'status-unknown';
-    switch (status) {
-      case 1: return 'status-active';
-      case 2: return 'status-inactive';
-      case 3: return 'status-suspended';
-      default: return 'status-unknown';
-    }
-  }
-
-  /**
-   * Obtiene el color del chip para el estado del equipo
-   */
-  getTeamStatusColor(status: number | undefined): 'primary' | 'accent' | 'warn' {
-    if (status === undefined) return 'accent';
-    switch (status) {
-      case 1: return 'primary';
-      case 2: return 'accent';
-      case 3: return 'warn';
-      default: return 'accent';
-    }
-  }
 
   /**
    * Copia la URL de registro al portapapeles
@@ -364,6 +327,69 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  /**
+   * Obtiene la clase CSS para el badge de estado del equipo
+   * @param status Estado del equipo
+   * @returns Clase CSS correspondiente
+   */
+  getTeamStatusClass(status: TeamStatus): string {
+    switch (status) {
+      case TeamStatus.Active:
+        return 'status-badge status-active';
+      case TeamStatus.Disqualified:
+        return 'status-badge status-disqualified';
+      case TeamStatus.Deleted:
+        return 'status-badge status-deleted';
+      default:
+        return 'status-badge status-active';
+    }
+  }
+
+  /**
+   * Obtiene el texto del estado del equipo
+   * @param status Estado del equipo
+   * @returns Texto del estado
+   */
+  getTeamStatusText(status: TeamStatus): string {
+    switch (status) {
+      case TeamStatus.Active:
+        return 'Activo';
+      case TeamStatus.Disqualified:
+        return 'Descalificado';
+      case TeamStatus.Deleted:
+        return 'Eliminado';
+      default:
+        return 'Activo';
+    }
+  }
+
+  /**
+   * Obtiene el ícono del estado del equipo
+   * @param status Estado del equipo
+   * @returns Ícono del estado
+   */
+  getTeamStatusIcon(status: TeamStatus): string {
+    switch (status) {
+      case TeamStatus.Active:
+        return 'check_circle';
+      case TeamStatus.Disqualified:
+        return 'gavel';
+      case TeamStatus.Deleted:
+        return 'delete';
+      default:
+        return 'check_circle';
+    }
+  }
+
+  /**
+   * Verifica si un equipo puede ser descalificado
+   * @param team Equipo a verificar
+   * @returns true si puede ser descalificado
+   */
+  canDisqualifyTeam(team: Team): boolean {
+    return team.status === TeamStatus.Active;
   }
 
   /**

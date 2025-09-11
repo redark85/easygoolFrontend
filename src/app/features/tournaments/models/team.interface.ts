@@ -1,9 +1,15 @@
+export enum TeamStatus {
+  Active = 0,      // Activo
+  Disqualified = 1, // Descalificado del campeonato
+  Deleted = 2      // Eliminado lógico
+}
+
 export interface Team {
   id: number;
   name: string;
   shortName: string;
   logoUrl?: string;
-  status: number;
+  status: TeamStatus;
   totalPlayers: number;
   urlRegistration: string;
   phaseTeamId: number;
