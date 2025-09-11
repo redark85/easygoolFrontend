@@ -153,7 +153,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdr.detectChanges();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error loading tournament:', error);
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -246,7 +246,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
         this.teams = teams;
         this.cdr.detectChanges();
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading teams:', error);
         this.teams = [];
         this.cdr.detectChanges();
@@ -263,7 +263,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
         this.phases = phases;
         this.cdr.detectChanges();
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading phases:', error);
         this.phases = [];
         this.cdr.detectChanges();
@@ -515,7 +515,7 @@ createTeam(): void {
             this.toastService.showSuccess(`Equipo "${createdTeam.name}" creado exitosamente`);
             this.loadTournamentData();
           },
-          error: (error) => {
+          error: (error: any) => {
             this.toastService.showError(`Error al crear equipo: ${error.message}`);
           }
         });
@@ -535,7 +535,7 @@ editTeam(team: Team): void {
             this.toastService.showSuccess(`Equipo "${updatedTeam.name}" actualizado exitosamente`);
             this.loadTournamentData();
           },
-          error: (error) => {
+          error: (error: any) => {
             this.toastService.showError(`Error al actualizar equipo: ${error.message}`);
           }
         });
@@ -601,17 +601,17 @@ addTeamToGroup(phaseId: number, groupId: number): void {
           next: (createdTeam) => {
             this.toastService.showSuccess(`Equipo "${createdTeam.name}" creado exitosamente`);
             // Asignar el equipo al grupo
-            this.teamService.assignTeamToGroup(createdTeam.id, groupId).subscribe({
+            this.teamService.assignTeamsToGroup(0, [createdTeam.id], groupId).subscribe({
               next: () => {
                 this.toastService.showSuccess(`Equipo asignado al grupo exitosamente`);
                 this.loadTournamentData();
               },
-              error: (error) => {
+              error: (error: any) => {
                 this.toastService.showError(`Error al asignar equipo al grupo: ${error.message}`);
               }
             });
           },
-          error: (error) => {
+          error: (error: any) => {
             this.toastService.showError(`Error al crear equipo: ${error.message}`);
           }
         });

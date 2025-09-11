@@ -125,21 +125,26 @@ export class TeamService {
   }
 
   /**
-   * Asigna un equipo a un grupo
-   * @param teamId ID del equipo
-   * @param groupId ID del grupo
+   * Asigna equipos a un grupo
+   * @param phaseId ID de la fase
+   * @param tournamentTeams Array de IDs de equipos
+   * @param tournamentGroupId ID del grupo
    * @returns Observable con el resultado de la operación
    */
-  assignTeamToGroup(teamId: number, groupId: number): Observable<boolean> {
-    const body = { groupId };
-    return this.apiService.post<ApiResponse<any>>(`${TEAM_ASSIGN_TO_GROUP_ENDPOINT}/${teamId}`, body).pipe(
+  assignTeamsToGroup(phaseId: number, tournamentTeams: number[], tournamentGroupId: number): Observable<boolean> {
+    const body = {
+      phaseTd: phaseId,
+      tournamentTeams: tournamentTeams,
+      tournamentGroupId: tournamentGroupId
+    };
+    return this.apiService.post<ApiResponse<any>>(TEAM_ASSIGN_TO_GROUP_ENDPOINT, body).pipe(
       map(response => {
         if (response.succeed) {
-          this.toastService.showSuccess(response.message || 'Equipo asignado al grupo con éxito');
+          this.toastService.showSuccess(response.message || 'Equipos asignados al grupo con éxito');
           return true;
         }
-        this.toastService.showError(response.message || 'Error al asignar equipo al grupo');
-        throw new Error(response.message || 'Error al asignar equipo al grupo');
+        this.toastService.showError(response.message || 'Error al asignar equipos al grupo');
+        throw new Error(response.message || 'Error al asignar equipos al grupo');
       }),
       catchError(this.handleError)
     );

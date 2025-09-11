@@ -13,8 +13,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
-import { Team } from '../../models/team.interface';
+import { Team, TeamStatus } from '../../models/team.interface';
 import { PhaseService } from '../../services/phase.service';
+import { TeamService } from '../../services/team.service';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
 import { AssignTeamsComponent, AssignTeamsDialogData, AssignTeamsResult } from '../assign-teams/assign-teams.component';
@@ -56,6 +57,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
 
   constructor(
     private phaseService: PhaseService,
+    private teamService: TeamService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
@@ -366,29 +368,11 @@ export class PhasesGroupsManagementComponent implements OnInit {
 
 
   /**
-   * Remueve un equipo de un grupo
-   */
-  removeTeamFromGroup(team: any, group: any): void {
-    // TODO: Implementar lógica para remover equipo del grupo
-    console.log('Remove team from group:', team, group);
-  }
-
-  /**
    * Remueve un equipo de una fase (para fases de eliminatorias)
    */
   removeTeamFromPhase(team: any, phase: Phase): void {
     // TODO: Implementar lógica para remover equipo de la fase de eliminatorias
     console.log('Remove team from phase:', team, phase);
-  }
-
-  /**
-   * Descalifica un equipo del torneo
-   * @param team Equipo a descalificar
-   * @param group Grupo del equipo
-   */
-  disqualifyTeam(team: any, group: any): void {
-    // TODO: Implementar lógica para descalificar equipo
-    console.log('Disqualify team:', team, group);
   }
 
   /**
@@ -411,13 +395,6 @@ export class PhasesGroupsManagementComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
-  }
-
-  /**
-   * Refresca la lista de fases
-   */
-  private refreshPhases(): void {
-    this.loadPhases();
   }
 
   /**
@@ -494,5 +471,109 @@ export class PhasesGroupsManagementComponent implements OnInit {
    */
   canDeleteGroup(group: Group): boolean {
     return !group.teams || group.teams.length === 0;
+  }
+
+  /**
+   * Verifica si un equipo puede ser descalificado
+   * @param team Equipo a verificar
+   * @returns true si puede ser descalificado
+   */
+  canDisqualifyTeam(team: Team): boolean {
+    return team.status === TeamStatus.Active;
+  }
+
+  /**
+   * Descalifica un equipo con confirmación
+   * @param team Equipo a descalificar
+   * @param group Grupo del equipo (opcional)
+   */
+  disqualifyTeam(team: Team, group?: Group): void {
+    Swal.fire({
+      title: '¿Descalificar equipo?',
+      html: `¿Estás seguro de que deseas descalificar al equipo <strong>"${team.name}"</strong>?<br><br>Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, descalificar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.teamService.disqualifyTeam(team.id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Equipo descalificado!',
+              text: `El equipo "${team.name}" ha sido descalificado exitosamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.refreshPhases();
+          },
+          error: (error: any) => {
+            Swal.fire({
+              title: 'Error',
+              text: error.message || 'No se pudo descalificar el equipo',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Quita un equipo del grupo con confirmación
+   * @param team Equipo a quitar
+   * @param group Grupo del equipo
+   */
+  removeTeamFromGroup(team: Team, group: Group): void {
+    Swal.fire({
+      title: '¿Quitar equipo del grupo?',
+      html: `¿Estás seguro de que deseas quitar al equipo <strong>"${team.name}"</strong> del grupo <strong>"${group.name}"</strong>?<br><br>El equipo volverá a estar disponible para asignación.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, quitar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.teamService.deleteTeam(team.id).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Equipo removido!',
+              text: `El equipo "${team.name}" ha sido removido del grupo exitosamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.refreshPhases();
+          },
+          error: (error: any) => {
+            Swal.fire({
+              title: 'Error',
+              text: error.message || 'No se pudo quitar el equipo del grupo',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Refresca la lista de fases
+   */
+  private refreshPhases(): void {
+    this.loadPhases();
   }
 }

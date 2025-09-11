@@ -12,7 +12,9 @@ import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 
 import { PhaseService } from '../../services/phase.service';
+import { TeamService } from '../../services/team.service';
 import { TeamWithoutPhase, TeamStatus } from '../../models/team.interface';
+import Swal from 'sweetalert2';
 
 export interface AssignTeamsDialogData {
   phaseId: number;
@@ -60,6 +62,7 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
     private dialogRef: MatDialogRef<AssignTeamsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AssignTeamsDialogData,
     private phaseService: PhaseService,
+    private teamService: TeamService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -233,16 +236,57 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Confirma la selección y cierra el modal
+   * Confirma la selección y asigna los equipos al grupo
    */
   onConfirm(): void {
-    const selectedTeamObjects = this.availableTeams.filter(team => 
-      this.selectedTeams.has(team.id)
-    );
+    if (this.selectedTeams.size === 0) {
+      return;
+    }
+
+    // Validar que tenemos los datos necesarios para asignar al grupo
+    if (!this.data.groupId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se puede asignar equipos: ID de grupo no válido',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    const selectedTeamIds = Array.from(this.selectedTeams);
     
-    this.dialogRef.close({ 
-      success: true, 
-      selectedTeams: selectedTeamObjects 
+    // Llamar al API para asignar equipos al grupo
+    this.teamService.assignTeamsToGroup(
+      this.data.phaseId,
+      selectedTeamIds,
+      this.data.groupId
+    ).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        Swal.fire({
+          title: '¡Equipos asignados!',
+          text: `${selectedTeamIds.length} equipo${selectedTeamIds.length !== 1 ? 's' : ''} asignado${selectedTeamIds.length !== 1 ? 's' : ''} exitosamente`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        
+        // Cerrar modal con éxito
+        this.dialogRef.close({ 
+          success: true, 
+          selectedTeams: this.availableTeams.filter(team => this.selectedTeams.has(team.id))
+        });
+      },
+      error: (error) => {
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'No se pudieron asignar los equipos al grupo',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      }
     });
   }
 
