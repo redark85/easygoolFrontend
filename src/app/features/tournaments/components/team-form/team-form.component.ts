@@ -15,9 +15,9 @@ import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 export interface TeamFormData {
+  mode: 'create' | 'edit';
   team?: Team;
   tournamentId: number;
-  isEdit: boolean;
 }
 
 @Component({
@@ -50,13 +50,13 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<TeamFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TeamFormData
   ) {
-    this.isEdit = data.isEdit;
+    this.isEdit = data.mode === 'edit';
     this.teamForm = this.createForm();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (this.isEdit && this.data.team) {
-      this.populateForm(this.data.team);
+      await this.populateForm(this.data.team);
     }
   }
 
@@ -83,15 +83,52 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  private populateForm(team: Team): void {
+  private async populateForm(team: Team): Promise<void> {
+    // Poblar campos básicos
     this.teamForm.patchValue({
       name: team.name,
-      shortName: team.shortName,
-      logo: team.logoBase64 ? {
-        base64: team.logoBase64,
-        contentType: team.logoContentType
-      } : null
+      shortName: team.shortName
     });
+
+    // Manejar imagen del equipo
+    if (team.logoUrl) {
+      try {
+        const imageData = await this.convertImageUrlToBase64(team.logoUrl);
+        const contentType = team.logoContentType || 'jpeg';
+        const fullBase64 = this.buildDataUrl(imageData.base64, contentType);
+        this.teamForm.patchValue({
+          logo: {
+            base64: fullBase64,
+            contentType: imageData.contentType
+          }
+        });
+      } catch (error) {
+        console.error('Error loading team logo:', error);
+        // Si falla la carga de imagen, usar logoBase64 si existe
+        if (team.logoBase64) {
+          const contentType = team.logoContentType || 'jpeg';
+          const fullBase64 = this.buildDataUrl(team.logoBase64, contentType);
+
+          this.teamForm.patchValue({
+            logo: {
+              base64: fullBase64,
+              contentType: `image/${contentType}`
+            }
+          });
+        }
+      }
+    } else if (team.logoBase64) {
+      // Usar logoBase64 directamente si no hay logoUrl
+      const contentType = team.logoContentType || 'jpeg';
+      const fullBase64 = this.buildDataUrl(team.logoBase64, contentType);
+
+      this.teamForm.patchValue({
+        logo: {
+          base64: fullBase64,
+          contentType: `image/${contentType}`
+        }
+      });
+    }
   }
 
   onImageUploaded(imageData: ImageUploadData): void {
@@ -209,13 +246,13 @@ export class TeamFormComponent implements OnInit, OnDestroy {
    */
   private cleanBase64(base64String: string): string {
     if (!base64String) return '';
-    
+
     // Remover prefijo data:image/...;base64, si existe
     const base64Prefix = base64String.indexOf(',');
     if (base64Prefix !== -1) {
       return base64String.substring(base64Prefix + 1);
     }
-    
+
     return base64String;
   }
 
@@ -224,17 +261,81 @@ export class TeamFormComponent implements OnInit, OnDestroy {
    */
   private extractFileExtension(contentType: string): string {
     if (!contentType) return '';
-    
+
     // Mapeo de content types a extensiones
     const contentTypeMap: { [key: string]: string } = {
       'image/jpeg': 'jpg',
-      'image/jpg': 'jpg', 
+      'image/jpg': 'jpg',
       'image/png': 'png',
       'image/gif': 'gif',
       'image/webp': 'webp'
     };
-    
+
     const normalizedContentType = contentType.toLowerCase();
     return contentTypeMap[normalizedContentType] || 'jpg'; // Default a jpg si no se encuentra
+  }
+
+  /**
+   * Convierte una URL de imagen a base64
+   */
+  private async convertImageUrlToBase64(imageUrl: string): Promise<{base64: string, contentType: string}> {
+    try {
+      // Convertir HTTP a HTTPS para evitar Mixed Content en producción
+      const httpsUrl = this.convertCloudinaryToHttps(imageUrl);
+
+      const response = await fetch(httpsUrl, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          'Accept': 'image/*'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          const base64Data = base64String.split(',')[1]; // Remover el prefijo data:image/...;base64,
+          const contentType = blob.type.split('/')[1] || 'jpeg';
+
+          resolve({
+            base64: base64Data,
+            contentType: contentType
+          });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting image URL to base64:', error);
+      return { base64: '', contentType: 'jpeg' };
+    }
+  }
+
+  /**
+   * Convierte URLs HTTP de Cloudinary a HTTPS
+   */
+  private convertCloudinaryToHttps(url: string): string {
+    if (url.startsWith('http://res.cloudinary.com')) {
+      return url.replace('http://', 'https://');
+    }
+    return url;
+  }
+
+  /**
+   * Construye un data URL completo con el prefijo correcto
+   */
+  private buildDataUrl(base64Data: string, contentType: string): string {
+    // Limpiar el base64 si ya tiene prefijo
+    const cleanBase64 = this.cleanBase64(base64Data);
+
+    // Construir el data URL completo
+    return `data:image/${contentType};base64,${cleanBase64}`;
   }
 }

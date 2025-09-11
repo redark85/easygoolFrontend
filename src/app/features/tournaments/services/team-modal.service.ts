@@ -30,8 +30,8 @@ export class TeamModalService {
         disableClose: true,
         autoFocus: true,
         data: {
-          tournamentId,
-          isEdit: false
+          mode: 'create',
+          tournamentId
         } as TeamFormData
       }
     );
@@ -55,9 +55,9 @@ export class TeamModalService {
         disableClose: true,
         autoFocus: true,
         data: {
+          mode: 'edit',
           team,
-          tournamentId,
-          isEdit: true
+          tournamentId
         } as TeamFormData
       }
     );
