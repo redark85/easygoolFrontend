@@ -243,24 +243,13 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validar que tenemos los datos necesarios para asignar al grupo
-    if (!this.data.groupId) {
-      Swal.fire({
-        title: 'Error',
-        text: 'No se puede asignar equipos: ID de grupo no válido',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-      return;
-    }
-
     const selectedTeamIds = Array.from(this.selectedTeams);
     
     // Llamar al API para asignar equipos al grupo
     this.teamService.assignTeamsToGroup(
       this.data.phaseId,
       selectedTeamIds,
-      this.data.groupId
+      this.data.groupId!
     ).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
