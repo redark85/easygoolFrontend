@@ -371,8 +371,42 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * Remueve un equipo de una fase (para fases de eliminatorias)
    */
   removeTeamFromPhase(team: any, phase: Phase): void {
-    // TODO: Implementar lógica para remover equipo de la fase de eliminatorias
-    console.log('Remove team from phase:', team, phase);
+      Swal.fire({
+      title: '¿Quitar equipo de la fase?',
+      html: `¿Estás seguro de que deseas quitar al equipo <strong>"${team.name}"</strong> de la fase <strong>"${phase.name}"</strong>?<br><br>El equipo volverá a estar disponible para asignación.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, quitar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.teamService.deleteTeam(team.phaseTeamId).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Equipo removido!',
+              text: `El equipo "${team.name}" ha sido removido de la fase exitosamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.refreshPhases();
+          },
+          error: (error: any) => {
+            Swal.fire({
+              title: 'Error',
+              text: error.message || 'No se pudo quitar el equipo de la fase',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
+          }
+        });
+      }
+    });
   }
 
   /**

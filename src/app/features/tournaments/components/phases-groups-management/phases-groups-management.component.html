@@ -232,6 +232,14 @@
                       </div>
                       <div class="team-actions-knockout">
                         <button mat-icon-button
+                                  (click)="disqualifyTeam(team)"
+                                  [disabled]="!canDisqualifyTeam(team)"
+                                  [matTooltip]="canDisqualifyTeam(team) ? 'Descalificar equipo' : 'Equipo ya descalificado'"
+                                  [class]="canDisqualifyTeam(team) ? 'text-warning' : 'text-muted'"
+                                  class="disqualify-team-btn">
+                            <mat-icon>gavel</mat-icon>
+                          </button>
+                        <button mat-icon-button
                                 color="warn"
                                 (click)="removeTeamFromPhase(team, phase)"
                                 matTooltip="Quitar de la fase"
