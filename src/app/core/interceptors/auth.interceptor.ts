@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { StorageService } from '@core/services';
 import { ToastService } from '../services/toast.service';
+import { ErrorHandlerService } from '../services/error-handler.service';
 import { AppConstants } from '../constants';
 
 // Auth interceptor siguiendo DIP - Preparado para APIs futuras
@@ -12,7 +13,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
   constructor(
     private storageService: StorageService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private errorHandlerService: ErrorHandlerService
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -51,6 +53,18 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   private handleHttpError(error: HttpErrorResponse): void {
+    // Intentar extraer ErrorResponse con códigos específicos
+    const specificError = this.errorHandlerService.extractErrorResponse(error);
+    
+    if (specificError) {
+      // Manejar error específico basado en código
+      const wasHandled = this.errorHandlerService.handleSpecificError(specificError);
+      if (wasHandled) {
+        return; // Error manejado específicamente, no continuar con manejo genérico
+      }
+    }
+
+    // Manejo genérico por status code si no hay código específico
     switch (error.status) {
       case 400:
         this.toastService.showError('Solicitud inválida. Verifica los datos ingresados.');
@@ -69,7 +83,8 @@ export class AuthInterceptor implements HttpInterceptor {
         break;
       default:
         if (error.status >= 400) {
-          this.toastService.showError('Ha ocurrido un error. Intenta nuevamente.');
+          // Usar ErrorHandlerService para manejo genérico
+          this.errorHandlerService.handleGenericError(error);
         }
         break;
     }

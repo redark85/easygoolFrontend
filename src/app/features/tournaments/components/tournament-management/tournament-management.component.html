@@ -88,6 +88,7 @@
     <!-- Tabs Navigation -->
     <mat-tab-group class="tournament-tabs" 
                    [(selectedIndex)]="selectedTabIndex"
+                   (selectedTabChange)="onTabChange($event)"
                    animationDuration="300ms">
       
       <!-- Tab 1: Fases -->

@@ -4,8 +4,9 @@
 @use 'app/shared/styles/components';
 
 // Bootstrap CSS - usando @use en lugar de @import deprecated
-@use 'bootstrap/scss/bootstrap';
-@use '@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'bootstrap/scss/bootstrap';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import './app/core/styles/error-styles.scss';
 
 // Colores basados en el logo de EasyGool + Temática Futbolística
 :root {

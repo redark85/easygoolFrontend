@@ -116,6 +116,9 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    */
   onPhasesUpdated(phases: Phase[]): void {
     this.phases = phases;
+    // Cuando se actualizan las fases, también refrescar equipos
+    // ya que pueden haber cambios en asignaciones
+    this.loadTeams();
     this.cdr.detectChanges();
   }
 
@@ -124,6 +127,9 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    */
   onTeamsUpdated(teams: Team[]): void {
     this.teams = teams;
+    // Cuando se actualizan los equipos, también refrescar fases
+    // para mostrar equipos actualizados en grupos
+    this.loadPhases();
     this.cdr.detectChanges();
   }
 
@@ -724,6 +730,21 @@ trackByTeamId(index: number, team: Team): number {
     this.registrationClosed = event.checked;
     const status = this.registrationClosed ? 'cerrado' : 'abierto';
     this.toastService.showInfo(`Registro de equipos ${status}`);
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja el cambio de tab y refresca los datos correspondientes
+   * @param event Evento del cambio de tab
+   */
+  onTabChange(event: any): void {
+    this.selectedTabIndex = event.index;
+    
+    // Siempre refrescar tanto equipos como fases en todos los tabs
+    // para asegurar que los datos estén sincronizados
+    this.loadTeams();
+    this.loadPhases();
+    
     this.cdr.detectChanges();
   }
 

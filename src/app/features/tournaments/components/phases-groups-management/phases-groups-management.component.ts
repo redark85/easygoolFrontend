@@ -325,37 +325,6 @@ export class PhasesGroupsManagementComponent implements OnInit {
   }
 
 
-  /**
-   * Abre el modal para crear un nuevo grupo
-   * @param phaseId ID de la fase donde crear el grupo
-   */
-  addGroup(phaseId: number): void {
-    const dialogRef = this.dialog.open(GroupFormComponent, {
-      width: '500px',
-      maxWidth: '90vw',
-      disableClose: true,
-      data: { 
-        phaseId: phaseId,
-        isEdit: false
-      } as GroupFormData
-    });
-
-    dialogRef.afterClosed().subscribe((result: GroupModalResult) => {
-      if (result && result.action === 'create') {
-        // Create group via API
-        this.phaseService.createGroup(phaseId, { name: result.data.name }).subscribe({
-          next: (response) => {
-            if (response.succeed) {
-              this.refreshPhases();
-            }
-          },
-          error: (error) => {
-            console.error('Error creating group:', error);
-          }
-        });
-      }
-    });
-  }
 
   /**
    * Asigna equipos aleatoriamente a los grupos de una fase
@@ -605,9 +574,19 @@ export class PhasesGroupsManagementComponent implements OnInit {
   }
 
   /**
-   * Refresca la lista de fases
+   * Refresca la lista de fases y notifica al componente padre
    */
   private refreshPhases(): void {
     this.loadPhases();
+    // También notificar al componente padre para que actualice equipos
+    this.notifyParentToRefreshTeams();
+  }
+
+  /**
+   * Notifica al componente padre que debe refrescar los equipos
+   */
+  private notifyParentToRefreshTeams(): void {
+    // Emitir evento para que el padre refresque los equipos
+    this.phasesUpdated.emit(this.phases);
   }
 }

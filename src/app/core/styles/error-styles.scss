@@ -1,0 +1,43 @@
+/* Estilos personalizados para mensajes de error específicos */
+
+.error-popup {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+.error-title {
+  color: #d32f2f !important;
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+}
+
+/* Estilos específicos para errores de EasyGool */
+.swal2-popup.error-popup {
+  .swal2-icon.swal2-warning {
+    border-color: #ff9800 !important;
+    color: #ff9800 !important;
+  }
+  
+  .swal2-icon.swal2-error {
+    border-color: #d32f2f !important;
+    color: #d32f2f !important;
+  }
+  
+  .swal2-confirm {
+    background-color: #1976D2 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 500 !important;
+    
+    &:hover {
+      background-color: #1565C0 !important;
+    }
+  }
+  
+  .swal2-content {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    color: #424242 !important;
+  }
+}
