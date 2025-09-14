@@ -589,4 +589,61 @@ export class PhasesGroupsManagementComponent implements OnInit {
     // Emitir evento para que el padre refresque los equipos
     this.phasesUpdated.emit(this.phases);
   }
+
+  /**
+   * Obtiene la clase CSS para el badge de estado del equipo
+   * @param status Estado del equipo
+   * @returns Clase CSS correspondiente
+   */
+  getTeamStatusClass(status: TeamStatus | number | undefined): string {
+    const teamStatus = status as TeamStatus;
+    switch (teamStatus) {
+      case TeamStatus.Active:
+        return 'status-badge status-active';
+      case TeamStatus.Disqualified:
+        return 'status-badge status-disqualified';
+      case TeamStatus.Deleted:
+        return 'status-badge status-deleted';
+      default:
+        return 'status-badge status-active';
+    }
+  }
+
+  /**
+   * Obtiene el texto del estado del equipo
+   * @param status Estado del equipo
+   * @returns Texto del estado
+   */
+  getTeamStatusText(status: TeamStatus | number | undefined): string {
+    const teamStatus = status as TeamStatus;
+    switch (teamStatus) {
+      case TeamStatus.Active:
+        return 'Activo';
+      case TeamStatus.Disqualified:
+        return 'Descalificado';
+      case TeamStatus.Deleted:
+        return 'Eliminado';
+      default:
+        return 'Activo';
+    }
+  }
+
+  /**
+   * Obtiene el ícono del estado del equipo
+   * @param status Estado del equipo
+   * @returns Ícono del estado
+   */
+  getTeamStatusIcon(status: TeamStatus | number | undefined): string {
+    const teamStatus = status as TeamStatus;
+    switch (teamStatus) {
+      case TeamStatus.Active:
+        return 'check_circle';
+      case TeamStatus.Disqualified:
+        return 'gavel';
+      case TeamStatus.Deleted:
+        return 'delete';
+      default:
+        return 'check_circle';
+    }
+  }
 }

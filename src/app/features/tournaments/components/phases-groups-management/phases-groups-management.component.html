@@ -181,6 +181,13 @@
                                [alt]="team.name"
                                class="team-logo"
                                (error)="$event.target.src='assets/default-team.jpg'">
+                          
+                          <!-- Status Badge sobre la imagen -->
+                          <div [class]="getTeamStatusClass(team.status)"
+                               [matTooltip]="getTeamStatusText(team.status)"
+                               matTooltipPosition="above">
+                            <mat-icon class="status-icon">{{ getTeamStatusIcon(team.status) }}</mat-icon>
+                          </div>
                         </div>
 
                         <div class="team-info">
@@ -224,6 +231,13 @@
                                [alt]="team.name"
                                class="team-logo-knockout"
                                (error)="$event.target.src='assets/default-team.jpg'">
+                          
+                          <!-- Status Badge sobre la imagen -->
+                          <div [class]="getTeamStatusClass(team.status)"
+                               [matTooltip]="getTeamStatusText(team.status)"
+                               matTooltipPosition="above">
+                            <mat-icon class="status-icon">{{ getTeamStatusIcon(team.status) }}</mat-icon>
+                          </div>
                         </div>
                         <div class="team-details-knockout">
                           <h5 class="team-name-knockout">{{ team.name }}</h5>
