@@ -58,12 +58,13 @@
         </mat-expansion-panel-header>
 
         <!-- Panel Content - Matches List -->
-        <div class="matches-grid">
-          <mat-card 
-            *ngFor="let match of group.matches; trackBy: trackByMatchId"
-            class="match-card"
-            [ngClass]="{'live-match': isLiveMatch(match.status)}"
-            (click)="viewMatchDetails(match.id)">
+        <div class="container-fluid">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            <div *ngFor="let match of group.matches; trackBy: trackByMatchId" class="col mb-4">
+              <mat-card 
+                class="match-card h-100"
+                [ngClass]="{'live-match': isLiveMatch(match.status)}"
+                (click)="viewMatchDetails(match.id)">
             
             <!-- Live indicator -->
             <div class="live-indicator" *ngIf="isLiveMatch(match.status)">
@@ -152,7 +153,9 @@
                 <mat-icon>edit</mat-icon>
               </button>
             </div>
-          </mat-card>
+              </mat-card>
+            </div>
+          </div>
         </div>
       </mat-expansion-panel>
     </mat-accordion>

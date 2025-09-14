@@ -47,14 +47,13 @@
       button {
         min-width: 100px;
         
-        &[mat-raised-button] {
-          position: relative;
+        .loading-content {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           
-          .button-spinner {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+          mat-progress-spinner {
+            flex-shrink: 0;
           }
         }
       }
@@ -103,5 +102,17 @@
   .height-spacer {
     height: 80px;
     margin-bottom: 1.25rem;
+  }
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    mat-progress-spinner {
+      ::ng-deep circle {
+        stroke: currentColor;
+      }
+    }
   }
 }

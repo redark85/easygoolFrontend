@@ -98,7 +98,8 @@
               <div class="row justify-content-center">
                 <div class="col-auto">
                   <mat-slide-toggle
-                    [checked]="true"
+                    [checked]="team.allowPlayerRegistration || false"
+                    (change)="onTogglePlayerRegistration(team, $event.checked)"
                     matTooltip="Permitir registro de jugadores"
                     class="registration-toggle">
                   </mat-slide-toggle>

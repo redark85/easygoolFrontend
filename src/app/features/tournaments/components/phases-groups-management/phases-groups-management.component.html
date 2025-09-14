@@ -122,46 +122,47 @@
                   <mat-expansion-panel-header class="group-header">
                     <mat-panel-title>
                       <div class="group-title-content">
-                        <mat-icon class="group-icon">group_work</mat-icon>
-                        <span class="group-name" [matTooltip]="group.name">{{ group.name }}</span>
+                        <div class="group-icon-container">
+                          <mat-icon class="group-icon">group_work</mat-icon>
+                          <span class="teams-count-badge" 
+                                [matTooltip]="(group.teams?.length || 0) === 1 ? '1 equipo' : (group.teams?.length || 0) + ' equipos'"
+                                matTooltipPosition="above">
+                            {{ group.teams?.length || 0 }}
+                          </span>
+                        </div>
+                        <span class="group-name" 
+                              [matTooltip]="group.name"
+                              matTooltipPosition="above">{{ group.name }}</span>
                       </div>
                     </mat-panel-title>
                     <mat-panel-description>
                       <div class="group-stats">
-                        <mat-chip class="teams-count-chip"
-                                  [matTooltip]="(group.teams?.length || 0) === 1 ? '1 equipo' : (group.teams?.length || 0) + ' equipos'">
-                          <mat-icon>groups</mat-icon>
-                          {{ group.teams?.length || 0 }}
-                        </mat-chip>
 
                         <div class="group-actions-inline">
-                          <div class="action-button-wrapper">
-                            <button mat-icon-button
-                                    color="primary"
-                                    (click)="addTeamToGroup(phase.id, group.id); $event.stopPropagation()"
-                                    matTooltip="Agregar Equipo"
-                                    class="group-action-btn">
-                              <mat-icon>add</mat-icon>
-                            </button>
-                          </div>
-                          <div class="action-button-wrapper">
-                            <button mat-icon-button
-                                    (click)="editGroup(group); $event.stopPropagation()"
-                                    matTooltip="Editar Grupo"
-                                    class="group-action-btn">
-                              <mat-icon>edit</mat-icon>
-                            </button>
-                          </div>
-                          <div class="action-button-wrapper">
-                            <button mat-icon-button
-                                    color="warn"
-                                    (click)="deleteGroup(group); $event.stopPropagation()"
-                                    class="group-action-btn"
-                                    [disabled]="!canDeleteGroup(group)"
-                                    [matTooltip]="canDeleteGroup(group) ? 'Eliminar Grupo' : 'No se puede eliminar: hay equipos en el grupo'">
-                              <mat-icon>delete</mat-icon>
-                            </button>
-                          </div>
+                          <button mat-icon-button
+                                  color="primary"
+                                  (click)="addTeamToGroup(phase.id, group.id); $event.stopPropagation()"
+                                  matTooltip="Agregar Equipo"
+                                  matTooltipPosition="above"
+                                  class="group-action-btn">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  (click)="editGroup(group); $event.stopPropagation()"
+                                  matTooltip="Editar Grupo"
+                                  matTooltipPosition="above"
+                                  class="group-action-btn">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  color="warn"
+                                  (click)="deleteGroup(group); $event.stopPropagation()"
+                                  class="group-action-btn"
+                                  [disabled]="!canDeleteGroup(group)"
+                                  [matTooltip]="canDeleteGroup(group) ? 'Eliminar Grupo' : 'No se puede eliminar: hay equipos en el grupo'"
+                                  matTooltipPosition="above">
+                            <mat-icon>delete</mat-icon>
+                          </button>
                         </div>
                       </div>
                     </mat-panel-description>

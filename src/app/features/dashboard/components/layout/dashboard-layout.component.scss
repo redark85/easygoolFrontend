@@ -3,37 +3,36 @@
   overflow: hidden;
   
   .sidenav-container {
-    height: 100%;
+    height: 100vh;
     
     .sidenav {
       width: var(--sidebar-width);
-      border-right: none;
+      border: none;
       box-shadow: none;
       transition: width var(--transition-normal) ease-in-out;
       
       &.mat-drawer-side {
-        border-right: none;
+        border: none;
       }
       
       // Collapsed state
       &.collapsed {
-        width: var(--sidebar-collapsed) !important;
-        min-width: var(--sidebar-collapsed) !important;
-        max-width: var(--sidebar-collapsed) !important;
+        width: var(--sidebar-collapsed);
       }
     }
     
     .main-content {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
+      margin-left: var(--sidebar-width);
+      transition: margin-left var(--transition-normal);
+      height: 100vh;
+      overflow-y: auto;
       background-color: var(--background-light);
-      margin-left: 0;
-      transition: margin-left var(--transition-normal) ease-in-out;
+      
+      &.sidebar-collapsed {
+        margin-left: var(--sidebar-collapsed);
+      }
       
       .page-content {
-        flex: 1;
-        overflow-y: auto;
         padding: var(--spacing-lg);
         
         .content-wrapper {
@@ -71,39 +70,6 @@
     }
   }
 }
-
-// Smooth transitions and layout adjustments
-.sidenav-container {
-  .sidenav {
-    transition: width var(--transition-normal) ease-in-out;
-  }
-  
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-    transition: all var(--transition-normal) ease-in-out;
-  }
-}
-
-// Force layout recalculation when sidebar collapses
-.dashboard-layout {
-  .sidenav-container {
-    .main-content {
-      margin-left: var(--sidebar-width);
-      width: calc(100vw - var(--sidebar-width));
-    }
-  }
-  
-  &.sidebar-collapsed {
-    .sidenav-container .main-content {
-      margin-left: var(--sidebar-collapsed);
-      width: calc(100vw - var(--sidebar-collapsed));
-    }
-  }
-}
-
-// Eliminar backdrop overrides que causan conflictos
-// Los estilos globales en styles.scss manejan esto mejor
 
 // Mobile responsive override
 @media (max-width: 768px) {

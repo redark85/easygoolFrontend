@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { UppercaseDirective } from '@shared/directives/uppercase.directive';
 import { ToastService } from '@core/services/toast.service';
 import { PhaseService } from '../../services/phase.service';
 import { GroupFormData, CreateGroupRequest, UpdateGroupRequest } from '../../models/group-form.interface';
@@ -22,7 +23,8 @@ import { GroupFormData, CreateGroupRequest, UpdateGroupRequest } from '../../mod
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    UppercaseDirective
   ],
   templateUrl: './group-form.component.html',
   styleUrls: ['./group-form.component.scss']

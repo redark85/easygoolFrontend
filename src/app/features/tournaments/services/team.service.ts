@@ -12,7 +12,8 @@ import {
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
   TEAM_REMOVE_FROM_GROUP_ENDPOINT,
   TEAM_DISQUALIFY_ENDPOINT,
-  TEAM_REMOVE_ENDPOINT
+  TEAM_REMOVE_ENDPOINT,
+  TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT
 } from '@core/config/endpoints';
 import {
   Team,
@@ -242,6 +243,27 @@ export class TeamService {
 
     return this.apiService.get<{ isAvailable: boolean }>(endpoint).pipe(
       map(response => response.isAvailable),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Permite o deshabilita el registro de jugadores para un equipo
+   * @param teamId ID del equipo
+   * @param allow true para permitir, false para deshabilitar
+   * @returns Observable con el resultado de la operación
+   */
+  allowPlayerRegistration(teamId: number, allow: boolean): Observable<boolean> {
+    return this.apiService.post<ApiResponse<any>>(`${TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT}/${teamId}?allow=${allow}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          const message = allow ? 'Registro de jugadores habilitado' : 'Registro de jugadores deshabilitado';
+          this.toastService.showSuccess(response.message || message);
+          return true;
+        }
+        this.toastService.showError(response.message || 'Error al cambiar estado de registro');
+        throw new Error(response.message || 'Error al cambiar estado de registro');
+      }),
       catchError(this.handleError)
     );
   }

@@ -175,16 +175,11 @@
   }
 }
 
-// Matches Grid
-.matches-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: var(--spacing-md);
+// Matches Grid - Migrated to Bootstrap
+.container-fluid {
   padding: var(--spacing-md);
   
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
     padding: var(--spacing-sm);
   }
 }

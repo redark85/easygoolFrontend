@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { UppercaseDirective } from '@shared/directives/uppercase.directive';
 import { ToastService } from '@core/services/toast.service';
 import { PhaseService } from '../../services/phase.service';
 import { PhaseFormData, CreatePhaseRequest, UpdatePhaseRequest, PhaseType } from '../../models/phase-form.interface';
@@ -28,7 +29,8 @@ import { UpdatePhaseRequest as PhaseUpdateRequest } from '../../models/phase.int
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    UppercaseDirective
   ],
   templateUrl: './phase-form.component.html',
   styleUrls: ['./phase-form.component.scss']

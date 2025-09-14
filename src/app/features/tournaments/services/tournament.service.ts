@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { ApiService } from '@core/services/api.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '@core/services/toast.service';
-import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT } from '@core/config/endpoints';
+import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT, TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
 
 import { CreateTournamentRequest, UpdateTournamentRequest, Tournament, TournamentApiResponse, TournamentStatusType, UpdateTournamentStatusRequest, ChangeStatusRequest, TournamentDetailResponse, TournamentDetail } from '../models/tournament.interface';
@@ -138,6 +138,29 @@ export class TournamentService {
           this.toastService.showSuccess('Torneo eliminado con éxito.');
         } else {
           this.toastService.showError(response.message || 'No se pudo eliminar el torneo.');
+        }
+        return response;
+      })
+    );
+  }
+
+  /**
+   * Permite o deshabilita el registro de equipos en un torneo
+   * @param id ID del torneo
+   * @param allow true para permitir registro, false para cerrarlo
+   * @returns Observable con la respuesta de la API
+   */
+  allowRegisterTeam(id: number, allow: boolean): Observable<ApiResponse<any>> {
+    console.log('API Call:', { id, allow, url: `${TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT}/${id}?allow=${allow}` });
+    
+    return this.apiService.post<ApiResponse<any>>(`${TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT}/${id}?allow=${allow}`, {}).pipe(
+      map(response => {
+        console.log('API Response:', response);
+        if (response.succeed) {
+          const statusText = allow ? 'abierto' : 'cerrado';
+          this.toastService.showSuccess(`Registro de equipos ${statusText} exitosamente`);
+        } else {
+          this.toastService.showError(response.message || 'No se pudo cambiar el estado del registro de equipos.');
         }
         return response;
       })

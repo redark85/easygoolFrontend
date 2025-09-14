@@ -16,7 +16,8 @@
                 matInput
                 formControlName="name"
                 placeholder="Ej: Grupo A"
-                maxlength="100">
+                maxlength="100"
+                appUppercase>
               <mat-icon matSuffix>group</mat-icon>
               <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
             </mat-form-field>
@@ -40,14 +41,10 @@
       type="submit"
       (click)="onSubmit()"
       [disabled]="groupForm.invalid || isSubmitting">
-      <mat-progress-spinner
-        *ngIf="isSubmitting"
-        diameter="20"
-        mode="indeterminate"
-        class="button-spinner">
-      </mat-progress-spinner>
-      <span *ngIf="!isSubmitting">
-        {{ isEdit ? 'Actualizar' : 'Crear' }} Grupo
+      <span *ngIf="!isSubmitting">{{ isEdit ? 'Actualizar' : 'Crear' }} Grupo</span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Procesando...</span>
       </span>
     </button>
   </mat-dialog-actions>

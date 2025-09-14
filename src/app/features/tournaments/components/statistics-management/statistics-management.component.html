@@ -19,44 +19,54 @@
           <mat-tab label="General">
             <!-- General Tournament Statistics -->
             <div class="general-stats-content">
-              <div class="stats-overview">
-                <div class="stat-card">
-                  <div class="stat-icon">
-                    <mat-icon>sports_soccer</mat-icon>
+              <div class="container-fluid">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4">
+                  <div class="col mb-3">
+                    <div class="stat-card">
+                      <div class="stat-icon">
+                        <mat-icon>sports_soccer</mat-icon>
+                      </div>
+                      <div class="stat-info">
+                        <h3 class="stat-value">{{ tournamentStatistics.totalMatches }}</h3>
+                        <p class="stat-label">Total Partidos</p>
+                      </div>
+                    </div>
                   </div>
-                  <div class="stat-info">
-                    <h3 class="stat-value">{{ tournamentStatistics.totalMatches }}</h3>
-                    <p class="stat-label">Total Partidos</p>
-                  </div>
-                </div>
 
-                <div class="stat-card">
-                  <div class="stat-icon completed">
-                    <mat-icon>check_circle</mat-icon>
+                  <div class="col mb-3">
+                    <div class="stat-card">
+                      <div class="stat-icon completed">
+                        <mat-icon>check_circle</mat-icon>
+                      </div>
+                      <div class="stat-info">
+                        <h3 class="stat-value">{{ tournamentStatistics.completedMatches }}</h3>
+                        <p class="stat-label">Partidos Jugados</p>
+                      </div>
+                    </div>
                   </div>
-                  <div class="stat-info">
-                    <h3 class="stat-value">{{ tournamentStatistics.completedMatches }}</h3>
-                    <p class="stat-label">Partidos Jugados</p>
-                  </div>
-                </div>
 
-                <div class="stat-card">
-                  <div class="stat-icon goals">
-                    <mat-icon>sports_score</mat-icon>
+                  <div class="col mb-3">
+                    <div class="stat-card">
+                      <div class="stat-icon goals">
+                        <mat-icon>sports_score</mat-icon>
+                      </div>
+                      <div class="stat-info">
+                        <h3 class="stat-value">{{ tournamentStatistics.totalGoals }}</h3>
+                        <p class="stat-label">Total Goles</p>
+                      </div>
+                    </div>
                   </div>
-                  <div class="stat-info">
-                    <h3 class="stat-value">{{ tournamentStatistics.totalGoals }}</h3>
-                    <p class="stat-label">Total Goles</p>
-                  </div>
-                </div>
 
-                <div class="stat-card">
-                  <div class="stat-icon average">
-                    <mat-icon>trending_up</mat-icon>
-                  </div>
-                  <div class="stat-info">
-                    <h3 class="stat-value">{{ formatDecimal(tournamentStatistics.averageGoalsPerMatch) }}</h3>
-                    <p class="stat-label">Promedio Goles/Partido</p>
+                  <div class="col mb-3">
+                    <div class="stat-card">
+                      <div class="stat-icon average">
+                        <mat-icon>trending_up</mat-icon>
+                      </div>
+                      <div class="stat-info">
+                        <h3 class="stat-value">{{ formatDecimal(tournamentStatistics.averageGoalsPerMatch) }}</h3>
+                        <p class="stat-label">Promedio Goles/Partido</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -68,36 +78,42 @@
                   Destacados
                 </h3>
 
-                <div class="highlights-grid">
-                  <mat-card class="highlight-card" *ngIf="tournamentStatistics.topScorer">
-                    <mat-card-header>
-                      <div class="highlight-icon top-scorer">
-                        <mat-icon>sports_score</mat-icon>
-                      </div>
-                      <div class="highlight-content">
-                        <mat-card-title>Máximo Goleador</mat-card-title>
-                        <mat-card-subtitle>{{ tournamentStatistics.topScorer.team.name }}</mat-card-subtitle>
-                      </div>
-                    </mat-card-header>
-                    <mat-card-content>
-                      <div class="highlight-value">{{ tournamentStatistics.topScorer.goals }} goles</div>
-                    </mat-card-content>
-                  </mat-card>
+                <div class="container-fluid">
+                  <div class="row row-cols-1 row-cols-md-2">
+                    <div class="col mb-3" *ngIf="tournamentStatistics.topScorer">
+                      <mat-card class="highlight-card h-100">
+                        <mat-card-header>
+                          <div class="highlight-icon top-scorer">
+                            <mat-icon>sports_score</mat-icon>
+                          </div>
+                          <div class="highlight-content">
+                            <mat-card-title>Máximo Goleador</mat-card-title>
+                            <mat-card-subtitle>{{ tournamentStatistics.topScorer.team.name }}</mat-card-subtitle>
+                          </div>
+                        </mat-card-header>
+                        <mat-card-content>
+                          <div class="highlight-value">{{ tournamentStatistics.topScorer.goals }} goles</div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
 
-                  <mat-card class="highlight-card" *ngIf="tournamentStatistics.mostWins">
-                    <mat-card-header>
-                      <div class="highlight-icon most-wins">
-                        <mat-icon>emoji_events</mat-icon>
-                      </div>
-                      <div class="highlight-content">
-                        <mat-card-title>Más Victorias</mat-card-title>
-                        <mat-card-subtitle>{{ tournamentStatistics.mostWins.team.name }}</mat-card-subtitle>
-                      </div>
-                    </mat-card-header>
-                    <mat-card-content>
-                      <div class="highlight-value">{{ tournamentStatistics.mostWins.wins }} victorias</div>
-                    </mat-card-content>
-                  </mat-card>
+                    <div class="col mb-3" *ngIf="tournamentStatistics.mostWins">
+                      <mat-card class="highlight-card h-100">
+                        <mat-card-header>
+                          <div class="highlight-icon most-wins">
+                            <mat-icon>emoji_events</mat-icon>
+                          </div>
+                          <div class="highlight-content">
+                            <mat-card-title>Más Victorias</mat-card-title>
+                            <mat-card-subtitle>{{ tournamentStatistics.mostWins.team.name }}</mat-card-subtitle>
+                          </div>
+                        </mat-card-header>
+                        <mat-card-content>
+                          <div class="highlight-value">{{ tournamentStatistics.mostWins.wins }} victorias</div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                  </div>
                 </div>
               </div>
 

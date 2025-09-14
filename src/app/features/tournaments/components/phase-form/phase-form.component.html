@@ -16,7 +16,8 @@
                 matInput
                 formControlName="name"
                 placeholder="Ej: Fase de Grupos A"
-                maxlength="100">
+                maxlength="100"
+                appUppercase>
               <mat-icon matSuffix>sports_soccer</mat-icon>
               <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
             </mat-form-field>
@@ -73,14 +74,10 @@
       type="submit"
       (click)="onSubmit()"
       [disabled]="phaseForm.invalid || isSubmitting">
-      <mat-progress-spinner
-        *ngIf="isSubmitting"
-        diameter="20"
-        mode="indeterminate"
-        class="button-spinner">
-      </mat-progress-spinner>
-      <span *ngIf="!isSubmitting">
-        {{ isEdit ? 'Actualizar' : 'Crear' }} Fase
+      <span *ngIf="!isSubmitting">{{ isEdit ? 'Actualizar' : 'Crear' }} Fase</span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Procesando...</span>
       </span>
     </button>
   </mat-dialog-actions>

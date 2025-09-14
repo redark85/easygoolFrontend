@@ -17,6 +17,7 @@ import { MatChipsModule } from '@angular/material/chips';
 
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { LocationMapComponent, LocationData } from '@shared/components/location-map/location-map.component';
+import { UppercaseDirective } from '@shared/directives/uppercase.directive';
 import { TournamentService } from '../../services/tournament.service';
 import { PhaseService } from '../../services/phase.service';
 import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType } from '../../models/tournament.interface';
@@ -49,7 +50,8 @@ export interface TournamentFormData {
     MatExpansionModule,
     MatCardModule,
     MatChipsModule,
-    ImageUploaderComponent
+    ImageUploaderComponent,
+    UppercaseDirective
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './tournament-form.component.html',
@@ -324,16 +326,27 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
    */
   openLocationModal(): void {
     const currentLocation = this.tournamentForm.get('location')?.value;
+    let initialLocationData = null;
+    
+    // Si hay datos de ubicación existentes (modo edición), usarlos
+    if (this.selectedLocationData) {
+      initialLocationData = this.selectedLocationData;
+    } else if (currentLocation && currentLocation.trim()) {
+      // Si hay texto en el campo pero no coordenadas, crear datos básicos
+      initialLocationData = {
+        address: currentLocation,
+        latitude: -0.1807, // Coordenadas por defecto (Quito)
+        longitude: -78.4678
+      };
+    }
+    // Si no hay datos, el modal usará ubicación actual del usuario
+    
     const dialogRef = this.dialog.open(LocationMapComponent, {
       width: '900px',
       height: '800px',
       maxHeight: '90vh',
       data: {
-        initialLocation: this.selectedLocationData || (currentLocation ? {
-          address: currentLocation,
-          latitude: -0.1807,
-          longitude: -78.4678
-        } : null)
+        initialLocation: initialLocationData
       }
     });
 
@@ -342,7 +355,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
         console.log('LocationData received:', result);
         this.selectedLocationData = result;
         this.tournamentForm.patchValue({
-          location: result.address
+          location: result.address.toUpperCase()
         });
         console.log('selectedLocationData updated:', this.selectedLocationData);
       }

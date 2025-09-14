@@ -75,6 +75,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   tournamentId: number = 0;
   selectedTabIndex: number = 0;
   registrationClosed = false; // Control para cerrar registro de equipos
+  isUpdatingRegistration = false; // Estado de carga para el switch
 
   private destroy$ = new Subject<void>();
 
@@ -151,6 +152,18 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           
           // Actualizar el store con la información del torneo
           this.tournamentStore.setCurrentTournament(this.tournamentId, this.tournament.name);
+
+          // Cargar el estado inicial del switch de registro
+          // LÓGICA CORREGIDA:
+          // allowTeamRegistration: false -> switch debe estar en false (registro cerrado)
+          // allowTeamRegistration: true -> switch debe estar en true (registro abierto)
+          this.registrationClosed = !this.tournament.allowTeamRegistration;
+          
+          console.log('Tournament loaded:', {
+            allowTeamRegistration: this.tournament.allowTeamRegistration,
+            registrationClosed: this.registrationClosed,
+            'Switch debe mostrar': this.registrationClosed ? 'CERRADO' : 'ABIERTO'
+          });
 
           // Cargar datos reales del backend
           this.loadTeams();
@@ -727,10 +740,52 @@ trackByTeamId(index: number, team: Team): number {
    * @param event Evento del slide toggle
    */
   onRegistrationToggleChange(event: any): void {
-    this.registrationClosed = event.checked;
-    const status = this.registrationClosed ? 'cerrado' : 'abierto';
-    this.toastService.showInfo(`Registro de equipos ${status}`);
-    this.cdr.detectChanges();
+    if (!this.tournament || this.isUpdatingRegistration) return;
+
+    this.isUpdatingRegistration = true;
+    
+    // El evento de mat-slide-toggle tiene la estructura: { source: MatSlideToggle, checked: boolean }
+    const isChecked = event?.checked !== undefined ? event.checked : event?.source?.checked;
+    
+    // LÓGICA CORREGIDA: El switch ahora representa "registro abierto"
+    // - Si checked = true -> registro abierto -> allow = true
+    // - Si checked = false -> registro cerrado -> allow = false
+    const allowRegistration = isChecked;
+    
+    console.log('Switch event:', { 
+      event,
+      isChecked, 
+      allowRegistration, 
+      tournamentId: this.tournamentId,
+      tournamentObject: this.tournament
+    });
+    
+    this.tournamentService.allowRegisterTeam(this.tournamentId, allowRegistration)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('API Response received:', response);
+          if (response.succeed) {
+            // Actualizar el estado local y del torneo
+            this.registrationClosed = !isChecked; // isChecked = true -> registrationClosed = false
+            if (this.tournament) {
+              this.tournament.allowTeamRegistration = allowRegistration;
+            }
+          } else {
+            // Revertir el switch si la API falló
+            this.registrationClosed = isChecked; // Revertir al estado anterior
+          }
+          this.isUpdatingRegistration = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error updating registration status:', error);
+          // Revertir el switch en caso de error
+          this.registrationClosed = isChecked;
+          this.isUpdatingRegistration = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   /**

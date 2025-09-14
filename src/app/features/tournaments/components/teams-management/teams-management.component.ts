@@ -393,6 +393,29 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Cambia el estado de registro de jugadores para un equipo
+   * @param team Equipo al que cambiar el estado
+   * @param allow true para permitir, false para deshabilitar
+   */
+  onTogglePlayerRegistration(team: Team, allow: boolean): void {
+    this.teamService.allowPlayerRegistration(team.id, allow).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        // Actualizar el estado local del equipo
+        team.allowPlayerRegistration = allow;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error changing player registration status:', error);
+        // Revertir el estado del toggle en caso de error
+        team.allowPlayerRegistration = !allow;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
    * Método alternativo para copiar texto al portapapeles
    */
   private fallbackCopyTextToClipboard(text: string): void {

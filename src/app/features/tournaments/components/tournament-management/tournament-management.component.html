@@ -62,12 +62,16 @@
           <!-- Switch para control de registro -->
           <div class="registration-control">
             <mat-slide-toggle
-              [(ngModel)]="registrationClosed"
+              [checked]="!registrationClosed"
               (change)="onRegistrationToggleChange($event)"
+              [disabled]="isUpdatingRegistration"
               [matTooltip]="registrationClosed ? 'Registro cerrado - Los equipos no pueden registrarse' : 'Registro abierto - Los equipos pueden registrarse'"
               matTooltipPosition="below"
               class="registration-toggle">
-              <span class="toggle-label">{{ registrationClosed ? 'Registro cerrado' : 'Registro abierto' }}</span>
+              <span class="toggle-label">
+                <mat-spinner *ngIf="isUpdatingRegistration" diameter="16" class="inline-spinner"></mat-spinner>
+                {{ registrationClosed ? 'Registro cerrado' : 'Registro abierto' }}
+              </span>
             </mat-slide-toggle>
           </div>
 

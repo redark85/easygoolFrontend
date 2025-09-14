@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
+import { UppercaseDirective } from '@shared/directives/uppercase.directive';
 import { ToastService } from '@core/services/toast.service';
 import { TeamService } from '../../services/team.service';
 import { CreateTeamRequest, UpdateTeamRequest, Team } from '../../models/team.interface';
@@ -32,7 +33,8 @@ export interface TeamFormData {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    ImageUploaderComponent
+    ImageUploaderComponent,
+    UppercaseDirective
   ],
   templateUrl: './team-form.component.html',
   styleUrls: ['./team-form.component.scss']

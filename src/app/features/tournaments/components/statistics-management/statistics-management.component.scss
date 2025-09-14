@@ -56,9 +56,6 @@
   padding-top: 20px;
 
   .stats-overview {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
     margin-bottom: 32px;
 
     .stat-card {
@@ -143,9 +140,7 @@
     margin-bottom: 32px;
 
     .highlights-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      // Migrated to Bootstrap grid system
 
       .highlight-card {
         border: 1px solid var(--border-color);
@@ -278,8 +273,8 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
       .table-header {
-        display: grid;
-        grid-template-columns: 50px 1fr 50px 50px 50px 50px 60px 60px 60px 60px;
+        display: flex;
+        align-items: center;
         gap: 8px;
         padding: 16px 20px;
         background: var(--surface-color);
@@ -300,8 +295,8 @@
 
       .table-body {
         .table-row {
-          display: grid;
-          grid-template-columns: 50px 1fr 50px 50px 50px 50px 60px 60px 60px 60px;
+          display: flex;
+          align-items: center;
           gap: 8px;
           padding: 16px 20px;
           border-bottom: 1px solid var(--border-color);
@@ -477,9 +472,7 @@
         padding: 20px;
 
         .phase-stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 16px;
+          // Migrated to Bootstrap grid system
           margin-bottom: 20px;
 
           .phase-stat-item {

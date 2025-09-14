@@ -159,6 +159,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.data?.initialLocation) {
+      // Modo edición: usar ubicación del torneo
       this.selectedLocation = { ...this.data.initialLocation };
       this.searchQuery = this.data.initialLocation.address;
       
@@ -181,6 +182,9 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       }
+    } else {
+      // Modo creación: intentar obtener ubicación actual del usuario
+      this.getInitialLocation();
     }
   }
 
@@ -210,13 +214,10 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
       let initialLat = -0.1807;
       let initialLng = -78.4678;
       
-      // Si hay ubicación inicial, usarla
+      // Si hay ubicación inicial (modo edición), usarla
       if (this.selectedLocation) {
         initialLat = this.selectedLocation.latitude;
         initialLng = this.selectedLocation.longitude;
-      } else {
-        // Intentar obtener ubicación actual del usuario
-        this.getInitialLocation();
       }
 
       // Inicializar mapa

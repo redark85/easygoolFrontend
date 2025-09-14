@@ -29,7 +29,8 @@
                 matInput
                 formControlName="name"
                 placeholder="Ej: Real Madrid Club de Fútbol"
-                maxlength="100">
+                maxlength="100"
+                appUppercase>
               <mat-icon matSuffix>sports_soccer</mat-icon>
               <mat-hint>Nombre completo del equipo (2-100 caracteres)</mat-hint>
               <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
@@ -46,7 +47,8 @@
                 matInput
                 formControlName="shortName"
                 placeholder="Ej: RMA"
-                maxlength="100">
+                maxlength="100"
+                appUppercase>
               <mat-icon matSuffix>label</mat-icon>
               <mat-hint>Abreviación del equipo (máximo 100 caracteres)</mat-hint>
               <mat-error *ngIf="shortNameErrors">{{ shortNameErrors }}</mat-error>
@@ -70,8 +72,11 @@
       color="primary"
       (click)="onSubmit()"
       [disabled]="teamForm.invalid || isSubmitting">
-      <mat-progress-spinner *ngIf="isSubmitting" diameter="20" mode="indeterminate"></mat-progress-spinner>
-      <span>{{ isSubmitting ? 'Procesando...' : (isEdit ? 'Actualizar' : 'Crear') + ' Equipo' }}</span>
+      <span *ngIf="!isSubmitting">{{ (isEdit ? 'Actualizar' : 'Crear') + ' Equipo' }}</span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Procesando...</span>
+      </span>
     </button>
   </mat-dialog-actions>
 </div>

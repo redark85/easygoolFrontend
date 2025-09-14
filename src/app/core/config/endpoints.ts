@@ -10,6 +10,7 @@ export const TOURNAMENT_UPDATE_ENDPOINT = '/api/Tournament/UpdateTournament';
 export const TOURNAMENT_UPDATE_STATUS_ENDPOINT = '/api/Tournament/UpdateStatus';
 export const TOURNAMENT_CHANGE_STATUS_ENDPOINT = '/api/Tournament/ChangeStatus';
 export const TOURNAMENT_DELETE_ENDPOINT = '/api/Tournament/DeleteTournament';
+export const TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT = '/api/Tournament/AllowRegisterTeam';
 
 // Phase Endpoints
 export const PHASE_CREATE_ENDPOINT = '/api/Phase/CreatePhase';
@@ -33,6 +34,7 @@ export const TEAM_REMOVE_FROM_GROUP_ENDPOINT = '/api/Team/RemoveFromGroup';
 export const TEAM_DISQUALIFY_ENDPOINT = '/api/Team/DisqualifyTeam';
 export const TEAM_GET_WITHOUT_PHASE_ENDPOINT = '/api/Team/GetAllTeamsWithoutPhase';
 export const TEAM_REMOVE_ENDPOINT = '/api/Team/RemoveTeam';
+export const TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT = '/api/Team/AllowPlayerRegistration';
 
 
 // Configuración de endpoints
@@ -49,6 +51,7 @@ export const EndpointsConfig = {
   TOURNAMENT_UPDATE_STATUS_ENDPOINT,
   TOURNAMENT_CHANGE_STATUS_ENDPOINT,
   TOURNAMENT_DELETE_ENDPOINT,
+  TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT,
 
   // Phase
   PHASE_CREATE_ENDPOINT,
@@ -71,5 +74,6 @@ export const EndpointsConfig = {
   TEAM_REMOVE_FROM_GROUP_ENDPOINT,
   TEAM_DISQUALIFY_ENDPOINT,
   TEAM_GET_WITHOUT_PHASE_ENDPOINT,
-  TEAM_REMOVE_ENDPOINT
+  TEAM_REMOVE_ENDPOINT,
+  TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT
 };

@@ -517,13 +517,16 @@
 @media (max-width: 768px) {
   .sidebar-container {
     width: var(--sidebar-width) !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100vh !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     z-index: 9999 !important;
     background-color: #2c3e50 !important;
     opacity: 1 !important;
     visibility: visible !important;
-    filter: none !important;
-    backdrop-filter: none !important;
+    transform: translateX(0) !important;
     
     // Ensure background image is visible on mobile
     background-image: url('/assets/sidebar.jpg') !important;
@@ -533,6 +536,12 @@
     
     // Forzar overlay oscuro sobre la imagen
     &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: rgba(0, 0, 0, 0.7) !important;
       z-index: 1 !important;
     }

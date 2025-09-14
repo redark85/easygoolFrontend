@@ -166,8 +166,14 @@
         .tournament-actions {
           display: flex;
           flex-direction: column;
-          align-items: flex-end;
           gap: 12px;
+          align-items: flex-end;
+
+          .inline-spinner {
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+          }
 
           .registration-control {
             display: flex;
