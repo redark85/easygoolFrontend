@@ -29,6 +29,7 @@ import { TeamService } from '../../services/team.service';
 import { PhaseService } from '../../services/phase.service';
 import Swal from 'sweetalert2';
 import { MatDialog } from '@angular/material/dialog';
+import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
 import { PhasesGroupsManagementComponent } from '../phases-groups-management/phases-groups-management.component';
@@ -90,7 +91,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     private teamModalService: TeamModalService,
     private teamService: TeamService,
     private phaseService: PhaseService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private deletionErrorHandler: DeletionErrorHandlerHook
   ) {}
 
   ngOnInit(): void {
@@ -576,30 +578,21 @@ deleteTeam(team: Team): void {
   }).then((result) => {
     if (result.isConfirmed) {
       this.teamService.deleteTeam(team.id).subscribe({
-        next: () => {
-          this.toastService.showSuccess(`Equipo "${team.name}" eliminado exitosamente`);
-          // Recargar datos del torneo para actualizar la lista de equipos
-          this.loadTournamentData();
-
-          // Mostrar mensaje de éxito adicional
-          Swal.fire({
-            title: '¡Eliminado!',
-            text: 'El equipo ha sido eliminado correctamente.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
+        next: (response: any) => {
+          const config = this.deletionErrorHandler.createConfig('Equipo', {
+            'EGOL_113': 'No se puede eliminar el equipo porque pertenece a una fase activa.',
+            'EGOL_114': 'No se puede eliminar el equipo porque tiene partidos programados.',
+            'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
           });
+
+          if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+            this.loadTournamentData();
+          }
         },
         error: (error) => {
-          this.toastService.showError(`Error al eliminar equipo: ${error.message}`);
-          
-          // Mostrar mensaje de error
-          Swal.fire({
-            title: 'Error',
-            text: 'No se pudo eliminar el equipo. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-          });
+          console.error('Error deleting team:', error);
+          const config = this.deletionErrorHandler.createConfig('Equipo');
+          this.deletionErrorHandler.handleDeletionError(error, config);
         }
       });
     }
@@ -655,29 +648,21 @@ removeTeamFromGroup(team: Team, group: Group): void {
   }).then((result) => {
     if (result.isConfirmed) {
       this.teamService.removeTeamFromGroup(team.id).subscribe({
-        next: () => {
-          this.toastService.showSuccess(`Equipo "${team.name}" removido del grupo exitosamente`);
-          this.loadTournamentData();
-
-          // Mostrar mensaje de éxito
-          Swal.fire({
-            title: '¡Removido!',
-            text: 'El equipo ha sido removido del grupo correctamente.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
+        next: (response: any) => {
+          const config = this.deletionErrorHandler.createConfig('Equipo del grupo', {
+            'EGOL_116': 'No se puede remover el equipo porque tiene partidos programados en este grupo.',
+            'EGOL_117': 'No se puede remover el equipo porque la fase ya comenzó.',
+            'EGOL_118': 'No se puede remover el equipo porque es el único en el grupo.'
           });
+
+          if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+            this.loadTournamentData();
+          }
         },
         error: (error) => {
-          this.toastService.showError(`Error al remover equipo del grupo: ${error.message}`);
-          
-          // Mostrar mensaje de error
-          Swal.fire({
-            title: 'Error',
-            text: 'No se pudo remover el equipo del grupo. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-          });
+          console.error('Error removing team from group:', error);
+          const config = this.deletionErrorHandler.createConfig('Equipo del grupo');
+          this.deletionErrorHandler.handleDeletionError(error, config);
         }
       });
     }

@@ -21,6 +21,7 @@ import { GroupFormComponent } from '../group-form/group-form.component';
 import { AssignTeamsComponent, AssignTeamsDialogData, AssignTeamsResult } from '../assign-teams/assign-teams.component';
 import { PhaseFormData, PhaseModalResult } from '../../models/phase-form.interface';
 import { GroupFormData, GroupModalResult } from '../../models/group-form.interface';
+import { DeletionErrorHandlerHook, DeletionErrorResponse } from '../../../../shared/hooks/deletion-error-handler.hook';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -59,7 +60,8 @@ export class PhasesGroupsManagementComponent implements OnInit {
     private phaseService: PhaseService,
     private teamService: TeamService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private deletionErrorHandler: DeletionErrorHandlerHook
   ) {}
 
   ngOnInit(): void {
@@ -143,20 +145,21 @@ export class PhasesGroupsManagementComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.phaseService.deletePhase(phase.id).subscribe({
-          next: (response) => {
-            if (response.succeed) {
+          next: (response: any) => {
+            const config = this.deletionErrorHandler.createConfig('Fase', {
+              'EGOL_113': 'No se puede eliminar la fase porque tiene equipos asignados.',
+              'EGOL_114': 'No se puede eliminar la fase porque tiene grupos con equipos.',
+              'EGOL_115': 'No se puede eliminar la fase porque tiene partidos programados.'
+            });
+
+            if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
               this.loadPhases();
-              Swal.fire({
-                title: '¡Eliminada!',
-                text: 'La fase ha sido eliminada correctamente.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-              });
             }
           },
           error: (error) => {
             console.error('Error deleting phase:', error);
+            const config = this.deletionErrorHandler.createConfig('Fase');
+            this.deletionErrorHandler.handleDeletionError(error, config);
           }
         });
       }
@@ -304,20 +307,21 @@ export class PhasesGroupsManagementComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.phaseService.deleteGroup(group.id).subscribe({
-          next: (response) => {
-            if (response.succeed) {
+          next: (response: any) => {
+            const config = this.deletionErrorHandler.createConfig('Grupo', {
+              'EGOL_113': 'No se puede eliminar el grupo porque tiene equipos asignados.',
+              'EGOL_114': 'No se puede eliminar el grupo porque tiene partidos programados.',
+              'EGOL_115': 'No se puede eliminar el grupo porque el torneo ya comenzó.'
+            });
+
+            if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
               this.loadPhases();
-              Swal.fire({
-                title: '¡Eliminado!',
-                text: 'El grupo ha sido eliminado correctamente.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-              });
             }
           },
           error: (error) => {
             console.error('Error deleting group:', error);
+            const config = this.deletionErrorHandler.createConfig('Grupo');
+            this.deletionErrorHandler.handleDeletionError(error, config);
           }
         });
       }

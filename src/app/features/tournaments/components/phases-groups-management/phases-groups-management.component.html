@@ -90,9 +90,7 @@
                           color="warn"
                           (click)="deletePhase(phase)"
                           matTooltip="Eliminar Fase"
-                          class="phase-action-btn"
-                          [disabled]="!canDeletePhase(phase)"
-                          [matTooltip]="canDeletePhase(phase) ? 'Eliminar Fase' : 'No se puede eliminar: hay equipos asignados'">
+                          class="phase-action-btn">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -158,8 +156,7 @@
                                   color="warn"
                                   (click)="deleteGroup(group); $event.stopPropagation()"
                                   class="group-action-btn"
-                                  [disabled]="!canDeleteGroup(group)"
-                                  [matTooltip]="canDeleteGroup(group) ? 'Eliminar Grupo' : 'No se puede eliminar: hay equipos en el grupo'"
+                                  matTooltip="Eliminar Grupo"
                                   matTooltipPosition="above">
                             <mat-icon>delete</mat-icon>
                           </button>

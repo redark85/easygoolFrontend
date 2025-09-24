@@ -19,6 +19,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Team, TeamStatus } from '../../models/team.interface';
 import { TeamService } from '../../services/team.service';
 import { TeamFormComponent } from '../team-form/team-form.component';
+import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
 import Swal from 'sweetalert2';
 
 export interface TeamFormData {
@@ -66,7 +67,8 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   constructor(
     private teamService: TeamService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private deletionErrorHandler: DeletionErrorHandlerHook
   ) {}
 
   ngOnInit(): void {
@@ -187,31 +189,24 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        this.teamService.removeTeam(team.tournamentTeamId).pipe(
+        this.teamService.removeTeam(team.id).pipe(
           takeUntil(this.destroy$)
         ).subscribe({
-          next: () => {
-            this.refreshTeams();
-            
-            // Mostrar mensaje de éxito
-            Swal.fire({
-              title: '¡Eliminado!',
-              text: 'El equipo ha sido eliminado correctamente.',
-              icon: 'success',
-              timer: 2000,
-              showConfirmButton: false
+          next: (response: any) => {
+            const config = this.deletionErrorHandler.createConfig('Equipo', {
+              'EGOL_113': 'No se puede eliminar el equipo porque pertenece a una fase activa.',
+              'EGOL_114': 'No se puede eliminar el equipo porque tiene partidos programados.',
+              'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
             });
+
+            if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+              this.refreshTeams();
+            }
           },
           error: (error) => {
             console.error('Error deleting team:', error);
-            
-            // Mostrar mensaje de error
-            Swal.fire({
-              title: 'Error',
-              text: 'No se pudo eliminar el equipo. Inténtalo de nuevo.',
-              icon: 'error',
-              confirmButtonText: 'Aceptar'
-            });
+            const config = this.deletionErrorHandler.createConfig('Equipo');
+            this.deletionErrorHandler.handleDeletionError(error, config);
           }
         });
       }
@@ -282,7 +277,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         this.fallbackCopyTextToClipboard(team.urlRegistration!);
       });
     } else {
-      this.fallbackCopyTextToClipboard(team.urlRegistration);
+      this.fallbackCopyTextToClipboard(team.urlRegistration!);
     }
   }
 
