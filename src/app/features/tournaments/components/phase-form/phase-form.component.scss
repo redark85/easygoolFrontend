@@ -1,5 +1,5 @@
-@import '../../../../../styles.scss';
+@use '../../../../../styles.scss' as styles;
 
 :host {
-  @include modal-layout('modal-container');
+  @include styles.modal-layout('modal-container');
 }

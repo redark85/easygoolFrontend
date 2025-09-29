@@ -1,7 +1,7 @@
-@import '../../../../../styles.scss';
+@use '../../../../../styles.scss' as styles;
 
 :host {
-  @include modal-layout('team-form-container');
+  @include styles.modal-layout('team-form-container');
 }
 
 .team-form-container {
