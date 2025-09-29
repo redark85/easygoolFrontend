@@ -1,5 +1,5 @@
-@use '../../../../../styles.scss' as styles;
+@use '../../../../shared/styles/mixins.scss' as mixins;
 
 :host {
-  @include styles.modal-layout('modal-container');
+  @include mixins.modal-layout('modal-container');
 }

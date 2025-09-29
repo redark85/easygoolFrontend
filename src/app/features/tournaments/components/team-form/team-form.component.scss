@@ -1,7 +1,7 @@
-@use '../../../../../styles.scss' as styles;
+@use '../../../../shared/styles/mixins.scss' as mixins;
 
 :host {
-  @include styles.modal-layout('team-form-container');
+  @include mixins.modal-layout('team-form-container');
 }
 
 .team-form-container {
