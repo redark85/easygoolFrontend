@@ -1,0 +1,72 @@
+:host {
+  @include modal-layout('modal-container');
+}
+
+.modal-container {
+  .team-info {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+  }
+
+  .captain-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+
+    mat-icon {
+      color: var(--warning-color);
+      font-size: 1.2rem;
+    }
+
+    &.mat-mdc-checkbox-checked {
+      .mdc-checkbox__background {
+        background-color: var(--warning-color);
+        border-color: var(--warning-color);
+      }
+    }
+  }
+
+  // Estilos específicos para select de posición
+  mat-select {
+    mat-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      mat-icon {
+        margin-right: 0.5rem;
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  // Estilos para campos numéricos
+  input[type="number"] {
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .container-fluid {
+      .row {
+        margin-left: -0.25rem;
+        margin-right: -0.25rem;
+
+        [class*="col-"] {
+          padding-left: 0.25rem;
+          padding-right: 0.25rem;
+        }
+      }
+    }
+  }
+}

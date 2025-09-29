@@ -1,0 +1,170 @@
+<div class="modal-container">
+  <h2 mat-dialog-title>
+    <mat-icon>person_add</mat-icon>
+    {{ isEdit ? 'Editar Jugador' : 'Nuevo Jugador' }}
+    <span class="team-info" *ngIf="data.teamName"> - {{ data.teamName }}</span>
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="playerForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="container-fluid">
+        <!-- Foto del Jugador -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <label class="image-label">Foto del Jugador *</label>
+            <app-image-uploader
+              formControlName="photo"
+              [maxFileSizeMB]="2"
+              (imageUploaded)="onImageUploaded($event)">
+            </app-image-uploader>
+            <div class="error-message" *ngIf="photoErrors">
+              <mat-icon>error</mat-icon>
+              {{ photoErrors }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Nombres -->
+        <div class="row mb-3">
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Primer Nombre</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="Ej: Juan"
+                maxlength="50"
+                appUppercase>
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Segundo Nombre</mat-label>
+              <input
+                matInput
+                formControlName="secondName"
+                placeholder="Ej: Carlos"
+                maxlength="50"
+                appUppercase>
+              <mat-icon matSuffix>person_outline</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Apellidos -->
+        <div class="row mb-3">
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Primer Apellido</mat-label>
+              <input
+                matInput
+                formControlName="lastName"
+                placeholder="Ej: García"
+                maxlength="50"
+                appUppercase>
+              <mat-icon matSuffix>badge</mat-icon>
+              <mat-error *ngIf="lastNameErrors">{{ lastNameErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Segundo Apellido</mat-label>
+              <input
+                matInput
+                formControlName="secondLastName"
+                placeholder="Ej: López"
+                maxlength="50"
+                appUppercase>
+              <mat-icon matSuffix>badge</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Identificación -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Identificación</mat-label>
+              <input
+                matInput
+                formControlName="identification"
+                placeholder="Ej: 1234567890"
+                maxlength="20">
+              <mat-icon matSuffix>credit_card</mat-icon>
+              <mat-hint>Cédula, pasaporte u otro documento de identidad</mat-hint>
+              <mat-error *ngIf="identificationErrors">{{ identificationErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Posición y Número de Camiseta -->
+        <div class="row mb-3">
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Posición</mat-label>
+              <mat-select formControlName="position">
+                <mat-option
+                  *ngFor="let position of playerPositions"
+                  [value]="position.value">
+                  <mat-icon>{{ position.icon }}</mat-icon>
+                  {{ position.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>sports_soccer</mat-icon>
+              <mat-error *ngIf="positionErrors">{{ positionErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Número de Camiseta</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="jerseyNumber"
+                placeholder="1-99"
+                min="1"
+                max="99">
+              <mat-icon matSuffix>confirmation_number</mat-icon>
+              <mat-hint>Número único del 1 al 99</mat-hint>
+              <mat-error *ngIf="jerseyNumberErrors">{{ jerseyNumberErrors }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Capitán -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <mat-checkbox formControlName="isCapitan" class="captain-checkbox">
+              <mat-icon>star</mat-icon>
+              Es Capitán del Equipo
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="onCancel()"
+      [disabled]="isSubmitting">
+      Cancelar
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      (click)="onSubmit()"
+      [disabled]="playerForm.invalid || isSubmitting">
+      <span *ngIf="!isSubmitting">{{ isEdit ? 'Actualizar' : 'Crear' }} Jugador</span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Procesando...</span>
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>
