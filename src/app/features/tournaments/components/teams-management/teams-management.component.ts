@@ -18,8 +18,11 @@ import { takeUntil } from 'rxjs/operators';
 
 import { Team, TeamStatus } from '../../models/team.interface';
 import { TeamService } from '../../services/team.service';
+import { PlayerService } from '../../services/player.service';
 import { TeamFormComponent } from '../team-form/team-form.component';
+import { PlayerFormComponent } from '../player-form/player-form.component';
 import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
+import { Player, PlayerFormData, PlayerModalResult } from '../../../../core/models/player.interface';
 import Swal from 'sweetalert2';
 
 export interface TeamFormData {
@@ -66,6 +69,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     private teamService: TeamService,
+    private playerService: PlayerService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private deletionErrorHandler: DeletionErrorHandlerHook
@@ -174,6 +178,30 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Abre el modal para crear un nuevo jugador
+   */
+  createPlayer(team: Team): void {
+    const dialogRef = this.dialog.open(PlayerFormComponent, {
+      width: '700px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: { 
+        mode: 'create', 
+        tournamentTeamId: team.id,
+        teamName: team.name
+      } as PlayerFormData
+    });
+
+    dialogRef.afterClosed().subscribe((result: PlayerModalResult) => {
+      if (result && result.success) {
+        // Actualizar el contador de jugadores del equipo
+        team.totalPlayers = (team.totalPlayers || 0) + 1;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
    * Elimina un equipo después de confirmación
    */
   deleteTeam(team: Team): void {
@@ -226,8 +254,6 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   trackByTeamId(index: number, team: Team): number {
     return team.id;
   }
-
-
 
   /**
    * Copia la URL de registro al portapapeles

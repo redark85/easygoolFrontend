@@ -36,6 +36,12 @@ export const TEAM_GET_WITHOUT_PHASE_ENDPOINT = '/api/Team/GetAllTeamsWithoutPhas
 export const TEAM_REMOVE_ENDPOINT = '/api/Team/RemoveTeam';
 export const TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT = '/api/Team/AllowPlayerRegistration';
 
+// Player Endpoints
+export const PLAYER_CREATE_ENDPOINT = '/api/Player/CreatePlayer';
+export const PLAYER_GET_BY_TEAM_ENDPOINT = '/api/Player/GetByTeam';
+export const PLAYER_UPDATE_ENDPOINT = '/api/Player/UpdatePlayer';
+export const PLAYER_DELETE_ENDPOINT = '/api/Player/DeletePlayer';
+
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -75,5 +81,11 @@ export const EndpointsConfig = {
   TEAM_DISQUALIFY_ENDPOINT,
   TEAM_GET_WITHOUT_PHASE_ENDPOINT,
   TEAM_REMOVE_ENDPOINT,
-  TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT
+  TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT,
+
+  // Player
+  PLAYER_CREATE_ENDPOINT,
+  PLAYER_GET_BY_TEAM_ENDPOINT,
+  PLAYER_UPDATE_ENDPOINT,
+  PLAYER_DELETE_ENDPOINT
 };
