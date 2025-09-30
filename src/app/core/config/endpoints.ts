@@ -35,6 +35,7 @@ export const TEAM_DISQUALIFY_ENDPOINT = '/api/Team/DisqualifyTeam';
 export const TEAM_GET_WITHOUT_PHASE_ENDPOINT = '/api/Team/GetAllTeamsWithoutPhase';
 export const TEAM_REMOVE_ENDPOINT = '/api/Team/RemoveTeam';
 export const TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT = '/api/Team/AllowPlayerRegistration';
+export const TEAM_ASSIGN_RANDOM_REAMS = '/api/Team/AssignRandomTeams';
 
 // Player Endpoints
 export const PLAYER_CREATE_ENDPOINT = '/api/Player/CreatePlayer';

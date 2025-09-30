@@ -7,7 +7,18 @@ export interface DeletionErrorResponse {
   message: string | null;
   messageId: string | null;
   messageType: number | null;
+  response: DeletionErrorResponses;
 }
+
+export interface DeletionErrorResponses{
+  data: DeletionErrorData;
+}
+
+export interface DeletionErrorData{
+  message: string | null;
+  messageId: string | null;
+}
+
 
 export interface DeletionErrorConfig {
   entityName: string;
@@ -32,9 +43,9 @@ export class DeletionErrorHandlerHook {
     if (!error || error.succeed) {
       return false; // No hay error que manejar
     }
-
     // Mapeo de mensajes de error comunes
     const commonErrorMessages: { [messageId: string]: string } = {
+      'EGOL_112': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene partidos programados.`,
       'EGOL_113': `No se puede eliminar el ${config.entityName.toLowerCase()} porque pertenece a una fase activa.`,
       'EGOL_114': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene equipos asignados.`,
       'EGOL_115': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene partidos programados.`,
@@ -49,7 +60,7 @@ export class DeletionErrorHandlerHook {
     const allMessages = { ...commonErrorMessages, ...(config.customMessages || {}) };
 
     // Buscar mensaje específico por messageId
-    let errorMessage = error.messageId ? allMessages[error.messageId] : undefined;
+    let errorMessage = error.response.data.messageId ? allMessages[error.response.data.messageId] : undefined;
 
     // Si no hay mensaje específico, usar el mensaje del backend o uno genérico
     if (!errorMessage) {

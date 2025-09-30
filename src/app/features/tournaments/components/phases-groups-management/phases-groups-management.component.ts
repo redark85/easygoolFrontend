@@ -157,7 +157,6 @@ export class PhasesGroupsManagementComponent implements OnInit {
             }
           },
           error: (error) => {
-            console.error('Error deleting phase:', error);
             const config = this.deletionErrorHandler.createConfig('Fase');
             this.deletionErrorHandler.handleDeletionError(error, config);
           }
@@ -309,9 +308,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
         this.phaseService.deleteGroup(group.id).subscribe({
           next: (response: any) => {
             const config = this.deletionErrorHandler.createConfig('Grupo', {
-              'EGOL_113': 'No se puede eliminar el grupo porque tiene equipos asignados.',
-              'EGOL_114': 'No se puede eliminar el grupo porque tiene partidos programados.',
-              'EGOL_115': 'No se puede eliminar el grupo porque el torneo ya comenzó.'
+              'EGOL_112': 'No se puede eliminar el grupo porque tiene partidos programados.'
             });
 
             if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
@@ -335,8 +332,33 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * @param phase Fase de grupos donde asignar equipos
    */
   assignTeamsRandomly(phase: Phase): void {
-    // TODO: Implementar lógica para asignar equipos disponibles aleatoriamente a los grupos
-    console.log('Asignar equipos aleatoriamente a la fase:', phase);
+    if (phase.groups?.length == 0) {
+        Swal.fire({
+            title: '¡Atención!',
+            text: `Debes agregar al menos un grupo para esta fase`,
+            icon: 'warning',
+            timer: 3000,
+            showConfirmButton: false
+        });
+        return;        
+    }
+
+    this.teamService.assignRandomTeams(phase.id).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Equipos asignados!',
+              text: `Equipos asignados aleatoriamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.refreshPhases();
+          },
+          error: (error) => {
+            const config = this.deletionErrorHandler.createConfig('Fase');
+            this.deletionErrorHandler.handleDeletionError(error, config);
+          }
+        });
   }
 
 
@@ -369,13 +391,9 @@ export class PhasesGroupsManagementComponent implements OnInit {
             });
             this.refreshPhases();
           },
-          error: (error: any) => {
-            Swal.fire({
-              title: 'Error',
-              text: error.message || 'No se pudo quitar el equipo de la fase',
-              icon: 'error',
-              confirmButtonText: 'Aceptar'
-            });
+        error: (error) => {
+            const config = this.deletionErrorHandler.createConfig('Equipo');
+            this.deletionErrorHandler.handleDeletionError(error, config);
           }
         });
       }
@@ -564,13 +582,9 @@ export class PhasesGroupsManagementComponent implements OnInit {
             });
             this.refreshPhases();
           },
-          error: (error: any) => {
-            Swal.fire({
-              title: 'Error',
-              text: error.message || 'No se pudo quitar el equipo del grupo',
-              icon: 'error',
-              confirmButtonText: 'Aceptar'
-            });
+           error: (error) => {
+            const config = this.deletionErrorHandler.createConfig('Equipo');
+            this.deletionErrorHandler.handleDeletionError(error, config);
           }
         });
       }
