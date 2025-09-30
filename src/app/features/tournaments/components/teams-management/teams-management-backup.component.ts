@@ -15,6 +15,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { Team, TeamStatus } from '../../models/team.interface';
 import { TeamService } from '../../services/team.service';
@@ -52,7 +53,8 @@ export interface TeamModalResult {
     MatBadgeModule,
     MatInputModule,
     MatFormFieldModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatExpansionModule
   ],
   templateUrl: './teams-management.component.html',
   styleUrls: ['./teams-management.component.scss'],
@@ -77,6 +79,25 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadTeams();
+  }
+
+  /**
+   * Obtiene los jugadores del equipo. Si el backend no provee la lista,
+   * retorna datos de ejemplo para demostración.
+   */
+  getPlayersForTeam(team: Team): Player[] {
+    const players = (team as any).players as Player[] | undefined;
+    if (players && players.length > 0) {
+      return players;
+    }
+    return [];
+  }
+
+    /**
+   * TrackBy para jugadores
+   */
+  trackByPlayerId(index: number, player: Player): number {
+    return player.tournamentTeamId;
   }
 
   /**
@@ -122,11 +143,77 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+    /**
+     * Retorna el nombre completo del jugador
+     */
+    getPlayerFullName(player: Player): string {
+      const names = [player.name, player.secondName].filter(n => n?.trim()).join(' ');
+      const lasts = [player.lastName, player.secondLastName].filter(n => n?.trim()).join(' ');
+      return `${names} ${lasts}`.trim();
+    }
+
   /**
    * Maneja el cambio en el campo de búsqueda
    */
   onSearchChange(): void {
     this.updateFilteredTeams();
+  }
+
+  /**
+   * Abre el modal para editar un jugador existente
+   */
+  editPlayer(player: Player, team: Team): void {
+    const dialogRef = this.dialog.open(PlayerFormComponent, {
+      width: '700px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: {
+        mode: 'edit',
+        player,
+        tournamentTeamId: team.id,
+        teamName: team.name
+      } as PlayerFormData
+    });
+
+    dialogRef.afterClosed().subscribe((result: PlayerModalResult) => {
+      if (result && result.success && result.player) {
+        // Actualiza el jugador en la lista del equipo si existe localmente
+        const players = (team as any).players as Player[] | undefined;
+        if (players) {
+          const idx = players.findIndex(p => p.id === result.player!.id);
+          if (idx !== -1) {
+            players[idx] = result.player!;
+          }
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  /**
+   * Elimina un jugador del equipo
+   */
+  deletePlayer(player: Player, team: Team): void {
+    this.playerService.deletePlayer(player.id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        const players = (team as any).players as Player[] | undefined;
+        if (players) {
+          const idx = players.findIndex(p => p.id === player.id);
+          if (idx !== -1) {
+            players.splice(idx, 1);
+            // Actualizar contador si está presente
+            if (typeof team.totalPlayers === 'number' && team.totalPlayers > 0) {
+              team.totalPlayers = team.totalPlayers - 1;
+            }
+          }
+        }
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error deleting player:', error);
+      }
+    });
   }
 
   ngOnDestroy(): void {

@@ -3,6 +3,95 @@
   position: relative;
 }
 
+// Reusar estilos clave dentro de .team-panel
+.team-panel {
+  .team-avatar {
+    position: relative;
+
+    .team-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .team-info {
+    .team-name {
+      margin: 0 0 4px 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .team-short-name {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+  }
+
+  .status-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+
+    .status-icon {
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
+      color: white;
+    }
+
+    &.status-active {
+      background-color: #4caf50;
+    }
+
+    &.status-disqualified {
+      background-color: #f44336;
+    }
+
+    &.status-deleted {
+      background-color: #9e9e9e;
+    }
+  }
+}
+
+// Lista de jugadores dentro del panel
+.players-list {
+  .player-item {
+    border-bottom: 1px solid var(--divider-color);
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .player-avatar .rounded-circle {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .badge.bg-secondary {
+    background-color: var(--secondary-color) !important;
+  }
+}
+
 .teams-management-card {
   margin: 0;
   box-shadow: none;
@@ -32,6 +121,20 @@
       margin-top: 4px;
       color: var(--text-secondary);
       font-size: 0.95rem;
+    }
+  }
+
+  .team-panel {
+    margin-bottom: 12px;
+
+    .team-avatar .team-logo {
+      width: 50px;
+      height: 50px;
+    }
+
+    .team-info {
+      .team-name { font-size: 1.1rem; }
+      .team-short-name { font-size: 0.8rem; }
     }
   }
 }
@@ -91,6 +194,37 @@
   padding-bottom: 80px; // Space for FAB
 }
 
+// Estilos para el panel de expansión por equipo
+.team-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .mat-expansion-panel-header {
+    padding: 12px 16px;
+    min-height: unset;
+
+    .mat-content {
+      align-items: center;
+      margin-right: 0; // evitar compresión
+      width: 100%; // ocupar todo el ancho del header
+    }
+  }
+
+  .mat-expansion-panel-body {
+    padding: 0; // controlamos padding en .players-list
+  }
+}
+
 .team-row {
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -109,7 +243,7 @@
   // Team avatar styles
   .team-avatar {
     position: relative;
-    
+
     .team-logo {
       width: 60px;
       height: 60px;
