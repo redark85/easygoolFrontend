@@ -167,8 +167,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
             'Switch debe mostrar': this.registrationClosed ? 'CERRADO' : 'ABIERTO'
           });
 
-          // Cargar datos reales del backend
-          this.loadTeams();
+          // Cargar datos reales del backend En un inicio solo cargar las phases
+          //this.loadTeams();
           this.loadPhases();
 
           this.isLoading = false;
@@ -779,11 +779,19 @@ trackByTeamId(index: number, team: Team): number {
    */
   onTabChange(event: any): void {
     this.selectedTabIndex = event.index;
+
+    switch (this.selectedTabIndex) {
+      case 0:
+        this.loadPhases();        
+        break;
+      case 1:
+        this.loadTeams();
+        break;    
+      default:
+        break;
+    }
     
-    // Siempre refrescar tanto equipos como fases en todos los tabs
-    // para asegurar que los datos estén sincronizados
-    this.loadTeams();
-    this.loadPhases();
+    // Refrescar los servicios dependiendo del tab en que se encuentra o hace click
     
     this.cdr.detectChanges();
   }

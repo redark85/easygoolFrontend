@@ -1,5 +1,7 @@
+@use '../../../../../styles.scss' as styles;
+
 :host {
-  @include modal-layout('modal-container');
+  @include styles.modal-layout('modal-container');
 }
 
 .modal-container {
@@ -46,6 +48,7 @@
 
   // Estilos para campos numéricos
   input[type="number"] {
+    appearance: textfield;
     -moz-appearance: textfield;
 
     &::-webkit-outer-spin-button,
