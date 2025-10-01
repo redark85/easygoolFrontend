@@ -199,19 +199,49 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // TODO: Llamar al API para crear el partido
-    console.log('Creating match:', {
-      homeTeamId: this.selectedHomeTeam!.tournamentTeamId,
-      awayTeamId: this.selectedAwayTeam!.tournamentTeamId,
-      matchDayId: this.data.matchDayId
-    });
+    this.isLoading = true;
+    this.cdr.detectChanges();
 
-    // Por ahora solo cerramos el modal con éxito
-    this.dialogRef.close({
-      success: true,
-      homeTeamId: this.selectedHomeTeam!.tournamentTeamId,
-      awayTeamId: this.selectedAwayTeam!.tournamentTeamId
-    });
+    const request = {
+      phaseId: this.data.phaseId,
+      matchDayId: this.data.matchDayId,
+      homeTeamId: this.selectedHomeTeam!.phaseTeamId,
+      awayTeamId: this.selectedAwayTeam!.phaseTeamId
+    };
+
+    this.matchService.createMatch(request)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          Swal.fire({
+            title: '¡Éxito!',
+            text: 'El partido se ha creado correctamente',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+          }).then(() => {
+            this.dialogRef.close({
+              success: true,
+              homeTeamId: this.selectedHomeTeam!.tournamentTeamId,
+              awayTeamId: this.selectedAwayTeam!.tournamentTeamId
+            });
+          });
+        },
+        error: (error) => {
+          console.error('Error creating match:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudo crear el partido',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
   }
 
   /**

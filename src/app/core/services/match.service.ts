@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -34,12 +34,26 @@ export interface FreeTeam {
   name: string;
   shortName: string;
   logoUrl?: string;
+  phaseTeamId : number;
 }
 
 export interface FreeMatchDayTeamsResponse {
   succeed: boolean;
   message: string;
   result: FreeTeam[];
+}
+
+export interface CreateMatchRequest {
+  phaseId: number;
+  matchDayId: number;
+  homeTeamId: number;
+  awayTeamId: number;
+}
+
+export interface CreateMatchResponse {
+  succeed: boolean;
+  message: string;
+  result?: any;
 }
 
 @Injectable({
@@ -81,6 +95,23 @@ export class MatchService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener equipos libres');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Crea un nuevo partido
+   * @param request Datos del partido a crear
+   * @returns Observable con la respuesta de la creación
+   */
+  createMatch(request: CreateMatchRequest): Observable<CreateMatchResponse> {
+    return this.apiService.post<CreateMatchResponse>(MATCH_CREATE_ENDPOINT, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al crear el partido');
       }),
       catchError(this.handleError)
     );
