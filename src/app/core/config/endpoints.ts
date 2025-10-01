@@ -49,6 +49,7 @@ export const MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT = '/api/Team/FreeMatchDayTea
 export const MATCH_CREATE_ENDPOINT = '/api/Match/CreateMatch';
 export const MATCH_CREATE_RANDOM_ENDPOINT = '/api/Match/CreateRandomMatches';
 export const MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT = '/api/Match/GenerateMatchesForMatchDay';
+export const MATCH_DELETE_ENDPOINT = '/api/Match/DeleteMatch';
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -101,5 +102,6 @@ export const EndpointsConfig = {
   MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT,
   MATCH_CREATE_ENDPOINT,
   MATCH_CREATE_RANDOM_ENDPOINT,
-  MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT
+  MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT,
+  MATCH_DELETE_ENDPOINT
 };
