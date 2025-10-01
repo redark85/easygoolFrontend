@@ -1,24 +1,31 @@
 .auth-container {
   min-height: 100vh;
   display: flex;
-  background: #f5f5f5;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.auth-sidebar {
-  flex: 0 0 450px;
+.auth-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: white;
+  width: 100%;
+  max-width: 1200px;
 
   .auth-card {
     width: 100%;
-    max-width: 350px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    border: 1px solid #e0e0e0;
-    padding: 2rem;
+    max-width: 450px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1.5rem;
 
     .logo-section {
       text-align: center;
@@ -52,19 +59,32 @@
     .auth-form {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.5rem;
 
       .full-width {
         width: 100%;
       }
 
       mat-form-field {
+        font-size: 0.875rem;
+
         .mat-mdc-text-field-wrapper {
-          border-radius: 8px;
+          border-radius: 6px;
         }
 
         .mat-mdc-form-field-focus-overlay {
           background-color: var(--primary-color);
+        }
+
+        ::ng-deep .mat-mdc-form-field-infix {
+          padding-top: 0 rem;
+          padding-bottom: 0.5rem;
+          min-height: 40px;
+        }
+
+        ::ng-deep .mat-mdc-text-field-wrapper {
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
         }
       }
 
@@ -109,10 +129,11 @@
         background-color: #1976d2 !important;
         color: white !important;
         font-weight: 600;
-        padding: 0.875rem 2rem;
-        border-radius: 8px;
-        margin-top: 1rem;
+        padding: 0.625rem 1.5rem;
+        border-radius: 6px;
+        margin-top: 0.5rem;
         transition: all 0.3s ease;
+        font-size: 0.875rem;
 
         &:hover:not(:disabled) {
           background-color: #1565c0 !important;
@@ -153,9 +174,23 @@
 }
 
 .auth-wallpaper {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
 
   .wallpaper-image {
     width: 100%;
@@ -167,22 +202,22 @@
 
 // Responsive Design
 @media (max-width: 768px) {
-  .auth-container {
-    flex-direction: column;
-  }
-
-  .auth-sidebar {
-    flex: none;
-    min-height: 100vh;
+  .auth-content {
     padding: 1rem;
 
     .auth-card {
       max-width: 100%;
-      padding: 1.5rem;
-    }
-  }
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.98);
 
-  .auth-wallpaper {
-    display: none;
+      .logo-section {
+        margin-bottom: 1rem;
+
+        .logo {
+          width: 80px;
+          height: 64px;
+        }
+      }
+    }
   }
 }

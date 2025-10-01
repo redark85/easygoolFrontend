@@ -11,6 +11,7 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  role : RoleType;
 }
 
 export interface AuthResponse {
@@ -24,6 +25,13 @@ export interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+}
+
+export enum RoleType {
+  Superadmin,
+  TournamentOwner,
+  TeamOwner,
+  Official
 }
 
 // Import User interface

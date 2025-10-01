@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '@core/services';
-import { RegisterRequest } from '@core/models';
+import { RegisterRequest, RoleType } from '@core/models';
 import { PhoneValidatorUtil } from '@shared/utils';
 
 @Component({
@@ -36,17 +36,33 @@ export class RegisterComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   private destroy$ = new Subject<void>();
-
+  private tokenFromUrl: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.captureTokenFromUrl();
     this.initializeForm();
     this.subscribeToAuthState();
+  }
+
+  /**
+   * Captura el parámetro 'token' de la URL si existe
+   */
+  private captureTokenFromUrl(): void {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        if (params['token']) {
+          this.tokenFromUrl = params['token'];
+          console.log('Token capturado de la URL:', this.tokenFromUrl);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -94,8 +110,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.registerForm.valid) {
+      // Capturar el token de la URL si existe
+      const token = this.tokenFromUrl;
+     
       const registerData: RegisterRequest = this.registerForm.value;
-      this.authService.register(registerData).subscribe({
+      registerData.phoneNumber = registerData.phoneNumber.replace(/-/g, "");
+      registerData.role = token ? RoleType.TeamOwner : RoleType.TournamentOwner;
+      this.authService.register(registerData, token).subscribe({
         error: (error: any) => {
           console.error('Register error:', error);
         }

@@ -78,9 +78,10 @@ export class AuthService implements OnDestroy {
   }
 
 
-  register(data: RegisterRequest): Observable<void> {
+  register(data: RegisterRequest, token : string | null): Observable<void> {
     this.setLoading(true);
-    return this.apiService.post<ApiResponse<AuthResponse>>(AUTH_REGISTER_ENDPOINT, data).pipe(
+    const url = token? `${AUTH_REGISTER_ENDPOINT}?token=${token}` : AUTH_REGISTER_ENDPOINT;
+    return this.apiService.post<ApiResponse<AuthResponse>>(url, data).pipe(
       tap(response => {
         if (response.succeed && response.result) {
           this.handleAuthSuccess(response.result, true);
