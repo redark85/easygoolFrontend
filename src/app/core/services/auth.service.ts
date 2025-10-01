@@ -80,7 +80,7 @@ export class AuthService implements OnDestroy {
 
   register(data: RegisterRequest, token : string | null): Observable<void> {
     this.setLoading(true);
-    const url = token? `${AUTH_REGISTER_ENDPOINT}?token=${token}` : AUTH_REGISTER_ENDPOINT;
+    const url = token? `${AUTH_REGISTER_ENDPOINT}?token=${encodeURIComponent(token)}` : AUTH_REGISTER_ENDPOINT;
     return this.apiService.post<ApiResponse<AuthResponse>>(url, data).pipe(
       tap(response => {
         if (response.succeed && response.result) {

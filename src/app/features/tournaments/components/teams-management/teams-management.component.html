@@ -86,7 +86,7 @@
                 <div class="col-md-3 d-flex align-items-center">
                   <mat-icon class="text-primary me-1">people</mat-icon>
                   <span class="badge bg-primary rounded-pill">{{ team.totalPlayers }}</span>
-                  <small class="text-muted ms-3">Aqui nombre de Manager y phone</small>
+                  <small class="text-muted ms-3">{{team.manager ? 'Manager: ' + team.manager.managerName + ' Contacto: ' + team.manager.phoneNumber : 'Sin manager asignado'}}</small>
                 </div>
 
                 <!-- Switch -->

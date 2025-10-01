@@ -34,7 +34,7 @@ export interface Team {
 }
 
 export interface Manager{
-  name: string;
+  managerName: string;
   phoneNumber: string;
 }
 
