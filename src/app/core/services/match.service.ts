@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -74,6 +74,12 @@ export interface CreateRandomMatchesResponse {
 }
 
 export interface DeleteMatchResponse {
+  succeed: boolean;
+  message: string;
+  result?: any;
+}
+
+export interface DeleteMatchDayResponse {
   succeed: boolean;
   message: string;
   result?: any;
@@ -186,6 +192,23 @@ export class MatchService {
           return response;
         }
         throw new Error(response.message || 'Error al eliminar el partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Elimina una jornada completa
+   * @param matchDayId ID de la jornada a eliminar
+   * @returns Observable con la respuesta de la eliminación
+   */
+  deleteMatchDay(matchDayId: number): Observable<DeleteMatchDayResponse> {
+    return this.apiService.delete<DeleteMatchDayResponse>(`${MATCH_DELETE_MATCHDAY_ENDPOINT}?matchDayId=${matchDayId}`).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al eliminar la jornada');
       }),
       catchError(this.handleError)
     );

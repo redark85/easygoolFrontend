@@ -447,9 +447,55 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Elimina una jornada completa
    */
   deleteMatchDay(matchDay: MatchDay): void {
-    console.log('Eliminar jornada:', matchDay);
-    // TODO: Implementar confirmación y eliminación de jornada
-    // Mostrar SweetAlert2 para confirmar la eliminación
+    Swal.fire({
+      title: '¿Eliminar jornada?',
+      html: `
+        <p>¿Estás seguro de que deseas eliminar la jornada <strong>${matchDay.matchDayName}</strong>?</p>        
+        <p style="color: #d33; margin-top: 10px;">Esta acción eliminará la jornada y no se puede deshacer.</p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.cdr.detectChanges();
+
+        this.matchService.deleteMatchDay(matchDay.matchDayId)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.loading = false;
+              Swal.fire({
+                title: '¡Jornada eliminada!',
+                text: 'La jornada se ha eliminado correctamente',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              }).then(() => {
+                // Recargar los partidos del grupo
+                if (this.selectedGroupId) {
+                  this.loadMatchesByGroup(this.selectedGroupId);
+                }
+              });
+            },
+            error: (error) => {
+              this.loading = false;
+              console.error('Error deleting match day:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo eliminar la jornada',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+              this.cdr.detectChanges();
+            }
+          });
+      }
+    });
   }
 
   /**
