@@ -379,9 +379,68 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Genera partidos aleatorios para una jornada
    */
   generateRandomMatches(matchDay: MatchDay): void {
-    console.log('Generar partidos aleatorios para jornada:', matchDay);
-    // TODO: Implementar lógica para generar partidos aleatorios
-    // Podría abrir un diálogo de confirmación antes de generar
+    if (!this.selectedGroupId || !this.selectedPhaseId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se ha seleccionado un grupo o fase',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Confirmar antes de generar
+    Swal.fire({
+      title: '¿Generar partidos aleatorios?',
+      text: `Se generarán partidos aleatorios para ${matchDay.matchDayName}. Esta acción no se puede deshacer.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, generar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.cdr.detectChanges();
+
+        const request = {
+          phaseId: this.selectedPhaseId!,
+          groupId: this.selectedGroupId!,
+          matchDayId: matchDay.matchDayId
+        };
+
+        this.matchService.createRandomMatchesForMatchDay(request)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.loading = false;
+              Swal.fire({
+                title: '¡Éxito!',
+                text: 'Los partidos aleatorios se han generado correctamente',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+              }).then(() => {
+                // Recargar los partidos del grupo
+                if (this.selectedGroupId) {
+                  this.loadMatchesByGroup(this.selectedGroupId);
+                }
+              });
+            },
+            error: (error) => {
+              this.loading = false;
+              console.error('Error generating random matches:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudieron generar los partidos aleatorios',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+              this.cdr.detectChanges();
+            }
+          });
+      }
+    });
   }
 
   /**

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -51,6 +51,23 @@ export interface CreateMatchRequest {
 }
 
 export interface CreateMatchResponse {
+  succeed: boolean;
+  message: string;
+  result?: any;
+}
+
+export interface CreateRandomMatchesRequest {
+  phaseId: number;
+  groupId: number;
+}
+
+export interface CreateRandomMatchesForMatchDayRequest {
+  phaseId: number;
+  groupId: number;
+  matchDayId : number;
+}
+
+export interface CreateRandomMatchesResponse {
   succeed: boolean;
   message: string;
   result?: any;
@@ -112,6 +129,40 @@ export class MatchService {
           return response;
         }
         throw new Error(response.message || 'Error al crear el partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Genera partidos aleatorios para una fase y grupo
+   * @param request Datos de la fase y grupo
+   * @returns Observable con la respuesta de la generación
+   */
+  createRandomMatches(request: CreateRandomMatchesRequest): Observable<CreateRandomMatchesResponse> {
+    return this.apiService.post<CreateRandomMatchesResponse>(MATCH_CREATE_RANDOM_ENDPOINT, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al generar partidos aleatorios');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Genera partidos aleatorios para una fase, grupo y jornada
+   * @param request Datos de la fase y grupo
+   * @returns Observable con la respuesta de la generación
+   */
+  createRandomMatchesForMatchDay(request: CreateRandomMatchesForMatchDayRequest): Observable<CreateRandomMatchesResponse> {
+    return this.apiService.post<CreateRandomMatchesResponse>(MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al generar partidos aleatorios');
       }),
       catchError(this.handleError)
     );

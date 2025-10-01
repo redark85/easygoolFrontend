@@ -47,6 +47,8 @@ export const PLAYER_DELETE_ENDPOINT = '/api/Player/DeletePlayer';
 export const MATCH_GET_ALL_BY_GROUP_ENDPOINT = '/api/Match/GetAllMatchesByGroup';
 export const MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT = '/api/Team/FreeMatchDayTeams';
 export const MATCH_CREATE_ENDPOINT = '/api/Match/CreateMatch';
+export const MATCH_CREATE_RANDOM_ENDPOINT = '/api/Match/CreateRandomMatches';
+export const MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT = '/api/Match/GenerateMatchesForMatchDay';
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -97,5 +99,7 @@ export const EndpointsConfig = {
   // Match
   MATCH_GET_ALL_BY_GROUP_ENDPOINT,
   MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT,
-  MATCH_CREATE_ENDPOINT
+  MATCH_CREATE_ENDPOINT,
+  MATCH_CREATE_RANDOM_ENDPOINT,
+  MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT
 };
