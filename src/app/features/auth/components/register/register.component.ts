@@ -57,7 +57,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
+      secondName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
+      secondLastName: [''],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
@@ -140,7 +142,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private getFieldDisplayName(fieldName: string): string {
     const displayNames: {[key: string]: string} = {
       'firstName': 'Nombre',
+      'secondName': 'Segundo nombre',
       'lastName': 'Apellido',
+      'secondLastName': 'Segundo apellido',
       'email': 'Email',
       'password': 'Contraseña',
       'confirmPassword': 'Confirmar contraseña',

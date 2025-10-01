@@ -9,7 +9,7 @@ export class PhoneValidatorUtil {
   /**
    * Formatea un número de teléfono ecuatoriano
    * @param phone - Número de teléfono sin formato
-   * @returns Número formateado (09XX-XXX-XXX) o string vacío si es inválido
+   * @returns Número formateado (09-XXX-XXX-XX) o string sin formato si no está completo
    */
   static formatEcuadorianPhone(phone: string): string {
     if (!phone) return '';
@@ -17,12 +17,21 @@ export class PhoneValidatorUtil {
     // Remover todos los caracteres no numéricos
     const cleanPhone = phone.replace(/\D/g, '');
     
-    // Validar que tenga exactamente 10 dígitos y empiece con 09
-    if (cleanPhone.length === 10 && cleanPhone.startsWith('09')) {
-      return `${cleanPhone.substring(0, 2)}-${cleanPhone.substring(2, 5)}-${cleanPhone.substring(5, 8)}-${cleanPhone.substring(8)}`;
+    // Limitar a 10 dígitos
+    const limitedPhone = cleanPhone.substring(0, 10);
+    
+    // Aplicar formato progresivo según la cantidad de dígitos
+    if (limitedPhone.length <= 2) {
+      return limitedPhone;
+    } else if (limitedPhone.length <= 5) {
+      return `${limitedPhone.substring(0, 2)}-${limitedPhone.substring(2)}`;
+    } else if (limitedPhone.length <= 8) {
+      return `${limitedPhone.substring(0, 2)}-${limitedPhone.substring(2, 5)}-${limitedPhone.substring(5)}`;
+    } else if (limitedPhone.length === 10) {
+      return `${limitedPhone.substring(0, 2)}-${limitedPhone.substring(2, 5)}-${limitedPhone.substring(5, 8)}-${limitedPhone.substring(8)}`;
     }
     
-    return cleanPhone;
+    return limitedPhone;
   }
 
   /**
