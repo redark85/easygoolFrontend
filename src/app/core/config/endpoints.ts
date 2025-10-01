@@ -45,6 +45,7 @@ export const PLAYER_DELETE_ENDPOINT = '/api/Player/DeletePlayer';
 
 // Match Endpoints
 export const MATCH_GET_ALL_BY_GROUP_ENDPOINT = '/api/Match/GetAllMatchesByGroup';
+export const MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT = '/api/Team/FreeMatchDayTeams';
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -93,5 +94,6 @@ export const EndpointsConfig = {
   PLAYER_DELETE_ENDPOINT,
 
   // Match
-  MATCH_GET_ALL_BY_GROUP_ENDPOINT
+  MATCH_GET_ALL_BY_GROUP_ENDPOINT,
+  MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT
 };

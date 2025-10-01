@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -18,6 +18,8 @@ export interface MatchInfo {
   awayTeam: string;
   matchDate: string;
   status: number;
+  homeTeamLogoUrl? : string;
+  awayTeamLogoUrl? : string;
 }
 
 export interface MatchesByGroupResponse {
@@ -26,13 +28,26 @@ export interface MatchesByGroupResponse {
   result: MatchDay[];
 }
 
+export interface FreeTeam {
+  id: number;
+  tournamentTeamId: number;
+  name: string;
+  shortName: string;
+  logoUrl?: string;
+}
+
+export interface FreeMatchDayTeamsResponse {
+  succeed: boolean;
+  message: string;
+  result: FreeTeam[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class MatchService {
   constructor(
-    private apiService: ApiService,
-    
+    private apiService: ApiService
   ) {}
 
   /**
@@ -47,6 +62,25 @@ export class MatchService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener partidos del grupo');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Obtiene los equipos libres para una jornada específica
+   * @param groupId ID del grupo
+   * @param phaseId ID de la fase
+   * @param matchDayId ID de la jornada
+   * @returns Observable con los equipos libres
+   */
+  getFreeMatchDayTeams(groupId: number, phaseId: number, matchDayId: number): Observable<FreeTeam[]> {
+    return this.apiService.get<FreeMatchDayTeamsResponse>(`${MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT}?groupId=${groupId}&phaseId=${phaseId}&matchDayId=${matchDayId}`).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        throw new Error(response.message || 'Error al obtener equipos libres');
       }),
       catchError(this.handleError)
     );

@@ -70,6 +70,29 @@
                         <mat-chip class="matches-count-chip">
                           {{ matchDay.matches.length }} {{ matchDay.matches.length === 1 ? 'partido' : 'partidos' }}
                         </mat-chip>
+                        
+                        <!-- Action Buttons -->
+                        <div class="matchday-actions" (click)="$event.stopPropagation()">
+                          <button mat-icon-button
+                                  (click)="createMatchForMatchDay(matchDay)"
+                                  matTooltip="Crear nuevo partido"
+                                  class="action-btn create-btn">
+                            <mat-icon>add_circle</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  (click)="generateRandomMatches(matchDay)"
+                                  matTooltip="Generar partidos aleatorios"
+                                  class="action-btn random-btn">
+                            <mat-icon>shuffle</mat-icon>
+                          </button>
+                          <button mat-icon-button
+                                  *ngIf="isLastMatchDay(matchDay)"
+                                  (click)="deleteMatchDay(matchDay)"
+                                  matTooltip="Eliminar jornada"
+                                  class="action-btn delete-btn">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
                       </div>
                     </mat-panel-title>
                   </mat-expansion-panel-header>
@@ -84,7 +107,7 @@
                             <div class="match-main">
                               <!-- Home Team -->
                               <div class="team home-team">
-                                <img src="assets/logo.png" alt="Home Team" class="team-logo">
+                                <img [src]="match.homeTeamLogoUrl || 'assets/logo.png'" alt="Home Team" class="team-logo">
                                 <div class="team-info">
                                   <span class="team-name">{{ match.homeTeam }}</span>
                                 </div>
@@ -109,7 +132,7 @@
                                 <div class="team-info">
                                   <span class="team-name">{{ match.awayTeam }}</span>
                                 </div>
-                                <img src="assets/logo.png" alt="Away Team" class="team-logo">
+                                <img [src]="match.awayTeamLogoUrl || 'assets/logo.png'" alt="Away Team" class="team-logo">
                               </div>
                             </div>
 

@@ -138,6 +138,49 @@
           .matches-count-chip {
             margin-left: auto;
           }
+
+          .matchday-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+
+            .action-btn {
+              width: 36px;
+              height: 36px;
+              transition: all 0.3s ease;
+
+              mat-icon {
+                font-size: 1.2rem;
+                width: 1.2rem;
+                height: 1.2rem;
+              }
+
+              &.create-btn {
+                color: #4caf50;
+
+                &:hover {
+                  background-color: rgba(76, 175, 80, 0.1);
+                }
+              }
+
+              &.random-btn {
+                color: #ff9800;
+
+                &:hover {
+                  background-color: rgba(255, 152, 0, 0.1);
+                }
+              }
+
+              &.delete-btn {
+                color: #f44336;
+
+                &:hover {
+                  background-color: rgba(244, 67, 54, 0.1);
+                }
+              }
+            }
+          }
         }
       }
     }

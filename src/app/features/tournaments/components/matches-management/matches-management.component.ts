@@ -12,12 +12,15 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase, Group } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
 import { MatchService, MatchDay } from '@core/services/match.service';
+import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-matches-management',
@@ -56,7 +59,8 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private matchService: MatchService
+    private matchService: MatchService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -314,5 +318,78 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    */
   trackByMatchInfoId(index: number, match: any): number {
     return match.id;
+  }
+
+  /**
+   * Verifica si una jornada es la última (tiene el matchDayId más alto)
+   */
+  isLastMatchDay(matchDay: MatchDay): boolean {
+    if (!this.matchDays || this.matchDays.length === 0) {
+      return false;
+    }
+    const maxMatchDayId = Math.max(...this.matchDays.map(md => md.matchDayId));
+    return matchDay.matchDayId === maxMatchDayId;
+  }
+
+  /**
+   * Crea un nuevo partido para una jornada específica
+   */
+  createMatchForMatchDay(matchDay: MatchDay): void {
+    if (!this.selectedGroupId || !this.selectedPhaseId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se ha seleccionado un grupo o fase',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(CreateMatchModalComponent, {
+      width: '700px',
+      maxWidth: '90vw',
+      disableClose: false,
+      data: {
+        groupId: this.selectedGroupId,
+        phaseId: this.selectedPhaseId,
+        matchDayId: matchDay.matchDayId,
+        matchDayName: matchDay.matchDayName
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        Swal.fire({
+          title: '¡Partido creado!',
+          text: 'El partido se ha creado exitosamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        
+        // Recargar los partidos del grupo
+        if (this.selectedGroupId) {
+          this.loadMatchesByGroup(this.selectedGroupId);
+        }
+      }
+    });
+  }
+
+  /**
+   * Genera partidos aleatorios para una jornada
+   */
+  generateRandomMatches(matchDay: MatchDay): void {
+    console.log('Generar partidos aleatorios para jornada:', matchDay);
+    // TODO: Implementar lógica para generar partidos aleatorios
+    // Podría abrir un diálogo de confirmación antes de generar
+  }
+
+  /**
+   * Elimina una jornada completa
+   */
+  deleteMatchDay(matchDay: MatchDay): void {
+    console.log('Eliminar jornada:', matchDay);
+    // TODO: Implementar confirmación y eliminación de jornada
+    // Mostrar SweetAlert2 para confirmar la eliminación
   }
 }
