@@ -451,4 +451,168 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
     // TODO: Implementar confirmación y eliminación de jornada
     // Mostrar SweetAlert2 para confirmar la eliminación
   }
+
+  /**
+   * Actualiza la fecha de un partido
+   */
+  updateMatchDate(match: any): void {
+    Swal.fire({
+      title: 'Actualizar fecha del partido',
+      html: `
+        <div style="text-align: left;">
+          <p><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></p>
+          <label for="match-date" style="display: block; margin-top: 15px; margin-bottom: 5px;">Nueva fecha y hora:</label>
+          <input type="datetime-local" id="match-date" class="swal2-input" style="width: 90%;">
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Actualizar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      preConfirm: () => {
+        const dateInput = document.getElementById('match-date') as HTMLInputElement;
+        const dateValue = dateInput.value;
+        
+        if (!dateValue) {
+          Swal.showValidationMessage('Por favor ingresa una fecha');
+          return false;
+        }
+        
+        return dateValue;
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        // TODO: Llamar al API para actualizar la fecha
+        console.log('Actualizar fecha del partido:', match.id, 'Nueva fecha:', result.value);
+        
+        Swal.fire({
+          title: '¡Fecha actualizada!',
+          text: 'La fecha del partido se ha actualizado correctamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          // Recargar los partidos del grupo
+          if (this.selectedGroupId) {
+            this.loadMatchesByGroup(this.selectedGroupId);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Cambia el estado de un partido
+   */
+  changeMatchStatus(match: any): void {
+    const statusOptions: { [key: string]: string } = {
+      '0': 'Programado',
+      '1': 'En Curso',
+      '2': 'Finalizado',
+      '3': 'Suspendido',
+      '4': 'Cancelado'
+    };
+
+    Swal.fire({
+      title: 'Cambiar estado del partido',
+      html: `
+        <div style="text-align: left;">
+          <p><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></p>
+          <p style="margin-top: 10px;">Estado actual: <strong>${this.getMatchStatusTextByNumber(match.status)}</strong></p>
+          <label for="match-status" style="display: block; margin-top: 15px; margin-bottom: 5px;">Nuevo estado:</label>
+          <select id="match-status" class="swal2-input" style="width: 90%;">
+            ${Object.entries(statusOptions).map(([key, value]) => 
+              `<option value="${key}" ${key === match.status.toString() ? 'selected' : ''}>${value}</option>`
+            ).join('')}
+          </select>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Cambiar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      preConfirm: () => {
+        const statusSelect = document.getElementById('match-status') as HTMLSelectElement;
+        return parseInt(statusSelect.value);
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value !== undefined) {
+        // TODO: Llamar al API para cambiar el estado
+        console.log('Cambiar estado del partido:', match.id, 'Nuevo estado:', result.value);
+        
+        Swal.fire({
+          title: '¡Estado actualizado!',
+          text: 'El estado del partido se ha actualizado correctamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          // Recargar los partidos del grupo
+          if (this.selectedGroupId) {
+            this.loadMatchesByGroup(this.selectedGroupId);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Elimina un partido por su ID
+   */
+  deleteMatchById(match: any): void {
+    Swal.fire({
+      title: '¿Eliminar partido?',
+      html: `
+        <p>¿Estás seguro de que deseas eliminar este partido?</p>
+        <p><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></p>
+        <p style="color: #d33; margin-top: 10px;">Esta acción no se puede deshacer.</p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.cdr.detectChanges();
+
+        this.matchService.deleteMatch(match.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.loading = false;
+              Swal.fire({
+                title: '¡Partido eliminado!',
+                text: 'El partido se ha eliminado correctamente',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              }).then(() => {
+                // Recargar los partidos del grupo
+                if (this.selectedGroupId) {
+                  this.loadMatchesByGroup(this.selectedGroupId);
+                }
+              });
+            },
+            error: (error) => {
+              this.loading = false;
+              console.error('Error deleting match:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo eliminar el partido',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+              this.cdr.detectChanges();
+            }
+          });
+      }
+    });
+  }
 }

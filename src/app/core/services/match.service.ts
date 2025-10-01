@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -68,6 +68,12 @@ export interface CreateRandomMatchesForMatchDayRequest {
 }
 
 export interface CreateRandomMatchesResponse {
+  succeed: boolean;
+  message: string;
+  result?: any;
+}
+
+export interface DeleteMatchResponse {
   succeed: boolean;
   message: string;
   result?: any;
@@ -163,6 +169,23 @@ export class MatchService {
           return response;
         }
         throw new Error(response.message || 'Error al generar partidos aleatorios');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Elimina un partido
+   * @param matchId ID del partido a eliminar
+   * @returns Observable con la respuesta de la eliminación
+   */
+  deleteMatch(matchId: number): Observable<DeleteMatchResponse> {
+    return this.apiService.delete<DeleteMatchResponse>(`${MATCH_DELETE_ENDPOINT}/${matchId}`).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al eliminar el partido');
       }),
       catchError(this.handleError)
     );

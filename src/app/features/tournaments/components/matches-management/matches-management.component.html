@@ -56,9 +56,9 @@
               </div>
 
               <!-- Match Days Accordion -->
-              <mat-accordion multi="true" class="matchdays-accordion" *ngIf="matchDays.length > 0">
-                <mat-expansion-panel *ngFor="let matchDay of matchDays; trackBy: trackByMatchDayId" 
-                                     [expanded]="true"
+              <mat-accordion class="matchdays-accordion" *ngIf="matchDays.length > 0">
+                <mat-expansion-panel *ngFor="let matchDay of matchDays; let i = index; trackBy: trackByMatchDayId" 
+                                     [expanded]="i === 0"
                                      class="matchday-panel">
                   
                   <!-- Panel Header -->
@@ -142,6 +142,29 @@
                                 <mat-icon class="detail-icon">schedule</mat-icon>
                                 <span class="detail-text">{{ formatMatchDate(match.matchDate) }}</span>
                               </div>
+                            </div>
+
+                            <!-- Match Actions -->
+                            <mat-divider></mat-divider>
+                            <div class="match-actions">
+                              <button mat-icon-button
+                                      (click)="updateMatchDate(match)"
+                                      matTooltip="Actualizar fecha"
+                                      class="action-btn-small">
+                                <mat-icon>calendar_today</mat-icon>
+                              </button>
+                              <button mat-icon-button
+                                      (click)="changeMatchStatus(match)"
+                                      matTooltip="Cambiar estado"
+                                      class="action-btn-small">
+                                <mat-icon>swap_horiz</mat-icon>
+                              </button>
+                              <button mat-icon-button
+                                      (click)="deleteMatchById(match)"
+                                      matTooltip="Eliminar partido"
+                                      class="action-btn-small delete">
+                                <mat-icon>delete</mat-icon>
+                              </button>
                             </div>
                           </mat-card-content>
                         </mat-card>
