@@ -22,137 +22,118 @@
 
       <!-- Phase Selection Tabs -->
       <div class="phase-tabs-container" *ngIf="phases.length > 0">
-        <mat-tab-group [(selectedIndex)]="selectedPhaseId" 
-                       (selectedIndexChange)="onPhaseChange($event)"
+        <mat-tab-group (selectedIndexChange)="onPhaseChange($event)"
                        class="phase-tabs">
           <mat-tab *ngFor="let phase of phases; trackBy: trackByPhaseId" 
                    [label]="phase.name">
             
-            <!-- Matches for Selected Phase -->
-            <div class="matches-content">
+            <!-- Group Selection -->
+            <div class="group-selection" *ngIf="getGroupsForSelectedPhase().length > 0">
+              <mat-form-field appearance="outline" class="group-select">
+                <mat-label>Seleccionar Grupo</mat-label>
+                <mat-select [(value)]="selectedGroupId" (selectionChange)="onGroupChange($event.value)">
+                  <mat-option *ngFor="let group of getGroupsForSelectedPhase()" [value]="group.id">
+                    {{ group.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix>groups</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-container" *ngIf="loading">
+              <mat-spinner diameter="50"></mat-spinner>
+              <p class="loading-text">Cargando partidos...</p>
+            </div>
+
+            <!-- Matches by Match Days -->
+            <div class="matches-content" *ngIf="!loading && selectedGroupId">
               <!-- No Matches Message -->
-              <div class="no-matches" *ngIf="getMatchesByPhase().length === 0">
+              <div class="no-matches" *ngIf="matchDays.length === 0">
                 <mat-icon class="no-matches-icon">sports_soccer</mat-icon>
                 <h3>No hay partidos programados</h3>
-                <p>Comienza creando el primer partido para esta fase</p>
+                <p>No se encontraron partidos para este grupo</p>
               </div>
 
-              <!-- Matches List -->
-              <div *ngIf="getMatchesByPhase().length > 0" class="matches-list">
-                <mat-card *ngFor="let match of getMatchesByPhase(); trackBy: trackByMatchId" 
-                          class="match-card">
+              <!-- Match Days Accordion -->
+              <mat-accordion multi="true" class="matchdays-accordion" *ngIf="matchDays.length > 0">
+                <mat-expansion-panel *ngFor="let matchDay of matchDays; trackBy: trackByMatchDayId" 
+                                     [expanded]="true"
+                                     class="matchday-panel">
                   
-                  <!-- Match Header -->
-                  <mat-card-header class="match-card-header">
-                    <div class="match-info">
-                      <div class="match-date">
-                        <mat-icon class="date-icon">event</mat-icon>
-                        <span>{{ formatMatchDateTime(match.date) }}</span>
+                  <!-- Panel Header -->
+                  <mat-expansion-panel-header class="panel-header">
+                    <mat-panel-title class="panel-title">
+                      <div class="matchday-info">
+                        <mat-icon class="matchday-icon">event</mat-icon>
+                        <span class="matchday-name">{{ matchDay.matchDayName }}</span>
+                        <mat-chip class="matches-count-chip">
+                          {{ matchDay.matches.length }} {{ matchDay.matches.length === 1 ? 'partido' : 'partidos' }}
+                        </mat-chip>
                       </div>
-                      <mat-chip class="match-status-chip"
-                               [color]="getMatchStatusColor(match.status)"
-                               [class]="getMatchStatusClass(match.status)">
-                        {{ getMatchStatusText(match.status) }}
-                      </mat-chip>
-                    </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
 
-                    <div class="match-actions">
-                      <button mat-icon-button
-                              (click)="editMatch(match)"
-                              matTooltip="Editar Partido"
-                              class="match-action-btn edit-btn">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button mat-icon-button
-                              color="warn"
-                              (click)="deleteMatch(match)"
-                              matTooltip="Eliminar Partido"
-                              class="match-action-btn delete-btn">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
-                  </mat-card-header>
+                  <!-- Panel Content - Matches List -->
+                  <div class="container-fluid">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                      <div *ngFor="let match of matchDay.matches; trackBy: trackByMatchInfoId" class="col">
+                        <mat-card class="match-card h-100">
+                          <mat-card-content class="match-content">
+                            <!-- Teams and Score -->
+                            <div class="match-main">
+                              <!-- Home Team -->
+                              <div class="team home-team">
+                                <img src="assets/logo.png" alt="Home Team" class="team-logo">
+                                <div class="team-info">
+                                  <span class="team-name">{{ match.homeTeam }}</span>
+                                </div>
+                              </div>
 
-                  <!-- Match Content -->
-                  <mat-card-content class="match-card-content">
-                    <div class="match-teams">
-                      <!-- Home Team -->
-                      <div class="team home-team">
-                        <div class="team-logo">
-                          <img [src]="match.homeTeam.logoBase64 ? 'data:' + match.homeTeam.logoContentType + ';base64,' + match.homeTeam.logoBase64 : 'assets/logo.png'"
-                               [alt]="match.homeTeam.name || 'Equipo Local'"
-                               class="team-image"
-                               (error)="$event.target.src='assets/logo.png'">
-                        </div>
-                        <div class="team-details">
-                          <h4 class="team-name">{{ match.homeTeam.name || 'Equipo Local' }}</h4>
-                          <span class="team-short">{{ match.homeTeam.shortName || 'LOCAL' }}</span>
-                        </div>
-                      </div>
+                              <!-- Score Section -->
+                              <div class="score-section">
+                                <div class="vs-text">
+                                  VS
+                                </div>
+                                
+                                <!-- Match Status -->
+                                <mat-chip 
+                                  [class]="getMatchStatusClassByNumber(match.status)"
+                                  class="status-chip">
+                                  {{ getMatchStatusTextByNumber(match.status) }}
+                                </mat-chip>
+                              </div>
 
-                      <!-- Match Score/VS -->
-                      <div class="match-score">
-                        <div class="score-display">
-                          <span class="score">{{ getMatchResult(match) }}</span>
-                        </div>
-                        <div class="match-round" *ngIf="match.round">
-                          <span>Jornada {{ match.round }}</span>
-                        </div>
-                      </div>
+                              <!-- Away Team -->
+                              <div class="team away-team">
+                                <div class="team-info">
+                                  <span class="team-name">{{ match.awayTeam }}</span>
+                                </div>
+                                <img src="assets/logo.png" alt="Away Team" class="team-logo">
+                              </div>
+                            </div>
 
-                      <!-- Away Team -->
-                      <div class="team away-team">
-                        <div class="team-details">
-                          <h4 class="team-name">{{ match.awayTeam.name || 'Equipo Visitante' }}</h4>
-                          <span class="team-short">{{ match.awayTeam.shortName || 'VISIT' }}</span>
-                        </div>
-                        <div class="team-logo">
-                          <img [src]="match.awayTeam.logoBase64 ? 'data:' + match.awayTeam.logoContentType + ';base64,' + match.awayTeam.logoBase64 : 'assets/logo.png'"
-                               [alt]="match.awayTeam.name || 'Equipo Visitante'"
-                               class="team-image"
-                               (error)="$event.target.src='assets/logo.png'">
-                        </div>
+                            <!-- Match Details -->
+                            <div class="match-details">
+                              <div class="detail-item">
+                                <mat-icon class="detail-icon">schedule</mat-icon>
+                                <span class="detail-text">{{ formatMatchDate(match.matchDate) }}</span>
+                              </div>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
                       </div>
                     </div>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
 
-                    <!-- Match Details -->
-                    <div class="match-details" *ngIf="match.venue || match.referee">
-                      <mat-divider></mat-divider>
-                      <div class="details-row">
-                        <div class="detail-item" *ngIf="match.venue">
-                          <mat-icon class="detail-icon">stadium</mat-icon>
-                          <span>{{ match.venue }}</span>
-                        </div>
-                        <div class="detail-item" *ngIf="match.referee">
-                          <mat-icon class="detail-icon">sports</mat-icon>
-                          <span>{{ match.referee }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </mat-card-content>
-
-                  <!-- Match Footer -->
-                  <mat-card-actions class="match-card-actions" *ngIf="match.status === 'finished'">
-                    <div class="match-stats">
-                      <div class="stat-item">
-                        <mat-icon class="stat-icon">timer</mat-icon>
-                        <span class="stat-label">Duración</span>
-                        <span class="stat-value">90'</span>
-                      </div>
-                      <div class="stat-item">
-                        <mat-icon class="stat-icon">warning</mat-icon>
-                        <span class="stat-label">Tarjetas</span>
-                        <span class="stat-value">0</span>
-                      </div>
-                      <div class="stat-item">
-                        <mat-icon class="stat-icon">sports_soccer</mat-icon>
-                        <span class="stat-label">Goles</span>
-                        <span class="stat-value">{{ (match.homeScore || 0) + (match.awayScore || 0) }}</span>
-                      </div>
-                    </div>
-                  </mat-card-actions>
-                </mat-card>
-              </div>
+            <!-- No Groups Message -->
+            <div class="no-groups" *ngIf="getGroupsForSelectedPhase().length === 0 && !loading">
+              <mat-icon class="no-groups-icon">group_work</mat-icon>
+              <h3>No hay grupos configurados</h3>
+              <p>Esta fase no tiene grupos configurados para mostrar partidos</p>
             </div>
           </mat-tab>
         </mat-tab-group>

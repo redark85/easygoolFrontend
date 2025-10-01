@@ -43,6 +43,8 @@ export const PLAYER_GET_BY_TEAM_ENDPOINT = '/api/Player/GetByTeam';
 export const PLAYER_UPDATE_ENDPOINT = '/api/Player/UpdatePlayer';
 export const PLAYER_DELETE_ENDPOINT = '/api/Player/DeletePlayer';
 
+// Match Endpoints
+export const MATCH_GET_ALL_BY_GROUP_ENDPOINT = '/api/Match/GetAllMatchesByGroup';
 
 // Configuración de endpoints
 export const EndpointsConfig = {
@@ -88,5 +90,8 @@ export const EndpointsConfig = {
   PLAYER_CREATE_ENDPOINT,
   PLAYER_GET_BY_TEAM_ENDPOINT,
   PLAYER_UPDATE_ENDPOINT,
-  PLAYER_DELETE_ENDPOINT
+  PLAYER_DELETE_ENDPOINT,
+
+  // Match
+  MATCH_GET_ALL_BY_GROUP_ENDPOINT
 };
