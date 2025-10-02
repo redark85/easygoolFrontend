@@ -102,6 +102,9 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
       if (phase.groups && phase.groups.length > 0) {
         this.selectedGroupId = phase.groups[0].id;
         this.loadMatchesByGroup(this.selectedGroupId);
+      } else if (phase.phaseType === PhaseType.Knockout) {
+        this.loadMatchesByPhase(phase.id);
+        
       } else {
         this.selectedGroupId = null;
         this.matchDays = [];
@@ -140,12 +143,34 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
       });
   }
 
+   /**
+   * Carga los partidos de una phase organizados por jornadas
+   */
+  private loadMatchesByPhase(phaseId: number): void {
+    this.loading = true;
+    this.matchService.getAllMatchesByPhase(phaseId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (matchDays) => {
+          this.matchDays = matchDays;
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading matches by phase:', error);
+          this.matchDays = [];
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
   /**
    * Obtiene los grupos de la fase seleccionada
    */
   getGroupsForSelectedPhase(): Group[] {
     if (!this.selectedPhaseId) return [];
-    const phase = this.phases.find(p => p.id === this.selectedPhaseId);
+    const phase = this.phases.find(p => p.id === this.selectedPhaseId);    
     return phase?.groups || [];
   }
 
@@ -482,22 +507,38 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Crea un nuevo partido para una jornada específica
    */
   createMatchForMatchDay(matchDay: MatchDay): void {
-    if (!this.selectedGroupId || !this.selectedPhaseId) {
+    if (!this.selectedPhaseId) {
       Swal.fire({
         title: 'Error',
-        text: 'No se ha seleccionado un grupo o fase',
+        text: 'No se ha seleccionado una fase',
         icon: 'error',
         confirmButtonText: 'Aceptar'
       });
       return;
     }
 
+    const phase = this.getSelectedPhase();
+    
+    // Para fase de grupos, verificar que haya grupo seleccionado
+    if (phase?.phaseType === PhaseType.GroupStage && !this.selectedGroupId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se ha seleccionado un grupo',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Para eliminatoria directa, usar groupId = 0
+    const groupId = phase?.phaseType === PhaseType.GroupStage ? this.selectedGroupId! : 0;
+
     const dialogRef = this.dialog.open(CreateMatchModalComponent, {
       width: '700px',
       maxWidth: '90vw',
       disableClose: false,
       data: {
-        groupId: this.selectedGroupId,
+        groupId: groupId,
         phaseId: this.selectedPhaseId,
         matchDayId: matchDay.matchDayId,
         matchDayName: matchDay.matchDayName
@@ -514,9 +555,11 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
           showConfirmButton: false
         });
         
-        // Recargar los partidos del grupo
-        if (this.selectedGroupId) {
+        // Recargar los partidos según el tipo de fase
+        if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
           this.loadMatchesByGroup(this.selectedGroupId);
+        } else if (phase?.phaseType === PhaseType.Knockout && this.selectedPhaseId) {
+          this.loadMatchesByPhase(this.selectedPhaseId);
         }
       }
     });

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -100,6 +100,23 @@ export class MatchService {
    */
   getAllMatchesByGroup(groupId: number): Observable<MatchDay[]> {
     return this.apiService.get<MatchesByGroupResponse>(`${MATCH_GET_ALL_BY_GROUP_ENDPOINT}/${groupId}`).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        throw new Error(response.message || 'Error al obtener partidos del grupo');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+    /**
+   * Obtiene todos los partidos de un grupo organizados por jornadas
+   * @param groupId ID del grupo
+   * @returns Observable con las jornadas y partidos
+   */
+  getAllMatchesByPhase(phaseId: number): Observable<MatchDay[]> {
+    return this.apiService.get<MatchesByGroupResponse>(`${MATCH_GET_ALL_BY_PHASE_ENDPOINT}/${phaseId}`).pipe(
       map(response => {
         if (response.succeed && response.result) {
           return response.result;

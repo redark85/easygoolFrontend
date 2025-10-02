@@ -87,6 +87,7 @@
                             <mat-icon>add_circle</mat-icon>
                           </button>
                           <button mat-icon-button
+                                  *ngIf="phase.phaseType !== 1"
                                   (click)="generateRandomMatches(matchDay)"
                                   matTooltip="Generar partidos aleatorios"
                                   class="action-btn random-btn">
@@ -183,7 +184,7 @@
             </div>
 
             <!-- No Groups Message -->
-            <div class="no-groups" *ngIf="getGroupsForSelectedPhase().length === 0 && !loading">
+            <div class="no-groups" *ngIf="getGroupsForSelectedPhase().length === 0 && !loading && phase.phaseType !== 1">
               <mat-icon class="no-groups-icon">group_work</mat-icon>
               <h3>No hay grupos configurados</h3>
               <p>Esta fase no tiene grupos configurados para mostrar partidos</p>
