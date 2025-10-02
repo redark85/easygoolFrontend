@@ -209,32 +209,38 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Obtiene el texto del botón FAB según el tipo de fase
    */
   getFabButtonText(): string {
-    const phase = this.getSelectedPhase();
-    if (!phase) return 'Nuevo Partido';
-    return phase.phaseType === PhaseType.GroupStage ? 'Nueva Jornada' : 'Nuevo Partido';
+    return 'Nueva Jornada';
   }
 
   /**
    * Maneja el clic en el botón FAB principal
+   * Crea una nueva jornada tanto para fase de grupos como para eliminatoria directa
    */
   createMatch(): void {
     const phase = this.getSelectedPhase();
     if (!phase) return;
 
-    if (phase.phaseType === PhaseType.GroupStage) {
-      // Fase de grupos: crear nueva jornada
-      this.createNewMatchDay();
-    } else {
-      // Eliminatoria directa: abrir modal para crear partido
-      this.openCreateMatchModalForKnockout();
-    }
+    // Usar el mismo flujo para ambos tipos de fase
+    this.createNewMatchDay();
   }
 
   /**
-   * Crea una nueva jornada (para fase de grupos)
+   * Crea una nueva jornada
    */
   private createNewMatchDay(): void {
-    if (!this.selectedPhaseId || !this.selectedGroupId) {
+    const phase = this.getSelectedPhase();
+    if (!this.selectedPhaseId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se ha seleccionado una fase',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Para fase de grupos, verificar que haya grupo seleccionado
+    if (phase?.phaseType === PhaseType.GroupStage && !this.selectedGroupId) {
       Swal.fire({
         title: 'Error',
         text: 'Debes seleccionar un grupo primero',
@@ -244,8 +250,11 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Para eliminatoria directa, usar groupId = 0
+    const groupId = phase?.phaseType === PhaseType.GroupStage ? this.selectedGroupId! : 0;
+
     this.loading = true;
-    this.matchService.createMatchDay(this.selectedPhaseId, this.selectedGroupId)
+    this.matchService.createMatchDay(this.selectedPhaseId, groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -257,7 +266,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
             showConfirmButton: false
           });
           
-          // Recargar los partidos del grupo
+          // Recargar los partidos del grupo (si aplica)
           if (this.selectedGroupId) {
             this.loadMatchesByGroup(this.selectedGroupId);
           }
@@ -274,48 +283,6 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       });
-  }
-
-  /**
-   * Abre el modal para crear partido en eliminatoria directa
-   */
-  private openCreateMatchModalForKnockout(): void {
-    if (!this.selectedPhaseId) {
-      Swal.fire({
-        title: 'Error',
-        text: 'No se ha seleccionado una fase',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-      return;
-    }
-
-    // Para eliminatoria directa, usamos matchDayId = 1 por defecto
-    const dialogRef = this.dialog.open(CreateMatchModalComponent, {
-      width: '700px',
-      maxWidth: '90vw',
-      disableClose: false,
-      data: {
-        groupId: 0, // No hay grupo en eliminatorias
-        phaseId: this.selectedPhaseId,
-        matchDayId: 1,
-        matchDayName: 'Eliminatoria'
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result?.success) {
-        Swal.fire({
-          title: '¡Partido creado!',
-          text: 'El partido se ha creado exitosamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        
-        // TODO: Recargar los partidos de la fase
-      }
-    });
   }
 
   /**
