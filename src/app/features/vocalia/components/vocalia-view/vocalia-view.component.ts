@@ -824,16 +824,41 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#d33'
     }).then((result) => {
       if (result.isConfirmed) {
-        // TODO: Implementar llamada al API para finalizar partido
+        // Mostrar loading
         Swal.fire({
-          title: '¡Partido finalizado!',
-          text: 'El resultado ha sido guardado correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          this.router.navigate(['/matches']);
+          title: 'Finalizando partido...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
         });
+
+        // Llamar al API para finalizar partido
+        this.vocaliaService.finishMatch(this.matchId!)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              Swal.fire({
+                title: '¡Partido finalizado!',
+                text: 'El resultado ha sido guardado correctamente',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              }).then(() => {
+                this.router.navigate(['/matches']);
+              });
+            },
+            error: (error) => {
+              console.error('Error finishing match:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo finalizar el partido',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          });
       }
     });
   }

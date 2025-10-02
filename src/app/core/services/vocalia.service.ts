@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT, VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT } from '../config/endpoints';
+import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT, VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT, VOCALIA_FINISH_MATCH_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export enum MatchEventType {
@@ -92,6 +92,13 @@ interface RegisterMatchEventResponse {
   messageType: string | null;
 }
 
+interface FinishMatchResponse {
+  succeed: boolean;
+  message: string | null;
+  messageId: string | null;
+  messageType: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -148,6 +155,23 @@ export class VocaliaService {
           return true;
         }
         throw new Error(response.message || 'Error al registrar eventos del partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Finaliza el partido
+   * @param matchId ID del partido a finalizar
+   * @returns Observable con la respuesta del servidor
+   */
+  finishMatch(matchId: number): Observable<boolean> {
+    return this.apiService.post<FinishMatchResponse>(`${VOCALIA_FINISH_MATCH_ENDPOINT}/${matchId}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          return true;
+        }
+        throw new Error(response.message || 'Error al finalizar el partido');
       }),
       catchError(this.handleError)
     );
