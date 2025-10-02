@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -124,6 +124,24 @@ export class MatchService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener equipos libres');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Crea una nueva jornada para un grupo
+   * @param phaseId ID de la fase
+   * @param groupId ID del grupo
+   * @returns Observable con la respuesta de la creación
+   */
+  createMatchDay(phaseId: number, groupId: number): Observable<CreateMatchResponse> {
+    return this.apiService.post<CreateMatchResponse>(`${MATCH_CREATE_MATCHDAY_ENDPOINT}?phaseId=${phaseId}&groupId=${groupId}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al crear la jornada');
       }),
       catchError(this.handleError)
     );

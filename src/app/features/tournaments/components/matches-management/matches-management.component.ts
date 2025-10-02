@@ -16,7 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { Match, MatchStatus } from '../../models/match.interface';
-import { Phase, Group } from '../../models/phase.interface';
+import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
 import { MatchService, MatchDay } from '@core/services/match.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
@@ -198,11 +198,124 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Crea un nuevo partido
+   * Obtiene la fase seleccionada actualmente
+   */
+  getSelectedPhase(): Phase | null {
+    if (!this.selectedPhaseId) return null;
+    return this.phases.find(p => p.id === this.selectedPhaseId) || null;
+  }
+
+  /**
+   * Obtiene el texto del botón FAB según el tipo de fase
+   */
+  getFabButtonText(): string {
+    const phase = this.getSelectedPhase();
+    if (!phase) return 'Nuevo Partido';
+    return phase.phaseType === PhaseType.GroupStage ? 'Nueva Jornada' : 'Nuevo Partido';
+  }
+
+  /**
+   * Maneja el clic en el botón FAB principal
    */
   createMatch(): void {
-    // TODO: Implementar modal de creación de partido
-    console.log('Create match for phase:', this.selectedPhaseId);
+    const phase = this.getSelectedPhase();
+    if (!phase) return;
+
+    if (phase.phaseType === PhaseType.GroupStage) {
+      // Fase de grupos: crear nueva jornada
+      this.createNewMatchDay();
+    } else {
+      // Eliminatoria directa: abrir modal para crear partido
+      this.openCreateMatchModalForKnockout();
+    }
+  }
+
+  /**
+   * Crea una nueva jornada (para fase de grupos)
+   */
+  private createNewMatchDay(): void {
+    if (!this.selectedPhaseId || !this.selectedGroupId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Debes seleccionar un grupo primero',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    this.loading = true;
+    this.matchService.createMatchDay(this.selectedPhaseId, this.selectedGroupId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            title: '¡Jornada creada!',
+            text: 'La nueva jornada se ha creado exitosamente',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          
+          // Recargar los partidos del grupo
+          if (this.selectedGroupId) {
+            this.loadMatchesByGroup(this.selectedGroupId);
+          }
+        },
+        error: (error) => {
+          console.error('Error creating match day:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudo crear la jornada',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Abre el modal para crear partido en eliminatoria directa
+   */
+  private openCreateMatchModalForKnockout(): void {
+    if (!this.selectedPhaseId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se ha seleccionado una fase',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Para eliminatoria directa, usamos matchDayId = 1 por defecto
+    const dialogRef = this.dialog.open(CreateMatchModalComponent, {
+      width: '700px',
+      maxWidth: '90vw',
+      disableClose: false,
+      data: {
+        groupId: 0, // No hay grupo en eliminatorias
+        phaseId: this.selectedPhaseId,
+        matchDayId: 1,
+        matchDayName: 'Eliminatoria'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        Swal.fire({
+          title: '¡Partido creado!',
+          text: 'El partido se ha creado exitosamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        
+        // TODO: Recargar los partidos de la fase
+      }
+    });
   }
 
   /**

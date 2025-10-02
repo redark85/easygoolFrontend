@@ -15,7 +15,7 @@
       <button mat-fab
               class="fab-create-match"
               (click)="createMatch()"
-              matTooltip="Nuevo Partido"
+              [matTooltip]="getFabButtonText()"
               [disabled]="!selectedPhaseId">
         <mat-icon>add</mat-icon>
       </button>

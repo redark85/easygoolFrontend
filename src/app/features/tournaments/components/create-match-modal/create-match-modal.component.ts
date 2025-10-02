@@ -210,13 +210,7 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
     };
 
     this.matchService.createMatch(request)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        })
-      )
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           Swal.fire({
