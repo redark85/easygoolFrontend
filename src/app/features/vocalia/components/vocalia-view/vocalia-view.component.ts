@@ -253,28 +253,35 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Filtra los jugadores por número o nombre
+   * Filtra los jugadores por número de camiseta o nombre
+   * Busca en la lista de jugadores obtenida del API (playerInGame)
    */
   filterPlayers(team: 'home' | 'away'): void {
     if (team === 'home') {
       const searchText = this.homeTeamSearchText.toLowerCase().trim();
       if (searchText === '') {
+        // Mostrar todos los jugadores del equipo local
         this.filteredHomeTeamPlayers = [...this.homeTeamPlayers];
       } else {
-        this.filteredHomeTeamPlayers = this.homeTeamPlayers.filter(player =>
-          player.number.toString().includes(searchText) ||
-          player.name.toLowerCase().includes(searchText)
-        );
+        // Filtrar por número de camiseta o nombre
+        this.filteredHomeTeamPlayers = this.homeTeamPlayers.filter(player => {
+          const numberMatch = player.number.toString().includes(searchText);
+          const nameMatch = player.name.toLowerCase().includes(searchText);
+          return numberMatch || nameMatch;
+        });
       }
     } else {
       const searchText = this.awayTeamSearchText.toLowerCase().trim();
       if (searchText === '') {
+        // Mostrar todos los jugadores del equipo visitante
         this.filteredAwayTeamPlayers = [...this.awayTeamPlayers];
       } else {
-        this.filteredAwayTeamPlayers = this.awayTeamPlayers.filter(player =>
-          player.number.toString().includes(searchText) ||
-          player.name.toLowerCase().includes(searchText)
-        );
+        // Filtrar por número de camiseta o nombre
+        this.filteredAwayTeamPlayers = this.awayTeamPlayers.filter(player => {
+          const numberMatch = player.number.toString().includes(searchText);
+          const nameMatch = player.name.toLowerCase().includes(searchText);
+          return numberMatch || nameMatch;
+        });
       }
     }
   }
