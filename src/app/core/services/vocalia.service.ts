@@ -1,8 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT } from '../config/endpoints';
+import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT, VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
+
+export enum MatchEventType {
+  InMatch = 0,
+  Goal = 1,
+  YellowCard = 2,
+  DoubleYellowCard = 3,
+  RedCard = 4,
+  Substitution = 5,
+  Injury = 6,
+  PenaltyMissed = 7,
+  Other = 8
+}
 
 export interface VocaliaPlayer {
   tournamentTeamPlayerId: number;
@@ -17,6 +29,19 @@ export interface AvailablePlayer {
   jerseyNumber: number;
   tournamentTeamPlayerId: number;
   isSanctioned: boolean;
+}
+
+export interface MatchEvent {
+  tournamentTeamPlayerId: number;
+  eventType: MatchEventType;
+  minute: number;
+  description: string;
+  isHomeGoal: boolean;
+}
+
+export interface RegisterMatchEventRequest {
+  matchId: number;
+  events: MatchEvent[];
 }
 
 export interface VocaliaTeam {
@@ -54,6 +79,13 @@ interface VocaliaMatchResponse {
 interface AvailablePlayersResponse {
   records: number;
   result: AvailablePlayer[];
+  succeed: boolean;
+  message: string | null;
+  messageId: string | null;
+  messageType: string | null;
+}
+
+interface RegisterMatchEventResponse {
   succeed: boolean;
   message: string | null;
   messageId: string | null;
@@ -99,6 +131,23 @@ export class VocaliaService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener jugadores disponibles');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Registra eventos del partido (jugadores ingresando, goles, tarjetas, etc.)
+   * @param request Request con matchId y lista de eventos
+   * @returns Observable con la respuesta del servidor
+   */
+  registerMatchEvent(request: RegisterMatchEventRequest): Observable<boolean> {
+    return this.apiService.post<RegisterMatchEventResponse>(VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return true;
+        }
+        throw new Error(response.message || 'Error al registrar eventos del partido');
       }),
       catchError(this.handleError)
     );

@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { VocaliaService, VocaliaPlayer, AvailablePlayer } from '@core/services/vocalia.service';
+import { VocaliaService, VocaliaPlayer, AvailablePlayer, MatchEventType, RegisterMatchEventRequest, MatchEvent } from '@core/services/vocalia.service';
 
 interface Player {
   id: number;
@@ -355,9 +355,9 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       const sanctionedLabel = isSanctioned ? '<span class="sanctioned-badge">SANCIONADO</span>' : '';
       
       return `
-        <div class="player-item ${disabledClass}">
-          <input type="radio" 
-                 name="selectedPlayer" 
+        <div class="player-item ${disabledClass}" data-number="${player.jerseyNumber}" data-name="${player.fullName.toLowerCase()}">
+          <input type="checkbox" 
+                 class="player-checkbox"
                  value="${player.tournamentTeamPlayerId}" 
                  id="player-${player.tournamentTeamPlayerId}"
                  ${disabledAttr}
@@ -373,9 +373,29 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     }).join('');
 
     Swal.fire({
-      title: 'Seleccionar jugador',
+      title: 'Seleccionar jugadores',
       html: `
         <style>
+          .search-container {
+            margin-bottom: 15px;
+          }
+          .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+          }
+          .search-input:focus {
+            outline: none;
+            border-color: #3085d6;
+          }
+          .selected-count {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #3085d6;
+          }
           .player-item {
             display: flex;
             align-items: center;
@@ -395,11 +415,16 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
             cursor: not-allowed;
             background-color: #f5f5f5;
           }
-          .player-item input[type="radio"] {
+          .player-item.hidden {
+            display: none;
+          }
+          .player-checkbox {
             margin-right: 12px;
             cursor: pointer;
+            width: 18px;
+            height: 18px;
           }
-          .player-item.player-sanctioned input[type="radio"] {
+          .player-item.player-sanctioned .player-checkbox {
             cursor: not-allowed;
           }
           .player-item label {
@@ -430,53 +455,163 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
             font-size: 0.75rem;
             font-weight: 600;
           }
+          .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            display: none;
+          }
+          .no-results.show {
+            display: block;
+          }
         </style>
-        <div style="max-height: 400px; overflow-y: auto; text-align: left;">
+        <div class="search-container">
+          <input type="text" 
+                 id="playerSearch" 
+                 class="search-input" 
+                 placeholder="Buscar por número de camiseta o nombre..."
+                 autocomplete="off">
+        </div>
+        <div class="selected-count" id="selectedCount">0 jugadores seleccionados</div>
+        <div style="max-height: 400px; overflow-y: auto; text-align: left;" id="playersContainer">
           ${playersHtml}
+          <div class="no-results" id="noResults">No se encontraron jugadores</div>
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'Agregar',
+      confirmButtonText: 'Agregar seleccionados',
       cancelButtonText: 'Cancelar',
       width: '600px',
+      didOpen: () => {
+        const searchInput = document.getElementById('playerSearch') as HTMLInputElement;
+        const playerItems = document.querySelectorAll('.player-item');
+        const noResults = document.getElementById('noResults') as HTMLElement;
+        const checkboxes = document.querySelectorAll('.player-checkbox') as NodeListOf<HTMLInputElement>;
+        const selectedCount = document.getElementById('selectedCount') as HTMLElement;
+
+        // Función para actualizar contador
+        const updateCount = () => {
+          const checked = document.querySelectorAll('.player-checkbox:checked').length;
+          selectedCount.textContent = `${checked} jugador${checked !== 1 ? 'es' : ''} seleccionado${checked !== 1 ? 's' : ''}`;
+        };
+
+        // Event listener para checkboxes
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', updateCount);
+        });
+
+        // Event listener para búsqueda
+        searchInput.addEventListener('input', (e) => {
+          const searchText = (e.target as HTMLInputElement).value.toLowerCase().trim();
+          let visibleCount = 0;
+
+          playerItems.forEach(item => {
+            const playerNumber = (item as HTMLElement).dataset['number'] || '';
+            const playerName = (item as HTMLElement).dataset['name'] || '';
+            
+            const matchesNumber = playerNumber.includes(searchText);
+            const matchesName = playerName.includes(searchText);
+            
+            if (searchText === '' || matchesNumber || matchesName) {
+              item.classList.remove('hidden');
+              visibleCount++;
+            } else {
+              item.classList.add('hidden');
+            }
+          });
+
+          // Mostrar mensaje si no hay resultados
+          if (visibleCount === 0) {
+            noResults.classList.add('show');
+          } else {
+            noResults.classList.remove('show');
+          }
+        });
+
+        // Focus en el input de búsqueda
+        searchInput.focus();
+      },
       preConfirm: () => {
-        const selected = document.querySelector('input[name="selectedPlayer"]:checked') as HTMLInputElement;
-        if (!selected) {
-          Swal.showValidationMessage('Por favor selecciona un jugador');
+        const selected = Array.from(document.querySelectorAll('.player-checkbox:checked')) as HTMLInputElement[];
+        if (selected.length === 0) {
+          Swal.showValidationMessage('Por favor selecciona al menos un jugador');
           return false;
         }
-        return {
-          id: parseInt(selected.value),
-          number: parseInt(selected.dataset['number'] || '0'),
-          name: selected.dataset['name'] || ''
-        };
+        return selected.map(checkbox => ({
+          id: parseInt(checkbox.value),
+          number: parseInt(checkbox.dataset['number'] || '0'),
+          name: checkbox.dataset['name'] || ''
+        }));
       }
     }).then((result) => {
       if (result.isConfirmed && result.value) {
-        const newPlayer: Player = {
-          id: result.value.id,
-          number: result.value.number,
-          name: result.value.name,
+        const addedPlayers: Player[] = result.value.map((playerData: any) => ({
+          id: playerData.id,
+          number: playerData.number,
+          name: playerData.name,
           goals: 0,
           yellowCards: 0,
           redCards: 0
+        }));
+        
+        // Preparar eventos para el API
+        const isHomeTeam = team === 'home';
+        const events: MatchEvent[] = addedPlayers.map(player => ({
+          tournamentTeamPlayerId: player.id,
+          eventType: MatchEventType.InMatch,
+          minute: 0,
+          description: `${player.name} ingresa al partido`,
+          isHomeGoal: isHomeTeam
+        }));
+
+        const request: RegisterMatchEventRequest = {
+          matchId: this.matchId!,
+          events: events
         };
-        
-        if (team === 'home') {
-          this.homeTeamPlayers.push(newPlayer);
-          this.filterPlayers('home');
-        } else {
-          this.awayTeamPlayers.push(newPlayer);
-          this.filterPlayers('away');
-        }
-        
+
+        // Mostrar loading
         Swal.fire({
-          title: '¡Jugador agregado!',
-          text: `${newPlayer.name} ha sido agregado al equipo`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
+          title: 'Registrando jugadores...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
         });
+
+        // Llamar al API
+        this.vocaliaService.registerMatchEvent(request)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Agregar jugadores a la lista local
+              if (team === 'home') {
+                this.homeTeamPlayers.push(...addedPlayers);
+                this.filterPlayers('home');
+              } else {
+                this.awayTeamPlayers.push(...addedPlayers);
+                this.filterPlayers('away');
+              }
+              
+              const count = addedPlayers.length;
+              Swal.fire({
+                title: '¡Jugadores agregados!',
+                text: `${count} jugador${count !== 1 ? 'es' : ''} agregado${count !== 1 ? 's' : ''} al equipo`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (error) => {
+              console.error('Error registering players:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudieron registrar los jugadores',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          });
       }
     });
   }

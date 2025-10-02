@@ -57,6 +57,7 @@ export const MATCH_DELETE_MATCHDAY_ENDPOINT = '/api/Match/DeleteMatchDay';
 // Vocalia Endpoints
 export const VOCALIA_GET_MATCH_ENDPOINT = '/api/Vocalia/GetMatch';
 export const VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT = '/api/Vocalia/GetAvailablePlayers';
+export const VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT = '/api/Vocalia/RegisterMatchEvent';
 
 // Configuración de endpoints
 export const EndpointsConfig = {
