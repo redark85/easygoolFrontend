@@ -207,20 +207,74 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
    * Registra un gol
    */
   addGoal(player: Player, team: 'home' | 'away'): void {
-    player.goals++;
-    if (team === 'home') {
-      this.homeScore++;
-    } else {
-      this.awayScore++;
-    }
-    
     const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
-    this.incidents.unshift({
-      minute: this.getCurrentMinute(),
-      type: 'goal',
-      player: `#${player.number} ${player.name}`,
-      team: teamName,
-      description: `Gol de #${player.number} ${player.name} (${teamName})`
+    
+    Swal.fire({
+      title: '¿Registrar gol?',
+      html: `
+        <p>¿Estás seguro de registrar un gol para:</p>
+        <p style="margin-top: 10px;"><strong>#${player.number} ${player.name}</strong></p>
+        <p style="color: #666;">${teamName}</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#4caf50',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const isHomeTeam = team === 'home';
+        const event: MatchEvent = {
+          tournamentTeamPlayerId: player.id,
+          eventType: MatchEventType.Goal,
+          minute: 0,
+          description: `Gol de #${player.number} ${player.name} (${teamName})`,
+          isHomeGoal: isHomeTeam
+        };
+
+        const request: RegisterMatchEventRequest = {
+          matchId: this.matchId!,
+          events: [event]
+        };
+
+        // Mostrar loading
+        Swal.fire({
+          title: 'Registrando gol...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Llamar al API
+        this.vocaliaService.registerMatchEvent(request)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Recargar información del partido desde el API
+              this.loadMatchData(this.matchId!);
+
+              Swal.fire({
+                title: '¡Gol registrado!',
+                text: `Gol de ${player.name}`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (error) => {
+              console.error('Error registering goal:', error);
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo registrar el gol',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          });
+      }
     });
   }
 
@@ -603,14 +657,8 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
-              // Agregar jugadores a la lista local
-              if (team === 'home') {
-                this.homeTeamPlayers.push(...addedPlayers);
-                this.filterPlayers('home');
-              } else {
-                this.awayTeamPlayers.push(...addedPlayers);
-                this.filterPlayers('away');
-              }
+              // Recargar información del partido desde el API
+              this.loadMatchData(this.matchId!);
               
               const count = addedPlayers.length;
               Swal.fire({
