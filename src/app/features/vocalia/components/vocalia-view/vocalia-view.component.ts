@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { VocaliaService, VocaliaPlayer } from '@core/services/vocalia.service';
+import { VocaliaService, VocaliaPlayer, AvailablePlayer } from '@core/services/vocalia.service';
 
 interface Player {
   id: number;
@@ -53,6 +53,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
   matchId: number | null = null;
+  tournamentId: number | null = null;
   isLoading = false;
   
   // Match Info
@@ -129,6 +130,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           // Información del partido
+          this.tournamentId = data.tournamentId;
           this.tournamentName = data.tournamentName;
           this.homeTeam = data.homeTeam.name;
           this.awayTeam = data.awayTeam.name;
@@ -287,44 +289,172 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Agrega un nuevo jugador
+   * Agrega un nuevo jugador desde la lista de jugadores disponibles
    */
   addPlayer(team: 'home' | 'away'): void {
+    const phaseTeamId = team === 'home' ? this.homeTeamId : this.awayTeamId;
+    
+    if (!phaseTeamId || !this.tournamentId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo obtener la información del equipo',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Mostrar loading
     Swal.fire({
-      title: 'Agregar jugador',
+      title: 'Cargando jugadores...',
+      text: 'Por favor espera',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // Obtener jugadores disponibles del API
+    this.vocaliaService.getAvailablePlayers(phaseTeamId, this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (players) => {
+          this.showPlayerSelectionModal(players, team);
+        },
+        error: (error) => {
+          console.error('Error loading available players:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudieron cargar los jugadores disponibles',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+  }
+
+  /**
+   * Muestra el modal de selección de jugadores
+   */
+  private showPlayerSelectionModal(players: AvailablePlayer[], team: 'home' | 'away'): void {
+    if (players.length === 0) {
+      Swal.fire({
+        title: 'Sin jugadores',
+        text: 'No hay jugadores disponibles para agregar',
+        icon: 'info',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Generar HTML de la lista de jugadores
+    const playersHtml = players.map(player => {
+      const isSanctioned = player.isSanctioned;
+      const disabledClass = isSanctioned ? 'player-sanctioned' : '';
+      const disabledAttr = isSanctioned ? 'disabled' : '';
+      const sanctionedLabel = isSanctioned ? '<span class="sanctioned-badge">SANCIONADO</span>' : '';
+      
+      return `
+        <div class="player-item ${disabledClass}">
+          <input type="radio" 
+                 name="selectedPlayer" 
+                 value="${player.tournamentTeamPlayerId}" 
+                 id="player-${player.tournamentTeamPlayerId}"
+                 ${disabledAttr}
+                 data-number="${player.jerseyNumber}"
+                 data-name="${player.fullName}">
+          <label for="player-${player.tournamentTeamPlayerId}">
+            <span class="player-number">#${player.jerseyNumber}</span>
+            <span class="player-name">${player.fullName}</span>
+            ${sanctionedLabel}
+          </label>
+        </div>
+      `;
+    }).join('');
+
+    Swal.fire({
+      title: 'Seleccionar jugador',
       html: `
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-          <input id="player-number" type="number" class="swal2-input" placeholder="Número de camiseta" min="1" max="99">
-          <input id="player-name" type="text" class="swal2-input" placeholder="Nombre del jugador">
+        <style>
+          .player-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+          .player-item:hover:not(.player-sanctioned) {
+            border-color: #3085d6;
+            background-color: #f0f8ff;
+          }
+          .player-item.player-sanctioned {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+          }
+          .player-item input[type="radio"] {
+            margin-right: 12px;
+            cursor: pointer;
+          }
+          .player-item.player-sanctioned input[type="radio"] {
+            cursor: not-allowed;
+          }
+          .player-item label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin: 0;
+          }
+          .player-item.player-sanctioned label {
+            cursor: not-allowed;
+          }
+          .player-number {
+            font-weight: 700;
+            color: #3085d6;
+            min-width: 40px;
+          }
+          .player-name {
+            flex: 1;
+            text-align: left;
+          }
+          .sanctioned-badge {
+            background-color: #f44336;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+        </style>
+        <div style="max-height: 400px; overflow-y: auto; text-align: left;">
+          ${playersHtml}
         </div>
       `,
-      icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Agregar',
       cancelButtonText: 'Cancelar',
+      width: '600px',
       preConfirm: () => {
-        const numberInput = document.getElementById('player-number') as HTMLInputElement;
-        const nameInput = document.getElementById('player-name') as HTMLInputElement;
-        
-        const number = parseInt(numberInput.value);
-        const name = nameInput.value.trim();
-        
-        if (!number || number < 1 || number > 99) {
-          Swal.showValidationMessage('Por favor ingresa un número válido (1-99)');
+        const selected = document.querySelector('input[name="selectedPlayer"]:checked') as HTMLInputElement;
+        if (!selected) {
+          Swal.showValidationMessage('Por favor selecciona un jugador');
           return false;
         }
-        
-        if (!name) {
-          Swal.showValidationMessage('Por favor ingresa el nombre del jugador');
-          return false;
-        }
-        
-        return { number, name };
+        return {
+          id: parseInt(selected.value),
+          number: parseInt(selected.dataset['number'] || '0'),
+          name: selected.dataset['name'] || ''
+        };
       }
     }).then((result) => {
       if (result.isConfirmed && result.value) {
         const newPlayer: Player = {
-          id: Date.now(), // ID temporal
+          id: result.value.id,
           number: result.value.number,
           name: result.value.name,
           goals: 0,
@@ -334,10 +464,10 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
         
         if (team === 'home') {
           this.homeTeamPlayers.push(newPlayer);
-          this.filterPlayers('home'); // Actualizar lista filtrada
+          this.filterPlayers('home');
         } else {
           this.awayTeamPlayers.push(newPlayer);
-          this.filterPlayers('away'); // Actualizar lista filtrada
+          this.filterPlayers('away');
         }
         
         Swal.fire({
