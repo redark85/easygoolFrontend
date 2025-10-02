@@ -29,6 +29,13 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   
+  // Vocalia routes (lazy loaded, protected, fullscreen without sidebar)
+  {
+    path: 'vocalia',
+    loadChildren: () => import('./features/vocalia/vocalia.routes').then(r => r.VOCALIA_ROUTES),
+    canActivate: [AuthGuard]
+  },
+  
   // Wildcard route - redirect to login
   { 
     path: '**', 
