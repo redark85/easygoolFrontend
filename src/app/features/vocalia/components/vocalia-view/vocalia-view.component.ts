@@ -1,13 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
-import { Subject, takeUntil } from 'rxjs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
+import { VocaliaService, VocaliaPlayer } from '@core/services/vocalia.service';
 
 interface Player {
   id: number;
@@ -31,11 +36,15 @@ interface MatchIncident {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatChipsModule,
-    MatDividerModule
+    MatDividerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './vocalia-view.component.html',
   styleUrls: ['./vocalia-view.component.scss']
@@ -44,39 +53,50 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
   matchId: number | null = null;
+  isLoading = false;
   
   // Match Info
-  tournamentName = 'Campeonato Nacional - Estadio X';
-  homeTeam = 'Equipo A';
-  awayTeam = 'Equipo B';
-  homeScore = 1;
-  awayScore = 2;
-  matchTime = '23:15';
+  tournamentName = '';
+  homeTeam = '';
+  awayTeam = '';
+  homeTeamLogo = '';
+  awayTeamLogo = '';
+  homeScore = 0;
+  awayScore = 0;
+  matchTime = '00:00';
   isMatchActive = true;
   
-  // Players
-  homeTeamPlayers: Player[] = [
-    { id: 1, number: 9, name: 'Juan Pérez', goals: 0, yellowCards: 0, redCards: 0 },
-    { id: 2, number: 8, name: 'Carlos Ruiz', goals: 0, yellowCards: 0, redCards: 0 }
-  ];
+  // Team IDs
+  homeTeamId: number | null = null;
+  awayTeamId: number | null = null;
   
-  awayTeamPlayers: Player[] = [
-    { id: 3, number: 10, name: 'Luis Gómez', goals: 1, yellowCards: 0, redCards: 0 },
-    { id: 4, number: 7, name: 'Pedro Díaz', goals: 0, yellowCards: 0, redCards: 0 }
-  ];
+  // Players
+  homeTeamPlayers: Player[] = [];
+  awayTeamPlayers: Player[] = [];
+  
+  // Filtered Players
+  filteredHomeTeamPlayers: Player[] = [];
+  filteredAwayTeamPlayers: Player[] = [];
+  
+  // Search Text
+  homeTeamSearchText = '';
+  awayTeamSearchText = '';
   
   // Incidents
-  incidents: MatchIncident[] = [
-    { minute: 15, type: 'goal', player: '#10 Luis Gómez', team: 'Equipo B', description: 'Gol de #10 Luis Gómez (Equipo B)' },
-    { minute: 23, type: 'yellow', player: '#8 Carlos Ruiz', team: 'Equipo A', description: 'Falta de #8 Carlos Ruiz (Equipo A)' }
-  ];
+  incidents: MatchIncident[] = [];
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private vocaliaService: VocaliaService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    // Inicializar listas filtradas
+    this.filteredHomeTeamPlayers = [...this.homeTeamPlayers];
+    this.filteredAwayTeamPlayers = [...this.awayTeamPlayers];
+    
     // Obtener el ID del partido de la ruta
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.matchId = params['id'] ? +params['id'] : null;
@@ -92,11 +112,91 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos del partido
+   * Carga los datos del partido desde el API
    */
   private loadMatchData(matchId: number): void {
-    // TODO: Implementar llamada al API para obtener datos del partido
-    console.log('Loading match data for ID:', matchId);
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    this.vocaliaService.getMatchData(matchId)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          // Información del partido
+          this.tournamentName = data.tournamentName;
+          this.homeTeam = data.homeTeam.name;
+          this.awayTeam = data.awayTeam.name;
+          this.homeTeamLogo = data.homeTeam.logoUrl;
+          this.awayTeamLogo = data.awayTeam.logoUrl;
+          this.homeScore = data.homeTeam.score;
+          this.awayScore = data.awayTeam.score;
+          this.homeTeamId = data.homeTeam.phaseTeamId;
+          this.awayTeamId = data.awayTeam.phaseTeamId;
+
+          // Convertir jugadores del API al formato interno
+          this.homeTeamPlayers = data.homeTeam.playerInGame.map(p => this.convertToPlayer(p));
+          this.awayTeamPlayers = data.awayTeam.playerInGame.map(p => this.convertToPlayer(p));
+
+          // Inicializar listas filtradas
+          this.filteredHomeTeamPlayers = [...this.homeTeamPlayers];
+          this.filteredAwayTeamPlayers = [...this.awayTeamPlayers];
+
+          // Convertir eventos del API al formato interno
+          this.incidents = data.events.map(e => this.convertToIncident(e));
+
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading match data:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudieron cargar los datos del partido',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          }).then(() => {
+            this.router.navigate(['/matches']);
+          });
+        }
+      });
+  }
+
+  /**
+   * Convierte un jugador del API al formato interno
+   */
+  private convertToPlayer(apiPlayer: VocaliaPlayer): Player {
+    return {
+      id: apiPlayer.tournamentTeamPlayerId,
+      number: apiPlayer.jersey,
+      name: apiPlayer.name,
+      goals: 0,
+      yellowCards: 0,
+      redCards: 0
+    };
+  }
+
+  /**
+   * Convierte un evento del API al formato interno
+   */
+  private convertToIncident(apiEvent: any): MatchIncident {
+    // Determinar el tipo basado en el type del API
+    let type: 'goal' | 'yellow' | 'red' | 'substitution' = 'substitution';
+    if (apiEvent.type === 1) type = 'goal';
+    else if (apiEvent.type === 2) type = 'yellow';
+    else if (apiEvent.type === 3 || apiEvent.type === 4) type = 'red';
+
+    return {
+      minute: apiEvent.minute,
+      type: type,
+      player: '',
+      team: '',
+      description: apiEvent.description
+    };
   }
 
   /**
@@ -153,6 +253,98 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Filtra los jugadores por número o nombre
+   */
+  filterPlayers(team: 'home' | 'away'): void {
+    if (team === 'home') {
+      const searchText = this.homeTeamSearchText.toLowerCase().trim();
+      if (searchText === '') {
+        this.filteredHomeTeamPlayers = [...this.homeTeamPlayers];
+      } else {
+        this.filteredHomeTeamPlayers = this.homeTeamPlayers.filter(player =>
+          player.number.toString().includes(searchText) ||
+          player.name.toLowerCase().includes(searchText)
+        );
+      }
+    } else {
+      const searchText = this.awayTeamSearchText.toLowerCase().trim();
+      if (searchText === '') {
+        this.filteredAwayTeamPlayers = [...this.awayTeamPlayers];
+      } else {
+        this.filteredAwayTeamPlayers = this.awayTeamPlayers.filter(player =>
+          player.number.toString().includes(searchText) ||
+          player.name.toLowerCase().includes(searchText)
+        );
+      }
+    }
+  }
+
+  /**
+   * Agrega un nuevo jugador
+   */
+  addPlayer(team: 'home' | 'away'): void {
+    Swal.fire({
+      title: 'Agregar jugador',
+      html: `
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <input id="player-number" type="number" class="swal2-input" placeholder="Número de camiseta" min="1" max="99">
+          <input id="player-name" type="text" class="swal2-input" placeholder="Nombre del jugador">
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Agregar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const numberInput = document.getElementById('player-number') as HTMLInputElement;
+        const nameInput = document.getElementById('player-name') as HTMLInputElement;
+        
+        const number = parseInt(numberInput.value);
+        const name = nameInput.value.trim();
+        
+        if (!number || number < 1 || number > 99) {
+          Swal.showValidationMessage('Por favor ingresa un número válido (1-99)');
+          return false;
+        }
+        
+        if (!name) {
+          Swal.showValidationMessage('Por favor ingresa el nombre del jugador');
+          return false;
+        }
+        
+        return { number, name };
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        const newPlayer: Player = {
+          id: Date.now(), // ID temporal
+          number: result.value.number,
+          name: result.value.name,
+          goals: 0,
+          yellowCards: 0,
+          redCards: 0
+        };
+        
+        if (team === 'home') {
+          this.homeTeamPlayers.push(newPlayer);
+          this.filterPlayers('home'); // Actualizar lista filtrada
+        } else {
+          this.awayTeamPlayers.push(newPlayer);
+          this.filterPlayers('away'); // Actualizar lista filtrada
+        }
+        
+        Swal.fire({
+          title: '¡Jugador agregado!',
+          text: `${newPlayer.name} ha sido agregado al equipo`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  /**
    * Elimina un jugador
    */
   removePlayer(player: Player, team: 'home' | 'away'): void {
@@ -167,30 +359,114 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         if (team === 'home') {
           this.homeTeamPlayers = this.homeTeamPlayers.filter(p => p.id !== player.id);
+          this.filterPlayers('home'); // Actualizar lista filtrada
         } else {
           this.awayTeamPlayers = this.awayTeamPlayers.filter(p => p.id !== player.id);
+          this.filterPlayers('away'); // Actualizar lista filtrada
         }
       }
     });
   }
 
   /**
-   * Deshace la última acción
+   * Abre el modal para registrar una nueva incidencia
    */
-  undoLastAction(): void {
+  openAddIncidentModal(): void {
     Swal.fire({
-      title: '¿Deshacer última acción?',
-      text: 'Esta acción no se puede revertir',
-      icon: 'question',
+      title: 'Registrar incidencia',
+      html: `
+        <div style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+          <label for="incident-minute" style="font-weight: 600; margin-bottom: -10px;">Minuto del partido:</label>
+          <input id="incident-minute" type="number" class="swal2-input" placeholder="Ej: 45" min="1" max="120" style="margin-top: 0;">
+          
+          <label for="incident-description" style="font-weight: 600; margin-bottom: -10px;">Descripción de la incidencia:</label>
+          <textarea id="incident-description" class="swal2-textarea" placeholder="Describe lo que sucedió en el partido..." rows="5" style="margin-top: 0; resize: vertical; min-height: 120px;"></textarea>
+        </div>
+      `,
+      icon: 'info',
       showCancelButton: true,
-      confirmButtonText: 'Sí, deshacer',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: 'Registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      width: '600px',
+      preConfirm: () => {
+        const minuteInput = document.getElementById('incident-minute') as HTMLInputElement;
+        const descriptionInput = document.getElementById('incident-description') as HTMLTextAreaElement;
+        
+        const minute = parseInt(minuteInput.value);
+        const description = descriptionInput.value.trim();
+        
+        if (!minute || minute < 1 || minute > 120) {
+          Swal.showValidationMessage('Por favor ingresa un minuto válido (1-120)');
+          return false;
+        }
+        
+        if (!description) {
+          Swal.showValidationMessage('Por favor ingresa una descripción');
+          return false;
+        }
+        
+        if (description.length < 10) {
+          Swal.showValidationMessage('La descripción debe tener al menos 10 caracteres');
+          return false;
+        }
+        
+        return { minute, description };
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        const newIncident: MatchIncident = {
+          minute: result.value.minute,
+          type: 'substitution', // Tipo genérico para incidencias personalizadas
+          player: '',
+          team: '',
+          description: result.value.description
+        };
+        
+        // Agregar al inicio de la lista
+        this.incidents.unshift(newIncident);
+        
+        Swal.fire({
+          title: '¡Incidencia registrada!',
+          text: 'La incidencia ha sido registrada correctamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  /**
+   * Elimina una incidencia específica
+   */
+  deleteIncident(index: number): void {
+    const incident = this.incidents[index];
+    
+    Swal.fire({
+      title: '¿Eliminar incidencia?',
+      html: `
+        <p>¿Estás seguro de que deseas eliminar esta incidencia?</p>
+        <p style="margin-top: 10px;"><strong>${incident.description}</strong></p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
     }).then((result) => {
       if (result.isConfirmed) {
-        // TODO: Implementar lógica de deshacer
-        if (this.incidents.length > 0) {
-          this.incidents.shift();
-        }
+        this.incidents.splice(index, 1);
+        
+        Swal.fire({
+          title: '¡Incidencia eliminada!',
+          text: 'La incidencia ha sido eliminada correctamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       }
     });
   }

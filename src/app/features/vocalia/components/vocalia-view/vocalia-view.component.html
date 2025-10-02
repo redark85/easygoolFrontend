@@ -1,29 +1,54 @@
 <div class="vocalia-container">
-  <!-- Header -->
-  <div class="vocalia-header">
-    <h1 class="tournament-name">{{ tournamentName }}</h1>
+  <!-- Background Wallpaper -->
+  <div class="vocalia-wallpaper">
+    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
   </div>
 
-  <!-- Score Board -->
-  <div class="score-board">
-    <div class="team-section home-team">
-      <div class="team-shield">
-        <mat-icon>shield</mat-icon>
+  <!-- Content -->
+  <div class="vocalia-content">
+    <!-- Loading Spinner -->
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p class="loading-text">Cargando datos del partido...</p>
+    </div>
+
+    <!-- Match Content -->
+    <div *ngIf="!isLoading">
+      <!-- Header -->
+      <div class="vocalia-header">
+        <h1 class="tournament-name">{{ tournamentName }}</h1>
       </div>
-      <div class="team-score">{{ homeScore }}</div>
+
+      <!-- Score Board -->
+  <div class="score-board">
+    <!-- Home Team -->
+    <div class="team-section home-team">
+      <div class="team-logo">
+        <img *ngIf="homeTeamLogo" [src]="homeTeamLogo" [alt]="homeTeam" class="team-logo-img">
+        <mat-icon *ngIf="!homeTeamLogo">shield</mat-icon>
+      </div>
       <div class="team-name">{{ homeTeam }}</div>
     </div>
 
-    <div class="match-time">
-      <mat-icon class="time-icon">schedule</mat-icon>
-      <span class="time-text">{{ matchTime }}</span>
+    <!-- Score and Time -->
+    <div class="score-time-section">
+      <div class="score-display">
+        <span class="score-number">{{ homeScore }}</span>
+        <span class="score-separator">-</span>
+        <span class="score-number">{{ awayScore }}</span>
+      </div>
+      <div class="match-time">
+        <mat-icon class="time-icon">schedule</mat-icon>
+        <span class="time-text">{{ matchTime }}</span>
+      </div>
     </div>
 
+    <!-- Away Team -->
     <div class="team-section away-team">
-      <div class="team-shield">
-        <mat-icon>shield</mat-icon>
+      <div class="team-logo">
+        <img *ngIf="awayTeamLogo" [src]="awayTeamLogo" [alt]="awayTeam" class="team-logo-img">
+        <mat-icon *ngIf="!awayTeamLogo">shield</mat-icon>
       </div>
-      <div class="team-score">{{ awayScore }}</div>
       <div class="team-name">{{ awayTeam }}</div>
     </div>
   </div>
@@ -32,9 +57,31 @@
   <div class="players-section">
     <!-- Home Team Players -->
     <div class="team-players">
-      <h2 class="section-title">Jugadores {{ homeTeam }}</h2>
+      <div class="team-header">
+        <h2 class="section-title">Jugadores {{ homeTeam }}</h2>
+        <button mat-raised-button 
+                color="primary"
+                class="add-player-btn"
+                (click)="addPlayer('home')">
+          <mat-icon>person_add</mat-icon>
+          Agregar jugador
+        </button>
+      </div>
+      
+      <!-- Search Filter -->
+      <div class="search-filter">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar jugador</mat-label>
+          <input matInput 
+                 [(ngModel)]="homeTeamSearchText"
+                 placeholder="Número o nombre"
+                 (input)="filterPlayers('home')">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
       <div class="players-list">
-        <div *ngFor="let player of homeTeamPlayers; trackBy: trackByPlayerId" class="player-card">
+        <div *ngFor="let player of filteredHomeTeamPlayers; trackBy: trackByPlayerId" class="player-card">
           <div class="player-info">
             <span class="player-number">#{{ player.number }}</span>
             <span class="player-name">{{ player.name }}</span>
@@ -71,9 +118,31 @@
 
     <!-- Away Team Players -->
     <div class="team-players">
-      <h2 class="section-title">Jugadores {{ awayTeam }}</h2>
+      <div class="team-header">
+        <h2 class="section-title">Jugadores {{ awayTeam }}</h2>
+        <button mat-raised-button 
+                color="primary"
+                class="add-player-btn"
+                (click)="addPlayer('away')">
+          <mat-icon>person_add</mat-icon>
+          Agregar jugador
+        </button>
+      </div>
+      
+      <!-- Search Filter -->
+      <div class="search-filter">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar jugador</mat-label>
+          <input matInput 
+                 [(ngModel)]="awayTeamSearchText"
+                 placeholder="Número o nombre"
+                 (input)="filterPlayers('away')">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
       <div class="players-list">
-        <div *ngFor="let player of awayTeamPlayers; trackBy: trackByPlayerId" class="player-card">
+        <div *ngFor="let player of filteredAwayTeamPlayers; trackBy: trackByPlayerId" class="player-card">
           <div class="player-info">
             <span class="player-number">#{{ player.number }}</span>
             <span class="player-name">{{ player.name }}</span>
@@ -111,16 +180,31 @@
 
   <!-- Incidents Section -->
   <div class="incidents-section">
-    <h2 class="section-title">
-      <mat-icon>list</mat-icon>
-      Incidencias
-    </h2>
+    <div class="incidents-header">
+      <h2 class="section-title">
+        <mat-icon>list</mat-icon>
+        Incidencias
+      </h2>
+      <button mat-raised-button 
+              color="primary"
+              class="add-incident-btn"
+              (click)="openAddIncidentModal()">
+        <mat-icon>add</mat-icon>
+        Registrar incidencia
+      </button>
+    </div>
     <div class="incidents-list">
-      <div *ngFor="let incident of incidents; trackBy: trackByIncidentIndex" 
+      <div *ngFor="let incident of incidents; let i = index; trackBy: trackByIncidentIndex" 
            class="incident-item"
            [ngClass]="'incident-' + incident.type">
         <span class="incident-minute">[{{ incident.minute }}']</span>
         <span class="incident-description">{{ incident.description }}</span>
+        <button mat-icon-button 
+                class="delete-incident-btn"
+                (click)="deleteIncident(i)"
+                matTooltip="Eliminar incidencia">
+          <mat-icon>delete</mat-icon>
+        </button>
       </div>
       <div *ngIf="incidents.length === 0" class="no-incidents">
         <mat-icon>info</mat-icon>
@@ -132,18 +216,13 @@
   <!-- Action Buttons -->
   <div class="action-buttons">
     <button mat-raised-button 
-            class="undo-btn"
-            (click)="undoLastAction()"
-            [disabled]="incidents.length === 0">
-      <mat-icon>undo</mat-icon>
-      Deshacer
-    </button>
-    <button mat-raised-button 
             color="warn"
             class="finish-btn"
             (click)="finishMatch()">
       <mat-icon>flag</mat-icon>
       Finalizar partido
     </button>
+  </div>
+    </div>
   </div>
 </div>

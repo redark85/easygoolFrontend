@@ -1,9 +1,66 @@
 .vocalia-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+// Background Wallpaper
+.vocalia-wallpaper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+
+  .wallpaper-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.6);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 60, 114, 0.7) 0%, rgba(42, 82, 152, 0.7) 100%);
+    z-index: 1;
+  }
+}
+
+// Content
+.vocalia-content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
   color: white;
   padding: 20px;
   overflow-y: auto;
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 20px;
+
+    .loading-text {
+      font-size: 1.2rem;
+      color: white;
+      margin: 0;
+    }
+
+    ::ng-deep .mat-mdc-progress-spinner {
+      --mdc-circular-progress-active-indicator-color: white;
+    }
+  }
 }
 
 // Header
@@ -26,65 +83,95 @@
   align-items: center;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 16px;
-  padding: 30px;
+  padding: 20px 30px;
   margin-bottom: 30px;
   backdrop-filter: blur(10px);
+  gap: 20px;
 
   .team-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
     flex: 1;
 
-    .team-shield {
-      width: 80px;
-      height: 80px;
+    .team-logo {
+      width: 60px;
+      height: 60px;
       background: rgba(255, 255, 255, 0.2);
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+
+      .team-logo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 5px;
+      }
 
       mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
         color: white;
       }
     }
 
-    .team-score {
-      font-size: 3.5rem;
-      font-weight: 700;
-      color: white;
-    }
-
     .team-name {
-      font-size: 1.3rem;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      text-align: center;
     }
   }
 
-  .match-time {
+  .score-time-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 0 40px;
+    gap: 10px;
+    padding: 0 20px;
 
-    .time-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
-      color: #ffd700;
+    .score-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .score-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: white;
+        min-width: 50px;
+        text-align: center;
+      }
+
+      .score-separator {
+        font-size: 2rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.6);
+      }
     }
 
-    .time-text {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ffd700;
+    .match-time {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .time-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #ffd700;
+      }
+
+      .time-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #ffd700;
+      }
     }
   }
 }
@@ -102,14 +189,95 @@
     padding: 20px;
     backdrop-filter: blur(10px);
 
-    .section-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin: 0 0 20px 0;
-      color: white;
+    .team-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      margin-bottom: 20px;
+      gap: 15px;
+
+      .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .add-player-btn {
+        background: rgba(33, 150, 243, 0.8);
+        color: white;
+        font-weight: 500;
+        padding: 8px 20px;
+        white-space: nowrap;
+
+        &:hover {
+          background: rgba(33, 150, 243, 1);
+        }
+
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+
+    .search-filter {
+      margin-bottom: 15px;
+
+      .search-field {
+        width: 100%;
+
+        ::ng-deep {
+          .mat-mdc-form-field {
+            width: 100%;
+          }
+
+          .mat-mdc-text-field-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+          }
+
+          .mat-mdc-form-field-focus-overlay {
+            background-color: rgba(255, 255, 255, 0.05);
+          }
+
+          .mdc-text-field--filled {
+            background-color: transparent;
+          }
+
+          .mat-mdc-form-field-label,
+          .mat-mdc-floating-label {
+            color: rgba(255, 255, 255, 0.7) !important;
+          }
+
+          .mat-mdc-input-element {
+            color: white !important;
+            caret-color: white;
+          }
+
+          .mat-mdc-form-field-icon-suffix {
+            color: rgba(255, 255, 255, 0.7);
+          }
+
+          .mdc-line-ripple::before,
+          .mdc-line-ripple::after {
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+          }
+
+          .mat-mdc-form-field.mat-focused {
+            .mdc-line-ripple::after {
+              border-bottom-color: rgba(33, 150, 243, 0.8);
+            }
+
+            .mat-mdc-form-field-label,
+            .mat-mdc-floating-label {
+              color: rgba(33, 150, 243, 0.9) !important;
+            }
+          }
+        }
+      }
     }
 
     .players-list {
@@ -215,19 +383,43 @@
   margin-bottom: 30px;
   backdrop-filter: blur(10px);
 
-  .section-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin: 0 0 20px 0;
-    color: white;
+  .incidents-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    margin-bottom: 20px;
+    gap: 15px;
 
-    mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .add-incident-btn {
+      background: rgba(33, 150, 243, 0.8);
+      color: white;
+      font-weight: 500;
+      padding: 8px 20px;
+      white-space: nowrap;
+
+      &:hover {
+        background: rgba(33, 150, 243, 1);
+      }
+
+      mat-icon {
+        margin-right: 8px;
+      }
     }
   }
 
@@ -246,6 +438,11 @@
       gap: 12px;
       align-items: center;
       border-left: 4px solid transparent;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
 
       .incident-minute {
         font-weight: 700;
@@ -256,6 +453,25 @@
       .incident-description {
         flex: 1;
         color: white;
+      }
+
+      .delete-incident-btn {
+        width: 36px;
+        height: 36px;
+        background: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.4);
+          transform: scale(1.1);
+        }
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
       }
 
       &.incident-goal {
@@ -295,17 +511,23 @@
 .action-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
   padding: 20px 0;
 
-  button {
-    padding: 12px 32px;
+  .finish-btn {
+    padding: 12px 40px;
     font-size: 1.1rem;
     font-weight: 600;
     border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
+    background: rgba(244, 67, 54, 0.8);
+    color: white;
+
+    &:hover {
+      background: rgba(244, 67, 54, 1);
+      transform: scale(1.05);
+    }
 
     mat-icon {
       font-size: 24px;
@@ -313,79 +535,92 @@
       height: 24px;
     }
   }
-
-  .undo-btn {
-    background: rgba(96, 125, 139, 0.8);
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: rgba(96, 125, 139, 1);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-    }
-  }
-
-  .finish-btn {
-    background: rgba(244, 67, 54, 0.8);
-    color: white;
-
-    &:hover {
-      background: rgba(244, 67, 54, 1);
-    }
-  }
 }
 
 // Responsive
 @media (max-width: 768px) {
-  .vocalia-container {
+  .vocalia-content {
     padding: 15px;
   }
 
   .score-board {
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
+    padding: 15px 20px;
 
     .team-section {
-      .team-shield {
-        width: 60px;
-        height: 60px;
+      .team-logo {
+        width: 50px;
+        height: 50px;
 
         mat-icon {
-          font-size: 36px;
-          width: 36px;
-          height: 36px;
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
         }
       }
 
-      .team-score {
-        font-size: 2.5rem;
-      }
-
       .team-name {
-        font-size: 1.1rem;
+        font-size: 0.95rem;
       }
     }
 
-    .match-time {
-      padding: 0;
+    .score-time-section {
+      padding: 0 10px;
 
-      .time-text {
-        font-size: 1.5rem;
+      .score-display {
+        gap: 8px;
+
+        .score-number {
+          font-size: 2.2rem;
+          min-width: 40px;
+        }
+
+        .score-separator {
+          font-size: 1.5rem;
+        }
+      }
+
+      .match-time {
+        .time-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+
+        .time-text {
+          font-size: 1.1rem;
+        }
       }
     }
   }
 
   .players-section {
     grid-template-columns: 1fr;
+
+    .team-players {
+      .team-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .add-player-btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .incidents-section {
+    .incidents-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .add-incident-btn {
+        width: 100%;
+      }
+    }
   }
 
   .action-buttons {
-    flex-direction: column;
-
-    button {
+    .finish-btn {
       width: 100%;
     }
   }
