@@ -354,6 +354,18 @@
   p {
     margin: 0;
     font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .generate-matches-btn {
+    margin-top: 16px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    
+    mat-icon {
+      margin-right: 8px;
+    }
   }
 }
 

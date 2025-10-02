@@ -53,6 +53,13 @@
                 <mat-icon class="no-matches-icon">sports_soccer</mat-icon>
                 <h3>No hay partidos programados</h3>
                 <p>No se encontraron partidos para este grupo</p>
+                <button mat-raised-button 
+                        color="primary" 
+                        (click)="generateRandomMatchesForGroup()"
+                        class="generate-matches-btn">
+                  <mat-icon>shuffle</mat-icon>
+                  Generar partidos aleatoriamente
+                </button>
               </div>
 
               <!-- Match Days Accordion -->
