@@ -10,6 +10,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { VocaliaService, VocaliaPlayer, AvailablePlayer, MatchEventType, RegisterMatchEventRequest, MatchEvent } from '@core/services/vocalia.service';
@@ -44,7 +45,8 @@ interface MatchIncident {
     MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   templateUrl: './vocalia-view.component.html',
   styleUrls: ['./vocalia-view.component.scss']
@@ -239,6 +241,23 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Registra una doble tarjeta amarilla (expulsión)
+   */
+  addDoubleYellowCard(player: Player, team: 'home' | 'away'): void {
+    player.yellowCards += 2;
+    player.redCards++;
+    
+    const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
+    this.incidents.unshift({
+      minute: this.getCurrentMinute(),
+      type: 'red',
+      player: `#${player.number} ${player.name}`,
+      team: teamName,
+      description: `Doble amarilla (expulsión) para #${player.number} ${player.name} (${teamName})`
+    });
+  }
+
+  /**
    * Registra una tarjeta roja
    */
   addRedCard(player: Player, team: 'home' | 'away'): void {
@@ -250,7 +269,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       type: 'red',
       player: `#${player.number} ${player.name}`,
       team: teamName,
-      description: `Tarjeta roja para #${player.number} ${player.name} (${teamName})`
+      description: `Tarjeta roja directa para #${player.number} ${player.name} (${teamName})`
     });
   }
 

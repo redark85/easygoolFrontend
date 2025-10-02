@@ -87,28 +87,39 @@
             <span class="player-name">{{ player.name }}</span>
           </div>
           <div class="player-actions">
-            <button mat-icon-button 
+            <button mat-mini-fab 
                     class="action-btn goal-btn"
                     (click)="addGoal(player, 'home')"
-                    matTooltip="Gol">
+                    [matTooltip]="'Registrar gol'"
+                    matTooltipPosition="above">
               <mat-icon>sports_soccer</mat-icon>
             </button>
-            <button mat-icon-button 
+            <button mat-mini-fab 
                     class="action-btn yellow-btn"
                     (click)="addYellowCard(player, 'home')"
-                    matTooltip="Tarjeta amarilla">
+                    [matTooltip]="'Tarjeta amarilla'"
+                    matTooltipPosition="above">
               <mat-icon>square</mat-icon>
             </button>
-            <button mat-icon-button 
+            <button mat-mini-fab 
+                    class="action-btn double-yellow-btn"
+                    (click)="addDoubleYellowCard(player, 'home')"
+                    [matTooltip]="'Doble amarilla'"
+                    matTooltipPosition="above">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-mini-fab 
                     class="action-btn red-btn"
                     (click)="addRedCard(player, 'home')"
-                    matTooltip="Tarjeta roja">
+                    [matTooltip]="'Tarjeta roja'"
+                    matTooltipPosition="above">
               <mat-icon>square</mat-icon>
             </button>
-            <button mat-icon-button 
+            <button mat-mini-fab 
                     class="action-btn remove-btn"
                     (click)="removePlayer(player, 'home')"
-                    matTooltip="Eliminar">
+                    [matTooltip]="'Eliminar jugador'"
+                    matTooltipPosition="above">
               <mat-icon>close</mat-icon>
             </button>
           </div>
@@ -148,28 +159,39 @@
             <span class="player-name">{{ player.name }}</span>
           </div>
           <div class="player-actions">
-            <button mat-icon-button 
+            <button mat-mini-fab 
                     class="action-btn goal-btn"
                     (click)="addGoal(player, 'away')"
-                    matTooltip="Gol">
+                    [matTooltip]="'Registrar gol'"
+                    matTooltipPosition="above">
               <mat-icon>sports_soccer</mat-icon>
             </button>
-            <button mat-icon-button 
+            <button mat-mini-fab 
                     class="action-btn yellow-btn"
                     (click)="addYellowCard(player, 'away')"
-                    matTooltip="Tarjeta amarilla">
+                    [matTooltip]="'Tarjeta amarilla'"
+                    matTooltipPosition="above">
               <mat-icon>square</mat-icon>
             </button>
-            <button mat-icon-button 
+            <button mat-mini-fab 
+                    class="action-btn double-yellow-btn"
+                    (click)="addDoubleYellowCard(player, 'away')"
+                    [matTooltip]="'Doble amarilla'"
+                    matTooltipPosition="above">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-mini-fab 
                     class="action-btn red-btn"
                     (click)="addRedCard(player, 'away')"
-                    matTooltip="Tarjeta roja">
+                    [matTooltip]="'Tarjeta roja'"
+                    matTooltipPosition="above">
               <mat-icon>square</mat-icon>
             </button>
-            <button mat-icon-button 
+            <button mat-mini-fab 
                     class="action-btn remove-btn"
                     (click)="removePlayer(player, 'away')"
-                    matTooltip="Eliminar">
+                    [matTooltip]="'Eliminar jugador'"
+                    matTooltipPosition="above">
               <mat-icon>close</mat-icon>
             </button>
           </div>
