@@ -29,8 +29,8 @@ export interface AuthState {
 
 export enum RoleType {
   Superadmin,
-  TournamentOwner,
-  TeamOwner,
+  League,
+  Team,
   Official
 }
 

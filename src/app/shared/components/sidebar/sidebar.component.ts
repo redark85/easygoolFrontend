@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '@core/services';
-import { User } from '@core/models';
+import { User, RoleType } from '@core/models';
 import { Observable, map } from 'rxjs';
 
 interface MenuItem {
@@ -40,6 +40,8 @@ export class SidebarComponent implements OnInit {
   @Output() closeSidebar = new EventEmitter<void>();
 
   currentUser$: Observable<User | null>;
+  userRole$: Observable<RoleType | null>;
+  RoleType = RoleType; // Exponer el enum al template
 
   menuItems: MenuItem[] = [
     {
@@ -89,6 +91,7 @@ export class SidebarComponent implements OnInit {
     private router: Router
   ) {
     this.currentUser$ = this.authService.authState$.pipe(map(state => state.user));
+    this.userRole$ = this.authService.authState$.pipe(map(state => state.user?.role ?? null));
   }
 
   ngOnInit(): void {}
@@ -109,5 +112,21 @@ export class SidebarComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/auth/login']);
+  }
+
+  /**
+   * Verifica si el usuario tiene acceso a la sección de Administrar Torneos
+   */
+  canAccessTournaments(role: RoleType | null): boolean {
+    if (role === null) return false;
+    return role === RoleType.League || role === RoleType.Superadmin;
+  }
+
+  /**
+   * Verifica si el usuario tiene acceso a la sección de Administrar Equipos
+   */
+  canAccessTeams(role: RoleType | null): boolean {
+    if (role === null) return false;
+    return role === RoleType.Team || role === RoleType.Superadmin;
   }
 }

@@ -137,11 +137,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
       
       // Determinar el rol basado en el parámetro de la URL o el token
       if (this.roleType === 'league') {
-        registerData.role = RoleType.TournamentOwner;
+        registerData.role = RoleType.League;
       } else if (this.roleType === 'team' || token) {
-        registerData.role = RoleType.TeamOwner;
+        registerData.role = RoleType.Team;
       } else {
-        registerData.role = RoleType.TournamentOwner; // Default
+        registerData.role = RoleType.League; // Default
       }
       
       this.authService.register(registerData, token).subscribe({
