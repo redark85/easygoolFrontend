@@ -33,10 +33,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/matches/matches.routes').then(r => r.MATCHES_ROUTES)
       },
       
-      // Teams routes - Placeholder
+      // Teams routes
       {
         path: 'teams',
-        loadComponent: () => import('./features/dashboard/components/home/home.component').then(c => c.HomeComponent)
+        loadComponent: () => import('./features/teams/components/my-teams/my-teams.component').then(c => c.MyTeamsComponent)
       },
       
       // Players routes - Placeholder
