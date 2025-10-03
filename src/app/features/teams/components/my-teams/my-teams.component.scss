@@ -4,6 +4,22 @@
   margin: 0 auto;
 }
 
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+
+  .loading-text {
+    color: #666;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
 // Header
 .page-header {
   display: flex;

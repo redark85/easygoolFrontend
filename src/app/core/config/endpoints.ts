@@ -60,6 +60,9 @@ export const VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT = '/api/Vocalia/GetAvailable
 export const VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT = '/api/Vocalia/RegisterMatchEvent';
 export const VOCALIA_FINISH_MATCH_ENDPOINT = '/api/Vocalia/FinishMatch';
 
+// Manager Endpoints
+export const MANAGER_GET_TEAMS_ENDPOINT = '/api/Manager/ManagerTeams';
+
 // Configuración de endpoints
 export const EndpointsConfig = {
   // Auth
@@ -115,5 +118,14 @@ export const EndpointsConfig = {
   MATCH_CREATE_RANDOM_ENDPOINT,
   MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT,
   MATCH_DELETE_ENDPOINT,
-  MATCH_DELETE_MATCHDAY_ENDPOINT
+  MATCH_DELETE_MATCHDAY_ENDPOINT,
+
+  // Vocalia
+  VOCALIA_GET_MATCH_ENDPOINT,
+  VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT,
+  VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT,
+  VOCALIA_FINISH_MATCH_ENDPOINT,
+
+  // Manager
+  MANAGER_GET_TEAMS_ENDPOINT
 };

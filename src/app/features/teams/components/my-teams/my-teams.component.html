@@ -14,16 +14,22 @@
     </button>
   </div>
 
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando equipos...</p>
+  </div>
+
   <!-- Teams Grid -->
-  <div class="teams-grid">
+  <div class="teams-grid" *ngIf="!isLoading">
     <mat-card *ngFor="let team of teams" class="team-card">
       <!-- Team Header -->
       <div class="team-header">
         <div class="team-logo">
-          <img [src]="team.logo" [alt]="team.name">
+          <img [src]="getTeamLogo(team.logoUrl)" [alt]="team.teamName" (error)="$event.target.src='assets/logo.png'">
         </div>
         <div class="team-info">
-          <h2 class="team-name">{{ team.name }}</h2>
+          <h2 class="team-name">{{ team.teamName }}</h2>
           <p class="team-short-name">{{ team.shortName }}</p>
         </div>
       </div>
@@ -42,7 +48,7 @@
             <div class="tournament-info">
               <mat-icon class="tournament-icon">sports_soccer</mat-icon>
               <div class="tournament-details">
-                <span class="tournament-name">{{ tournament.name }}</span>
+                <span class="tournament-name">{{ tournament.tournamentName }}</span>
                 <span class="players-count">
                   <mat-icon class="small-icon">person</mat-icon>
                   {{ tournament.playersCount }} jugadores
@@ -75,7 +81,7 @@
   </div>
 
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="teams.length === 0">
+  <div class="empty-state" *ngIf="!isLoading && teams.length === 0">
     <mat-icon class="empty-icon">groups_off</mat-icon>
     <h2>No tienes equipos registrados</h2>
     <p>Comienza creando tu primer equipo</p>
