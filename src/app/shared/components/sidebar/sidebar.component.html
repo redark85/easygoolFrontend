@@ -22,27 +22,13 @@
   <!-- Navigation Menu -->
   <nav class="nav-menu">
     <mat-nav-list>
-      <!-- Dashboard Section -->
-      <div class="menu-section">
-        <span class="section-title" *ngIf="!isCollapsed || isMobile">Dashboard</span>
-      </div>
-      <mat-list-item
-        class="nav-item"
-        routerLink="/dashboard/home"
-        routerLinkActive="active"
-        [matTooltip]="isCollapsed && !isMobile ? 'Dashboard' : ''"
-        matTooltipPosition="right">
-        <mat-icon matListItemIcon class="nav-icon">dashboard</mat-icon>
-        <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Dashboard</span>
-      </mat-list-item>
-
       <!-- Administrar Torneos Section -->
       <div class="menu-section">
         <span class="section-title" *ngIf="!isCollapsed || isMobile">Administrar Torneos</span>
       </div>
       <mat-list-item
         class="nav-item"
-        routerLink="/dashboard/tournaments"
+        routerLink="/tournaments"
         routerLinkActive="active"
         [matTooltip]="isCollapsed && !isMobile ? 'Torneos' : ''"
         matTooltipPosition="right">
@@ -51,7 +37,7 @@
       </mat-list-item>
       <mat-list-item
         class="nav-item"
-        routerLink="/dashboard/matches"
+        routerLink="/matches"
         routerLinkActive="active"
         [matTooltip]="isCollapsed && !isMobile ? 'Partidos' : ''"
         matTooltipPosition="right">
@@ -60,7 +46,7 @@
       </mat-list-item>
       <mat-list-item
         class="nav-item"
-        routerLink="/dashboard/stats"
+        routerLink="/stats"
         routerLinkActive="active"
         [matTooltip]="isCollapsed && !isMobile ? 'Estadísticas' : ''"
         matTooltipPosition="right">
@@ -74,7 +60,7 @@
       </div>
       <mat-list-item
         class="nav-item"
-        routerLink="/dashboard/teams"
+        routerLink="/teams"
         routerLinkActive="active"
         [matTooltip]="isCollapsed && !isMobile ? 'Equipos' : ''"
         matTooltipPosition="right">
@@ -83,7 +69,7 @@
       </mat-list-item>
       <mat-list-item
         class="nav-item"
-        routerLink="/dashboard/players"
+        routerLink="/players"
         routerLinkActive="active"
         [matTooltip]="isCollapsed && !isMobile ? 'Jugadores' : ''"
         matTooltipPosition="right">
@@ -92,7 +78,7 @@
       </mat-list-item>
       <mat-list-item
         class="nav-item"
-        routerLink="/dashboard/settings"
+        routerLink="/settings"
         routerLinkActive="active"
         [matTooltip]="isCollapsed && !isMobile ? 'Configuración' : ''"
         matTooltipPosition="right">

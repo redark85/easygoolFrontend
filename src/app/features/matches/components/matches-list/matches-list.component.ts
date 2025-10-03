@@ -127,15 +127,15 @@ export class MatchesListComponent implements OnInit, OnDestroy {
 
   // Navigation methods
   viewMatchDetails(matchId: string): void {
-    this.router.navigate(['/dashboard/matches', matchId]);
+    this.router.navigate(['/matches', matchId]);
   }
 
   createMatch(): void {
-    this.router.navigate(['/dashboard/matches/create']);
+    this.router.navigate(['/matches/create']);
   }
 
   editMatch(matchId: string): void {
-    this.router.navigate(['/dashboard/matches/edit', matchId]);
+    this.router.navigate(['/matches/edit', matchId]);
   }
 
   // Utility methods for template

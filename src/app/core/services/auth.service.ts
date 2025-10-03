@@ -141,7 +141,7 @@ export class AuthService implements OnDestroy {
     this.scheduleTokenExpirationCheck(response.accessToken);
 
     if (navigate) {
-      this.router.navigate(['/dashboard/tournaments']);
+      this.router.navigate(['/tournaments']);
     }
   }
 

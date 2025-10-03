@@ -102,7 +102,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
         this.loadTournamentData();
       } else {
         this.toastService.showError('ID de torneo inválido');
-        this.router.navigate(['/dashboard/tournaments']);
+        this.router.navigate(['/tournaments']);
       }
     });
   }
@@ -180,7 +180,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           // El error ya se maneja en el servicio con toast
           // Redirigir a la lista de torneos
-          this.router.navigate(['/dashboard/tournaments']);
+          this.router.navigate(['/tournaments']);
         }
       });
   }
@@ -189,7 +189,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    * Navega de vuelta a la lista de torneos
    */
   goBack(): void {
-    this.router.navigate(['/dashboard/tournaments']);
+    this.router.navigate(['/tournaments']);
   }
 
   /**

@@ -43,49 +43,43 @@ export class SidebarComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     {
-      icon: 'dashboard',
-      label: 'Dashboard',
-      route: '/dashboard/home',
-      tooltip: 'Panel principal'
-    },
-    {
       icon: 'sports_soccer',
       label: 'Partidos',
-      route: '/dashboard/matches',
+      route: '/matches',
       tooltip: 'Gestión de partidos'
     },
     {
       icon: 'groups',
       label: 'Equipos',
-      route: '/dashboard/teams',
+      route: '/teams',
       tooltip: 'Gestión de equipos'
     },
     {
       icon: 'person',
       label: 'Jugadores',
-      route: '/dashboard/players',
+      route: '/players',
       tooltip: 'Gestión de jugadores'
     },
     {
       icon: 'emoji_events',
       label: 'Ligas',
-      route: './leagues'
+      route: '/leagues'
     },
     {
       icon: 'military_tech',
       label: 'Torneos',
-      route: './tournaments'
+      route: '/tournaments'
     },
     {
       icon: 'analytics',
       label: 'Estadísticas',
-      route: '/dashboard/stats',
+      route: '/stats',
       tooltip: 'Estadísticas y análisis'
     },
     {
       icon: 'settings',
       label: 'Configuración',
-      route: '/dashboard/settings',
+      route: '/settings',
       tooltip: 'Configuración del sistema'
     }
   ];

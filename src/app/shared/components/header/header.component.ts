@@ -55,11 +55,11 @@ export class HeaderComponent implements OnInit {
   }
 
   navigateToProfile(): void {
-    this.router.navigate(['/dashboard/profile']);
+    this.router.navigate(['/profile']);
   }
 
   navigateToSettings(): void {
-    this.router.navigate(['/dashboard/settings']);
+    this.router.navigate(['/settings']);
   }
 
   logout(): void {
