@@ -215,7 +215,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   navigateToLogin(): void {
-    this.router.navigate(['/auth/login']);
+    if (this.tokenFromUrl) {
+      this.router.navigate(['/auth/login'], { queryParams: { token: this.tokenFromUrl } });
+    }
+    else {
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   goBack(): void {

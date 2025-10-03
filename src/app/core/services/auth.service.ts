@@ -84,8 +84,8 @@ export class AuthService implements OnDestroy {
     return this.apiService.post<ApiResponse<AuthResponse>>(url, data).pipe(
       tap(response => {
         if (response.succeed && response.result) {
-          this.handleAuthSuccess(response.result, true);
           this.toastService.showSuccess('¡Registro exitoso! Bienvenido.');
+            this.router.navigate(['/auth/login']);
         } else {
           throw new HttpErrorResponse({
             error: { message: response.message || 'Error en el registro' },
@@ -110,7 +110,7 @@ export class AuthService implements OnDestroy {
     if (notify) {
       this.toastService.showInfo('Has cerrado sesión correctamente.');
     }
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/']);
   }
 
   private handleAuthSuccess(response: AuthResponse, navigate: boolean): void {
@@ -161,7 +161,30 @@ export class AuthService implements OnDestroy {
     this.scheduleTokenExpirationCheck(response.accessToken);
 
     if (navigate) {
-      this.router.navigate(['/tournaments']);
+      // Redirigir según el rol del usuario
+      this.navigateByRole(mappedRole);
+    }
+  }
+
+  /**
+   * Navega a la ruta correspondiente según el rol del usuario
+   */
+  private navigateByRole(role: RoleType): void {
+    switch (role) {
+      case RoleType.Superadmin:
+        this.router.navigate(['/tournaments']);
+        break;
+      case RoleType.League:
+        this.router.navigate(['/tournaments']);
+        break;
+      case RoleType.Team:
+        this.router.navigate(['/teams']);
+        break;
+      case RoleType.Official:
+        this.router.navigate(['/matches']);
+        break;
+      default:
+        this.router.navigate(['/tournaments']);
     }
   }
 
