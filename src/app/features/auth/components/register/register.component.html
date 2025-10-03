@@ -12,12 +12,16 @@
         <img src="assets/logo.png" alt="EasyGool Logo" class="logo">
       </div>
 
+      <!-- Page Title -->
+      <div class="title-section">
+        <h2 class="page-title">{{ pageTitle }}</h2>
+      </div>
+
       <!-- Error Message -->
       <div *ngIf="error" class="error-message">
         <mat-icon>error</mat-icon>
         <span>{{ error }}</span>
       </div>
-
       <!-- Register Form -->
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form" autocomplete="off">
         <div class="container-fluid">

@@ -37,6 +37,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   error: string | null = null;
   private destroy$ = new Subject<void>();
   private tokenFromUrl: string | null = null;
+  roleType: 'league' | 'team' | null = null;
+  pageTitle: string = 'Crear Cuenta';
 
   constructor(
     private fb: FormBuilder,
@@ -52,7 +54,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Captura el parámetro 'token' de la URL si existe
+   * Captura el parámetro 'token' y 'role' de la URL si existen
    */
   private captureTokenFromUrl(): void {
     this.route.queryParams
@@ -62,7 +64,24 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.tokenFromUrl = params['token'];
           console.log('Token capturado de la URL:', this.tokenFromUrl);
         }
+        if (params['role']) {
+          this.roleType = params['role'];
+          this.updatePageTitle();
+        }
       });
+  }
+
+  /**
+   * Actualiza el título de la página según el tipo de rol
+   */
+  private updatePageTitle(): void {
+    if (this.roleType === 'league') {
+      this.pageTitle = 'Registro de Presidente de Liga';
+    } else if (this.roleType === 'team') {
+      this.pageTitle = 'Registro de Presidente de Equipo';
+    } else {
+      this.pageTitle = 'Crear Cuenta';
+    }
   }
 
   ngOnDestroy(): void {
@@ -115,7 +134,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
      
       const registerData: RegisterRequest = this.registerForm.value;
       registerData.phoneNumber = registerData.phoneNumber.replace(/-/g, "");
-      registerData.role = token ? RoleType.TeamOwner : RoleType.TournamentOwner;
+      
+      // Determinar el rol basado en el parámetro de la URL o el token
+      if (this.roleType === 'league') {
+        registerData.role = RoleType.TournamentOwner;
+      } else if (this.roleType === 'team' || token) {
+        registerData.role = RoleType.TeamOwner;
+      } else {
+        registerData.role = RoleType.TournamentOwner; // Default
+      }
+      
       this.authService.register(registerData, token).subscribe({
         error: (error: any) => {
           console.error('Register error:', error);

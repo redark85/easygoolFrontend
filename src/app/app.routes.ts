@@ -2,11 +2,10 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  // Redirect root to login
+  // Landing page
   { 
     path: '', 
-    redirectTo: '/auth/login', 
-    pathMatch: 'full' 
+    loadComponent: () => import('./features/auth/components/landing/landing.component').then(c => c.LandingComponent)
   },
   
   // Auth routes (lazy loaded)
@@ -36,9 +35,15 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   
-  // Wildcard route - redirect to login
+  // Fixture viewer (public access)
+  {
+    path: 'fixture-viewer',
+    loadComponent: () => import('./features/fixture-viewer/fixture-viewer.component').then(c => c.FixtureViewerComponent)
+  },
+  
+  // Wildcard route - redirect to landing
   { 
     path: '**', 
-    redirectTo: '/auth/login' 
+    redirectTo: '/' 
   }
 ];
