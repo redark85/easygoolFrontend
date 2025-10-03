@@ -92,7 +92,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     const control = this.loginForm.get(fieldName);
 
     if (control?.hasError('required')) {
-      return fieldName === 'userName' ? 'Usuario es requerido' : 'Contraseña es requerida';
+      return fieldName === 'userName' ? 'Email es requerido' : 'Contraseña es requerida';
     }
 
     if (control?.hasError('minlength')) {
@@ -103,6 +103,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   navigateToRegister(): void {
-    this.router.navigate(['/auth/register']);
+    this.router.navigate(['/']);
   }
 }

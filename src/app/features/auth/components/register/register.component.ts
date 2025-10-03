@@ -217,4 +217,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   navigateToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
+
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
 }
