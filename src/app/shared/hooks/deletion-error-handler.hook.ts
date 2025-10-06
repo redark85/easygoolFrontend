@@ -52,8 +52,8 @@ export class DeletionErrorHandlerHook {
       'EGOL_115': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene partidos programados.`,
       'EGOL_116': `No se puede eliminar el ${config.entityName.toLowerCase()} porque está siendo utilizado en el torneo.`,
       'EGOL_117': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene dependencias activas.`,
-      'EGOL_118': `No se puede eliminar el ${config.entityName.toLowerCase()} porque el torneo ya comenzó.`,
-      'EGOL_119': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene resultados registrados.`,
+      'EGOL_118': `El código ingresado no es válido.`,
+      'EGOL_119': `El código ingresado ha vencido.`,
       'EGOL_120': `El ususario no ha validado su cuenta de correo.`
     };
 

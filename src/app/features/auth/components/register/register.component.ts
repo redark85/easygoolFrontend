@@ -249,43 +249,45 @@ export class RegisterComponent implements OnInit, OnDestroy {
       disableClose: true,
       data: {
         email: email,
-        expiryMinutes: 5 // Tiempo de expiración del código OTP: 5 minutos
+        expiryMinutes: 5, // Tiempo de expiración del código OTP: 5 minutos
+        onVerify: async (code: string) => {
+          return new Promise<boolean>((resolve) => {
+            this.authService.verifyOTP(email, code).subscribe({
+              next: () => {
+                // La navegación se maneja en el servicio después de la verificación exitosa
+                resolve(true); // Cerrar el modal
+              },
+              error: (error) => {
+                this.loading = false;
+                const config = this.errorHandler.createConfig('Code');
+                this.errorHandler.handleResponseError(error, config);
+                resolve(false); // No cerrar el modal, permitir reintentar
+              }
+            });
+          });
+        },
+        onResend: () => {
+          this.resendOtpCode(email);
+        }
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result?.verified && result?.code) {
-        // Verificar el código OTP con el email
-        this.authService.verifyOTP(email, result.code).subscribe({
-          next: () => {
-            // La navegación se maneja en el servicio después de la verificación exitosa
-          },
-          error: (error) => {
-            console.error('OTP verification error:', error);
-            // El error ya se muestra en el servicio con toast
-          }
-        });
-      } else if (result?.resend) {
-        // Reenviar código OTP
-        this.resendOtpCode(userId, email);
-      } else {
+      if (!result?.verified) {
         // Usuario canceló, redirigir al login
         this.router.navigate(['/auth/login']);
       }
     });
   }
 
-  private resendOtpCode(userId: number, email: string): void {
+  private resendOtpCode(email: string): void {
     this.authService.resendOTP(email).subscribe({
       next: () => {
-        // Reabrir el modal con el temporizador reiniciado
-        this.openOtpVerificationModal(userId, email);
+        // El mensaje de éxito ya se muestra en el servicio
       },
       error: (error) => {
         console.error('Resend OTP error:', error);
         // El error ya se muestra en el servicio con toast
-        // Aún así, reabrir el modal para que el usuario pueda intentar de nuevo
-        this.openOtpVerificationModal(userId, email);
       }
     });
   }

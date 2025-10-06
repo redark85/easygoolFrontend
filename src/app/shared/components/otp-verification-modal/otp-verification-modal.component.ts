@@ -12,6 +12,8 @@ import { Subject, takeUntil, timer } from 'rxjs';
 export interface OtpVerificationData {
   email: string;
   expiryMinutes?: number;
+  onVerify?: (code: string) => Promise<boolean>;
+  onResend?: () => void;
 }
 
 @Component({
@@ -147,15 +149,34 @@ export class OtpVerificationModalComponent implements OnInit, OnDestroy {
     return `${values.digit1}${values.digit2}${values.digit3}${values.digit4}${values.digit5}${values.digit6}`;
   }
 
-  onVerify(): void {
-    if (this.otpForm.valid && this.timeRemaining > 0) {
+  async onVerify(): Promise<void> {
+    if (this.otpForm.valid && this.timeRemaining > 0 && !this.loading) {
       const otpCode = this.getOtpCode();
-      this.dialogRef.close({ verified: true, code: otpCode });
+      
+      if (this.data.onVerify) {
+        this.loading = true;
+        try {
+          const success = await this.data.onVerify(otpCode);
+          if (success) {
+            this.dialogRef.close({ verified: true, code: otpCode });
+          }
+        } finally {
+          this.loading = false;
+        }
+      } else {
+        // Fallback al comportamiento anterior
+        this.dialogRef.close({ verified: true, code: otpCode });
+      }
     }
   }
 
   onResendCode(): void {
-    this.dialogRef.close({ resend: true });
+    if (this.data.onResend) {
+      this.data.onResend();
+    } else {
+      // Fallback al comportamiento anterior
+      this.dialogRef.close({ resend: true });
+    }
   }
 
   onCancel(): void {

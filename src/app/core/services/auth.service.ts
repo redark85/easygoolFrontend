@@ -69,7 +69,6 @@ export class AuthService implements OnDestroy {
       catchError((error: HttpErrorResponse) => {
         // Si la API responde con un error HTTP (ej. 500, 404)
         this.setLoading(false);
-        this.toastService.showError('Usuario o contraseña incorrectos.');
         return throwError(() => error);
       })
     );
@@ -109,18 +108,11 @@ export class AuthService implements OnDestroy {
         if (response.succeed) {
           this.toastService.showSuccess('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.');
           this.router.navigate(['/auth/login']);
-        } else {
-          throw new HttpErrorResponse({
-            error: { message: response.message || 'Código OTP inválido o expirado' },
-            status: 400,
-          });
         }
       }),
       map(() => void 0),
       catchError((error: HttpErrorResponse) => {
-        this.setLoading(false);
-        const errorMessage = error.error?.message || 'Error al verificar el código OTP.';
-        this.toastService.showError(errorMessage);
+        this.setLoading(false);   
         return throwError(() => error);
       })
     );

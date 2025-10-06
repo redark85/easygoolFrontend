@@ -11,7 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthService } from '@core/services';
+import { AuthService, ToastService } from '@core/services';
 import { LoginRequest } from '@core/models';
 import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
@@ -44,7 +44,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private errorHandler: DeletionErrorHandlerHook,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -89,11 +90,13 @@ export class LoginComponent implements OnInit, OnDestroy {
         },
         error: (error: any) => {
           this.loading = false;
-          const config = this.errorHandler.createConfig('User');
-          this.errorHandler.handleResponseError(error, config);
           if (error.response.data.messageId === 'EGOL_120') {
-               const email = loginData.userName; // El email es el userName
+            this.toastService.showError('Su cuenta de correo no ha sido verificada.');
+            const email = loginData.userName; // El email es el userName
             this.openOtpVerificationModal(email);
+          }
+          else {
+            this.toastService.showError('Usuario o contraseña incorrectos.');
           }
         }
       });
@@ -130,26 +133,31 @@ export class LoginComponent implements OnInit, OnDestroy {
       disableClose: true,
       data: {
         email: email,
-        expiryMinutes: 5 // Tiempo de expiración del código OTP: 5 minutos
+        expiryMinutes: 5, // Tiempo de expiración del código OTP: 5 minutos
+        onVerify: async (code: string) => {
+          return new Promise<boolean>((resolve) => {
+            this.authService.verifyOTP(email, code).subscribe({
+              next: () => {
+                // La navegación se maneja en el servicio después de la verificación exitosa
+                resolve(true); // Cerrar el modal
+              },
+              error: (error) => {
+                this.loading = false;
+                const config = this.errorHandler.createConfig('Code');
+                this.errorHandler.handleResponseError(error, config);
+                resolve(false); // No cerrar el modal, permitir reintentar
+              }
+            });
+          });
+        },
+        onResend: () => {
+          this.resendOtpCode(email);
+        }
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result?.verified && result?.code) {
-        // Verificar el código OTP con el email
-        this.authService.verifyOTP(email, result.code).subscribe({
-          next: () => {
-            // La navegación se maneja en el servicio después de la verificación exitosa
-          },
-          error: (error) => {
-            console.error('OTP verification error:', error);
-            // El error ya se muestra en el servicio con toast
-          }
-        });
-      } else if (result?.resend) {
-        // Reenviar código OTP
-        this.resendOtpCode(email);
-      } else {
+      if (!result?.verified) {
         // Usuario canceló, permanecer en login
         this.loading = false;
       }
@@ -159,14 +167,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   private resendOtpCode(email: string): void {
     this.authService.resendOTP(email).subscribe({
       next: () => {
-        // Reabrir el modal con el temporizador reiniciado
-        this.openOtpVerificationModal(email);
+        // El mensaje de éxito ya se muestra en el servicio
       },
       error: (error) => {
         console.error('Resend OTP error:', error);
         // El error ya se muestra en el servicio con toast
-        // Aún así, reabrir el modal para que el usuario pueda intentar de nuevo
-        this.openOtpVerificationModal(email);
       }
     });
   }
