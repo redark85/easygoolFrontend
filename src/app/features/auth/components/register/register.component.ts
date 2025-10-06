@@ -9,9 +9,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '@core/services';
 import { RegisterRequest, RoleType } from '@core/models';
 import { PhoneValidatorUtil } from '@shared/utils';
+import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
 
 @Component({
   selector: 'app-register',
@@ -44,7 +46,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -145,6 +148,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
       }
       
       this.authService.register(registerData, token).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.openOtpVerificationModal(response.userId, response.email);
+          }
+        },
         error: (error: any) => {
           console.error('Register error:', error);
         }
@@ -225,5 +233,52 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/']);
+  }
+
+  private openOtpVerificationModal(userId: number, email: string): void {
+    const dialogRef = this.dialog.open(OtpVerificationModalComponent, {
+      width: '550px',
+      disableClose: true,
+      data: {
+        email: email,
+        expiryMinutes: 5 // Tiempo de expiración del código OTP: 5 minutos
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.verified && result?.code) {
+        // Verificar el código OTP con el userId
+        this.authService.verifyOTP(userId, result.code).subscribe({
+          next: () => {
+            // La navegación se maneja en el servicio después de la verificación exitosa
+          },
+          error: (error) => {
+            console.error('OTP verification error:', error);
+            // El error ya se muestra en el servicio con toast
+          }
+        });
+      } else if (result?.resend) {
+        // Reenviar código OTP
+        this.resendOtpCode(userId, email);
+      } else {
+        // Usuario canceló, redirigir al login
+        this.router.navigate(['/auth/login']);
+      }
+    });
+  }
+
+  private resendOtpCode(userId: number, email: string): void {
+    this.authService.resendOTP(userId).subscribe({
+      next: () => {
+        // Reabrir el modal con el temporizador reiniciado
+        this.openOtpVerificationModal(userId, email);
+      },
+      error: (error) => {
+        console.error('Resend OTP error:', error);
+        // El error ya se muestra en el servicio con toast
+        // Aún así, reabrir el modal para que el usuario pueda intentar de nuevo
+        this.openOtpVerificationModal(userId, email);
+      }
+    });
   }
 }

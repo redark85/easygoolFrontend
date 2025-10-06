@@ -7,9 +7,9 @@ import { StorageService } from './storage.service';
 import { ApiService } from './api.service';
 import { JwtService } from './jwt.service';
 import { ToastService } from './toast.service';
-import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, RoleType } from '../models';
+import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, RoleType, AccessCodeType, VerifyOTPRequest } from '../models';
 import { ApiResponse } from '../models/api.interface';
-import { AUTH_LOGIN_ENDPOINT, AUTH_REGISTER_ENDPOINT } from '../config/endpoints';
+import { AUTH_LOGIN_ENDPOINT, AUTH_REGISTER_ENDPOINT, AUTH_VERIFY_OTP_ENDPOINT, AUTH_RESEND_OTP_ENDPOINT } from '../config/endpoints';
 import { AppConstants } from '../constants';
 
 @Injectable({
@@ -78,19 +78,47 @@ export class AuthService implements OnDestroy {
   }
 
 
-  register(data: RegisterRequest, token : string | null): Observable<void> {
+  register(data: RegisterRequest, token : string | null): Observable<{ success: boolean; userId: number; email: string }> {
     this.setLoading(true);
     const url = token? `${AUTH_REGISTER_ENDPOINT}?token=${encodeURIComponent(token)}` : AUTH_REGISTER_ENDPOINT;
     return this.apiService.post<ApiResponse<number>>(url, data).pipe(
+      map(response => {
+        this.setLoading(false);
+        if (response.succeed && response.result !== undefined) {
+          return { success: true, userId: response.result, email: data.email };
+        } else {
+          throw new HttpErrorResponse({
+            error: { message: response.message || 'Error en el registro' },
+            status: 400,
+          });
+        }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.setLoading(false);
+        const errorMessage = error.error?.errors?.[0] || error.error?.message || 'Ocurrió un error en el registro.';
+        this.toastService.showError(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  verifyOTP(userId: number, otpCode: string): Observable<void> {
+    this.setLoading(true);
+    const url = `${AUTH_VERIFY_OTP_ENDPOINT}/${userId}`;
+    const body: VerifyOTPRequest = {
+      accessCodeType: AccessCodeType.Email,
+      accessCode: parseInt(otpCode, 10)
+    };
+    
+    return this.apiService.post<ApiResponse<AuthResponse>>(url, body).pipe(
       tap(response => {
-        if (response.succeed) {
-          this.setLoading(false);
-          this.toastService.showSuccess(response.message || '¡Registro exitoso! Revisa tu correo para verificar tu cuenta.');
-          this.router.navigate(['/auth/login']);
+        if (response.succeed && response.result) {
+          this.handleAuthSuccess(response.result, true);
+          this.toastService.showSuccess('¡Cuenta verificada exitosamente! Bienvenido.');
         } else {
           this.setLoading(false);
           throw new HttpErrorResponse({
-            error: { message: response.message || 'Error en el registro' },
+            error: { message: response.message || 'Código OTP inválido o expirado' },
             status: 400,
           });
         }
@@ -98,7 +126,33 @@ export class AuthService implements OnDestroy {
       map(() => void 0),
       catchError((error: HttpErrorResponse) => {
         this.setLoading(false);
-        const errorMessage = error.error?.errors?.[0] || error.error?.message || 'Ocurrió un error en el registro.';
+        const errorMessage = error.error?.message || 'Error al verificar el código OTP.';
+        this.toastService.showError(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  resendOTP(userId: number): Observable<void> {
+    this.setLoading(true);
+    const url = `${AUTH_RESEND_OTP_ENDPOINT}/${userId}`;
+   
+    return this.apiService.post<ApiResponse<any>>(url, {}).pipe(
+      tap(response => {
+        this.setLoading(false);
+        if (response.succeed) {
+          this.toastService.showSuccess('Código OTP reenviado exitosamente. Revisa tu correo.');
+        } else {
+          throw new HttpErrorResponse({
+            error: { message: response.message || 'Error al reenviar el código' },
+            status: 400,
+          });
+        }
+      }),
+      map(() => void 0),
+      catchError((error: HttpErrorResponse) => {
+        this.setLoading(false);
+        const errorMessage = error.error?.message || 'Error al reenviar el código OTP.';
         this.toastService.showError(errorMessage);
         return throwError(() => error);
       })

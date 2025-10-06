@@ -34,5 +34,16 @@ export enum RoleType {
   Official
 }
 
+export enum AccessCodeType {
+  SMS = 0,
+  Email = 1,
+  All = 2
+}
+
+export interface VerifyOTPRequest {
+  accessCodeType: AccessCodeType;
+  accessCode: number;
+}
+
 // Import User interface
 import { User } from './user.interface';

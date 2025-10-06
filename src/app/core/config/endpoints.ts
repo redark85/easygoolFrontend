@@ -1,6 +1,8 @@
 // Endpoints de la aplicación
 export const AUTH_LOGIN_ENDPOINT = '/api/Auth/Login';
 export const AUTH_REGISTER_ENDPOINT = '/api/Auth/RegisterUser';
+export const AUTH_VERIFY_OTP_ENDPOINT = '/api/Auth/VerifyOTP';
+export const AUTH_RESEND_OTP_ENDPOINT = '/api/Auth/ResendOTP';
 
 // Tournament Endpoints
 export const TOURNAMENT_CREATE_ENDPOINT = '/api/Tournament/CreateTournament';
