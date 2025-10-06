@@ -585,14 +585,14 @@ deleteTeam(team: Team): void {
             'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
           });
 
-          if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+          if (this.deletionErrorHandler.handleResponse(response, config)) {
             this.loadTournamentData();
           }
         },
         error: (error) => {
           console.error('Error deleting team:', error);
           const config = this.deletionErrorHandler.createConfig('Equipo');
-          this.deletionErrorHandler.handleDeletionError(error, config);
+          this.deletionErrorHandler.handleResponseError(error, config);
         }
       });
     }
@@ -655,14 +655,14 @@ removeTeamFromGroup(team: Team, group: Group): void {
             'EGOL_118': 'No se puede remover el equipo porque es el único en el grupo.'
           });
 
-          if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+          if (this.deletionErrorHandler.handleResponse(response, config)) {
             this.loadTournamentData();
           }
         },
         error: (error) => {
           console.error('Error removing team from group:', error);
           const config = this.deletionErrorHandler.createConfig('Equipo del grupo');
-          this.deletionErrorHandler.handleDeletionError(error, config);
+          this.deletionErrorHandler.handleResponseError(error, config);
         }
       });
     }

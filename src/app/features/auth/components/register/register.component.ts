@@ -14,6 +14,7 @@ import { AuthService } from '@core/services';
 import { RegisterRequest, RoleType } from '@core/models';
 import { PhoneValidatorUtil } from '@shared/utils';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
+import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
 
 @Component({
   selector: 'app-register',
@@ -47,7 +48,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private errorHandler: DeletionErrorHandlerHook
+    
   ) {}
 
   ngOnInit(): void {
@@ -154,7 +157,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
           }
         },
         error: (error: any) => {
-          console.error('Register error:', error);
+          this.loading = false;
+          const config = this.errorHandler.createConfig('User');
+          this.errorHandler.handleResponseError(error, config);
+          if (error.response.data.messageId === 'EGOL_106') {
+            this.navigateToLogin();
+          }
         }
       });
     } else {
@@ -247,8 +255,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result?.verified && result?.code) {
-        // Verificar el código OTP con el userId
-        this.authService.verifyOTP(userId, result.code).subscribe({
+        // Verificar el código OTP con el email
+        this.authService.verifyOTP(email, result.code).subscribe({
           next: () => {
             // La navegación se maneja en el servicio después de la verificación exitosa
           },
@@ -268,7 +276,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   private resendOtpCode(userId: number, email: string): void {
-    this.authService.resendOTP(userId).subscribe({
+    this.authService.resendOTP(email).subscribe({
       next: () => {
         // Reabrir el modal con el temporizador reiniciado
         this.openOtpVerificationModal(userId, email);

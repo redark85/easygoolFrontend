@@ -56,22 +56,20 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  login(credentials: LoginRequest): Observable<void> {
+  login(credentials: LoginRequest): Observable<ApiResponse<AuthResponse>> {
     this.setLoading(true);
     return this.apiService.post<ApiResponse<AuthResponse>>(AUTH_LOGIN_ENDPOINT, credentials).pipe(
       map(response => {
         if (response.succeed && response.result) {
           this.handleAuthSuccess(response.result, true);
-          return;
-        }
-        // Si la API responde con éxito pero el login falla (succeed: false)
-        this.setLoading(false);
-        this.toastService.showError('Usuario o contraseña incorrectos.');
+          return response;
+        }   
+        return response;
       }),
       catchError((error: HttpErrorResponse) => {
         // Si la API responde con un error HTTP (ej. 500, 404)
         this.setLoading(false);
-        this.toastService.showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
+        this.toastService.showError('Usuario o contraseña incorrectos.');
         return throwError(() => error);
       })
     );
@@ -86,25 +84,20 @@ export class AuthService implements OnDestroy {
         this.setLoading(false);
         if (response.succeed && response.result !== undefined) {
           return { success: true, userId: response.result, email: data.email };
-        } else {
-          throw new HttpErrorResponse({
-            error: { message: response.message || 'Error en el registro' },
-            status: 400,
-          });
+        } else {         
+          return { success: false, userId: 0, email: '' };
         }
       }),
       catchError((error: HttpErrorResponse) => {
         this.setLoading(false);
-        const errorMessage = error.error?.errors?.[0] || error.error?.message || 'Ocurrió un error en el registro.';
-        this.toastService.showError(errorMessage);
         return throwError(() => error);
       })
     );
   }
 
-  verifyOTP(userId: number, otpCode: string): Observable<void> {
+  verifyOTP(email: string, otpCode: string): Observable<void> {
     this.setLoading(true);
-    const url = `${AUTH_VERIFY_OTP_ENDPOINT}/${userId}`;
+    const url = `${AUTH_VERIFY_OTP_ENDPOINT}?email=${encodeURIComponent(email)}`;
     const body: VerifyOTPRequest = {
       accessCodeType: AccessCodeType.Email,
       accessCode: parseInt(otpCode, 10)
@@ -112,11 +105,11 @@ export class AuthService implements OnDestroy {
     
     return this.apiService.post<ApiResponse<AuthResponse>>(url, body).pipe(
       tap(response => {
-        if (response.succeed && response.result) {
-          this.handleAuthSuccess(response.result, true);
-          this.toastService.showSuccess('¡Cuenta verificada exitosamente! Bienvenido.');
+        this.setLoading(false);
+        if (response.succeed) {
+          this.toastService.showSuccess('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.');
+          this.router.navigate(['/auth/login']);
         } else {
-          this.setLoading(false);
           throw new HttpErrorResponse({
             error: { message: response.message || 'Código OTP inválido o expirado' },
             status: 400,
@@ -133,9 +126,9 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  resendOTP(userId: number): Observable<void> {
+  resendOTP(email: string): Observable<void> {
     this.setLoading(true);
-    const url = `${AUTH_RESEND_OTP_ENDPOINT}/${userId}`;
+    const url = `${AUTH_RESEND_OTP_ENDPOINT}?email=${encodeURIComponent(email)}`;
    
     return this.apiService.post<ApiResponse<any>>(url, {}).pipe(
       tap(response => {

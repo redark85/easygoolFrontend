@@ -314,14 +314,14 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
               'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
             });
 
-            if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+            if (this.deletionErrorHandler.handleResponse(response, config)) {
               this.refreshTeams();
             }
           },
           error: (error) => {
             console.error('Error deleting team:', error);
             const config = this.deletionErrorHandler.createConfig('Equipo');
-            this.deletionErrorHandler.handleDeletionError(error, config);
+            this.deletionErrorHandler.handleResponseError(error, config);
           }
         });
       }
