@@ -81,12 +81,14 @@ export class AuthService implements OnDestroy {
   register(data: RegisterRequest, token : string | null): Observable<void> {
     this.setLoading(true);
     const url = token? `${AUTH_REGISTER_ENDPOINT}?token=${encodeURIComponent(token)}` : AUTH_REGISTER_ENDPOINT;
-    return this.apiService.post<ApiResponse<AuthResponse>>(url, data).pipe(
+    return this.apiService.post<ApiResponse<number>>(url, data).pipe(
       tap(response => {
-        if (response.succeed && response.result) {
-          this.toastService.showSuccess('¡Registro exitoso! Bienvenido.');
-            this.router.navigate(['/auth/login']);
+        if (response.succeed) {
+          this.setLoading(false);
+          this.toastService.showSuccess(response.message || '¡Registro exitoso! Revisa tu correo para verificar tu cuenta.');
+          this.router.navigate(['/auth/login']);
         } else {
+          this.setLoading(false);
           throw new HttpErrorResponse({
             error: { message: response.message || 'Error en el registro' },
             status: 400,
