@@ -1,23 +1,21 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService, ToastService } from '@core/services';
-import { LoginRequest } from '@core/models';
+import { AccessCodeTemplateType } from '@core/models';
 import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-reset-password',
   standalone: true,
   imports: [
     CommonModule,
@@ -26,109 +24,57 @@ import { OtpVerificationModalComponent } from '@shared/components/otp-verificati
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatCheckboxModule,
     MatIconModule,
     MatProgressSpinnerModule
   ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['./reset-password.component.scss']
 })
-export class LoginComponent implements OnInit, OnDestroy {
-  loginForm!: FormGroup;
-  hidePassword = true;
+export class ResetPasswordComponent implements OnInit {
+  resetForm!: FormGroup;
   loading = false;
-  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private errorHandler: DeletionErrorHandlerHook,
     private dialog: MatDialog,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private errorHandler: DeletionErrorHandlerHook
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
-    this.subscribeToAuthState();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   private initializeForm(): void {
-    this.loginForm = this.fb.group({
-      userName: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+    this.resetForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
     });
   }
 
-  private subscribeToAuthState(): void {
-    this.authService.authState$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
-        this.loading = state.loading;
-
-        if (state.isAuthenticated) {
-          this.router.navigate(['/dashboard']);
-        }
-      });
-  }
-
   onSubmit(): void {
-    if (this.loginForm.invalid) {
+    if (this.resetForm.invalid) {
       this.markFormGroupTouched();
       return;
     }
 
-    const loginData: LoginRequest = this.loginForm.value;
-    this.authService.login(loginData).subscribe({
-        next: (response) => {
-         
-        },
-        error: (error: any) => {
-          this.loading = false;
-          if (error.response.data.messageId === 'EGOL_120') {
-            this.toastService.showError('Su cuenta de correo no ha sido verificada.');
-            const email = loginData.userName; // El email es el userName
-            this.openOtpVerificationModal(email);
-          }
-          else {
-            this.toastService.showError('Usuario o contraseña incorrectos.');
-          }
-        }
-      });
-  }
+    const email = this.resetForm.value.email;
+    this.loading = true;
 
-  private markFormGroupTouched(): void {
-    Object.keys(this.loginForm.controls).forEach(key => {
-      const control = this.loginForm.get(key);
-      control?.markAsTouched();
+    // Llamar al servicio para enviar código OTP con template de ResetPassword
+    this.authService.resendOTP(email, AccessCodeTemplateType.ResetPassword).subscribe({
+      next: () => {
+        this.loading = false;
+        // Abrir modal OTP para verificar y cambiar contraseña
+        this.openOtpVerificationModal(email);
+      },
+      error: (error: any) => {
+        this.loading = false;
+        const config = this.errorHandler.createConfig('User');
+        this.errorHandler.handleResponseError(error, config);
+      }
     });
-  }
-
-  getErrorMessage(fieldName: string): string {
-    const control = this.loginForm.get(fieldName);
-
-    if (control?.hasError('required')) {
-      return fieldName === 'userName' ? 'Email es requerido' : 'Contraseña es requerida';
-    }
-
-    if (control?.hasError('minlength')) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
-
-    return '';
-  }
-
-  navigateToRegister(): void {
-    this.router.navigate(['/']);
-  }
-
-  navigateToResetPassword(): void {
-    this.router.navigate(['/auth/reset-password']);
   }
 
   private openOtpVerificationModal(email: string): void {
@@ -137,19 +83,21 @@ export class LoginComponent implements OnInit, OnDestroy {
       disableClose: true,
       data: {
         email: email,
-        expiryMinutes: 5, // Tiempo de expiración del código OTP: 5 minutos
+        expiryMinutes: 5,
         onVerify: async (code: string) => {
           return new Promise<boolean>((resolve) => {
             this.authService.verifyOTP(email, code).subscribe({
               next: () => {
-                // La navegación se maneja en el servicio después de la verificación exitosa
-                resolve(true); // Cerrar el modal
+                // Redirigir a una vista para cambiar la contraseña
+                this.toastService.showSuccess('Código verificado. Ahora puedes cambiar tu contraseña.');
+                this.router.navigate(['/auth/change-password'], { queryParams: { email: email } });
+                resolve(true);
               },
               error: (error) => {
                 this.loading = false;
                 const config = this.errorHandler.createConfig('Code');
                 this.errorHandler.handleResponseError(error, config);
-                resolve(false); // No cerrar el modal, permitir reintentar
+                resolve(false);
               }
             });
           });
@@ -165,14 +113,14 @@ export class LoginComponent implements OnInit, OnDestroy {
         // Usuario solicitó reenvío, llamar al servicio y reabrir modal
         this.resendOtpCode(email);
       } else if (!result?.verified) {
-        // Usuario canceló, permanecer en login
+        // Usuario canceló
         this.loading = false;
       }
     });
   }
 
   private resendOtpCode(email: string): void {
-    this.authService.resendOTP(email).subscribe({
+    this.authService.resendOTP(email, AccessCodeTemplateType.ResetPassword).subscribe({
       next: () => {
         // Reabrir el modal con el temporizador reiniciado
         this.openOtpVerificationModal(email);
@@ -184,5 +132,34 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.openOtpVerificationModal(email);
       }
     });
+  }
+
+  private markFormGroupTouched(): void {
+    Object.keys(this.resetForm.controls).forEach(key => {
+      const control = this.resetForm.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.resetForm.get(fieldName);
+
+    if (control?.hasError('required')) {
+      return 'Email es requerido';
+    }
+
+    if (control?.hasError('email')) {
+      return 'Email inválido';
+    }
+
+    return '';
+  }
+
+  navigateToLogin(): void {
+    this.router.navigate(['/auth/login']);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/auth/login']);
   }
 }

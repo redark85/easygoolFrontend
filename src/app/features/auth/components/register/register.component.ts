@@ -267,13 +267,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
           });
         },
         onResend: () => {
-          this.resendOtpCode(email);
+          // No hacer nada aquí, el modal se cerrará y se reabrirá
         }
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (!result?.verified) {
+      if (result?.resend) {
+        // Usuario solicitó reenvío, llamar al servicio y reabrir modal
+        this.resendOtpCode(email);
+      } else if (!result?.verified) {
         // Usuario canceló, redirigir al login
         this.router.navigate(['/auth/login']);
       }
@@ -283,11 +286,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private resendOtpCode(email: string): void {
     this.authService.resendOTP(email).subscribe({
       next: () => {
-        // El mensaje de éxito ya se muestra en el servicio
+        // Reabrir el modal con el temporizador reiniciado
+        // Necesitamos el userId, lo obtenemos del registro previo
+        const userId = 0; // El userId ya no es necesario para el modal
+        this.openOtpVerificationModal(userId, email);
       },
       error: (error) => {
         console.error('Resend OTP error:', error);
         // El error ya se muestra en el servicio con toast
+        // Aún así, reabrir el modal para que el usuario pueda intentar de nuevo
+        const userId = 0;
+        this.openOtpVerificationModal(userId, email);
       }
     });
   }

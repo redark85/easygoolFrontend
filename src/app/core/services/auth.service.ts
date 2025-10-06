@@ -7,7 +7,7 @@ import { StorageService } from './storage.service';
 import { ApiService } from './api.service';
 import { JwtService } from './jwt.service';
 import { ToastService } from './toast.service';
-import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, RoleType, AccessCodeType, VerifyOTPRequest } from '../models';
+import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, RoleType, AccessCodeType, VerifyOTPRequest, AccessCodeTemplateType, ResendOTPRequest } from '../models';
 import { ApiResponse } from '../models/api.interface';
 import { AUTH_LOGIN_ENDPOINT, AUTH_REGISTER_ENDPOINT, AUTH_VERIFY_OTP_ENDPOINT, AUTH_RESEND_OTP_ENDPOINT } from '../config/endpoints';
 import { AppConstants } from '../constants';
@@ -118,11 +118,14 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  resendOTP(email: string): Observable<void> {
+  resendOTP(email: string, templateType: AccessCodeTemplateType = AccessCodeTemplateType.AccessCodeNotification): Observable<void> {
     this.setLoading(true);
-    const url = `${AUTH_RESEND_OTP_ENDPOINT}?email=${encodeURIComponent(email)}`;
+    const body: ResendOTPRequest = {
+      email: email,
+      templateType: templateType
+    };
    
-    return this.apiService.post<ApiResponse<any>>(url, {}).pipe(
+    return this.apiService.post<ApiResponse<any>>(AUTH_RESEND_OTP_ENDPOINT, body).pipe(
       tap(response => {
         this.setLoading(false);
         if (response.succeed) {

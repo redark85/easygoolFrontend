@@ -40,9 +40,19 @@ export enum AccessCodeType {
   All = 2
 }
 
+export enum AccessCodeTemplateType {
+  ResetPassword = 0,
+  AccessCodeNotification = 1
+}
+
 export interface VerifyOTPRequest {
   accessCodeType: AccessCodeType;
   accessCode: number;
+}
+
+export interface ResendOTPRequest {
+  email: string;
+  templateType: AccessCodeTemplateType;
 }
 
 // Import User interface

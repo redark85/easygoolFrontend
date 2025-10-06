@@ -173,6 +173,8 @@ export class OtpVerificationModalComponent implements OnInit, OnDestroy {
   onResendCode(): void {
     if (this.data.onResend) {
       this.data.onResend();
+      // Cerrar el modal para que se abra uno nuevo con temporizador reiniciado
+      this.dialogRef.close({ resend: true });
     } else {
       // Fallback al comportamiento anterior
       this.dialogRef.close({ resend: true });
