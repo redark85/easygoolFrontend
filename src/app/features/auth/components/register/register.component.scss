@@ -43,25 +43,125 @@
 
     .logo-section {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
 
       .logo {
-        width: 80px;
-        height: 64px;
+        width: 60px;
+        height: 48px;
         object-fit: contain;
       }
     }
 
     .title-section {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
 
       .page-title {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #1976d2;
         margin: 0;
       }
+    }
+
+    .tournament-banner {
+      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+
+      .tournament-content {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        .tournament-logo {
+          width: 80px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tournament-text {
+          flex: 1;
+          color: white;
+
+          .tournament-message {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.5;
+
+            mat-icon {
+              font-size: 1.2rem;
+              width: 1.2rem;
+              height: 1.2rem;
+              flex-shrink: 0;
+            }
+          }
+
+          .tournament-name {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+          }
+
+          .login-prompt {
+            margin: 0;
+            font-size: 0.85rem;
+
+            .login-link {
+              color: #ffeb3b;
+              text-decoration: none;
+              font-weight: 600;
+              transition: all 0.3s ease;
+
+              &:hover {
+                color: #fff59d;
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+
+      @media (max-width: 576px) {
+        .tournament-content {
+          flex-direction: column;
+          text-align: center;
+
+          .tournament-logo {
+            width: 60px;
+            height: 60px;
+          }
+
+          .tournament-text {
+            .tournament-message {
+              justify-content: center;
+            }
+          }
+        }
+      }
+    }
+
+    .loading-tournament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: #e3f2fd;
+      border-radius: 8px;
+      color: #1976d2;
+      font-size: 0.9rem;
     }
 
     .error-message {

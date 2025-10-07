@@ -8,7 +8,7 @@
   <div class="auth-content">
     <mat-card class="auth-card">
       <!-- Back Button -->
-      <div class="back-button-section">
+      <div class="back-button-section" *ngIf="!tournamentInfo">
         <button mat-icon-button (click)="goBack()" class="back-button" type="button">
           <mat-icon>arrow_back</mat-icon>
         </button>
@@ -22,6 +22,31 @@
       <!-- Page Title -->
       <div class="title-section">
         <h2 class="page-title">{{ pageTitle }}</h2>
+      </div>
+
+      <!-- Tournament Info Banner -->
+      <div *ngIf="tournamentInfo" class="tournament-banner">
+        <div class="tournament-content">
+          <img [src]="tournamentInfo.imageUrl" [alt]="tournamentInfo.name" class="tournament-logo">
+          <div class="tournament-text">
+            <p class="tournament-message">
+              <mat-icon>sports_soccer</mat-icon>
+              Para registrar tu equipo en "{{ tournamentInfo.name }}" debes estar registrado
+            </p>
+            <p class="login-prompt">
+              ¿Ya tienes cuenta en EasyGool? 
+              <a [routerLink]="['/auth/login']" [queryParams]="{ token: tokenFromUrl }" class="login-link">
+                Inicia sesión aquí
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Tournament -->
+      <div *ngIf="loadingTournament" class="loading-tournament">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Cargando información del torneo...</span>
       </div>
 
       <!-- Error Message -->

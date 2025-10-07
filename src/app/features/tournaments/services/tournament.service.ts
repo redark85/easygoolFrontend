@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { ApiService } from '@core/services/api.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '@core/services/toast.service';
-import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT, TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT } from '@core/config/endpoints';
+import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT, TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT, TOURNAMENT_GET_BY_TOKEN_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
 
 import { CreateTournamentRequest, UpdateTournamentRequest, Tournament, TournamentApiResponse, TournamentStatusType, UpdateTournamentStatusRequest, ChangeStatusRequest, TournamentDetailResponse, TournamentDetail } from '../models/tournament.interface';
@@ -61,6 +61,22 @@ export class TournamentService {
           throw new Error(response.message || 'Error al obtener torneo');
         }
         return response.result;
+      })
+    );
+  }
+
+  /**
+   * Obtiene información básica de un torneo por token
+   * @param token Token del torneo
+   * @returns Observable con información básica del torneo
+   */
+  getTournamentByToken(token: string ): Observable<{ id: number; name: string; imageUrl: string } | null> {
+    return this.apiService.get<ApiResponse<{ id: number; name: string; imageUrl: string }>>(`${TOURNAMENT_GET_BY_TOKEN_ENDPOINT}?token=${encodeURIComponent(token)}`).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        return null;
       })
     );
   }

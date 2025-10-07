@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +15,7 @@ import { RegisterRequest, RoleType } from '@core/models';
 import { PhoneValidatorUtil } from '@shared/utils';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
 import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
+import { TournamentService } from '@features/tournaments/services/tournament.service';
 
 @Component({
   selector: 'app-register',
@@ -22,6 +23,7 @@ import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.h
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -39,9 +41,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   private destroy$ = new Subject<void>();
-  private tokenFromUrl: string | null = null;
+  tokenFromUrl: string | null = null;
   roleType: 'league' | 'team' | null = null;
   pageTitle: string = 'Crear Cuenta';
+  tournamentInfo: { id: number; name: string; imageUrl: string } | null = null;
+  loadingTournament = false;
 
   constructor(
     private fb: FormBuilder,
@@ -49,8 +53,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private dialog: MatDialog,
-    private errorHandler: DeletionErrorHandlerHook
-    
+    private errorHandler: DeletionErrorHandlerHook,
+    private tournamentService: TournamentService
   ) {}
 
   ngOnInit(): void {
@@ -69,10 +73,33 @@ export class RegisterComponent implements OnInit, OnDestroy {
         if (params['token']) {
           this.tokenFromUrl = params['token'];
           console.log('Token capturado de la URL:', this.tokenFromUrl);
+          this.loadTournamentByToken(params['token']);
         }
         if (params['role']) {
           this.roleType = params['role'];
           this.updatePageTitle();
+        }
+      });
+  }
+
+  /**
+   * Carga la información del torneo usando el token
+   */
+  private loadTournamentByToken(token: string): void {
+    this.loadingTournament = true;
+    this.tournamentService.getTournamentByToken(token)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournament) => {
+          this.loadingTournament = false;
+          if (tournament) {
+            this.tournamentInfo = tournament;
+            console.log('Torneo cargado:', this.tournamentInfo);
+          }
+        },
+        error: (error) => {
+          this.loadingTournament = false;
+          console.error('Error al cargar torneo:', error);
         }
       });
   }

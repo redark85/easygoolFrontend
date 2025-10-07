@@ -13,6 +13,7 @@ export const TOURNAMENT_UPDATE_STATUS_ENDPOINT = '/api/Tournament/UpdateStatus';
 export const TOURNAMENT_CHANGE_STATUS_ENDPOINT = '/api/Tournament/ChangeStatus';
 export const TOURNAMENT_DELETE_ENDPOINT = '/api/Tournament/DeleteTournament';
 export const TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT = '/api/Tournament/AllowRegisterTeam';
+export const TOURNAMENT_GET_BY_TOKEN_ENDPOINT = '/api/Tournament/GetByToken';
 
 // Phase Endpoints
 export const PHASE_CREATE_ENDPOINT = '/api/Phase/CreatePhase';
