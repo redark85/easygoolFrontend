@@ -17,7 +17,6 @@ import { MatChipsModule } from '@angular/material/chips';
 
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { LocationMapComponent, LocationData } from '@shared/components/location-map/location-map.component';
-import { UppercaseDirective } from '@shared/directives/uppercase.directive';
 import { TournamentService } from '../../services/tournament.service';
 import { PhaseService } from '../../services/phase.service';
 import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType } from '../../models/tournament.interface';
@@ -50,8 +49,7 @@ export interface TournamentFormData {
     MatExpansionModule,
     MatCardModule,
     MatChipsModule,
-    ImageUploaderComponent,
-    UppercaseDirective
+    ImageUploaderComponent    
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './tournament-form.component.html',

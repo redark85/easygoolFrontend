@@ -13,7 +13,6 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { PlayerService } from '../../services/player.service';
-import { UppercaseDirective } from '../../../../shared/directives/uppercase.directive';
 import { ImageUploaderComponent } from '../../../../shared/components/image-uploader/image-uploader.component';
 import { 
   Player, 
@@ -45,7 +44,6 @@ import {
     MatCheckboxModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    UppercaseDirective,
     ImageUploaderComponent
   ],
   templateUrl: './player-form.component.html',
