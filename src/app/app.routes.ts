@@ -1,12 +1,13 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
+import { AuthGuard, NoAuthGuard } from './core/guards';
 
 export const routes: Routes = [
   // Landing page (without layout)
   {
     path: '',
     loadComponent: () => import('./features/auth/components/landing/landing.component').then(c => c.LandingComponent),
-    pathMatch: 'full'
+    pathMatch: 'full',
+    canActivate: [NoAuthGuard]
   },
   
   // Auth routes (lazy loaded)
