@@ -94,7 +94,7 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  verifyOTP(email: string, otpCode: string): Observable<void> {
+  verifyOTP(email: string, otpCode: string, autoRedirect: boolean = true): Observable<void> {
     this.setLoading(true);
     const url = `${AUTH_VERIFY_OTP_ENDPOINT}?email=${encodeURIComponent(email)}`;
     const body: VerifyOTPRequest = {
@@ -106,8 +106,10 @@ export class AuthService implements OnDestroy {
       tap(response => {
         this.setLoading(false);
         if (response.succeed) {
-          this.toastService.showSuccess('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.');
-          this.router.navigate(['/auth/login']);
+          if (autoRedirect) {
+            this.toastService.showSuccess('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.');
+            this.router.navigate(['/auth/login']);
+          }
         }
       }),
       map(() => void 0),
@@ -141,6 +143,36 @@ export class AuthService implements OnDestroy {
       catchError((error: HttpErrorResponse) => {
         this.setLoading(false);
         const errorMessage = error.error?.message || 'Error al reenviar el código OTP.';
+        this.toastService.showError(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  resetPassword(email: string, newPassword: string): Observable<void> {
+    this.setLoading(true);
+    const body = {
+      email: email,
+      password: newPassword
+    };
+
+    // Ajusta el endpoint según tu API
+    const url = `${AUTH_LOGIN_ENDPOINT.replace('/Login', '/ResetPassword')}`;
+   
+    return this.apiService.post<ApiResponse<any>>(url, body).pipe(
+      tap(response => {
+        this.setLoading(false);
+        if (!response.succeed) {
+          throw new HttpErrorResponse({
+            error: { message: response.message || 'Error al cambiar la contraseña' },
+            status: 400,
+          });
+        }
+      }),
+      map(() => void 0),
+      catchError((error: HttpErrorResponse) => {
+        this.setLoading(false);
+        const errorMessage = error.error?.message || 'Error al cambiar la contraseña.';
         this.toastService.showError(errorMessage);
         return throwError(() => error);
       })
