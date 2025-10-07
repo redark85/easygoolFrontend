@@ -42,8 +42,8 @@ export interface CreateTeamRequest {
   tournamentId: number;
   name: string;
   shortName: string;
-  logoBase64: string;
-  logoContentType: string;
+  logoBase64?: string | null;
+  logoContentType: string | null;
 }
 
 export interface UpdateTeamRequest {
@@ -51,8 +51,8 @@ export interface UpdateTeamRequest {
   tournamentId: number;
   name: string;
   shortName: string;
-  logoBase64: string;
-  logoContentType: string;
+  logoBase64: string | null;
+  logoContentType: string | null;
 }
 
 

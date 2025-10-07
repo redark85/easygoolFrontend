@@ -10,16 +10,12 @@
         <!-- Logo Upload Section -->
         <div class="row mb-3">
           <div class="col-12">
-            <label class="image-label">Logo del Equipo *</label>
+            <label class="image-label">Logo del Equipo</label>
             <app-image-uploader
               formControlName="logo"
               [maxFileSizeMB]="2"
               (imageUploaded)="onImageUploaded($event)">
             </app-image-uploader>
-            <div class="error-message" *ngIf="logoErrors">
-              <mat-icon>error</mat-icon>
-              {{ logoErrors }}
-            </div>
           </div>
         </div>
 

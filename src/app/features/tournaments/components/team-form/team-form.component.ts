@@ -74,10 +74,9 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1\s0-9]+$/)
       ]],
       shortName: ['', [
-        Validators.required,
         Validators.maxLength(100)
       ]],
-      logo: [null, this.isEdit ? [] : [Validators.required]]
+      logo: [null]
     });
   }
 
@@ -153,8 +152,8 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         tournamentId: this.data.tournamentId,
         name: formValue.name,
         shortName: formValue.shortName.toUpperCase(),
-        logoBase64: logoData?.base64 ? this.cleanBase64(logoData.base64) : '',
-        logoContentType: logoData?.contentType ? this.extractFileExtension(logoData.contentType) : ''
+        logoBase64: logoData ? this.cleanBase64(logoData.base64) : null,
+        logoContentType: logoData ? this.extractFileExtension(logoData.contentType) : null
       };
 
       this.teamService.updateTeam(updateRequest).pipe(
@@ -174,8 +173,8 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         tournamentId: this.data.tournamentId,
         name: formValue.name,
         shortName: formValue.shortName.toUpperCase(),
-        logoBase64: this.cleanBase64(logoData.base64),
-        logoContentType: this.extractFileExtension(logoData.contentType)
+        logoBase64: logoData ? this.cleanBase64(logoData.base64) : null,
+        logoContentType: logoData ? this.extractFileExtension(logoData.contentType) : null
       };
 
       this.teamService.createTeam(createRequest).pipe(
@@ -240,8 +239,8 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   /**
    * Limpia el base64 removiendo prefijos como "data:image/jpeg;base64,"
    */
-  private cleanBase64(base64String: string): string {
-    if (!base64String) return '';
+  private cleanBase64(base64String: string | null): string | null {
+    if (!base64String) return null;
 
     // Remover prefijo data:image/...;base64, si existe
     const base64Prefix = base64String.indexOf(',');
