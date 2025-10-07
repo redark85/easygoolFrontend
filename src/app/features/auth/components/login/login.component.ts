@@ -143,6 +143,23 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.authService.verifyOTP(email, code).subscribe({
               next: () => {
                 // La navegación se maneja en el servicio después de la verificación exitosa
+                const loginData: LoginRequest = this.loginForm.value;
+                this.authService.login(loginData).subscribe({
+                    next: (response) => {
+                    
+                    },
+                    error: (error: any) => {
+                      this.loading = false;
+                      if (error.response.data.messageId === 'EGOL_120') {
+                        this.toastService.showError('Su cuenta de correo no ha sido verificada.');
+                        const email = loginData.userName; // El email es el userName
+                        this.openOtpVerificationModal(email);
+                      }
+                      else {
+                        this.toastService.showError('Usuario o contraseña incorrectos.');
+                      }
+                    }
+                  });
                 resolve(true); // Cerrar el modal
               },
               error: (error) => {

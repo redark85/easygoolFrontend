@@ -94,7 +94,7 @@ export class AuthService implements OnDestroy {
     );
   }
 
-  verifyOTP(email: string, otpCode: string, autoRedirect: boolean = true): Observable<void> {
+  verifyOTP(email: string, otpCode: string, autoRedirect: boolean = true, autoLogin: boolean = false): Observable<AuthResponse | void> {
     this.setLoading(true);
     const url = `${AUTH_VERIFY_OTP_ENDPOINT}?email=${encodeURIComponent(email)}`;
     const body: VerifyOTPRequest = {
@@ -105,14 +105,16 @@ export class AuthService implements OnDestroy {
     return this.apiService.post<ApiResponse<AuthResponse>>(url, body).pipe(
       tap(response => {
         this.setLoading(false);
-        if (response.succeed) {
-          if (autoRedirect) {
+        if (response.succeed && response.result) {
+          if (autoLogin) {
+            // Hacer login automático con la respuesta
+          } else if (autoRedirect) {
             this.toastService.showSuccess('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.');
             this.router.navigate(['/auth/login']);
           }
         }
       }),
-      map(() => void 0),
+      map(response => autoLogin && response.succeed ? response.result : void 0),
       catchError((error: HttpErrorResponse) => {
         this.setLoading(false);   
         return throwError(() => error);

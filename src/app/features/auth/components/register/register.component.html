@@ -31,7 +31,7 @@
           <div class="tournament-text">
             <p class="tournament-message">
               <mat-icon>sports_soccer</mat-icon>
-              Para registrar tu equipo en "{{ tournamentInfo.name }}" debes estar registrado
+              Para registrar tu equipo en "{{ tournamentInfo.name }}" debes tener cuenta en EasyGool, totalmente GRATIS
             </p>
             <p class="login-prompt">
               ¿Ya tienes cuenta en EasyGool? 
@@ -173,8 +173,8 @@
         </button>
 
         <!-- Login Link -->
-        <div class="login-link">
-          <span>¿Ya tienes cuenta? </span>
+        <div class="login-link" *ngIf="!tournamentInfo">
+          <span>¿Ya tienes cuenta en EasyGool? </span>
           <button mat-button type="button" class="link-button" (click)="navigateToLogin()">
             Inicia sesión aquí
           </button>

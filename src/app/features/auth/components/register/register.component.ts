@@ -10,8 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthService } from '@core/services';
-import { RegisterRequest, RoleType } from '@core/models';
+import { AuthService, ToastService } from '@core/services';
+import { LoginRequest, RegisterRequest, RoleType } from '@core/models';
 import { PhoneValidatorUtil } from '@shared/utils';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
 import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
@@ -54,7 +54,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private errorHandler: DeletionErrorHandlerHook,
-    private tournamentService: TournamentService
+    private tournamentService: TournamentService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -180,7 +181,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.authService.register(registerData, token).subscribe({
         next: (response) => {
           if (response.success) {
-            this.openOtpVerificationModal(response.userId, response.email);
+            this.openOtpVerificationModal(registerData.password, response.email);
           }
         },
         error: (error: any) => {
@@ -270,7 +271,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  private openOtpVerificationModal(userId: number, email: string): void {
+  private openOtpVerificationModal(password: string, email: string): void {
     const dialogRef = this.dialog.open(OtpVerificationModalComponent, {
       width: '550px',
       disableClose: true,
@@ -279,9 +280,25 @@ export class RegisterComponent implements OnInit, OnDestroy {
         expiryMinutes: 5, // Tiempo de expiración del código OTP: 5 minutos
         onVerify: async (code: string) => {
           return new Promise<boolean>((resolve) => {
-            this.authService.verifyOTP(email, code).subscribe({
+            this.authService.verifyOTP(email, code, false, true).subscribe({
               next: () => {
-                // La navegación se maneja en el servicio después de la verificación exitosa
+                // Login automático exitoso, el servicio ya maneja la navegación
+                 const loginData: LoginRequest = { userName: email, password: password };
+                this.authService.login(loginData).subscribe({
+                    next: (response) => {
+                    
+                    },
+                    error: (error: any) => {
+                      this.loading = false;
+                      if (error.response.data.messageId === 'EGOL_120') {
+                        this.toastService.showError('Su cuenta de correo no ha sido verificada.');
+                      }
+                      else {
+                        this.toastService.showError('Usuario o contraseña incorrectos.');
+                      }
+                    }
+                  });
+                this.toastService.showSuccess('¡Cuenta verificada e inicio de sesión exitoso!');
                 resolve(true); // Cerrar el modal
               },
               error: (error) => {
@@ -302,28 +319,26 @@ export class RegisterComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result?.resend) {
         // Usuario solicitó reenvío, llamar al servicio y reabrir modal
-        this.resendOtpCode(email);
+        this.resendOtpCode(password,email);
       } else if (!result?.verified) {
-        // Usuario canceló, redirigir al login
-        this.router.navigate(['/auth/login']);
+        // Usuario canceló, permanecer en la página de registro
+        this.loading = false;
       }
     });
   }
 
-  private resendOtpCode(email: string): void {
+  private resendOtpCode(password: string, email: string): void {
     this.authService.resendOTP(email).subscribe({
       next: () => {
         // Reabrir el modal con el temporizador reiniciado
-        // Necesitamos el userId, lo obtenemos del registro previo
-        const userId = 0; // El userId ya no es necesario para el modal
-        this.openOtpVerificationModal(userId, email);
+        this.openOtpVerificationModal(password, email);
       },
       error: (error) => {
         console.error('Resend OTP error:', error);
         // El error ya se muestra en el servicio con toast
         // Aún así, reabrir el modal para que el usuario pueda intentar de nuevo
         const userId = 0;
-        this.openOtpVerificationModal(userId, email);
+        this.openOtpVerificationModal(password, email);
       }
     });
   }
