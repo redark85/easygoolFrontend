@@ -7,14 +7,19 @@
 .team-panel {
   .team-avatar {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px; // Asegurar altura mínima para el avatar
 
     .team-logo {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid white;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0; // Evitar que se comprima
     }
   }
 
@@ -211,17 +216,27 @@
 
   .mat-expansion-panel-header {
     padding: 12px 16px;
-    min-height: unset;
+    min-height: 84px; // Aumentado 5% más de altura (80px base + 5% = 84px)
 
     .mat-content {
       align-items: center;
       margin-right: 0; // evitar compresión
       width: 100%; // ocupar todo el ancho del header
+      min-height: 60px; // Altura mínima para contener avatares
     }
   }
 
   .mat-expansion-panel-body {
     padding: 0; // controlamos padding en .players-list
+  }
+
+  // Switch dentro del expansion panel
+  .registration-toggle {
+    pointer-events: auto; // Asegurar que el switch sea clickeable
+    
+    mat-slide-toggle {
+      pointer-events: auto;
+    }
   }
 }
 
@@ -328,6 +343,9 @@
 
   // Registration toggle styles
   .registration-toggle {
+    z-index: 10; // Asegurar que esté por encima del expansion panel
+    position: relative;
+    
     .mat-slide-toggle {
       .mat-slide-toggle-thumb {
         background-color: white;
@@ -452,6 +470,27 @@
 
   .teams-list {
     padding-bottom: 60px;
+  }
+
+  // Ajustes para expansion panels en móvil
+  .team-panel {
+    .mat-expansion-panel-header {
+      min-height: 90px; // Aumentar aún más en móvil para mejor visualización
+      padding: 8px 12px;
+
+      .mat-content {
+        min-height: 70px;
+      }
+    }
+
+    .team-avatar {
+      min-height: 50px;
+      
+      .team-logo {
+        width: 45px;
+        height: 45px;
+      }
+    }
   }
 
   .team-row {

@@ -94,6 +94,7 @@
                   <mat-slide-toggle
                     [checked]="team.allowPlayerRegistration || false"
                     (change)="onTogglePlayerRegistration(team, $event.checked)"
+                    (click)="$event.stopPropagation()"
                     matTooltip="Permitir registro de jugadores"
                     class="registration-toggle">
                   </mat-slide-toggle>
