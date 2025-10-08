@@ -476,6 +476,7 @@ html, body {
 
 .mat-mdc-dialog-container .mat-mdc-dialog-title + .mat-mdc-dialog-content {
   padding-top: 10px !important;
+  display: contents !important;
 }
 
 .cdk-overlay-pane.mat-mdc-dialog-panel {
