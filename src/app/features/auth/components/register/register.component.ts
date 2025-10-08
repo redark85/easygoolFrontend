@@ -284,7 +284,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
               next: () => {
                 // Login automático exitoso, el servicio ya maneja la navegación
                  const loginData: LoginRequest = { userName: email, password: password };
-                this.authService.login(loginData).subscribe({
+                this.authService.login(loginData, this.tokenFromUrl).subscribe({
                     next: (response) => {
                     
                     },

@@ -56,9 +56,10 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  login(credentials: LoginRequest): Observable<ApiResponse<AuthResponse>> {
+  login(credentials: LoginRequest, token : string | null): Observable<ApiResponse<AuthResponse>> {
     this.setLoading(true);
-    return this.apiService.post<ApiResponse<AuthResponse>>(AUTH_LOGIN_ENDPOINT, credentials).pipe(
+    const url = token? `${AUTH_LOGIN_ENDPOINT}?token=${encodeURIComponent(token)}` : AUTH_LOGIN_ENDPOINT;
+    return this.apiService.post<ApiResponse<AuthResponse>>(url, credentials).pipe(
       map(response => {
         if (response.succeed && response.result) {
           this.handleAuthSuccess(response.result, true);
