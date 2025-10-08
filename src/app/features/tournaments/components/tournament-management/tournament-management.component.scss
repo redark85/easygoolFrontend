@@ -189,12 +189,78 @@
                 margin-left: 8px;
               }
 
-              &.mat-mdc-slide-toggle.mat-checked .mdc-switch__track {
-                background-color: var(--accent-color, #4caf50);
-              }
+              // Estilos más específicos para el switch azul
+              ::ng-deep {
+                // Switch en estado activo/checked
+                &.mat-mdc-slide-toggle.mat-checked {
+                  .mdc-switch {
+                    .mdc-switch__track {
+                      background-color: #1976d2 !important;
+                      opacity: 1 !important;
+                      border-color: #1976d2 !important;
+                    }
 
-              &.mat-mdc-slide-toggle.mat-checked .mdc-switch__handle {
-                background-color: var(--accent-color, #4caf50);
+                    .mdc-switch__handle {
+                      background-color: #1976d2 !important;
+
+                      &::before {
+                        background-color: #1976d2 !important;
+                      }
+
+                      &::after {
+                        background-color: #1976d2 !important;
+                      }
+                    }
+
+                    .mdc-switch__handle-track {
+                      background-color: #1976d2 !important;
+                    }
+                  }
+                }
+
+                // Selectores adicionales para Material Design
+                .mdc-switch--selected {
+                  .mdc-switch__track {
+                    background-color: #1976d2 !important;
+                    opacity: 1 !important;
+                    border-color: #1976d2 !important;
+                  }
+
+                  .mdc-switch__handle {
+                    background-color: #1976d2 !important;
+
+                    &::before {
+                      background-color: #1976d2 !important;
+                    }
+
+                    &::after {
+                      background-color: #1976d2 !important;
+                    }
+                  }
+
+                  .mdc-switch__handle-track {
+                    background-color: #1976d2 !important;
+                  }
+                }
+
+                // Selectores más específicos para sobrescribir Material Design
+                .mat-mdc-slide-toggle-checked {
+                  .mdc-switch__track {
+                    background-color: #1976d2 !important;
+                    opacity: 1 !important;
+                  }
+
+                  .mdc-switch__handle {
+                    background-color: #1976d2 !important;
+                  }
+                }
+
+                // Color del spinner de loading también azul
+                .inline-spinner {
+                  circle {
+                    stroke: #1976d2 !important;
+                  }
+                }
               }
             }
           }
@@ -959,6 +1025,138 @@
       &:hover {
         background-color: rgba(244, 67, 54, 0.1);
       }
+    }
+  }
+}
+
+// Estilos globales para switch azul - Máxima especificidad
+::ng-deep .registration-toggle.mat-mdc-slide-toggle {
+  // Sobrescribir todos los colores posibles del switch
+  --mdc-switch-selected-track-color: #1976d2 !important;
+  --mdc-switch-selected-handle-color: #1976d2 !important;
+  --mdc-switch-selected-pressed-handle-color: #1976d2 !important;
+  --mdc-switch-selected-focus-handle-color: #1976d2 !important;
+  --mdc-switch-selected-hover-handle-color: #1976d2 !important;
+  --mdc-switch-selected-pressed-track-color: #1976d2 !important;
+  --mdc-switch-selected-focus-track-color: #1976d2 !important;
+  --mdc-switch-selected-hover-track-color: #1976d2 !important;
+
+  &.mat-checked {
+    .mdc-switch__track {
+      background-color: #1976d2 !important;
+      opacity: 1 !important;
+      border-color: #1976d2 !important;
+    }
+
+    .mdc-switch__handle {
+      background-color: #1976d2 !important;
+      border-color: #1976d2 !important;
+    }
+
+    .mdc-switch__handle::before {
+      background-color: #1976d2 !important;
+      border-color: #1976d2 !important;
+    }
+
+    .mdc-switch__handle::after {
+      background-color: #1976d2 !important;
+      border-color: #1976d2 !important;
+    }
+
+    .mdc-switch__ripple {
+      background-color: transparent !important;
+    }
+  }
+
+  // Estado seleccionado
+  .mdc-switch--selected {
+    .mdc-switch__track {
+      background-color: #1976d2 !important;
+      opacity: 1 !important;
+      border-color: #1976d2 !important;
+    }
+
+    .mdc-switch__handle {
+      background-color: #1976d2 !important;
+      border-color: #1976d2 !important;
+    }
+
+    .mdc-switch__ripple {
+      background-color: transparent !important;
+    }
+  }
+
+  // Todos los estados posibles del switch
+  .mdc-switch {
+    &.mdc-switch--selected {
+      .mdc-switch__track {
+        background-color: #1976d2 !important;
+        border-color: #1976d2 !important;
+      }
+
+      .mdc-switch__handle {
+        background-color: #1976d2 !important;
+        border-color: #1976d2 !important;
+      }
+    }
+  }
+
+  // Spinner azul
+  .inline-spinner {
+    mat-spinner circle {
+      stroke: #1976d2 !important;
+    }
+  }
+
+  // Sobrescribir cualquier color accent o primary
+  .mat-accent, .mat-primary {
+    --mdc-switch-selected-track-color: #1976d2 !important;
+    --mdc-switch-selected-handle-color: #1976d2 !important;
+  }
+}
+
+// Estilos adicionales para eliminar cualquier rastro de color rosado/accent
+::ng-deep .tournament-management-container .registration-toggle {
+  // Variables CSS de Material Design para switch
+  --mdc-switch-selected-track-color: #1976d2;
+  --mdc-switch-selected-handle-color: #1976d2;
+  --mdc-switch-selected-pressed-handle-color: #1976d2;
+  --mdc-switch-selected-focus-handle-color: #1976d2;
+  --mdc-switch-selected-hover-handle-color: #1976d2;
+  --mdc-switch-selected-pressed-track-color: #1976d2;
+  --mdc-switch-selected-focus-track-color: #1976d2;
+  --mdc-switch-selected-hover-track-color: #1976d2;
+  --mat-switch-selected-track-color: #1976d2;
+  --mat-switch-selected-handle-color: #1976d2;
+
+  // Sobrescribir todos los elementos del switch
+  .mdc-switch__track,
+  .mdc-switch__track::before,
+  .mdc-switch__track::after {
+    background-color: #1976d2 !important;
+    border-color: #1976d2 !important;
+  }
+
+  .mdc-switch__handle,
+  .mdc-switch__handle::before,
+  .mdc-switch__handle::after {
+    background-color: #1976d2 !important;
+    border-color: #1976d2 !important;
+  }
+
+  .mdc-switch__ripple {
+    background-color: transparent !important;
+  }
+
+  // Estado activo específico
+  &.mat-mdc-slide-toggle-checked {
+    .mdc-switch__track {
+      background-color: #1976d2 !important;
+      opacity: 1 !important;
+    }
+
+    .mdc-switch__handle {
+      background-color: #1976d2 !important;
     }
   }
 }

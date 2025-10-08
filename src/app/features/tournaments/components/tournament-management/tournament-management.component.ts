@@ -724,9 +724,17 @@ trackByTeamId(index: number, team: Team): number {
    * @param event Evento del slide toggle
    */
   onRegistrationToggleChange(event: any): void {
-    if (!this.tournament || this.isUpdatingRegistration) return;
+    if (!this.tournament || this.isUpdatingRegistration) {
+      // Si está en loading, prevenir cualquier cambio
+      event.source.checked = !event.source.checked;
+      return;
+    }
 
-    this.isUpdatingRegistration = true;
+    // Guardar el estado original antes del cambio
+    const originalState = !this.registrationClosed;
+    
+    // Prevenir el cambio automático del switch
+    event.source.checked = originalState;
 
     // El evento de mat-slide-toggle tiene la estructura: { source: MatSlideToggle, checked: boolean }
     const isChecked = event?.checked !== undefined ? event.checked : event?.source?.checked;
@@ -736,40 +744,130 @@ trackByTeamId(index: number, team: Team): number {
     // - Si checked = false -> registro cerrado -> allow = false
     const allowRegistration = isChecked;
 
-    console.log('Switch event:', {
-      event,
-      isChecked,
-      allowRegistration,
-      tournamentId: this.tournamentId,
-      tournamentObject: this.tournament
+    // Mostrar confirmación con SweetAlert2
+    Swal.fire({
+      title: 'Confirmar cambio',
+      text: '¿Estás seguro de cambiar el estado de esta opción?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#1976d2',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Usuario confirmó, cambiar el switch y proceder con la API
+        event.source.checked = !originalState;
+        this.cdr.detectChanges();
+        this.updateRegistrationStatus(allowRegistration);
+      } else {
+        // Usuario canceló, asegurar que el switch esté en su estado original
+        event.source.checked = originalState;
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  /**
+   * Actualiza el estado de registro del torneo
+   * @param allowRegistration Estado del registro a establecer
+   */
+  private updateRegistrationStatus(allowRegistration: boolean): void {
+    console.log('Starting updateRegistrationStatus:', {
+      allowRegistration,
+      currentState: this.registrationClosed,
+      isUpdating: this.isUpdatingRegistration
+    });
+
+    this.isUpdatingRegistration = true;
+    this.cdr.detectChanges();
 
     this.tournamentService.allowRegisterTeam(this.tournamentId, allowRegistration)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           console.log('API Response received:', response);
+          console.log('Setting isUpdatingRegistration to false');
+          
+          // CRÍTICO: Terminar el loading INMEDIATAMENTE
+          this.isUpdatingRegistration = false;
+          
           if (response.succeed) {
             // Actualizar el estado local y del torneo
-            this.registrationClosed = !isChecked; // isChecked = true -> registrationClosed = false
+            this.registrationClosed = !allowRegistration;
             if (this.tournament) {
               this.tournament.allowTeamRegistration = allowRegistration;
             }
+            
+            console.log('Updated states:', {
+              registrationClosed: this.registrationClosed,
+              allowTeamRegistration: this.tournament?.allowTeamRegistration,
+              isUpdating: this.isUpdatingRegistration
+            });
+            
+            // Forzar detección de cambios INMEDIATAMENTE
+            this.cdr.detectChanges();
+            
+            // Forzar una segunda detección después de un tick
+            setTimeout(() => {
+              this.cdr.detectChanges();
+            }, 0);
+            
+            // Mostrar mensaje de éxito después de un pequeño delay
+            setTimeout(() => {
+              const statusText = allowRegistration ? 'abierto' : 'cerrado';
+              this.toastService.showSuccess(`Registro de equipos ${statusText} exitosamente`);
+            }, 300);
           } else {
+            console.log('API response failed, reverting switch');
             // Revertir el switch si la API falló
-            this.registrationClosed = isChecked; // Revertir al estado anterior
+            this.registrationClosed = allowRegistration;
+            this.cdr.detectChanges();
+            this.toastService.showError('Error al cambiar el estado del registro');
           }
-          this.isUpdatingRegistration = false;
-          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error updating registration status:', error);
-          // Revertir el switch en caso de error
-          this.registrationClosed = isChecked;
+          console.log('Setting isUpdatingRegistration to false due to error');
+          
+          // CRÍTICO: Terminar el loading INMEDIATAMENTE
           this.isUpdatingRegistration = false;
+          
+          // Revertir el switch en caso de error
+          this.registrationClosed = allowRegistration;
+          
+          console.log('Error - Updated states:', {
+            registrationClosed: this.registrationClosed,
+            isUpdating: this.isUpdatingRegistration
+          });
+          
+          // Forzar detección de cambios INMEDIATAMENTE
           this.cdr.detectChanges();
+          
+          // Forzar una segunda detección después de un tick
+          setTimeout(() => {
+            this.cdr.detectChanges();
+          }, 0);
+          
+          // Mostrar error después de un pequeño delay
+          setTimeout(() => {
+            this.toastService.showError('Error al cambiar el estado del registro');
+          }, 300);
         }
       });
+  }
+
+  /**
+   * Método para debug - verificar estado del loading
+   */
+  debugLoadingState(): void {
+    console.log('DEBUG - Current loading state:', {
+      isUpdatingRegistration: this.isUpdatingRegistration,
+      registrationClosed: this.registrationClosed,
+      tournament: this.tournament,
+      allowTeamRegistration: this.tournament?.allowTeamRegistration
+    });
   }
 
   /**

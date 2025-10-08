@@ -95,13 +95,18 @@
                 </div>
 
                 <!-- Switch -->
-                <div class="col-md-2 d-flex justify-content-center">
+                <div class="col-md-2 d-flex justify-content-left">
                   <mat-slide-toggle
                     [checked]="team.allowPlayerRegistration || false"
-                    (change)="onTogglePlayerRegistration(team, $event.checked)"
+                    (change)="onTogglePlayerRegistration(team, $event)"
                     (click)="$event.stopPropagation()"
-                    matTooltip="Permitir registro de jugadores"
+                    [disabled]="isUpdatingTeamRegistration(team)"
+                    [matTooltip]="isUpdatingTeamRegistration(team) ? 'Actualizando...' : 'Permitir registro de jugadores'"
                     class="registration-toggle">
+                    <span class="toggle-label">
+                      <mat-spinner *ngIf="isUpdatingTeamRegistration(team)" diameter="16" class="inline-spinner"></mat-spinner>
+                      {{ (team.allowPlayerRegistration || false) ? 'Habilitado' : 'Deshabilitado' }}
+                    </span>
                   </mat-slide-toggle>
                 </div>
 
@@ -161,7 +166,7 @@
 
             <div *ngFor="let player of getPlayersForTeam(team); trackBy: trackByPlayerId" class="player-item d-flex align-items-center py-2 border-bottom">
               <!-- Foto -->
-              <div class="player-avatar me-3">
+              <div class="player-avatar me-3 flex-shrink-0">
                 <img [src]="player.photoUrl || 'assets/logo.png'"
                      [alt]="getPlayerFullName(player)"
                      class="player-photo"
@@ -170,36 +175,42 @@
               </div>
 
               <!-- Número de camiseta -->
-              <span class="badge bg-secondary me-3">#{{ player.jerseyNumber }}</span>
+              <div class="player-jersey me-3 flex-shrink-0">
+                <span class="badge bg-secondary">#{{ player.jerseyNumber }}</span>
+              </div>
 
               <!-- Nombre completo e identificación -->
-              <div class="player-info flex-grow-1 me-3">
-                <div class="d-flex align-items-center gap-2">
-                  <strong>{{ getPlayerFullName(player) }}</strong>
-                  <small class="text-muted">C.I: {{ player.identification }}</small>
+              <div class="player-info flex-grow-1 me-3 text-start">
+                <div class="player-name-container">
+                  <strong class="d-block text-start">{{ getPlayerFullName(player) }}</strong>
+                  <small class="text-muted d-block text-start">C.I: {{ player.identification }}</small>
                 </div>
               </div>
 
               <!-- Posición -->
-              <div class="player-position text-muted me-3 d-flex align-items-center">
-                <mat-icon class="me-1">sports_soccer</mat-icon>
-                <small>{{ player.position }}</small>
+              <div class="player-position me-3 flex-shrink-0 text-start">
+                <div class="d-flex align-items-center justify-content-start">
+                  <mat-icon class="me-1 text-muted">sports_soccer</mat-icon>
+                  <small class="text-muted">{{ player.position }}</small>
+                </div>
               </div>
 
               <!-- Acciones del jugador -->
-              <div class="player-actions d-flex align-items-center gap-1">
-                <button mat-icon-button
-                        (click)="editPlayer(player, team)"
-                        matTooltip="Editar jugador"
-                        class="text-primary">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button
-                        (click)="deletePlayer(player, team)"
-                        matTooltip="Eliminar jugador"
-                        class="text-danger">
-                  <mat-icon>delete</mat-icon>
-                </button>
+              <div class="player-actions flex-shrink-0">
+                <div class="d-flex align-items-center gap-1">
+                  <button mat-icon-button
+                          (click)="editPlayer(player, team)"
+                          matTooltip="Editar jugador"
+                          class="text-primary">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button
+                          (click)="deletePlayer(player, team)"
+                          matTooltip="Eliminar jugador"
+                          class="text-danger">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

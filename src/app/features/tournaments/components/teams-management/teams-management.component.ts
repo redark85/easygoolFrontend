@@ -68,6 +68,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   searchTerm = '';
   filteredTeams: Team[] = [];
   private destroy$ = new Subject<void>();
+  private updatingTeamRegistration = new Set<number>(); // Track loading state per team
 
   constructor(
     private teamService: TeamService,
@@ -499,26 +500,133 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cambia el estado de registro de jugadores para un equipo
+   * Cambia el estado de registro de jugadores para un equipo con confirmación
    * @param team Equipo al que cambiar el estado
-   * @param allow true para permitir, false para deshabilitar
+   * @param event Evento del slide toggle
    */
-  onTogglePlayerRegistration(team: Team, allow: boolean): void {
-    this.teamService.allowPlayerRegistration(team.id, allow).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: () => {
-        // Actualizar el estado local del equipo
-        team.allowPlayerRegistration = allow;
+  onTogglePlayerRegistration(team: Team, event: any): void {
+    if (this.updatingTeamRegistration.has(team.id)) {
+      // Si está en loading, prevenir cualquier cambio
+      event.source.checked = !event.source.checked;
+      return;
+    }
+
+    // Guardar el estado original antes del cambio
+    const originalState = team.allowPlayerRegistration || false;
+    
+    // Prevenir el cambio automático del switch
+    event.source.checked = originalState;
+
+    // Extraer el valor checked del evento
+    const isChecked = event?.checked !== undefined ? event.checked : event?.source?.checked;
+
+    // Mostrar confirmación con SweetAlert2
+    Swal.fire({
+      title: 'Confirmar cambio',
+      text: '¿Estás seguro de cambiar el estado de esta opción?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#1976d2',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Usuario confirmó, cambiar el switch y proceder con la API
+        event.source.checked = isChecked;
         this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error changing player registration status:', error);
-        // Revertir el estado del toggle en caso de error
-        team.allowPlayerRegistration = !allow;
+        this.updateTeamRegistrationStatus(team, isChecked);
+      } else {
+        // Usuario canceló, asegurar que el switch esté en su estado original
+        event.source.checked = originalState;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  /**
+   * Actualiza el estado de registro de jugadores del equipo
+   * @param team Equipo a actualizar
+   * @param allow Estado del registro a establecer
+   */
+  private updateTeamRegistrationStatus(team: Team, allow: boolean): void {
+    console.log('Starting updateTeamRegistrationStatus:', {
+      teamId: team.id,
+      teamName: team.name,
+      allow,
+      currentState: team.allowPlayerRegistration
+    });
+
+    // Marcar como en loading
+    this.updatingTeamRegistration.add(team.id);
+    this.cdr.detectChanges();
+
+    this.teamService.allowPlayerRegistration(team.id, allow).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        console.log('API Response received for team:', team.name, response);
+        
+        // CRÍTICO: Terminar el loading INMEDIATAMENTE
+        this.updatingTeamRegistration.delete(team.id);
+        
+        // Actualizar el estado local del equipo
+        team.allowPlayerRegistration = allow;
+        
+        console.log('Updated team state:', {
+          teamId: team.id,
+          allowPlayerRegistration: team.allowPlayerRegistration,
+          isUpdating: this.updatingTeamRegistration.has(team.id)
+        });
+        
+        // Forzar detección de cambios INMEDIATAMENTE
+        this.cdr.detectChanges();
+        
+        // Forzar una segunda detección después de un tick
+        setTimeout(() => {
+          this.cdr.detectChanges();
+        }, 0);
+        
+        // El toast ya se maneja automáticamente por el ToastService
+        // No mostrar alert adicional para evitar duplicación
+      },
+      error: (error) => {
+        console.error('Error changing player registration status:', error);
+        
+        // CRÍTICO: Terminar el loading INMEDIATAMENTE
+        this.updatingTeamRegistration.delete(team.id);
+        
+        // Revertir el estado del toggle en caso de error
+        team.allowPlayerRegistration = !allow;
+        
+        console.log('Error - Reverted team state:', {
+          teamId: team.id,
+          allowPlayerRegistration: team.allowPlayerRegistration,
+          isUpdating: this.updatingTeamRegistration.has(team.id)
+        });
+        
+        // Forzar detección de cambios INMEDIATAMENTE
+        this.cdr.detectChanges();
+        
+        // Forzar una segunda detección después de un tick
+        setTimeout(() => {
+          this.cdr.detectChanges();
+        }, 0);
+        
+        // El toast de error ya se maneja automáticamente por el ToastService
+        // No mostrar alert adicional para evitar duplicación
+      }
+    });
+  }
+
+  /**
+   * Verifica si un equipo está en proceso de actualización
+   * @param team Equipo a verificar
+   * @returns true si está actualizando
+   */
+  isUpdatingTeamRegistration(team: Team): boolean {
+    return this.updatingTeamRegistration.has(team.id);
   }
 
   /**
