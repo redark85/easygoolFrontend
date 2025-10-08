@@ -15,6 +15,7 @@ import { AuthService, ToastService } from '@core/services';
 import { LoginRequest } from '@core/models';
 import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
+import { TournamentService } from '@features/tournaments/services/tournament.service';
 
 @Component({
   selector: 'app-login',
@@ -47,7 +48,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private errorHandler: DeletionErrorHandlerHook,
     private dialog: MatDialog,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private tournamentService: TournamentService    
   ) {}
 
   ngOnInit(): void {
@@ -66,9 +68,30 @@ export class LoginComponent implements OnInit, OnDestroy {
         if (params['token']) {
           this.tokenFromUrl = params['token'];
           console.log('Token capturado de la URL en login:', this.tokenFromUrl);
+          this.loadTournamentByToken(params['token']);
         }
       });
   }
+
+  /**
+   * Carga la información del torneo usando el token
+   */
+  private loadTournamentByToken(token: string): void {
+    this.tournamentService.getTournamentByToken(token)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournament) => {
+          if (tournament) {
+          }
+        },
+        error: (error) => {
+          if (error.response.data.messageId === 'EGOL_121') {
+              this.router.navigate(['/auth/login']);
+          }
+        }
+      });
+  }
+
 
   ngOnDestroy(): void {
     this.destroy$.next();

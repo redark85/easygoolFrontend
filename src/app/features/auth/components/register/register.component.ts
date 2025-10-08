@@ -100,7 +100,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.loadingTournament = false;
-          console.error('Error al cargar torneo:', error);
+          if (error.response.data.messageId === 'EGOL_121') {
+              this.router.navigate(['/auth/register']);
+          }
         }
       });
   }
