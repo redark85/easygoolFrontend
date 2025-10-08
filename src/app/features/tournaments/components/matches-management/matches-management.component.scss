@@ -1,3 +1,5 @@
+@use '../../../../shared/styles/mixins.scss' as mixins;
+
 .matches-management-container {
   padding: 0;
   position: relative;
@@ -8,6 +10,7 @@
   box-shadow: none;
   border: none;
   background: transparent;
+
 
   .mat-card-header {
     padding: 16px 0;
@@ -61,23 +64,6 @@
     font-size: 1.5rem;
     width: 1.5rem;
     height: 1.5rem;
-  }
-}
-
-// Phase Tabs
-.phase-tabs-container {
-  margin-bottom: 20px;
-
-  .phase-tabs {
-    .mat-tab-label {
-      font-weight: 500;
-      color: var(--text-secondary);
-
-      &.mat-tab-label-active {
-        color: var(--primary-color);
-        font-weight: 600;
-      }
-    }
   }
 }
 
@@ -187,20 +173,35 @@
   }
 }
 
-// Match Card Styles
+// New Match Card Styles - Based on image design
 .match-card {
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  background: white;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
   .match-content {
     padding: 16px;
     
+    // Match header with day label
+    .match-header {
+      text-align: center;
+      margin-bottom: 12px;
+      
+      .match-day-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary, #666);
+        font-weight: 500;
+      }
+    }
+    
+    // Main match layout
     .match-main {
       display: flex;
       align-items: center;
@@ -214,12 +215,36 @@
         gap: 8px;
         flex: 1;
         
-        .team-logo {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid #e0e0e0;
+        &.home-team {
+          .team-logo-container {
+            order: 1;
+          }
+          .team-info {
+            order: 2;
+          }
+          .team-score {
+            order: 3;
+          }
+        }
+        
+        &.away-team {
+          .team-score {
+            order: 1;
+          }
+          .team-info {
+            order: 2;
+          }
+          .team-logo-container {
+            order: 3;
+          }
+        }
+        
+        .team-logo-container {
+          .team-logo {
+            width: 50px;
+            height: 50px;
+            @include mixins.square-rounded-image($border-radius: 8px, $border-width: 2px);
+          }
         }
         
         .team-info {
@@ -227,76 +252,59 @@
           
           .team-name {
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-primary);
+            line-height: 1.2;
+          }
+        }
+        
+        .team-score {
+          .score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color, #1976d2);
           }
         }
       }
       
-      .score-section {
+      // VS Section in the center
+      .vs-section {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
+        min-width: 80px;
         
         .vs-text {
-          font-size: 1.2rem;
-          font-weight: 700;
-          color: var(--text-secondary);
-        }
-        
-        .status-chip {
-          font-size: 0.75rem;
-        }
-      }
-    }
-    
-    .match-details {
-      border-top: 1px solid #e0e0e0;
-      padding-top: 12px;
-      
-      .detail-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-secondary);
-        font-size: 0.85rem;
-        
-        .detail-icon {
           font-size: 1rem;
-          width: 1rem;
-          height: 1rem;
+          font-weight: 700;
+          color: var(--text-secondary, #666);
         }
-      }
-    }
-
-    .match-actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      padding-top: 12px;
-
-      .action-btn-small {
-        width: 32px;
-        height: 32px;
-        transition: all 0.3s ease;
-
-        mat-icon {
-          font-size: 1.1rem;
-          width: 1.1rem;
-          height: 1.1rem;
+        
+        .match-time {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          
+          .time-icon {
+            font-size: 0.9rem;
+            width: 0.9rem;
+            height: 0.9rem;
+            color: var(--text-secondary, #666);
+          }
+          
+          .time-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary, #666);
+            font-weight: 500;
+          }
         }
-
-        &:hover {
-          background-color: rgba(33, 150, 243, 0.1);
-          color: #2196f3;
-        }
-
-        &.delete {
-          &:hover {
-            background-color: rgba(244, 67, 54, 0.1);
-            color: #f44336;
+        
+        .match-venue {
+          .venue-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary, #666);
+            text-align: center;
           }
         }
       }
@@ -304,33 +312,6 @@
   }
 }
 
-// Status Classes
-.status-scheduled {
-  background-color: #2196f3 !important;
-  color: white !important;
-}
-
-.status-in-progress {
-  background-color: #4caf50 !important;
-  color: white !important;
-}
-
-.status-finished {
-  background-color: #9e9e9e !important;
-  color: white !important;
-}
-
-.status-suspended {
-  background-color: #ff9800 !important;
-  color: white !important;
-}
-
-.status-cancelled {
-  background-color: #f44336 !important;
-  color: white !important;
-}
-
-// No States
 .no-phases, .no-matches, .no-groups {
   text-align: center;
   padding: 60px 20px;
@@ -480,112 +461,60 @@
     }
   }
 
-  .match-card-content {
-    padding: 20px;
+  // Vertical separator
+  .vertical-separator {
+    width: 1px;
+    height: 40px;
+    background-color: var(--border-color, #e0e0e0);
+    margin: 0 16px;
+  }
 
-    .match-teams {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-
-      .team {
+  // Phase Selection (Right Side - 8 columns)
+  .phase-selection {
+    .phase-buttons-container {
+      .phase-buttons-scroll {
         display: flex;
-        align-items: center;
-        gap: 12px;
-        flex: 1;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 4px 0;
 
-        &.away-team {
-          flex-direction: row-reverse;
-          text-align: right;
-
-          .team-details {
-            text-align: right;
-          }
+        &::-webkit-scrollbar {
+          display: none;
         }
 
-        .team-logo {
-          .team-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--border-color);
-          }
-        }
+        .phase-button {
+          white-space: nowrap;
+          min-width: auto;
+          padding: 8px 20px;
+          border-radius: 25px; // More rounded like in image
+          font-weight: 500;
+          font-size: 0.9rem;
+          color: var(--text-secondary, #666);
+          background: white;
+          border: 1px solid var(--border-color, #e0e0e0);
+          transition: all 0.3s ease;
+          text-transform: none;
 
-        .team-details {
-          .team-name {
-            margin: 0 0 2px 0;
-            font-size: 1.1rem;
+          &:hover {
+            background: var(--hover-color, #f0f0f0);
+            border-color: var(--primary-color, #1976d2);
+            transform: translateY(-1px);
+          }
+
+          &.active {
+            background: var(--primary-color, #1976d2);
+            color: white;
+            border-color: var(--primary-color, #1976d2);
             font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.2;
-          }
-
-          .team-short {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-transform: uppercase;
-          }
-        }
-      }
-
-      .match-score {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        min-width: 80px;
-
-        .score-display {
-          .score {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-align: center;
-          }
-        }
-
-        .match-round {
-          span {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-transform: uppercase;
-          }
-        }
-      }
-    }
-
-    .match-details {
-      margin-top: 16px;
-      padding-top: 16px;
-
-      .details-row {
-        display: flex;
-        justify-content: center;
-        gap: 24px;
-        margin-top: 12px;
-
-        .detail-item {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.85rem;
-          color: var(--text-secondary);
-
-          .detail-icon {
-            font-size: 1rem;
-            width: 1rem;
-            height: 1rem;
-            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
           }
         }
       }
     }
   }
+}
 
   .match-card-actions {
     padding: 16px 20px;
@@ -621,6 +550,104 @@
           font-size: 1.1rem;
           font-weight: 600;
           color: var(--text-primary);
+        }
+      }
+    }
+  }
+
+// New selection container design - Based on image layout
+.selection-container {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+
+  .row {
+    margin: 0;
+  }
+
+  // Group Selection (Left Side - 4 columns)
+  .group-selection {
+    .group-select {
+      width: 100%;
+      
+      // Make select thinner and rounded
+      .mat-form-field-wrapper {
+        padding-bottom: 0;
+      }
+      
+      .mat-form-field-infix {
+        padding: 8px 0;
+        border-top: none;
+      }
+      
+      .mat-form-field-appearance-outline .mat-form-field-outline {
+        border-radius: 20px;
+        color: var(--border-color, #e0e0e0);
+      }
+
+      .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+        color: var(--primary-color, #1976d2);
+        border-radius: 20px;
+      }
+
+      .mat-select-value {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Vertical separator
+  .vertical-separator {
+    width: 1px;
+    height: 40px;
+    background-color: var(--border-color, #e0e0e0);
+    margin: 0 16px;
+  }
+
+  // Phase Selection (Right Side - 8 columns)
+  .phase-selection {
+    .phase-buttons-container {
+      .phase-buttons-scroll {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 4px 0;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        .phase-button {
+          white-space: nowrap;
+          min-width: auto;
+          padding: 8px 20px;
+          border-radius: 25px; // More rounded like in image
+          font-weight: 500;
+          font-size: 0.9rem;
+          color: var(--text-secondary, #666);
+          background: white;
+          border: 1px solid var(--border-color, #e0e0e0);
+          transition: all 0.3s ease;
+          text-transform: none;
+
+          &:hover {
+            background: var(--hover-color, #f0f0f0);
+            border-color: var(--primary-color, #1976d2);
+            transform: translateY(-1px);
+          }
+
+          &.active {
+            background: var(--primary-color, #1976d2);
+            color: white;
+            border-color: var(--primary-color, #1976d2);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+          }
         }
       }
     }
@@ -773,4 +800,74 @@
 
 .match-card {
   animation: fadeInUp 0.3s ease-out;
+}
+
+// Match Status Chips
+.status-chip {
+  &.status-scheduled {
+    background-color: #e3f2fd;
+    color: #1976d2;
+  }
+  
+  &.status-in-progress {
+    background-color: #fff3e0;
+    color: #f57c00;
+  }
+  
+  &.status-finished {
+    background-color: #e8f5e8;
+    color: #388e3c;
+  }
+  
+  &.status-cancelled {
+    background-color: #ffebee;
+    color: #d32f2f;
+  }
+}
+
+// Status Classes
+.status-scheduled {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
+.status-in-progress {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.status-finished {
+  background-color: #9e9e9e !important;
+  color: white !important;
+}
+
+.status-suspended {
+  background-color: #ff9800 !important;
+  color: white !important;
+}
+
+.status-cancelled {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+// Global spinner styles - Make all spinners blue
+::ng-deep {
+  mat-spinner circle, .mat-spinner circle {
+    stroke: #1976d2 !important;
+  }
+  
+  mat-progress-spinner circle, .mat-progress-spinner circle {
+    stroke: #1976d2 !important;
+  }
+  
+  .mdc-circular-progress__determinate-circle,
+  .mdc-circular-progress__indeterminate-circle-graphic {
+    stroke: #1976d2 !important;
+  }
+  
+  svg.mat-spinner circle,
+  svg.mat-progress-spinner circle {
+    stroke: #1976d2 !important;
+  }
 }

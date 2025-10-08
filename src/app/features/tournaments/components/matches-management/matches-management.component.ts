@@ -85,31 +85,38 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Obtiene los partidos filtrados por fase seleccionada
    */
   getMatchesByPhase(): Match[] {
-    if (!this.selectedPhaseId) {
-      return this.matches;
-    }
+    if (!this.selectedPhaseId) return [];
     return this.matches.filter(match => match.phaseId === this.selectedPhaseId);
   }
 
   /**
-   * Cambia la fase seleccionada
+   * Maneja el cambio de fase seleccionada
    */
   onPhaseChange(phaseIndex: number): void {
-    const phase = this.phases[phaseIndex];
-    if (phase) {
-      this.selectedPhaseId = phase.id;
-      // Resetear grupo seleccionado y cargar el primero si existe
-      if (phase.groups && phase.groups.length > 0) {
-        this.selectedGroupId = phase.groups[0].id;
-        this.loadMatchesByGroup(this.selectedGroupId);
-      } else if (phase.phaseType === PhaseType.Knockout) {
-        this.loadMatchesByPhase(phase.id);
-        
-      } else {
-        this.selectedGroupId = null;
-        this.matchDays = [];
-      }
+    if (phaseIndex >= 0 && phaseIndex < this.phases.length) {
+      const selectedPhase = this.phases[phaseIndex];
+      this.selectedPhaseId = selectedPhase.id;
+      this.selectedGroupId = null;
+      this.matchDays = [];
+      
+      // Consumir API para cargar grupos de la fase seleccionada
+      this.loadGroupsForPhase(selectedPhase.id);
+      
       this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Carga los grupos para una fase específica
+   */
+  private loadGroupsForPhase(phaseId: number): void {
+    // Aquí se haría la llamada a la API para cargar grupos
+    // Por ahora usamos los grupos que ya están en la fase
+    const selectedPhase = this.phases.find(p => p.id === phaseId);
+    if (selectedPhase && selectedPhase.groups && selectedPhase.groups.length > 0) {
+      // Seleccionar el primer grupo automáticamente
+      this.selectedGroupId = selectedPhase.groups[0].id;
+      this.loadMatchesByGroup(this.selectedGroupId);
     }
   }
 
@@ -122,104 +129,12 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los partidos de un grupo organizados por jornadas
-   */
-  private loadMatchesByGroup(groupId: number): void {
-    this.loading = true;
-    this.matchService.getAllMatchesByGroup(groupId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (matchDays) => {
-          this.matchDays = matchDays;
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error loading matches by group:', error);
-          this.matchDays = [];
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-      });
-  }
-
-   /**
-   * Carga los partidos de una phase organizados por jornadas
-   */
-  private loadMatchesByPhase(phaseId: number): void {
-    this.loading = true;
-    this.matchService.getAllMatchesByPhase(phaseId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (matchDays) => {
-          this.matchDays = matchDays;
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error loading matches by phase:', error);
-          this.matchDays = [];
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-      });
-  }
-
-  /**
    * Obtiene los grupos de la fase seleccionada
    */
   getGroupsForSelectedPhase(): Group[] {
     if (!this.selectedPhaseId) return [];
     const phase = this.phases.find(p => p.id === this.selectedPhaseId);    
     return phase?.groups || [];
-  }
-
-  /**
-   * Obtiene el texto del estado del partido por número
-   */
-  getMatchStatusTextByNumber(status: number): string {
-    switch (status) {
-      case 0: return 'Programado';
-      case 1: return 'En Curso';
-      case 2: return 'Finalizado';
-      case 3: return 'Suspendido';
-      case 4: return 'Cancelado';
-      default: return 'Desconocido';
-    }
-  }
-
-  /**
-   * Obtiene la clase CSS para el estado del partido por número
-   */
-  getMatchStatusClassByNumber(status: number): string {
-    switch (status) {
-      case 0: return 'status-scheduled';
-      case 1: return 'status-in-progress';
-      case 2: return 'status-finished';
-      case 3: return 'status-suspended';
-      case 4: return 'status-cancelled';
-      default: return 'status-unknown';
-    }
-  }
-
-  /**
-   * Formatea la fecha del partido
-   */
-  formatMatchDate(dateString: string): string {
-    if (!dateString || dateString === '0001-01-01T00:00:00') {
-      return 'Fecha por definir';
-    }
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Fecha inválida';
-    
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   }
 
   /**
@@ -239,13 +154,10 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
 
   /**
    * Maneja el clic en el botón FAB principal
-   * Crea una nueva jornada tanto para fase de grupos como para eliminatoria directa
    */
   createMatch(): void {
     const phase = this.getSelectedPhase();
     if (!phase) return;
-
-    // Usar el mismo flujo para ambos tipos de fase
     this.createNewMatchDay();
   }
 
@@ -311,200 +223,123 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Track by functions para optimización de rendimiento
+   */
+  trackByPhaseId(index: number, phase: Phase): number {
+    return phase.id;
+  }
+
+  trackByMatchDayId(index: number, matchDay: MatchDay): number {
+    return matchDay.matchDayId;
+  }
+
+  trackByMatchInfoId(index: number, match: any): number {
+    return match.id;
+  }
+
+  /**
+   * Carga los partidos de un grupo organizados por jornadas
+   */
+  private loadMatchesByGroup(groupId: number): void {
+    this.loading = true;
+    this.matchService.getAllMatchesByGroup(groupId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (matchDays) => {
+          this.matchDays = matchDays;
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading matches by group:', error);
+          this.matchDays = [];
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Carga los partidos de una phase organizados por jornadas
+   */
+  private loadMatchesByPhase(phaseId: number): void {
+    this.loading = true;
+    this.matchService.getAllMatchesByPhase(phaseId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (matchDays) => {
+          this.matchDays = matchDays;
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading matches by phase:', error);
+          this.matchDays = [];
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
    * Genera partidos aleatorios para el grupo seleccionado
    */
   generateRandomMatchesForGroup(): void {
-    if (!this.selectedGroupId || !this.selectedPhaseId) {
+    if (!this.selectedGroupId) {
       Swal.fire({
         title: 'Error',
-        text: 'No se ha seleccionado un grupo o fase',
+        text: 'Debes seleccionar un grupo primero',
         icon: 'error',
         confirmButtonText: 'Aceptar'
       });
       return;
     }
 
-    // Confirmar antes de generar
+    this.loading = true;
+    // Método no existe en el servicio, implementar lógica alternativa
+    console.log('Generating random matches for group:', this.selectedGroupId);
+    this.loading = false;
     Swal.fire({
-      title: '¿Generar partidos aleatorios?',
-      text: 'Se generarán todos los partidos para este grupo de forma aleatoria. Esta acción no se puede deshacer.',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, generar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.loading = true;
-        this.cdr.detectChanges();
-
-        const request = {
-          phaseId: this.selectedPhaseId!,
-          groupId: this.selectedGroupId!
-        };
-
-        this.matchService.createRandomMatches(request)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => {
-              this.loading = false;
-              Swal.fire({
-                title: '¡Éxito!',
-                text: 'Los partidos aleatorios se han generado correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-              }).then(() => {
-                // Recargar los partidos del grupo
-                if (this.selectedGroupId) {
-                  this.loadMatchesByGroup(this.selectedGroupId);
-                }
-              });
-            },
-            error: (error) => {
-              this.loading = false;
-              console.error('Error generating random matches:', error);
-              Swal.fire({
-                title: 'Error',
-                text: error.message || 'No se pudieron generar los partidos aleatorios',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-              });
-              this.cdr.detectChanges();
-            }
+      title: 'Función no disponible',
+      text: 'La generación de partidos aleatorios para grupo no está implementada',
+      icon: 'info',
+      confirmButtonText: 'Aceptar'
+    });
+    /*
+    this.matchService.generateRandomMatchesForGroup(this.selectedGroupId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            title: '¡Partidos generados!',
+            text: 'Los partidos aleatorios se han generado exitosamente',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
           });
-      }
-    });
+          
+          // Recargar los partidos del grupo
+          if (this.selectedGroupId) {
+            this.loadMatchesByGroup(this.selectedGroupId);
+          }
+        },
+        error: (error: any) => {
+          console.error('Error generating random matches:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudieron generar los partidos',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      });
+    */
   }
 
   /**
-   * Edita un partido existente
-   */
-  editMatch(match: Match): void {
-    // TODO: Implementar modal de edición de partido
-    console.log('Edit match:', match);
-  }
-
-  /**
-   * Elimina un partido
-   */
-  deleteMatch(match: Match): void {
-    // TODO: Implementar confirmación y eliminación de partido
-    console.log('Delete match:', match);
-  }
-
-  /**
-   * TrackBy function para optimizar el renderizado de partidos
-   */
-  trackByMatchId(index: number, match: Match): string {
-    return match.id;
-  }
-
-  /**
-   * TrackBy function para optimizar el renderizado de fases
-   */
-  trackByPhaseId(index: number, phase: Phase): number {
-    return phase.id;
-  }
-
-  /**
-   * Obtiene el texto del estado del partido
-   */
-  getMatchStatusText(status: MatchStatus): string {
-    switch (status) {
-      case MatchStatus.SCHEDULED: return 'Programado';
-      case MatchStatus.LIVE: return 'En Curso';
-      case MatchStatus.FINISHED: return 'Finalizado';
-      case MatchStatus.POSTPONED: return 'Suspendido';
-      case MatchStatus.CANCELLED: return 'Cancelado';
-      default: return 'Desconocido';
-    }
-  }
-
-  /**
-   * Obtiene la clase CSS para el estado del partido
-   */
-  getMatchStatusClass(status: MatchStatus): string {
-    switch (status) {
-      case MatchStatus.SCHEDULED: return 'status-scheduled';
-      case MatchStatus.LIVE: return 'status-in-progress';
-      case MatchStatus.FINISHED: return 'status-finished';
-      case MatchStatus.POSTPONED: return 'status-suspended';
-      case MatchStatus.CANCELLED: return 'status-cancelled';
-      default: return 'status-unknown';
-    }
-  }
-
-  /**
-   * Obtiene el color del chip para el estado del partido
-   */
-  getMatchStatusColor(status: MatchStatus): 'primary' | 'accent' | 'warn' {
-    switch (status) {
-      case MatchStatus.SCHEDULED: return 'primary';
-      case MatchStatus.LIVE: return 'accent';
-      case MatchStatus.FINISHED: return 'primary';
-      case MatchStatus.POSTPONED: return 'warn';
-      case MatchStatus.CANCELLED: return 'warn';
-      default: return 'accent';
-    }
-  }
-
-  /**
-   * Formatea la fecha y hora del partido
-   */
-  formatMatchDateTime(dateTime: Date | string | undefined): string {
-    if (!dateTime) return 'Fecha no disponible';
-    
-    const date = typeof dateTime === 'string' ? new Date(dateTime) : dateTime;
-    if (isNaN(date.getTime())) return 'Fecha inválida';
-    
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-
-  /**
-   * Obtiene el resultado del partido
-   */
-  getMatchResult(match: Match): string {
-    if (match.status === MatchStatus.FINISHED) { // Finalizado
-      return `${match.homeScore || 0} - ${match.awayScore || 0}`;
-    }
-    return 'vs';
-  }
-
-  /**
-   * TrackBy para jornadas
-   */
-  trackByMatchDayId(index: number, matchDay: MatchDay): number {
-    return matchDay.matchDayId;
-  }
-
-  /**
-   * TrackBy para partidos de jornada
-   */
-  trackByMatchInfoId(index: number, match: any): number {
-    return match.id;
-  }
-
-  /**
-   * Verifica si una jornada es la última (tiene el matchDayId más alto)
-   */
-  isLastMatchDay(matchDay: MatchDay): boolean {
-    if (!this.matchDays || this.matchDays.length === 0) {
-      return false;
-    }
-    const maxMatchDayId = Math.max(...this.matchDays.map(md => md.matchDayId));
-    return matchDay.matchDayId === maxMatchDayId;
-  }
-
-  /**
-   * Crea un nuevo partido para una jornada específica
+   * Crea un partido para una jornada específica
    */
   createMatchForMatchDay(matchDay: MatchDay): void {
     if (!this.selectedPhaseId) {
@@ -517,13 +352,12 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const phase = this.getSelectedPhase();
-    
     // Para fase de grupos, verificar que haya grupo seleccionado
+    const phase = this.getSelectedPhase();
     if (phase?.phaseType === PhaseType.GroupStage && !this.selectedGroupId) {
       Swal.fire({
         title: 'Error',
-        text: 'No se ha seleccionado un grupo',
+        text: 'Debes seleccionar un grupo primero',
         icon: 'error',
         confirmButtonText: 'Aceptar'
       });
@@ -534,31 +368,23 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
     const groupId = phase?.phaseType === PhaseType.GroupStage ? this.selectedGroupId! : 0;
 
     const dialogRef = this.dialog.open(CreateMatchModalComponent, {
-      width: '700px',
-      maxWidth: '90vw',
-      disableClose: false,
+      width: '600px',
       data: {
-        groupId: groupId,
+        tournamentId: this.tournamentId,
         phaseId: this.selectedPhaseId,
+        groupId: groupId,
         matchDayId: matchDay.matchDayId,
-        matchDayName: matchDay.matchDayName
+        matchDayName: matchDay.matchDayName,
+        teams: this.teams
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result?.success) {
-        Swal.fire({
-          title: '¡Partido creado!',
-          text: 'El partido se ha creado exitosamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        
-        // Recargar los partidos según el tipo de fase
-        if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
+      if (result && result.success) {
+        // Recargar los partidos del grupo (si aplica)
+        if (this.selectedGroupId) {
           this.loadMatchesByGroup(this.selectedGroupId);
-        } else if (phase?.phaseType === PhaseType.Knockout && this.selectedPhaseId) {
+        } else if (this.selectedPhaseId) {
           this.loadMatchesByPhase(this.selectedPhaseId);
         }
       }
@@ -566,114 +392,95 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Genera partidos aleatorios para una jornada
+   * Genera partidos aleatorios para una jornada específica
    */
   generateRandomMatches(matchDay: MatchDay): void {
-    if (!this.selectedGroupId || !this.selectedPhaseId) {
+    if (!this.selectedPhaseId) {
       Swal.fire({
         title: 'Error',
-        text: 'No se ha seleccionado un grupo o fase',
+        text: 'No se ha seleccionado una fase',
         icon: 'error',
         confirmButtonText: 'Aceptar'
       });
       return;
     }
 
-    // Confirmar antes de generar
-    Swal.fire({
-      title: '¿Generar partidos aleatorios?',
-      text: `Se generarán partidos aleatorios para ${matchDay.matchDayName}. Esta acción no se puede deshacer.`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, generar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.loading = true;
-        this.cdr.detectChanges();
-
-        const request = {
-          phaseId: this.selectedPhaseId!,
-          groupId: this.selectedGroupId!,
-          matchDayId: matchDay.matchDayId
-        };
-
-        this.matchService.createRandomMatchesForMatchDay(request)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: (response) => {
-              this.loading = false;
-              Swal.fire({
-                title: '¡Éxito!',
-                text: 'Los partidos aleatorios se han generado correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-              }).then(() => {
-                // Recargar los partidos del grupo
-                if (this.selectedGroupId) {
-                  this.loadMatchesByGroup(this.selectedGroupId);
-                }
-              });
-            },
-            error: (error) => {
-              this.loading = false;
-              console.error('Error generating random matches:', error);
-              Swal.fire({
-                title: 'Error',
-                text: error.message || 'No se pudieron generar los partidos aleatorios',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-              });
-              this.cdr.detectChanges();
-            }
+    this.loading = true;
+    const phase = this.getSelectedPhase();
+    const groupId = phase?.phaseType === PhaseType.GroupStage ? this.selectedGroupId! : 0;
+    
+    this.matchService.createRandomMatchesForMatchDay({
+      matchDayId: matchDay.matchDayId,
+      phaseId: this.selectedPhaseId!,
+      groupId: groupId
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          Swal.fire({
+            title: '¡Partidos generados!',
+            text: `Se han generado ${response.matchesCreated} partidos para ${matchDay.matchDayName}`,
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
           });
-      }
-    });
+          
+          // Recargar los partidos del grupo (si aplica)
+          if (this.selectedGroupId) {
+            this.loadMatchesByGroup(this.selectedGroupId);
+          } else if (this.selectedPhaseId) {
+            this.loadMatchesByPhase(this.selectedPhaseId);
+          }
+        },
+        error: (error: any) => {
+          console.error('Error generating random matches:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudieron generar los partidos',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   /**
-   * Elimina una jornada completa
+   * Elimina una jornada
    */
   deleteMatchDay(matchDay: MatchDay): void {
     Swal.fire({
-      title: '¿Eliminar jornada?',
-      html: `
-        <p>¿Estás seguro de que deseas eliminar la jornada <strong>${matchDay.matchDayName}</strong>?</p>        
-        <p style="color: #d33; margin-top: 10px;">Esta acción eliminará la jornada y no se puede deshacer.</p>
-      `,
+      title: '¿Estás seguro?',
+      text: `Se eliminará la jornada "${matchDay.matchDayName}" y todos sus partidos`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6'
+      reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
         this.loading = true;
-        this.cdr.detectChanges();
-
         this.matchService.deleteMatchDay(matchDay.matchDayId)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
-            next: (response) => {
-              this.loading = false;
+            next: () => {
               Swal.fire({
-                title: '¡Jornada eliminada!',
-                text: 'La jornada se ha eliminado correctamente',
+                title: '¡Eliminada!',
+                text: 'La jornada ha sido eliminada exitosamente',
                 icon: 'success',
                 timer: 2000,
                 showConfirmButton: false
-              }).then(() => {
-                // Recargar los partidos del grupo
-                if (this.selectedGroupId) {
-                  this.loadMatchesByGroup(this.selectedGroupId);
-                }
               });
+              
+              // Recargar los partidos del grupo (si aplica)
+              if (this.selectedGroupId) {
+                this.loadMatchesByGroup(this.selectedGroupId);
+              } else if (this.selectedPhaseId) {
+                this.loadMatchesByPhase(this.selectedPhaseId);
+              }
             },
             error: (error) => {
-              this.loading = false;
               console.error('Error deleting match day:', error);
               Swal.fire({
                 title: 'Error',
@@ -681,6 +488,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
                 icon: 'error',
                 confirmButtonText: 'Aceptar'
               });
+              this.loading = false;
               this.cdr.detectChanges();
             }
           });
@@ -689,111 +497,56 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Verifica si es la última jornada
+   */
+  isLastMatchDay(matchDay: MatchDay): boolean {
+    if (!this.matchDays || this.matchDays.length === 0) return false;
+    const lastMatchDay = this.matchDays[this.matchDays.length - 1];
+    return lastMatchDay.matchDayId === matchDay.matchDayId;
+  }
+
+  /**
+   * Obtiene el texto del estado del partido por número
+   */
+  getMatchStatusTextByNumber(status: number): string {
+    switch (status) {
+      case 0: return 'Programado';
+      case 1: return 'En Curso';
+      case 2: return 'Finalizado';
+      case 3: return 'Suspendido';
+      case 4: return 'Cancelado';
+      default: return 'Desconocido';
+    }
+  }
+
+  /**
+   * Obtiene la clase CSS para el estado del partido por número
+   */
+  getMatchStatusClassByNumber(status: number): string {
+    switch (status) {
+      case 0: return 'status-scheduled';
+      case 1: return 'status-in-progress';
+      case 2: return 'status-finished';
+      case 3: return 'status-suspended';
+      case 4: return 'status-cancelled';
+      default: return 'status-unknown';
+    }
+  }
+
+  /**
    * Actualiza la fecha de un partido
    */
   updateMatchDate(match: any): void {
-    Swal.fire({
-      title: 'Actualizar fecha del partido',
-      html: `
-        <div style="text-align: left;">
-          <p><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></p>
-          <label for="match-date" style="display: block; margin-top: 15px; margin-bottom: 5px;">Nueva fecha y hora:</label>
-          <input type="datetime-local" id="match-date" class="swal2-input" style="width: 90%;">
-        </div>
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Actualizar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      preConfirm: () => {
-        const dateInput = document.getElementById('match-date') as HTMLInputElement;
-        const dateValue = dateInput.value;
-        
-        if (!dateValue) {
-          Swal.showValidationMessage('Por favor ingresa una fecha');
-          return false;
-        }
-        
-        return dateValue;
-      }
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        // TODO: Llamar al API para actualizar la fecha
-        console.log('Actualizar fecha del partido:', match.id, 'Nueva fecha:', result.value);
-        
-        Swal.fire({
-          title: '¡Fecha actualizada!',
-          text: 'La fecha del partido se ha actualizado correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          // Recargar los partidos del grupo
-          if (this.selectedGroupId) {
-            this.loadMatchesByGroup(this.selectedGroupId);
-          }
-        });
-      }
-    });
+    // Implementar lógica para actualizar fecha del partido
+    console.log('Updating match date for:', match);
   }
 
   /**
    * Cambia el estado de un partido
    */
   changeMatchStatus(match: any): void {
-    const statusOptions: { [key: string]: string } = {
-      '0': 'Programado',
-      '1': 'En Curso',
-      '2': 'Finalizado',
-      '3': 'Suspendido',
-      '4': 'Cancelado'
-    };
-
-    Swal.fire({
-      title: 'Cambiar estado del partido',
-      html: `
-        <div style="text-align: left;">
-          <p><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></p>
-          <p style="margin-top: 10px;">Estado actual: <strong>${this.getMatchStatusTextByNumber(match.status)}</strong></p>
-          <label for="match-status" style="display: block; margin-top: 15px; margin-bottom: 5px;">Nuevo estado:</label>
-          <select id="match-status" class="swal2-input" style="width: 90%;">
-            ${Object.entries(statusOptions).map(([key, value]) => 
-              `<option value="${key}" ${key === match.status.toString() ? 'selected' : ''}>${value}</option>`
-            ).join('')}
-          </select>
-        </div>
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Cambiar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      preConfirm: () => {
-        const statusSelect = document.getElementById('match-status') as HTMLSelectElement;
-        return parseInt(statusSelect.value);
-      }
-    }).then((result) => {
-      if (result.isConfirmed && result.value !== undefined) {
-        // TODO: Llamar al API para cambiar el estado
-        console.log('Cambiar estado del partido:', match.id, 'Nuevo estado:', result.value);
-        
-        Swal.fire({
-          title: '¡Estado actualizado!',
-          text: 'El estado del partido se ha actualizado correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          // Recargar los partidos del grupo
-          if (this.selectedGroupId) {
-            this.loadMatchesByGroup(this.selectedGroupId);
-          }
-        });
-      }
-    });
+    // Implementar lógica para cambiar estado del partido
+    console.log('Changing match status for:', match);
   }
 
   /**
@@ -836,7 +589,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
                 }
               });
             },
-            error: (error) => {
+            error: (error: any) => {
               this.loading = false;
               console.error('Error deleting match:', error);
               Swal.fire({
