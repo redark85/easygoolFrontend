@@ -13,15 +13,15 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { PlayerService } from '../../services/player.service';
-import { ImageUploaderComponent } from '../../../../shared/components/image-uploader/image-uploader.component';
-import { 
-  Player, 
-  PlayerFormData, 
-  PlayerModalResult, 
-  CreatePlayerRequest, 
+import { ImageUploaderComponent } from '@shared/components';
+import {
+  Player,
+  PlayerFormData,
+  PlayerModalResult,
+  CreatePlayerRequest,
   UpdatePlayerRequest,
   PlayerPositionOption
-} from '../../../../core/models/player.interface';
+} from '@core/models';
 
 /**
  * Componente modal para crear y editar jugadores
@@ -55,7 +55,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   isEdit = false;
   playerPositions: PlayerPositionOption[] = [];
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(

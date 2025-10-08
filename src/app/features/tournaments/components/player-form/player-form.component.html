@@ -15,6 +15,7 @@
             <app-image-uploader
               formControlName="photo"
               [maxFileSizeMB]="2"
+              [viewUploadText]="'Subir imagen del jugador'"
               (imageUploaded)="onImageUploaded($event)">
             </app-image-uploader>
             <div class="error-message" *ngIf="photoErrors">
@@ -134,7 +135,7 @@
           <div class="col-12">
             <mat-checkbox formControlName="isCapitan" class="captain-checkbox">
               <mat-icon>star</mat-icon>
-              Es Capitán del Equipo
+              Es capitán del equipo
             </mat-checkbox>
           </div>
         </div>

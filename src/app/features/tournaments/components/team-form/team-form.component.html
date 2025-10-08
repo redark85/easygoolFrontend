@@ -14,6 +14,7 @@
             <app-image-uploader
               formControlName="logo"
               [maxFileSizeMB]="2"
+              [viewUploadText]="'Subir imagen del equipo'"
               (imageUploaded)="onImageUploaded($event)">
             </app-image-uploader>
           </div>

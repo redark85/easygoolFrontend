@@ -8,9 +8,10 @@
         <div class="row mb-3">
           <div class="col-12">
             <label class="image-label">Imagen del Torneo *</label>
-            <app-image-uploader 
-              [(ngModel)]="uploadedImage" 
+            <app-image-uploader
+              [(ngModel)]="uploadedImage"
               [ngModelOptions]="{standalone: true}"
+              [viewUploadText]="'Subir imagen del torneo'"
               (imageUploaded)="onImageUploaded($event)">
             </app-image-uploader>
             <div class="error-message" *ngIf="!uploadedImage && tournamentForm.touched">
@@ -68,10 +69,10 @@
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Ubicación del Torneo</mat-label>
-              <input matInput formControlName="location" 
-                     placeholder="Escribe una dirección o selecciona en el mapa" 
+              <input matInput formControlName="location"
+                     placeholder="Escribe una dirección o selecciona en el mapa"
                      maxlength="250">
-              <button mat-icon-button matSuffix type="button" (click)="openLocationModal()" 
+              <button mat-icon-button matSuffix type="button" (click)="openLocationModal()"
                       matTooltip="Seleccionar ubicación en el mapa">
                 <mat-icon>location_on</mat-icon>
               </button>
@@ -85,7 +86,7 @@
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Descripción del Torneo</mat-label>
-              <textarea matInput formControlName="description" rows="4" 
+              <textarea matInput formControlName="description" rows="4"
                         placeholder="Describe las reglas, premios, etc." maxlength="250"></textarea>
               <mat-error>{{ getErrorMessage('description') }}</mat-error>
             </mat-form-field>
@@ -136,7 +137,7 @@
             </form>
           </mat-card-content>
           <mat-card-actions align="end">
-            <button mat-flat-button color="primary" (click)="onCreatePhase()" 
+            <button mat-flat-button color="primary" (click)="onCreatePhase()"
                     [disabled]="!phaseForm.valid || isCreatingPhase">
               <span *ngIf="!isCreatingPhase">
                 <mat-icon>add</mat-icon>
@@ -201,7 +202,7 @@
                     </form>
                   </mat-card-content>
                   <mat-card-actions align="end">
-                    <button mat-flat-button color="accent" (click)="onSelectPhase(phase.id); onCreateGroup()" 
+                    <button mat-flat-button color="accent" (click)="onSelectPhase(phase.id); onCreateGroup()"
                             [disabled]="!groupForm.valid || isCreatingGroup">
                       <span *ngIf="!isCreatingGroup">
                         <mat-icon>add</mat-icon>
@@ -233,9 +234,9 @@
     <button mat-stroked-button (click)="onCancel()" [disabled]="isSubmitting">
       Cancelar
     </button>
-    
+
     <!-- Botón para crear/editar torneo (solo se muestra si no está en modo de configuración de fases) -->
-    <button *ngIf="!showPhaseSection" mat-flat-button color="primary" (click)="onSubmit()" 
+    <button *ngIf="!showPhaseSection" mat-flat-button color="primary" (click)="onSubmit()"
             [disabled]="!isFormValid || isSubmitting">
       <span *ngIf="!isSubmitting">{{ submitButtonText }}</span>
       <span *ngIf="isSubmitting" class="loading-content">
@@ -243,7 +244,7 @@
         <span>Procesando...</span>
       </span>
     </button>
-    
+
     <!-- Botón para finalizar configuración (solo se muestra en modo de configuración de fases) -->
     <button *ngIf="showPhaseSection" mat-flat-button color="primary" (click)="onFinishTournamentSetup()">
       <mat-icon>check_circle</mat-icon>

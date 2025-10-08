@@ -27,6 +27,7 @@ export interface ImageUploadData {
 })
 export class ImageUploaderComponent implements ControlValueAccessor {
   @Input() maxFileSizeMB = 1;
+  @Input() viewUploadText: string = '';
   @Output() imageUploaded = new EventEmitter<ImageUploadData>();
 
   previewUrl: string | ArrayBuffer | null = null;
@@ -170,7 +171,7 @@ export class ImageUploaderComponent implements ControlValueAccessor {
     try {
       // Convertir HTTP a HTTPS para evitar Mixed Content en producción
       const httpsUrl = convertCloudinaryToHttps(imageUrl);
-      
+
       // Agregar headers para evitar problemas CORS
       const response = await fetch(httpsUrl, {
         mode: 'cors',
@@ -179,19 +180,19 @@ export class ImageUploaderComponent implements ControlValueAccessor {
           'Accept': 'image/*'
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const blob = await response.blob();
-      
+
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result as string;
           const contentType = blob.type || 'image/jpeg';
-          
+
           resolve({
             base64: base64String,
             contentType: contentType
