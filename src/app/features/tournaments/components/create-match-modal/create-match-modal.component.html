@@ -1,0 +1,115 @@
+<div class="create-match-dialog">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon class="title-icon">sports_soccer</mat-icon>
+      Crear Partido - {{ data.matchDayName }}
+    </h2>
+    <button mat-icon-button 
+            mat-dialog-close 
+            class="close-button"
+            matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="dialog-content">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-progress-spinner 
+        diameter="40" 
+        mode="indeterminate">
+      </mat-progress-spinner>
+      <p class="loading-text">Cargando equipos disponibles...</p>
+    </div>
+
+    <!-- Content when loaded -->
+    <div *ngIf="!isLoading">
+      
+      <!-- Selection Summary -->
+      <div class="selection-summary" *ngIf="selectedHomeTeam || selectedAwayTeam">
+        <div class="summary-item">
+          <span class="summary-label">Equipo Local:</span>
+          <span class="summary-value">{{ selectedHomeTeam?.name || 'No seleccionado' }}</span>
+        </div>
+        <div class="summary-vs">VS</div>
+        <div class="summary-item">
+          <span class="summary-label">Equipo Visitante:</span>
+          <span class="summary-value">{{ selectedAwayTeam?.name || 'No seleccionado' }}</span>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="selectedHomeTeam || selectedAwayTeam"></mat-divider>
+
+      <!-- No Teams Available -->
+      <div *ngIf="availableTeams.length === 0" class="no-teams">
+        <mat-icon class="no-teams-icon">groups_off</mat-icon>
+        <h3>No hay equipos disponibles</h3>
+        <p>Todos los equipos ya tienen partidos asignados en esta jornada.</p>
+      </div>
+
+      <!-- Teams List -->
+      <div *ngIf="availableTeams.length > 0" class="teams-section">
+        <h3 class="section-title">Selecciona los equipos para el partido:</h3>
+        
+        <div class="teams-list">
+          <div *ngFor="let team of availableTeams; trackBy: trackByTeamId" 
+               class="team-item">
+            
+            <div class="team-avatar">
+              <img [src]="getTeamImageUrl(team)"
+                   [alt]="team.name"
+                   class="team-logo"
+                   (error)="$event.target.src='assets/logo.png'">
+            </div>
+
+            <div class="team-info">
+              <div class="team-name">{{ team.name }}</div>
+              <div class="team-short-name">{{ team.shortName }}</div>
+            </div>
+
+            <div class="team-actions">
+              <button mat-raised-button
+                      [color]="isHomeTeamSelected(team) ? 'primary' : 'default'"
+                      (click)="selectHomeTeam(team)"
+                      [disabled]="isAwayTeamSelected(team)"
+                      class="select-button">
+                <mat-icon>home</mat-icon>
+                {{ isHomeTeamSelected(team) ? '✓ Local' : 'Local' }}
+              </button>
+              
+              <button mat-raised-button
+                      [color]="isAwayTeamSelected(team) ? 'accent' : 'default'"
+                      (click)="selectAwayTeam(team)"
+                      [disabled]="isHomeTeamSelected(team)"
+                      class="select-button">
+                <mat-icon>flight_takeoff</mat-icon>
+                {{ isAwayTeamSelected(team) ? '✓ Visitante' : 'Visitante' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button 
+            (click)="onCancel()"
+            class="cancel-button">
+      Cancelar
+    </button>
+    
+    <button mat-raised-button 
+            color="primary"
+            (click)="onConfirm()"
+            [disabled]="!canConfirm() || isLoading"
+            class="confirm-button">
+      <mat-icon>add</mat-icon>
+      Crear Partido
+    </button>
+  </div>
+</div>

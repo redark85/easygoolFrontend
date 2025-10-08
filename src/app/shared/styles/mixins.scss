@@ -1,0 +1,185 @@
+// Mixins compartidos para EasyGool
+
+// Modal Layout Compartido - EasyGool con Bootstrap
+@mixin modal-layout($container-class: 'modal-container') {
+  .#{$container-class} {
+    padding: 1.5rem;
+    max-width: 650px;
+    width: 100%;
+
+    h2[mat-dialog-title] {
+      margin: 0 0 1.5rem 0;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      &::before {
+        content: '⚽';
+        font-size: 1.2rem;
+        padding-top: 3px;
+      }
+    }
+
+    // Bootstrap container para formularios
+    .container-fluid {
+      padding: 0;
+      margin-bottom: 1.5rem;
+
+      .row {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+
+        [class*="col-"] {
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
+      }
+
+      // Estilos para mat-form-field con Bootstrap
+      mat-form-field {
+        &.w-100 {
+          width: 100%;
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+          margin-top: 0.25rem;
+        }
+      }
+
+      // Responsive design
+      @media (max-width: 768px) {
+        .row {
+          margin-left: -0.25rem;
+          margin-right: -0.25rem;
+
+          [class*="col-"] {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+          }
+        }
+      }
+    }
+
+    // Backward compatibility con form-grid (deprecated)
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .form-field-full {
+        grid-column: 1 / -1;
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+
+        .form-field-full {
+          grid-column: 1;
+        }
+      }
+    }
+
+    // Estilos para labels y errores
+    .form-field label {
+      display: block;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .error-message {
+      color: #f44336;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    // Acciones del diálogo
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+
+      button {
+        min-width: 100px;
+        height: 40px;
+        border-radius: 6px;
+        font-weight: 500;
+        text-transform: none;
+        transition: all 0.2s ease;
+
+        &.mat-mdc-button {
+          color: var(--text-secondary);
+          border: 1px solid var(--border-medium);
+
+          &:hover {
+            background-color: var(--surface-variant);
+            border-color: var(--border-dark);
+          }
+        }
+
+        &.mat-mdc-raised-button {
+          background-color: var(--primary-color);
+          color: white;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+          &:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+          }
+
+          &:disabled {
+            background-color: var(--disabled-color);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+          }
+        }
+
+        // Loading spinner en botones
+        .loading-content {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          mat-progress-spinner {
+            ::ng-deep circle {
+              stroke: currentColor;
+            }
+          }
+        }
+      }
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 0.5rem;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+
+    // Responsive para el modal completo
+    @media (max-width: 768px) {
+      padding: 1rem;
+      max-width: 100%;
+
+      h2[mat-dialog-title] {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        gap: 1rem;
+      }
+    }
+  }
+}

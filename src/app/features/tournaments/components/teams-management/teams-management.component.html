@@ -54,49 +54,43 @@
         <p>No hay equipos que coincidan con "{{ searchTerm }}"</p>
       </div>
 
-      <!-- Teams List -->
+      <!-- Teams List con Paneles de Expansión -->
       <div *ngIf="filteredTeams.length > 0" class="teams-list">
-        <div *ngFor="let team of filteredTeams; trackBy: trackByTeamId" class="team-row">
-          <div class="row align-items-center py-3 border-bottom">
-            <!-- Avatar y Info Principal -->
-            <div class="col-md-3 d-flex align-items-center">
-              <div class="team-avatar me-3 position-relative">
-                <img [src]="team.logoUrl || 'assets/logo.png'"
-                     [alt]="team.name"
-                     class="team-logo rounded-circle"
-                     (error)="$event.target.src='assets/logo.png'"
-                     width="50" height="50">
-                
-                <!-- Status Badge sobre la imagen -->
-                <div [class]="getTeamStatusClass(team.status)"
-                     [matTooltip]="getTeamStatusText(team.status)"
-                     matTooltipPosition="above">
-                  <mat-icon class="status-icon">{{ getTeamStatusIcon(team.status) }}</mat-icon>
+        <mat-accordion [multi]="false">
+        <mat-expansion-panel *ngFor="let team of filteredTeams; trackBy: trackByTeamId" class="team-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="w-100">
+              <div class="row align-items-center w-100 g-3">
+                <!-- Avatar e info principal -->
+                <div class="col-md-4 d-flex align-items-center">
+                  <div class="team-avatar me-3 position-relative">
+                    <img [src]="team.logoUrl || 'assets/logo.png'"
+                         [alt]="team.name"
+                         class="team-logo rounded-circle"
+                         (error)="$event.target.src='assets/logo.png'"
+                         width="50" height="50">
+                    <!-- Status Badge sobre la imagen -->
+                    <div [class]="getTeamStatusClass(team.status)"
+                         [matTooltip]="getTeamStatusText(team.status)"
+                         matTooltipPosition="above">
+                      <mat-icon class="status-icon">{{ getTeamStatusIcon(team.status) }}</mat-icon>
+                    </div>
+                  </div>
+                  <div class="team-info">
+                    <h5 class="mb-1 fw-bold">{{ team.name }}</h5>
+                    <small class="text-muted">{{ team.shortName }}</small>
+                  </div>
                 </div>
-              </div>
-              <div class="team-info">
-                <h5 class="mb-1 fw-bold">{{ team.name }}</h5>
-                <small class="text-muted">{{ team.shortName }}</small>
-              </div>
-            </div>
 
-            <!-- Estadísticas -->
-            <div class="col-3">
-              <div class="row align-items-center">
-                <div class="col-auto">
+                <!-- Estadísticas -->
+                <div class="col-md-3 d-flex align-items-center">
                   <mat-icon class="text-primary me-1">people</mat-icon>
                   <span class="badge bg-primary rounded-pill">{{ team.totalPlayers }}</span>
+                  <small class="text-muted ms-3">{{team.manager ? 'Manager: ' + team.manager.managerName + ' Contacto: ' + team.manager.phoneNumber : 'Sin manager asignado'}}</small>
                 </div>
-                <div class="col-auto">
-                  <small class="text-muted">Aqui nombre de Manager y phone</small>   <!-- Obtiene del objeto Manager -->
-                </div>
-              </div>
-            </div>
 
-            <!-- Switch y Controles -->
-            <div class="col-2">
-              <div class="row justify-content-center">
-                <div class="col-auto">
+                <!-- Switch -->
+                <div class="col-md-2 d-flex justify-content-center">
                   <mat-slide-toggle
                     [checked]="team.allowPlayerRegistration || false"
                     (change)="onTogglePlayerRegistration(team, $event.checked)"
@@ -104,39 +98,36 @@
                     class="registration-toggle">
                   </mat-slide-toggle>
                 </div>
-              </div>
-            </div>
 
-            <!-- Botones de Acción -->
-            <div class="col-4">
-              <div class="row justify-content-end">
-                <div class="col-auto">
+                <!-- Acciones -->
+                <div class="col-md-3 d-flex justify-content-end">
                   <div class="btn-group" role="group">
                     <button mat-icon-button
-                            (click)="createPlayer(team)"
+                            (click)="createPlayer(team); $event.stopPropagation()"
                             matTooltip="Agregar jugador"
                             class="text-success">
                       <mat-icon>person_add</mat-icon>
                     </button>
                     <button mat-icon-button
-                            (click)="editTeam(team)"
+                            (click)="editTeam(team); $event.stopPropagation()"
                             matTooltip="Editar equipo"
                             class="text-primary">
                       <mat-icon>edit</mat-icon>
                     </button>
                     <button mat-icon-button
-                            (click)="deleteTeam(team)"
+                            (click)="deleteTeam(team); $event.stopPropagation()"
                             matTooltip="Eliminar equipo"
                             class="text-danger">
                       <mat-icon>delete</mat-icon>
                     </button>
-                    <button   *ngIf="!team.hasExcelUploaded" mat-icon-button
+                    <button *ngIf="!team.hasExcelUploaded" mat-icon-button
                             matTooltip="Subir excel de registro de jugadores"
-                            class="text-info">
+                            class="text-info"
+                            (click)="$event.stopPropagation()">
                       <mat-icon>upload_file</mat-icon>
                     </button>
                     <button mat-icon-button
-                            (click)="disqualifyTeam(team)"
+                            (click)="disqualifyTeam(team); $event.stopPropagation()"
                             [disabled]="!canDisqualifyTeam(team)"
                             [matTooltip]="canDisqualifyTeam(team) ? 'Descalificar equipo' : 'Equipo ya descalificado'"
                             [class]="canDisqualifyTeam(team) ? 'text-warning' : 'text-muted'">
@@ -144,17 +135,70 @@
                     </button>
                     <button mat-icon-button
                             *ngIf="!team.hasUsedLink"
-                            (click)="copyRegistrationUrl(team.urlRegistration)"
+                            (click)="copyRegistrationUrl(team.urlRegistration); $event.stopPropagation()"
                             matTooltip="Copiar URL de registro"
                             class="text-secondary">
                       <mat-icon>link</mat-icon>
-                    </button>                  
+                    </button>
                   </div>
                 </div>
               </div>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <!-- Contenido del panel: lista de jugadores -->
+          <div class="players-list p-3">
+            <div *ngIf="getPlayersForTeam(team).length === 0" class="text-center text-muted py-3">
+              <mat-icon>person_off</mat-icon>
+              <p class="mb-0">No hay jugadores registrados en este equipo</p>
+            </div>
+
+            <div *ngFor="let player of getPlayersForTeam(team); trackBy: trackByPlayerId" class="player-item d-flex align-items-center py-2 border-bottom">
+              <!-- Foto -->
+              <div class="player-avatar me-3">
+                <img [src]="player.photoUrl || 'assets/logo.png'"
+                     [alt]="getPlayerFullName(player)"
+                     class="rounded-circle"
+                     width="40" height="40"
+                     (error)="$event.target.src='assets/logo.png'">
+              </div>
+
+              <!-- Número de camiseta -->
+              <span class="badge bg-secondary me-3">#{{ player.jerseyNumber }}</span>
+
+              <!-- Nombre completo e identificación -->
+              <div class="player-info flex-grow-1 me-3">
+                <div class="d-flex align-items-center gap-2">
+                  <strong>{{ getPlayerFullName(player) }}</strong>
+                  <small class="text-muted">C.I: {{ player.identification }}</small>
+                </div>
+              </div>
+
+              <!-- Posición -->
+              <div class="player-position text-muted me-3 d-flex align-items-center">
+                <mat-icon class="me-1">sports_soccer</mat-icon>
+                <small>{{ player.position }}</small>
+              </div>
+
+              <!-- Acciones del jugador -->
+              <div class="player-actions d-flex align-items-center gap-1">
+                <button mat-icon-button
+                        (click)="editPlayer(player, team)"
+                        matTooltip="Editar jugador"
+                        class="text-primary">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        (click)="deletePlayer(player, team)"
+                        matTooltip="Eliminar jugador"
+                        class="text-danger">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </mat-expansion-panel>
+        </mat-accordion>
       </div>
     </mat-card-content>
   </mat-card>

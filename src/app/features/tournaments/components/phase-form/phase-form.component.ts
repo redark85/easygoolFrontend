@@ -14,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UppercaseDirective } from '@shared/directives/uppercase.directive';
 import { ToastService } from '@core/services/toast.service';
 import { PhaseService } from '../../services/phase.service';
-import { PhaseFormData, CreatePhaseRequest, UpdatePhaseRequest, PhaseType } from '../../models/phase-form.interface';
+import { PhaseFormData, CreatePhaseRequest, PhaseType } from '../../models/phase-form.interface';
 import { UpdatePhaseRequest as PhaseUpdateRequest } from '../../models/phase.interface';
 
 @Component({
@@ -29,8 +29,7 @@ import { UpdatePhaseRequest as PhaseUpdateRequest } from '../../models/phase.int
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule,
-    UppercaseDirective
+    MatProgressSpinnerModule
   ],
   templateUrl: './phase-form.component.html',
   styleUrls: ['./phase-form.component.scss']

@@ -7,9 +7,9 @@ import { StorageService } from './storage.service';
 import { ApiService } from './api.service';
 import { JwtService } from './jwt.service';
 import { ToastService } from './toast.service';
-import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, UserRole } from '../models';
+import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, RoleType, AccessCodeType, VerifyOTPRequest, AccessCodeTemplateType, ResendOTPRequest } from '../models';
 import { ApiResponse } from '../models/api.interface';
-import { AUTH_LOGIN_ENDPOINT, AUTH_REGISTER_ENDPOINT } from '../config/endpoints';
+import { AUTH_LOGIN_ENDPOINT, AUTH_REGISTER_ENDPOINT, AUTH_VERIFY_OTP_ENDPOINT, AUTH_RESEND_OTP_ENDPOINT } from '../config/endpoints';
 import { AppConstants } from '../constants';
 
 @Injectable({
@@ -56,38 +56,87 @@ export class AuthService implements OnDestroy {
     }
   }
 
-  login(credentials: LoginRequest): Observable<void> {
+  login(credentials: LoginRequest): Observable<ApiResponse<AuthResponse>> {
     this.setLoading(true);
     return this.apiService.post<ApiResponse<AuthResponse>>(AUTH_LOGIN_ENDPOINT, credentials).pipe(
       map(response => {
         if (response.succeed && response.result) {
           this.handleAuthSuccess(response.result, true);
-          return;
-        }
-        // Si la API responde con éxito pero el login falla (succeed: false)
-        this.setLoading(false);
-        this.toastService.showError('Usuario o contraseña incorrectos.');
+          return response;
+        }   
+        return response;
       }),
       catchError((error: HttpErrorResponse) => {
         // Si la API responde con un error HTTP (ej. 500, 404)
         this.setLoading(false);
-        this.toastService.showError('Ocurrió un error inesperado. Inténtalo de nuevo.');
         return throwError(() => error);
       })
     );
   }
 
 
-  register(data: RegisterRequest): Observable<void> {
+  register(data: RegisterRequest, token : string | null): Observable<{ success: boolean; userId: number; email: string }> {
     this.setLoading(true);
-    return this.apiService.post<ApiResponse<AuthResponse>>(AUTH_REGISTER_ENDPOINT, data).pipe(
+    const url = token? `${AUTH_REGISTER_ENDPOINT}?token=${encodeURIComponent(token)}` : AUTH_REGISTER_ENDPOINT;
+    return this.apiService.post<ApiResponse<number>>(url, data).pipe(
+      map(response => {
+        this.setLoading(false);
+        if (response.succeed && response.result !== undefined) {
+          return { success: true, userId: response.result, email: data.email };
+        } else {         
+          return { success: false, userId: 0, email: '' };
+        }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.setLoading(false);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  verifyOTP(email: string, otpCode: string, autoRedirect: boolean = true, autoLogin: boolean = false): Observable<AuthResponse | void> {
+    this.setLoading(true);
+    const url = `${AUTH_VERIFY_OTP_ENDPOINT}?email=${encodeURIComponent(email)}`;
+    const body: VerifyOTPRequest = {
+      accessCodeType: AccessCodeType.Email,
+      accessCode: parseInt(otpCode, 10)
+    };
+    
+    return this.apiService.post<ApiResponse<AuthResponse>>(url, body).pipe(
       tap(response => {
+        this.setLoading(false);
         if (response.succeed && response.result) {
-          this.handleAuthSuccess(response.result, true);
-          this.toastService.showSuccess('¡Registro exitoso! Bienvenido.');
+          if (autoLogin) {
+            // Hacer login automático con la respuesta
+          } else if (autoRedirect) {
+            this.toastService.showSuccess('¡Cuenta verificada exitosamente! Ahora puedes iniciar sesión.');
+            this.router.navigate(['/auth/login']);
+          }
+        }
+      }),
+      map(response => autoLogin && response.succeed ? response.result : void 0),
+      catchError((error: HttpErrorResponse) => {
+        this.setLoading(false);   
+        return throwError(() => error);
+      })
+    );
+  }
+
+  resendOTP(email: string, templateType: AccessCodeTemplateType = AccessCodeTemplateType.AccessCodeNotification): Observable<void> {
+    this.setLoading(true);
+    const body: ResendOTPRequest = {
+      email: email,
+      templateType: templateType
+    };
+   
+    return this.apiService.post<ApiResponse<any>>(AUTH_RESEND_OTP_ENDPOINT, body).pipe(
+      tap(response => {
+        this.setLoading(false);
+        if (response.succeed) {
+          this.toastService.showSuccess('Código OTP reenviado exitosamente. Revisa tu correo.');
         } else {
           throw new HttpErrorResponse({
-            error: { message: response.message || 'Error en el registro' },
+            error: { message: response.message || 'Error al reenviar el código' },
             status: 400,
           });
         }
@@ -95,7 +144,37 @@ export class AuthService implements OnDestroy {
       map(() => void 0),
       catchError((error: HttpErrorResponse) => {
         this.setLoading(false);
-        const errorMessage = error.error?.errors?.[0] || error.error?.message || 'Ocurrió un error en el registro.';
+        const errorMessage = error.error?.message || 'Error al reenviar el código OTP.';
+        this.toastService.showError(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  resetPassword(email: string, newPassword: string): Observable<void> {
+    this.setLoading(true);
+    const body = {
+      email: email,
+      password: newPassword
+    };
+
+    // Ajusta el endpoint según tu API
+    const url = `${AUTH_LOGIN_ENDPOINT.replace('/Login', '/ResetPassword')}`;
+   
+    return this.apiService.post<ApiResponse<any>>(url, body).pipe(
+      tap(response => {
+        this.setLoading(false);
+        if (!response.succeed) {
+          throw new HttpErrorResponse({
+            error: { message: response.message || 'Error al cambiar la contraseña' },
+            status: 400,
+          });
+        }
+      }),
+      map(() => void 0),
+      catchError((error: HttpErrorResponse) => {
+        this.setLoading(false);
+        const errorMessage = error.error?.message || 'Error al cambiar la contraseña.';
         this.toastService.showError(errorMessage);
         return throwError(() => error);
       })
@@ -109,7 +188,7 @@ export class AuthService implements OnDestroy {
     if (notify) {
       this.toastService.showInfo('Has cerrado sesión correctamente.');
     }
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/']);
   }
 
   private handleAuthSuccess(response: AuthResponse, navigate: boolean): void {
@@ -121,12 +200,32 @@ export class AuthService implements OnDestroy {
     }
 
     const nameParts = userInfo.fullName.split(' ');
+    
+    // Mapear el rol del backend (string) al enum RoleType (number)
+    let mappedRole: RoleType;
+    switch (userInfo.role) {
+      case 'Superadmin':
+        mappedRole = RoleType.Superadmin;
+        break;
+      case 'League':
+        mappedRole = RoleType.League;
+        break;
+      case 'Team':
+        mappedRole = RoleType.Team;
+        break;
+      case 'Official':
+        mappedRole = RoleType.Official;
+        break;
+      default:
+        mappedRole = RoleType.League; // Default
+    }
+    
     const user: User = {
       id: userInfo.id,
       email: userInfo.email,
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
-      role: userInfo.role.toLowerCase() as UserRole,
+      role: mappedRole,
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -140,7 +239,30 @@ export class AuthService implements OnDestroy {
     this.scheduleTokenExpirationCheck(response.accessToken);
 
     if (navigate) {
-      this.router.navigate(['/dashboard/tournaments']);
+      // Redirigir según el rol del usuario
+      this.navigateByRole(mappedRole);
+    }
+  }
+
+  /**
+   * Navega a la ruta correspondiente según el rol del usuario
+   */
+  private navigateByRole(role: RoleType): void {
+    switch (role) {
+      case RoleType.Superadmin:
+        this.router.navigate(['/tournaments']);
+        break;
+      case RoleType.League:
+        this.router.navigate(['/tournaments']);
+        break;
+      case RoleType.Team:
+        this.router.navigate(['/teams']);
+        break;
+      case RoleType.Official:
+        this.router.navigate(['/matches']);
+        break;
+      default:
+        this.router.navigate(['/tournaments']);
     }
   }
 

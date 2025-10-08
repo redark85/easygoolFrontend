@@ -1,15 +1,26 @@
 import { Injectable } from '@angular/core';
 import { ToastService } from '../../core/services/toast.service';
 
-export interface DeletionErrorResponse {
+export interface ErrorResponse {
   result: boolean;
   succeed: boolean;
   message: string | null;
   messageId: string | null;
   messageType: number | null;
+  response: ErrorResponses;
 }
 
-export interface DeletionErrorConfig {
+export interface ErrorResponses{
+  data: ErrorData;
+}
+
+export interface ErrorData{
+  message: string | null;
+  messageId: string | null;
+}
+
+
+export interface ErrorConfig {
   entityName: string;
   customMessages?: { [messageId: string]: string };
   showGenericError?: boolean;
@@ -28,28 +39,29 @@ export class DeletionErrorHandlerHook {
    * @param config Configuración para el manejo del error
    * @returns true si se manejó el error, false si debe continuar con el flujo normal
    */
-  handleDeletionError(error: DeletionErrorResponse, config: DeletionErrorConfig): boolean {
+  handleResponseError(error: ErrorResponse, config: ErrorConfig): boolean {
     if (!error || error.succeed) {
       return false; // No hay error que manejar
     }
-
     // Mapeo de mensajes de error comunes
     const commonErrorMessages: { [messageId: string]: string } = {
+      'EGOL_106': `Ya existe una cuenta vinculada con esta direción de correo.`,
+      'EGOL_112': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene partidos programados.`,
       'EGOL_113': `No se puede eliminar el ${config.entityName.toLowerCase()} porque pertenece a una fase activa.`,
       'EGOL_114': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene equipos asignados.`,
       'EGOL_115': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene partidos programados.`,
       'EGOL_116': `No se puede eliminar el ${config.entityName.toLowerCase()} porque está siendo utilizado en el torneo.`,
       'EGOL_117': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene dependencias activas.`,
-      'EGOL_118': `No se puede eliminar el ${config.entityName.toLowerCase()} porque el torneo ya comenzó.`,
-      'EGOL_119': `No se puede eliminar el ${config.entityName.toLowerCase()} porque tiene resultados registrados.`,
-      'EGOL_120': `No se puede eliminar el ${config.entityName.toLowerCase()} porque está en uso.`
+      'EGOL_118': `El código ingresado no es válido.`,
+      'EGOL_119': `El código ingresado ha vencido.`,
+      'EGOL_120': `El ususario no ha validado su cuenta de correo.`
     };
 
     // Combinar mensajes comunes con mensajes personalizados
     const allMessages = { ...commonErrorMessages, ...(config.customMessages || {}) };
 
     // Buscar mensaje específico por messageId
-    let errorMessage = error.messageId ? allMessages[error.messageId] : undefined;
+    let errorMessage = error.response.data.messageId ? allMessages[error.response.data.messageId] : undefined;
 
     // Si no hay mensaje específico, usar el mensaje del backend o uno genérico
     if (!errorMessage) {
@@ -83,12 +95,12 @@ export class DeletionErrorHandlerHook {
    * @param config Configuración para el manejo del error
    * @returns true si la eliminación fue exitosa, false si hubo error
    */
-  handleDeletionResponse(response: DeletionErrorResponse, config: DeletionErrorConfig): boolean {
+  handleResponse(response: ErrorResponse, config: ErrorConfig): boolean {
     if (response.succeed) {
       this.toastService.showSuccess(`${config.entityName} eliminado correctamente`);
       return true;
     } else {
-      this.handleDeletionError(response, config);
+      this.handleResponseError(response, config);
       return false;
     }
   }
@@ -99,7 +111,7 @@ export class DeletionErrorHandlerHook {
    * @param customMessages Mensajes personalizados opcionales
    * @returns Configuración para el hook
    */
-  createConfig(entityName: string, customMessages?: { [messageId: string]: string }): DeletionErrorConfig {
+  createConfig(entityName: string, customMessages?: { [messageId: string]: string }): ErrorConfig {
     return {
       entityName,
       customMessages,

@@ -102,7 +102,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
         this.loadTournamentData();
       } else {
         this.toastService.showError('ID de torneo inválido');
-        this.router.navigate(['/dashboard/tournaments']);
+        this.router.navigate(['/tournaments']);
       }
     });
   }
@@ -167,8 +167,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
             'Switch debe mostrar': this.registrationClosed ? 'CERRADO' : 'ABIERTO'
           });
 
-          // Cargar datos reales del backend
-          this.loadTeams();
+          // Cargar datos reales del backend En un inicio solo cargar las phases
+          //this.loadTeams();
           this.loadPhases();
 
           this.isLoading = false;
@@ -180,7 +180,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           // El error ya se maneja en el servicio con toast
           // Redirigir a la lista de torneos
-          this.router.navigate(['/dashboard/tournaments']);
+          this.router.navigate(['/tournaments']);
         }
       });
   }
@@ -189,7 +189,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    * Navega de vuelta a la lista de torneos
    */
   goBack(): void {
-    this.router.navigate(['/dashboard/tournaments']);
+    this.router.navigate(['/tournaments']);
   }
 
   /**
@@ -585,14 +585,14 @@ deleteTeam(team: Team): void {
             'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
           });
 
-          if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+          if (this.deletionErrorHandler.handleResponse(response, config)) {
             this.loadTournamentData();
           }
         },
         error: (error) => {
           console.error('Error deleting team:', error);
           const config = this.deletionErrorHandler.createConfig('Equipo');
-          this.deletionErrorHandler.handleDeletionError(error, config);
+          this.deletionErrorHandler.handleResponseError(error, config);
         }
       });
     }
@@ -655,14 +655,14 @@ removeTeamFromGroup(team: Team, group: Group): void {
             'EGOL_118': 'No se puede remover el equipo porque es el único en el grupo.'
           });
 
-          if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+          if (this.deletionErrorHandler.handleResponse(response, config)) {
             this.loadTournamentData();
           }
         },
         error: (error) => {
           console.error('Error removing team from group:', error);
           const config = this.deletionErrorHandler.createConfig('Equipo del grupo');
-          this.deletionErrorHandler.handleDeletionError(error, config);
+          this.deletionErrorHandler.handleResponseError(error, config);
         }
       });
     }
@@ -779,11 +779,19 @@ trackByTeamId(index: number, team: Team): number {
    */
   onTabChange(event: any): void {
     this.selectedTabIndex = event.index;
+
+    switch (this.selectedTabIndex) {
+      case 0:
+        this.loadPhases();        
+        break;
+      case 1:
+        this.loadTeams();
+        break;    
+      default:
+        break;
+    }
     
-    // Siempre refrescar tanto equipos como fases en todos los tabs
-    // para asegurar que los datos estén sincronizados
-    this.loadTeams();
-    this.loadPhases();
+    // Refrescar los servicios dependiendo del tab en que se encuentra o hace click
     
     this.cdr.detectChanges();
   }

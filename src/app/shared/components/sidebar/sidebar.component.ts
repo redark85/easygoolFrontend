@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '@core/services';
-import { User } from '@core/models';
+import { User, RoleType } from '@core/models';
 import { Observable, map } from 'rxjs';
 
 interface MenuItem {
@@ -40,52 +40,48 @@ export class SidebarComponent implements OnInit {
   @Output() closeSidebar = new EventEmitter<void>();
 
   currentUser$: Observable<User | null>;
+  userRole$: Observable<RoleType | null>;
+  RoleType = RoleType; // Exponer el enum al template
 
   menuItems: MenuItem[] = [
     {
-      icon: 'dashboard',
-      label: 'Dashboard',
-      route: '/dashboard/home',
-      tooltip: 'Panel principal'
-    },
-    {
       icon: 'sports_soccer',
       label: 'Partidos',
-      route: '/dashboard/matches',
+      route: '/matches',
       tooltip: 'Gestión de partidos'
     },
     {
       icon: 'groups',
       label: 'Equipos',
-      route: '/dashboard/teams',
+      route: '/teams',
       tooltip: 'Gestión de equipos'
     },
     {
       icon: 'person',
       label: 'Jugadores',
-      route: '/dashboard/players',
+      route: '/players',
       tooltip: 'Gestión de jugadores'
     },
     {
       icon: 'emoji_events',
       label: 'Ligas',
-      route: './leagues'
+      route: '/leagues'
     },
     {
       icon: 'military_tech',
       label: 'Torneos',
-      route: './tournaments'
+      route: '/tournaments'
     },
     {
       icon: 'analytics',
       label: 'Estadísticas',
-      route: '/dashboard/stats',
+      route: '/stats',
       tooltip: 'Estadísticas y análisis'
     },
     {
       icon: 'settings',
       label: 'Configuración',
-      route: '/dashboard/settings',
+      route: '/settings',
       tooltip: 'Configuración del sistema'
     }
   ];
@@ -95,6 +91,7 @@ export class SidebarComponent implements OnInit {
     private router: Router
   ) {
     this.currentUser$ = this.authService.authState$.pipe(map(state => state.user));
+    this.userRole$ = this.authService.authState$.pipe(map(state => state.user?.role ?? null));
   }
 
   ngOnInit(): void {}
@@ -114,6 +111,21 @@ export class SidebarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
+  }
+
+  /**
+   * Verifica si el usuario tiene acceso a la sección de Administrar Torneos
+   */
+  canAccessTournaments(role: RoleType | null): boolean {
+    if (role === null) return false;
+    return role === RoleType.League || role === RoleType.Superadmin;
+  }
+
+  /**
+   * Verifica si el usuario tiene acceso a la sección de Administrar Equipos
+   */
+  canAccessTeams(role: RoleType | null): boolean {
+    if (role === null) return false;
+    return role === RoleType.Team || role === RoleType.Superadmin;
   }
 }

@@ -13,7 +13,8 @@ import {
   TEAM_REMOVE_FROM_GROUP_ENDPOINT,
   TEAM_DISQUALIFY_ENDPOINT,
   TEAM_REMOVE_ENDPOINT,
-  TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT
+  TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT,
+  TEAM_ASSIGN_RANDOM_REAMS
 } from '@core/config/endpoints';
 import {
   Team,
@@ -119,10 +120,11 @@ export class TeamService {
           this.toastService.showSuccess(response.message || 'Equipo eliminado con éxito');
           return true;
         }
-        this.toastService.showError(response.message || 'Error al eliminar equipo');
-        throw new Error(response.message || 'Error al eliminar equipo');
-      }),
-      catchError(this.handleError)
+        else{
+          this.toastService.showError(response.message || 'Error al eliminar equipo');
+          return false;
+        }
+      })
     );
   }
 
@@ -140,8 +142,7 @@ export class TeamService {
         }
         this.toastService.showError(response.message || 'Error al eliminar equipo');
         throw new Error(response.message || 'Error al eliminar equipo');
-      }),
-      catchError(this.handleError)
+      })
     );
   }
 
@@ -265,6 +266,24 @@ export class TeamService {
         throw new Error(response.message || 'Error al cambiar estado de registro');
       }),
       catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Asigna equipos aelatoriamente
+   * @param phaseId ID de la fase de grupos
+   * @returns Observable con el resultado de la operación
+   */
+  assignRandomTeams(phaseId: number): Observable<boolean> {
+    return this.apiService.post<ApiResponse<any>>(`${TEAM_ASSIGN_RANDOM_REAMS}/${phaseId}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipos asignados aleatoriamente');
+          return true;
+        }
+        this.toastService.showError(response.message || 'Error al asignar equipos aleatoriamente');
+        throw new Error(response.message || 'Error al asignar equipos aleatoriamente');
+      })
     );
   }
 

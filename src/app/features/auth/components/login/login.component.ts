@@ -10,8 +10,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '@core/services';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthService, ToastService } from '@core/services';
 import { LoginRequest } from '@core/models';
+import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
+import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +42,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private errorHandler: DeletionErrorHandlerHook,
+    private dialog: MatDialog,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -78,7 +84,22 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     const loginData: LoginRequest = this.loginForm.value;
-    this.authService.login(loginData).subscribe();
+    this.authService.login(loginData).subscribe({
+        next: (response) => {
+         
+        },
+        error: (error: any) => {
+          this.loading = false;
+          if (error.response.data.messageId === 'EGOL_120') {
+            this.toastService.showError('Su cuenta de correo no ha sido verificada.');
+            const email = loginData.userName; // El email es el userName
+            this.openOtpVerificationModal(email);
+          }
+          else {
+            this.toastService.showError('Usuario o contraseña incorrectos.');
+          }
+        }
+      });
   }
 
   private markFormGroupTouched(): void {
@@ -92,7 +113,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     const control = this.loginForm.get(fieldName);
 
     if (control?.hasError('required')) {
-      return fieldName === 'userName' ? 'Usuario es requerido' : 'Contraseña es requerida';
+      return fieldName === 'userName' ? 'Email es requerido' : 'Contraseña es requerida';
     }
 
     if (control?.hasError('minlength')) {
@@ -103,6 +124,82 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   navigateToRegister(): void {
-    this.router.navigate(['/auth/register']);
+    this.router.navigate(['/']);
+  }
+
+  navigateToResetPassword(): void {
+    this.router.navigate(['/auth/reset-password']);
+  }
+
+  private openOtpVerificationModal(email: string): void {
+    const dialogRef = this.dialog.open(OtpVerificationModalComponent, {
+      width: '550px',
+      disableClose: true,
+      data: {
+        email: email,
+        expiryMinutes: 5, // Tiempo de expiración del código OTP: 5 minutos
+        onVerify: async (code: string) => {
+          return new Promise<boolean>((resolve) => {
+            this.authService.verifyOTP(email, code).subscribe({
+              next: () => {
+                // La navegación se maneja en el servicio después de la verificación exitosa
+                const loginData: LoginRequest = this.loginForm.value;
+                this.authService.login(loginData).subscribe({
+                    next: (response) => {
+                    
+                    },
+                    error: (error: any) => {
+                      this.loading = false;
+                      if (error.response.data.messageId === 'EGOL_120') {
+                        this.toastService.showError('Su cuenta de correo no ha sido verificada.');
+                        const email = loginData.userName; // El email es el userName
+                        this.openOtpVerificationModal(email);
+                      }
+                      else {
+                        this.toastService.showError('Usuario o contraseña incorrectos.');
+                      }
+                    }
+                  });
+                resolve(true); // Cerrar el modal
+              },
+              error: (error) => {
+                this.loading = false;
+                const config = this.errorHandler.createConfig('Code');
+                this.errorHandler.handleResponseError(error, config);
+                resolve(false); // No cerrar el modal, permitir reintentar
+              }
+            });
+          });
+        },
+        onResend: () => {
+          // No hacer nada aquí, el modal se cerrará y se reabrirá
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.resend) {
+        // Usuario solicitó reenvío, llamar al servicio y reabrir modal
+        this.resendOtpCode(email);
+      } else if (!result?.verified) {
+        // Usuario canceló, permanecer en login
+        this.loading = false;
+      }
+    });
+  }
+
+  private resendOtpCode(email: string): void {
+    this.authService.resendOTP(email).subscribe({
+      next: () => {
+        // Reabrir el modal con el temporizador reiniciado
+        this.openOtpVerificationModal(email);
+      },
+      error: (error) => {
+        console.error('Resend OTP error:', error);
+        // El error ya se muestra en el servicio con toast
+        // Aún así, reabrir el modal para que el usuario pueda intentar de nuevo
+        this.openOtpVerificationModal(email);
+      }
+    });
   }
 }

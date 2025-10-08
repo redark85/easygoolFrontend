@@ -21,7 +21,7 @@ import { GroupFormComponent } from '../group-form/group-form.component';
 import { AssignTeamsComponent, AssignTeamsDialogData, AssignTeamsResult } from '../assign-teams/assign-teams.component';
 import { PhaseFormData, PhaseModalResult } from '../../models/phase-form.interface';
 import { GroupFormData, GroupModalResult } from '../../models/group-form.interface';
-import { DeletionErrorHandlerHook, DeletionErrorResponse } from '../../../../shared/hooks/deletion-error-handler.hook';
+import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -61,7 +61,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
     private teamService: TeamService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
-    private deletionErrorHandler: DeletionErrorHandlerHook
+    private errorHandler: DeletionErrorHandlerHook
   ) {}
 
   ngOnInit(): void {
@@ -146,20 +146,19 @@ export class PhasesGroupsManagementComponent implements OnInit {
       if (result.isConfirmed) {
         this.phaseService.deletePhase(phase.id).subscribe({
           next: (response: any) => {
-            const config = this.deletionErrorHandler.createConfig('Fase', {
+            const config = this.errorHandler.createConfig('Fase', {
               'EGOL_113': 'No se puede eliminar la fase porque tiene equipos asignados.',
               'EGOL_114': 'No se puede eliminar la fase porque tiene grupos con equipos.',
               'EGOL_115': 'No se puede eliminar la fase porque tiene partidos programados.'
             });
 
-            if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+            if (this.errorHandler.handleResponse(response, config)) {
               this.loadPhases();
             }
           },
           error: (error) => {
-            console.error('Error deleting phase:', error);
-            const config = this.deletionErrorHandler.createConfig('Fase');
-            this.deletionErrorHandler.handleDeletionError(error, config);
+            const config = this.errorHandler.createConfig('Fase');
+            this.errorHandler.handleResponseError(error, config);
           }
         });
       }
@@ -308,20 +307,18 @@ export class PhasesGroupsManagementComponent implements OnInit {
       if (result.isConfirmed) {
         this.phaseService.deleteGroup(group.id).subscribe({
           next: (response: any) => {
-            const config = this.deletionErrorHandler.createConfig('Grupo', {
-              'EGOL_113': 'No se puede eliminar el grupo porque tiene equipos asignados.',
-              'EGOL_114': 'No se puede eliminar el grupo porque tiene partidos programados.',
-              'EGOL_115': 'No se puede eliminar el grupo porque el torneo ya comenzó.'
+            const config = this.errorHandler.createConfig('Grupo', {
+              'EGOL_112': 'No se puede eliminar el grupo porque tiene partidos programados.'
             });
 
-            if (this.deletionErrorHandler.handleDeletionResponse(response, config)) {
+            if (this.errorHandler.handleResponse(response, config)) {
               this.loadPhases();
             }
           },
           error: (error) => {
             console.error('Error deleting group:', error);
-            const config = this.deletionErrorHandler.createConfig('Grupo');
-            this.deletionErrorHandler.handleDeletionError(error, config);
+            const config = this.errorHandler.createConfig('Grupo');
+            this.errorHandler.handleResponseError(error, config);
           }
         });
       }
@@ -335,8 +332,33 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * @param phase Fase de grupos donde asignar equipos
    */
   assignTeamsRandomly(phase: Phase): void {
-    // TODO: Implementar lógica para asignar equipos disponibles aleatoriamente a los grupos
-    console.log('Asignar equipos aleatoriamente a la fase:', phase);
+    if (phase.groups?.length == 0) {
+        Swal.fire({
+            title: '¡Atención!',
+            text: `Debes agregar al menos un grupo para esta fase`,
+            icon: 'warning',
+            timer: 3000,
+            showConfirmButton: false
+        });
+        return;        
+    }
+
+    this.teamService.assignRandomTeams(phase.id).subscribe({
+          next: () => {
+            Swal.fire({
+              title: '¡Equipos asignados!',
+              text: `Equipos asignados aleatoriamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.refreshPhases();
+          },
+          error: (error) => {
+            const config = this.errorHandler.createConfig('Fase');
+            this.errorHandler.handleResponseError(error, config);
+          }
+        });
   }
 
 
@@ -369,13 +391,9 @@ export class PhasesGroupsManagementComponent implements OnInit {
             });
             this.refreshPhases();
           },
-          error: (error: any) => {
-            Swal.fire({
-              title: 'Error',
-              text: error.message || 'No se pudo quitar el equipo de la fase',
-              icon: 'error',
-              confirmButtonText: 'Aceptar'
-            });
+        error: (error) => {
+            const config = this.errorHandler.createConfig('Equipo');
+            this.errorHandler.handleResponseError(error, config);
           }
         });
       }
@@ -564,13 +582,9 @@ export class PhasesGroupsManagementComponent implements OnInit {
             });
             this.refreshPhases();
           },
-          error: (error: any) => {
-            Swal.fire({
-              title: 'Error',
-              text: error.message || 'No se pudo quitar el equipo del grupo',
-              icon: 'error',
-              confirmButtonText: 'Aceptar'
-            });
+           error: (error) => {
+            const config = this.errorHandler.createConfig('Equipo');
+            this.errorHandler.handleResponseError(error, config);
           }
         });
       }

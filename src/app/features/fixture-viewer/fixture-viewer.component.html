@@ -1,0 +1,50 @@
+<div class="auth-container">
+  <!-- Background Wallpaper -->
+  <div class="auth-wallpaper">
+    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+  </div>
+
+  <!-- Centered Content Card -->
+  <div class="auth-content">
+    <mat-card class="fixture-card">
+      <!-- Header -->
+      <div class="header-section">
+        <button mat-icon-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="title">Selecciona un Campeonato</h1>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="loading-section">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando campeonatos...</p>
+      </div>
+
+      <!-- Tournaments List -->
+      <div *ngIf="!loading && tournaments.length > 0" class="tournaments-section">
+        <div *ngFor="let tournament of tournaments" class="tournament-item">
+          <div class="tournament-info">
+            <mat-icon class="tournament-icon">emoji_events</mat-icon>
+            <div class="tournament-details">
+              <h3 class="tournament-name">{{ tournament.name }}</h3>
+              <span class="tournament-status">{{ tournament.status }}</span>
+            </div>
+          </div>
+          <button mat-raised-button 
+                  class="view-button"
+                  (click)="viewFixture(tournament.id)">
+            <mat-icon>visibility</mat-icon>
+            Ver Fixture
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && tournaments.length === 0" class="empty-section">
+        <mat-icon class="empty-icon">event_busy</mat-icon>
+        <p class="empty-text">No hay campeonatos en curso</p>
+      </div>
+    </mat-card>
+  </div>
+</div>

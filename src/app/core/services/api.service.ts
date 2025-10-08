@@ -151,12 +151,6 @@ export class ApiService {
       errorMessage = AppConstants.ERROR_MESSAGES.NETWORK_ERROR;
     }
 
-    // Mostrar toast de error
-    this.toastService.showError(errorMessage);
-
-    // Log del error para debugging
-    console.error('API Error:', errorMessage, error);
-
     return throwError(() => error);
   }
 

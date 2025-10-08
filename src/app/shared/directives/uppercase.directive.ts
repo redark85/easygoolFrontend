@@ -10,32 +10,7 @@ export class UppercaseDirective {
   constructor(
     private el: ElementRef,
     @Optional() private ngControl: NgControl
-  ) {}
-
-  @HostListener('input', ['$event']) onInputChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
-    
-    // Convertir a mayúsculas manteniendo espacios
-    const originalValue = input.value;
-    const upperValue = originalValue.toUpperCase();
-    
-    // Solo actualizar si hay cambios para evitar loops infinitos
-    if (originalValue !== upperValue) {
-      input.value = upperValue;
-      
-      // Actualizar el control de Angular Forms si existe
-      if (this.ngControl && this.ngControl.control) {
-        this.ngControl.control.setValue(upperValue, { emitEvent: false });
-      }
-      
-      // Restaurar la posición del cursor
-      if (start !== null && end !== null) {
-        input.setSelectionRange(start, end);
-      }
-    }
-  }
+  ) {}  
 
   @HostListener('paste', ['$event']) onPaste(event: ClipboardEvent) {
     event.preventDefault();

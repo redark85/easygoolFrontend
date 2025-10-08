@@ -11,6 +11,7 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  role : RoleType;
 }
 
 export interface AuthResponse {
@@ -24,6 +25,34 @@ export interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+}
+
+export enum RoleType {
+  Superadmin,
+  League,
+  Team,
+  Official
+}
+
+export enum AccessCodeType {
+  SMS = 0,
+  Email = 1,
+  All = 2
+}
+
+export enum AccessCodeTemplateType {
+  ResetPassword = 0,
+  AccessCodeNotification = 1
+}
+
+export interface VerifyOTPRequest {
+  accessCodeType: AccessCodeType;
+  accessCode: number;
+}
+
+export interface ResendOTPRequest {
+  email: string;
+  templateType: AccessCodeTemplateType;
 }
 
 // Import User interface

@@ -33,7 +33,7 @@ export class BreadcrumbComponent implements OnInit {
     'dashboard': { label: 'Dashboard', icon: 'dashboard' },
     'home': { label: 'Inicio', icon: 'home' },
     'matches': { label: 'Partidos', icon: 'sports_soccer' },
-    'teams': { label: 'Equipos', icon: 'groups' },
+    'teams': { label: 'Mis Equipos', icon: 'groups' },
     'players': { label: 'Jugadores', icon: 'person' },
     'tournaments': { label: 'Torneos', icon: 'emoji_events' },
     'stats': { label: 'Estadísticas', icon: 'analytics' },

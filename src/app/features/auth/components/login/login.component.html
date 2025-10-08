@@ -1,6 +1,11 @@
 <div class="auth-container">
-  <!-- Left Sidebar -->
-  <div class="auth-sidebar">
+  <!-- Background Wallpaper -->
+  <div class="auth-wallpaper">
+    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+  </div>
+
+  <!-- Centered Form Card -->
+  <div class="auth-content">
     <mat-card class="auth-card">
       <!-- Logo -->
       <div class="logo-section">
@@ -12,11 +17,11 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
         <!-- Username Field -->
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Usuario</mat-label>
+          <mat-label>Email</mat-label>
           <input matInput
                  type="text"
                  formControlName="userName"
-                 placeholder="Ingresa tu usuario">
+                 placeholder="Ingresa tu email">
           <mat-icon matSuffix>person</mat-icon>
           <mat-error *ngIf="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched">
             {{ getErrorMessage('userName') }}
@@ -45,7 +50,7 @@
 
         <!-- Forgot Password -->
         <div class="form-options">
-          <button mat-button type="button" class="forgot-password">
+          <button mat-button type="button" class="forgot-password" (click)="navigateToResetPassword()">
             ¿Olvidaste tu contraseña?
           </button>
         </div>
@@ -63,21 +68,16 @@
         </button>
 
         <!-- Register Link -->
-<!--        <div class="register-link">-->
-<!--          <span>¿Nuevo en EasyGool? </span>-->
-<!--          <button mat-button -->
-<!--                  type="button"-->
-<!--                  class="link-button"-->
-<!--                  (click)="navigateToRegister()">-->
-<!--            ¡Regístrate!-->
-<!--          </button>-->
-<!--        </div>-->
+       <div class="register-link">
+         <span>¿Nuevo en EasyGool? </span>
+         <button mat-button
+                 type="button"
+                 class="link-button"
+                 (click)="navigateToRegister()">
+           ¡Regístrate!
+         </button>
+       </div>
       </form>
     </mat-card>
-  </div>
-
-  <!-- Right Wallpaper -->
-  <div class="auth-wallpaper">
-    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
   </div>
 </div>

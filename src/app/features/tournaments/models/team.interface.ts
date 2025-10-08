@@ -1,3 +1,5 @@
+import { Player } from "@core/models/player.interface";
+
 export enum TeamStatus {
   Active = 0,      // Activo
   Disqualified = 1, // Descalificado del campeonato
@@ -28,10 +30,11 @@ export interface Team {
   manager? : Manager;
   hasUsedLink? : boolean;
   tournamentTeamId : number;
+  players : Player[];
 }
 
 export interface Manager{
-  name: string;
+  managerName: string;
   phoneNumber: string;
 }
 
@@ -39,8 +42,8 @@ export interface CreateTeamRequest {
   tournamentId: number;
   name: string;
   shortName: string;
-  logoBase64: string;
-  logoContentType: string;
+  logoBase64?: string | null;
+  logoContentType: string | null;
 }
 
 export interface UpdateTeamRequest {
@@ -48,18 +51,11 @@ export interface UpdateTeamRequest {
   tournamentId: number;
   name: string;
   shortName: string;
-  logoBase64: string;
-  logoContentType: string;
+  logoBase64: string | null;
+  logoContentType: string | null;
 }
 
-export interface Player {
-  tournamentTeamPlayerId: number;
-  name: string;
-  lastName: string;
-  identification: string;
-  photoUrl: string;
-  jerseyNumber: number;
-}
+
 
 export interface TeamWithoutPhase {
   id: number;

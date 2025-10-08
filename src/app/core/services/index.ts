@@ -8,3 +8,4 @@ export * from './loading.service';
 export * from './jwt.service';
 export * from './notification.service';
 export * from './error-handler.service';
+export * from './team.service';

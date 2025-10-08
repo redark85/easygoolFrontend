@@ -131,7 +131,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    * Navega a la vista de administración del torneo (fases y grupos)
    */
   viewTournamentDetails(tournament: Tournament): void {
-    this.router.navigate(['/dashboard/tournaments', tournament.id, 'manage']);
+    this.router.navigate(['/tournaments', tournament.id, 'manage']);
   }
 
   /**

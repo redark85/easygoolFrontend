@@ -1,0 +1,61 @@
+<div class="auth-container">
+  <!-- Background Wallpaper -->
+  <div class="auth-wallpaper">
+    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+  </div>
+
+  <!-- Centered Content Card -->
+  <div class="auth-content">
+    <mat-card class="landing-card">
+      <!-- Logo -->
+      <div class="logo-section">
+        <img src="assets/logo.png" alt="EasyGool Logo" class="logo">
+      </div>
+
+      <!-- Welcome Text -->
+      <div class="welcome-section">
+        <h1 class="welcome-title">Bienvenido a EasyGool</h1>
+        <p class="welcome-subtitle">Selecciona una opción para continuar</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions-section">
+        <button mat-raised-button 
+                class="action-button league-button"
+                (click)="navigateToLeagueOwnerRegister()">
+          <mat-icon>emoji_events</mat-icon>
+          <div class="button-text">
+            <span class="button-title">Presidente de Liga</span>
+            <span class="button-subtitle">Registrar nueva liga</span>
+          </div>
+        </button>
+
+        <button mat-raised-button 
+                class="action-button team-button"
+                (click)="navigateToTeamOwnerRegister()">
+          <mat-icon>groups</mat-icon>
+          <div class="button-text">
+            <span class="button-title">Presidente de Equipo</span>
+            <span class="button-subtitle">Registrar nuevo equipo</span>
+          </div>
+        </button>
+
+        <button mat-raised-button 
+                class="action-button fixture-button"
+                (click)="navigateToFixtureViewer()">
+          <mat-icon>calendar_month</mat-icon>
+          <div class="button-text">
+            <span class="button-title">Ver Fixture</span>
+            <span class="button-subtitle">Consultar campeonatos en curso</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        <span>¿Ya tienes una cuenta? </span>
+        <a routerLink="/auth/login" class="link-text">Inicia sesión</a>
+      </div>
+    </mat-card>
+  </div>
+</div>

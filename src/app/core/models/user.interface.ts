@@ -1,3 +1,5 @@
+import { RoleType } from './auth.interface';
+
 // User interface siguiendo principios SOLID - SRP
 export interface User {
   id: string;
@@ -5,7 +7,7 @@ export interface User {
   firstName: string;
   lastName: string;
   avatar?: string;
-  role: UserRole;
+  role: RoleType;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -18,20 +20,13 @@ export interface UserProfile extends Omit<User, 'id' | 'createdAt' | 'updatedAt'
   position?: string;
 }
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  COACH = 'coach',
-  PLAYER = 'player'
-}
-
 // DTOs para API integration
 export interface CreateUserRequest {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
-  role?: UserRole;
+  role?: RoleType;
 }
 
 export interface UpdateUserRequest extends Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>> {}

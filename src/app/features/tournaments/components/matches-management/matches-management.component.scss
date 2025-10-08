@@ -81,13 +81,262 @@
   }
 }
 
+// Group Selection
+.group-selection {
+  padding: 20px 0;
+  
+  .group-select {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+// Loading Container
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  
+  .loading-text {
+    margin-top: 16px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+}
+
+// Match Days Accordion
+.matchdays-accordion {
+  .matchday-panel {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    .panel-header {
+      background-color: #f5f5f5;
+      
+      .panel-title {
+        width: 100%;
+        
+        .matchday-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          
+          .matchday-icon {
+            color: var(--primary-color);
+          }
+          
+          .matchday-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+          }
+          
+          .matches-count-chip {
+            margin-left: auto;
+          }
+
+          .matchday-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+
+            .action-btn {
+              width: 36px;
+              height: 36px;
+              transition: all 0.3s ease;
+
+              mat-icon {
+                font-size: 1.2rem;
+                width: 1.2rem;
+                height: 1.2rem;
+              }
+
+              &.create-btn {
+                color: #4caf50;
+
+                &:hover {
+                  background-color: rgba(76, 175, 80, 0.1);
+                }
+              }
+
+              &.random-btn {
+                color: #ff9800;
+
+                &:hover {
+                  background-color: rgba(255, 152, 0, 0.1);
+                }
+              }
+
+              &.delete-btn {
+                color: #f44336;
+
+                &:hover {
+                  background-color: rgba(244, 67, 54, 0.1);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Match Card Styles
+.match-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .match-content {
+    padding: 16px;
+    
+    .match-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      
+      .team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        
+        .team-logo {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #e0e0e0;
+        }
+        
+        .team-info {
+          text-align: center;
+          
+          .team-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+          }
+        }
+      }
+      
+      .score-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        
+        .vs-text {
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: var(--text-secondary);
+        }
+        
+        .status-chip {
+          font-size: 0.75rem;
+        }
+      }
+    }
+    
+    .match-details {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 12px;
+      
+      .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        
+        .detail-icon {
+          font-size: 1rem;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+    }
+
+    .match-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding-top: 12px;
+
+      .action-btn-small {
+        width: 32px;
+        height: 32px;
+        transition: all 0.3s ease;
+
+        mat-icon {
+          font-size: 1.1rem;
+          width: 1.1rem;
+          height: 1.1rem;
+        }
+
+        &:hover {
+          background-color: rgba(33, 150, 243, 0.1);
+          color: #2196f3;
+        }
+
+        &.delete {
+          &:hover {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Status Classes
+.status-scheduled {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
+.status-in-progress {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.status-finished {
+  background-color: #9e9e9e !important;
+  color: white !important;
+}
+
+.status-suspended {
+  background-color: #ff9800 !important;
+  color: white !important;
+}
+
+.status-cancelled {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
 // No States
-.no-phases, .no-matches {
+.no-phases, .no-matches, .no-groups {
   text-align: center;
   padding: 60px 20px;
   color: var(--text-secondary);
 
-  .no-phases-icon, .no-matches-icon {
+  .no-phases-icon, .no-matches-icon, .no-groups-icon {
     font-size: 4rem;
     width: 4rem;
     height: 4rem;
@@ -105,6 +354,18 @@
   p {
     margin: 0;
     font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .generate-matches-btn {
+    margin-top: 16px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    
+    mat-icon {
+      margin-right: 8px;
+    }
   }
 }
 
