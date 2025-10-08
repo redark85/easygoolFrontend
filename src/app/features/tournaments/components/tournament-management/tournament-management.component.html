@@ -90,18 +90,18 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <mat-tab-group class="tournament-tabs" 
+    <mat-tab-group class="tournament-tabs"
                    [(selectedIndex)]="selectedTabIndex"
                    (selectedTabChange)="onTabChange($event)"
                    animationDuration="300ms">
-      
+
       <!-- Tab 1: Fases -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">timeline</mat-icon>
           <span class="tab-text">Fases</span>
         </ng-template>
-        
+
         <div class="tab-content">
           <app-phases-groups-management
             [tournamentId]="tournamentId"
@@ -117,7 +117,7 @@
           <mat-icon class="tab-icon">groups</mat-icon>
           <span class="tab-text">Equipos</span>
         </ng-template>
-        
+
         <div class="tab-content">
           <app-teams-management
             [tournamentId]="tournamentId"
@@ -133,7 +133,7 @@
           <mat-icon class="tab-icon">sports_soccer</mat-icon>
           <span class="tab-text">Partidos</span>
         </ng-template>
-        
+
         <div class="tab-content">
           <app-matches-management
             [tournamentId]="tournamentId"
@@ -144,21 +144,21 @@
       </mat-tab>
 
       <!-- Tab 4: Estadísticas -->
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">analytics</mat-icon>
-          <span class="tab-text">Estadísticas</span>
-        </ng-template>
-        
-        <div class="tab-content">
-          <app-statistics-management
-            [tournamentId]="tournamentId"
-            [tournament]="tournament"
-            [phases]="phases"
-            [teams]="teams">
-          </app-statistics-management>
-        </div>
-      </mat-tab>
+<!--      <mat-tab>-->
+<!--        <ng-template mat-tab-label>-->
+<!--          <mat-icon class="tab-icon">analytics</mat-icon>-->
+<!--          <span class="tab-text">Estadísticas</span>-->
+<!--        </ng-template>-->
+<!--        -->
+<!--        <div class="tab-content">-->
+<!--          <app-statistics-management-->
+<!--            [tournamentId]="tournamentId"-->
+<!--            [tournament]="tournament"-->
+<!--            [phases]="phases"-->
+<!--            [teams]="teams">-->
+<!--          </app-statistics-management>-->
+<!--        </div>-->
+<!--      </mat-tab>-->
     </mat-tab-group>
   </div>
 

@@ -3,7 +3,9 @@
     padding: 24px;
     min-width: 400px;
     max-width: 600px;
-    
+    overflow-y: auto;
+    max-height: 700px;
+
     h2[mat-dialog-title] {
       display: flex;
       align-items: center;
@@ -12,44 +14,44 @@
       color: var(--primary-color);
       font-size: 1.5rem;
       font-weight: 500;
-      
+
       .ball-icon {
         font-size: 1.5rem;
         padding-top: 5px;
       }
     }
-    
+
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
       margin-bottom: 1.5rem;
-      
+
       .form-field-full {
         grid-column: 1 / -1;
       }
-      
+
       @media (max-width: 768px) {
         grid-template-columns: 1fr;
-        
+
         .form-field {
           grid-column: 1 / -1;
         }
       }
     }
-    
+
     .dialog-actions {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
       padding: 16px 0 0 0;
-      
+
       button {
         min-width: 100px;
-        
+
         &[mat-raised-button] {
           position: relative;
-          
+
           .button-spinner {
             position: absolute;
             left: 50%;

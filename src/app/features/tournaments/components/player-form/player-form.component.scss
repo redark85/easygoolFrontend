@@ -10,6 +10,8 @@
     font-weight: 400;
     color: var(--text-secondary);
     margin-left: 0.5rem;
+    overflow-y: auto;
+    max-height: 700px;
   }
 
   .captain-checkbox {

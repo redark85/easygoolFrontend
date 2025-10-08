@@ -60,8 +60,7 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
     MatSlideToggleModule,
     PhasesGroupsManagementComponent,
     TeamsManagementComponent,
-    MatchesManagementComponent,
-    StatisticsManagementComponent
+    MatchesManagementComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   templateUrl: './tournament-management.component.html',
@@ -148,10 +147,10 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (tournamentData) => {
           this.tournament = tournamentData;
-          
+
           // Actualizar título de la página para el breadcrumb
           this.titleService.setTitle(`${this.tournament.name} - EasyGool`);
-          
+
           // Actualizar el store con la información del torneo
           this.tournamentStore.setCurrentTournament(this.tournamentId, this.tournament.name);
 
@@ -160,7 +159,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
           // allowTeamRegistration: false -> switch debe estar en false (registro cerrado)
           // allowTeamRegistration: true -> switch debe estar en true (registro abierto)
           this.registrationClosed = !this.tournament.allowTeamRegistration;
-          
+
           console.log('Tournament loaded:', {
             allowTeamRegistration: this.tournament.allowTeamRegistration,
             registrationClosed: this.registrationClosed,
@@ -372,12 +371,12 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    */
   getDateRange(): string {
     if (!this.tournament) return '';
-    
+
     const startDate = new Date(this.tournament.startDate).toLocaleDateString('es-ES', {
       day: 'numeric',
       month: 'short'
     });
-    
+
     if (this.tournament.endDate) {
       const endDate = new Date(this.tournament.endDate).toLocaleDateString('es-ES', {
         day: 'numeric',
@@ -385,7 +384,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
       });
       return `${startDate} - ${endDate}`;
     }
-    
+
     return `Desde ${startDate}`;
   }
 
@@ -728,23 +727,23 @@ trackByTeamId(index: number, team: Team): number {
     if (!this.tournament || this.isUpdatingRegistration) return;
 
     this.isUpdatingRegistration = true;
-    
+
     // El evento de mat-slide-toggle tiene la estructura: { source: MatSlideToggle, checked: boolean }
     const isChecked = event?.checked !== undefined ? event.checked : event?.source?.checked;
-    
+
     // LÓGICA CORREGIDA: El switch ahora representa "registro abierto"
     // - Si checked = true -> registro abierto -> allow = true
     // - Si checked = false -> registro cerrado -> allow = false
     const allowRegistration = isChecked;
-    
-    console.log('Switch event:', { 
+
+    console.log('Switch event:', {
       event,
-      isChecked, 
-      allowRegistration, 
+      isChecked,
+      allowRegistration,
       tournamentId: this.tournamentId,
       tournamentObject: this.tournament
     });
-    
+
     this.tournamentService.allowRegisterTeam(this.tournamentId, allowRegistration)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -782,17 +781,17 @@ trackByTeamId(index: number, team: Team): number {
 
     switch (this.selectedTabIndex) {
       case 0:
-        this.loadPhases();        
+        this.loadPhases();
         break;
       case 1:
         this.loadTeams();
-        break;    
+        break;
       default:
         break;
     }
-    
+
     // Refrescar los servicios dependiendo del tab en que se encuentra o hace click
-    
+
     this.cdr.detectChanges();
   }
 

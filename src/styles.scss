@@ -483,3 +483,8 @@ html, body {
   max-height: 100% !important;
   height: auto !important;
 }
+
+.modal-container {
+  overflow-y: auto !important;
+  max-height: 700px !important;
+}

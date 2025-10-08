@@ -3,7 +3,9 @@
     padding: 24px;
     min-width: 400px;
     max-width: 600px;
-    
+    overflow-y: auto;
+    max-height: 700px;
+
     h2[mat-dialog-title] {
       display: flex;
       align-items: center;
@@ -13,21 +15,21 @@
       font-size: 1.5rem;
       font-weight: 500;
     }
-    
+
     // Form grid removed - now using Bootstrap Grid System
-    
+
     .dialog-actions {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
       padding: 16px 0 0 0;
-      
+
       button {
         min-width: 100px;
-        
+
         &[mat-raised-button] {
           position: relative;
-          
+
           .button-spinner {
             position: absolute;
             left: 50%;
