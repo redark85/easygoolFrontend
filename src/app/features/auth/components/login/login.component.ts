@@ -86,7 +86,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           if (error.response.data.messageId === 'EGOL_121') {
-              this.router.navigate(['/auth/login']);
+              this.router.navigate(['/not-found']);
           }
         }
       });

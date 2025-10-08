@@ -1,0 +1,41 @@
+<div class="not-found-container">
+  <!-- Background Wallpaper -->
+  <div class="not-found-wallpaper">
+    <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+  </div>
+
+  <!-- Content -->
+  <div class="not-found-content">
+    <mat-card class="not-found-card">
+      <!-- Icon -->
+      <div class="icon-section">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+      </div>
+
+      <!-- Title -->
+      <div class="title-section">
+        <h1>404</h1>
+        <h2>Página No Encontrada</h2>
+      </div>
+
+      <!-- Message -->
+      <div class="message-section">
+        <p class="main-message">
+          <mat-icon>warning</mat-icon>
+          La URL ingresada no es correcta o el recurso no existe.
+        </p>
+        <p class="sub-message">
+          Por favor, verifica la dirección e intenta nuevamente.
+        </p>
+      </div>
+
+      <!-- Action Button -->
+      <div class="action-section">
+        <button mat-raised-button color="primary" (click)="goToHome()" class="home-button">
+          <mat-icon>home</mat-icon>
+          Ir a la Página Principal
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div>

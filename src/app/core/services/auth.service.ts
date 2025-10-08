@@ -62,7 +62,7 @@ export class AuthService implements OnDestroy {
     return this.apiService.post<ApiResponse<AuthResponse>>(url, credentials).pipe(
       map(response => {
         if (response.succeed && response.result) {
-          this.handleAuthSuccess(response.result, true);
+          this.handleAuthSuccess(response.result, true, token);
           return response;
         }   
         return response;
@@ -192,7 +192,7 @@ export class AuthService implements OnDestroy {
     this.router.navigate(['/']);
   }
 
-  private handleAuthSuccess(response: AuthResponse, navigate: boolean): void {
+  private handleAuthSuccess(response: AuthResponse, navigate: boolean, tournamentToken?: string | null): void {
     const userInfo = this.jwtService.getUserInfo(response.accessToken);
     if (!userInfo) {
       this.logout(false);
@@ -241,14 +241,14 @@ export class AuthService implements OnDestroy {
 
     if (navigate) {
       // Redirigir según el rol del usuario
-      this.navigateByRole(mappedRole);
+      this.navigateByRole(mappedRole, tournamentToken);
     }
   }
 
   /**
    * Navega a la ruta correspondiente según el rol del usuario
    */
-  private navigateByRole(role: RoleType): void {
+  private navigateByRole(role: RoleType, tournamentToken?: string | null): void {
     switch (role) {
       case RoleType.Superadmin:
         this.router.navigate(['/tournaments']);
@@ -257,7 +257,12 @@ export class AuthService implements OnDestroy {
         this.router.navigate(['/tournaments']);
         break;
       case RoleType.Team:
-        this.router.navigate(['/teams']);
+        // Si hay token, pasarlo como state para no mostrarlo en la URL
+        if (tournamentToken) {
+          this.router.navigate(['/teams'], { state: { tournamentToken: tournamentToken } });
+        } else {
+          this.router.navigate(['/teams']);
+        }
         break;
       case RoleType.Official:
         this.router.navigate(['/matches']);

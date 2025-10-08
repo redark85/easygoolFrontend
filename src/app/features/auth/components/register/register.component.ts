@@ -101,7 +101,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         error: (error) => {
           this.loadingTournament = false;
           if (error.response.data.messageId === 'EGOL_121') {
-              this.router.navigate(['/auth/register']);
+              this.router.navigate(['/not-found']);
           }
         }
       });
