@@ -1,7 +1,7 @@
 <div class="phases-groups-container">
   <mat-card class="phases-management-card">
     <mat-card-header>
-      <mat-card-title>
+      <mat-card-title class="white-bold-title">
         <mat-icon>timeline</mat-icon>
         Fases del Torneo
       </mat-card-title>
@@ -45,7 +45,7 @@
                   <h3 class="phase-name">{{ phase.name }}</h3>
                   <mat-chip class="phase-type-chip"
                            [class]="'phase-type-' + phase.phaseType">
-                    {{ getPhaseTypeText(phase.phaseType) }}
+                    <strong style="color: white;">{{ getPhaseTypeText(phase.phaseType) }}</strong>
                   </mat-chip>
                 </div>
               </div>
@@ -56,7 +56,7 @@
                           matBadge="{{ phase.phaseType === 1 ? (phase.knockoutTeams?.length || 0) : (phase.groups?.length || 0) }}"
                           matBadgeColor="accent"
                           matBadgeSize="small"
-                          [matTooltip]="phase.phaseType === 1 ? 
+                          [matTooltip]="phase.phaseType === 1 ?
                             ((phase.knockoutTeams?.length || 0) === 1 ? '1 equipo' : (phase.knockoutTeams?.length || 0) + ' equipos') :
                             ((phase.groups?.length || 0) === 1 ? '1 grupo' : (phase.groups?.length || 0) + ' grupos')">
                   {{ phase.phaseType === 1 ? 'groups' : 'group_work' }}
@@ -122,13 +122,13 @@
                       <div class="group-title-content">
                         <div class="group-icon-container">
                           <mat-icon class="group-icon">group_work</mat-icon>
-                          <span class="teams-count-badge" 
+                          <span class="teams-count-badge"
                                 [matTooltip]="(group.teams?.length || 0) === 1 ? '1 equipo' : (group.teams?.length || 0) + ' equipos'"
                                 matTooltipPosition="above">
                             {{ group.teams?.length || 0 }}
                           </span>
                         </div>
-                        <span class="group-name" 
+                        <span class="group-name"
                               [matTooltip]="group.name"
                               matTooltipPosition="above">{{ group.name }}</span>
                       </div>
@@ -179,7 +179,7 @@
                                [alt]="team.name"
                                class="team-logo"
                                (error)="$event.target.src='assets/default-team.jpg'">
-                          
+
                           <!-- Status Badge sobre la imagen -->
                           <div [class]="getTeamStatusClass(team.status)"
                                [matTooltip]="getTeamStatusText(team.status)"
@@ -229,7 +229,7 @@
                                [alt]="team.name"
                                class="team-logo-knockout"
                                (error)="$event.target.src='assets/default-team.jpg'">
-                          
+
                           <!-- Status Badge sobre la imagen -->
                           <div [class]="getTeamStatusClass(team.status)"
                                [matTooltip]="getTeamStatusText(team.status)"

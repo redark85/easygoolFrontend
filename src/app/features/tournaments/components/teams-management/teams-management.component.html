@@ -66,7 +66,7 @@
                   <div class="team-avatar me-3 position-relative">
                     <img [src]="team.logoUrl || 'assets/logo.png'"
                          [alt]="team.name"
-                         class="team-logo rounded-circle"
+                         class="team-logo"
                          (error)="$event.target.src='assets/logo.png'"
                          width="50" height="50">
                     <!-- Status Badge sobre la imagen -->
@@ -84,9 +84,14 @@
 
                 <!-- Estadísticas -->
                 <div class="col-md-3 d-flex align-items-center">
-                  <mat-icon class="text-primary me-1">people</mat-icon>
-                  <span class="badge bg-primary rounded-pill">{{ team.totalPlayers }}</span>
-                  <small class="text-muted ms-3">{{team.manager ? 'Manager: ' + team.manager.managerName + ' Contacto: ' + team.manager.phoneNumber : 'Sin manager asignado'}}</small>
+                  <div class="d-flex align-items-center me-3">
+                    <mat-icon class="text-primary me-1">people</mat-icon>
+                    <span class="badge bg-primary rounded-pill">{{ team.totalPlayers }}</span>
+                  </div>
+                  <div class="manager-info flex-grow-1">
+                    <small class="text-muted d-block">{{team.manager ? 'Manager: ' + team.manager.managerName : 'Sin manager asignado'}}</small>
+                    <small class="text-muted d-block" *ngIf="team.manager">Contacto: {{ team.manager.phoneNumber }}</small>
+                  </div>
                 </div>
 
                 <!-- Switch -->
@@ -159,7 +164,7 @@
               <div class="player-avatar me-3">
                 <img [src]="player.photoUrl || 'assets/logo.png'"
                      [alt]="getPlayerFullName(player)"
-                     class="rounded-circle"
+                     class="player-photo"
                      width="40" height="40"
                      (error)="$event.target.src='assets/logo.png'">
               </div>

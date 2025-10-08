@@ -1,3 +1,5 @@
+@use '../../../../shared/styles/mixins.scss' as mixins;
+
 .tournament-management-container {
   padding: 20px;
   max-width: 100%;
@@ -39,8 +41,7 @@
           .avatar-image {
             width: 80px;
             height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
+            @include mixins.square-rounded-image($border-radius: 12px, $border-width: 3px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           }
 
@@ -610,9 +611,7 @@
                           .team-logo {
                             width: 32px;
                             height: 32px;
-                            border-radius: 50%;
-                            object-fit: cover;
-                            border: 1px solid var(--mdc-theme-outline, #e0e0e0);
+                            @include mixins.square-rounded-image($border-radius: 6px, $border-width: 1px, $border-color: var(--mdc-theme-outline, #e0e0e0));
                           }
                         }
 
@@ -898,9 +897,7 @@
     .team-logo {
       width: 48px;
       height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--mdc-theme-outline, #e0e0e0);
+      @include mixins.square-rounded-image($border-radius: 8px, $border-width: 2px, $border-color: var(--mdc-theme-outline, #e0e0e0));
       background-color: var(--mdc-theme-surface-variant, #f5f5f5);
     }
   }

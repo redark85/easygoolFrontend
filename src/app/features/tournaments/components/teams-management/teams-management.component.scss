@@ -1,3 +1,5 @@
+@use '../../../../shared/styles/mixins.scss' as mixins;
+
 .teams-management-container {
   padding: 0;
   position: relative;
@@ -15,10 +17,7 @@
     .team-logo {
       width: 50px;
       height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      @include mixins.square-rounded-image();
       flex-shrink: 0; // Evitar que se comprima
     }
   }
@@ -37,6 +36,21 @@
       font-size: 0.9rem;
       color: var(--text-secondary);
       font-weight: 500;
+    }
+  }
+
+  // Estilos para la información del manager
+  .manager-info {
+    min-width: 0; // Permitir que el texto se ajuste
+    
+    small {
+      font-size: 0.75rem;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      display: inline-block;
     }
   }
 
@@ -77,19 +91,23 @@
 
 // Lista de jugadores dentro del panel
 .players-list {
+  padding: 16px;
+  
   .player-item {
-    border-bottom: 1px solid var(--divider-color);
+    @include mixins.gray-background-blue-text();
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    
     &:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
   }
 
-  .player-avatar .rounded-circle {
+  .player-avatar .player-photo {
     width: 40px;
     height: 40px;
-    object-fit: cover;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    @include mixins.square-rounded-image($border-radius: 8px, $border-width: 2px);
   }
 
   .badge.bg-secondary {
