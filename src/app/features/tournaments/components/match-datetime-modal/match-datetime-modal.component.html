@@ -40,13 +40,15 @@
         <div class="form-column">
           <mat-form-field appearance="outline" class="full-width time-field">
             <mat-label>Hora del Partido</mat-label>
-            <mat-select formControlName="matchTime" 
-                       placeholder="Seleccionar hora">
-              <mat-option *ngFor="let time of timeOptions" [value]="time">
-                {{ time }}
-              </mat-option>
-            </mat-select>
-            <mat-icon matSuffix>schedule</mat-icon>
+            <input matInput 
+                   [matTimepicker]="timePicker" 
+                   formControlName="matchTime"
+                   placeholder="Seleccionar hora"
+                   readonly>
+            <mat-timepicker-toggle matIconSuffix [for]="timePicker">
+              <mat-icon matTimepickerToggleIcon>schedule</mat-icon>
+            </mat-timepicker-toggle>
+            <mat-timepicker #timePicker interval="15m"></mat-timepicker>
             <mat-error *ngIf="dateTimeForm.get('matchTime')?.hasError('required')">
               La hora es requerida
             </mat-error>

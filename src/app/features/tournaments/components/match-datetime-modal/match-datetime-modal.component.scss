@@ -194,20 +194,33 @@
       }
     }
     
-    // Select de tiempo
-    .mat-mdc-select {
-      font-family: 'Roboto', sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-      
-      .mat-mdc-select-trigger {
-        min-height: 1.5em;
-        display: flex;
-        align-items: center;
+    // Timepicker nativo
+    .mat-mdc-form-field.time-field {
+      .mat-mdc-form-field-infix {
+        min-height: 2em;
       }
       
-      .mat-mdc-select-value {
+      input[matTimepicker] {
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
         line-height: 1.5;
+        cursor: pointer;
+      }
+    }
+    
+    // Timepicker toggle
+    .mat-timepicker-toggle {
+      .mat-icon-button {
+        width: 40px;
+        height: 40px;
+        
+        &:hover {
+          background-color: rgba(25, 118, 210, 0.1);
+        }
+        
+        .mat-icon {
+          color: #1976d2;
+        }
       }
     }
   }
@@ -250,6 +263,10 @@
   .mat-calendar {
     .mat-calendar-header {
       padding: 8px 16px;
+      
+      .mat-calendar-period-button {
+        font-weight: 500;
+      }
     }
     
     .mat-calendar-content {
@@ -260,40 +277,60 @@
       width: 32px;
       height: 32px;
       line-height: 32px;
+      border-radius: 50%;
+      
+      &:hover {
+        background-color: rgba(25, 118, 210, 0.1);
+      }
+    }
+    
+    .mat-calendar-body-selected {
+      background-color: #1976d2;
+      color: white;
+    }
+    
+    .mat-calendar-body-today {
+      border: 1px solid #1976d2;
     }
   }
 }
 
 // Backdrop específico para datepicker
-::ng-deep .cdk-overlay-backdrop.mat-datepicker-popup-backdrop {
+::ng-deep .cdk-overlay-backdrop.mat-datepicker-backdrop {
   z-index: 1099 !important;
 }
 
-// Estilos globales para el select dropdown
-::ng-deep .mat-mdc-select-panel {
+// Estilos globales para el timepicker popup
+::ng-deep .mat-timepicker-popup {
   z-index: 1101 !important;
-  max-height: 300px;
-  overflow-y: auto;
   position: relative;
   
-  .mat-mdc-option {
-    height: 48px;
-    line-height: 48px;
-    padding: 0 16px;
-    font-size: 14px;
+  .mat-timepicker-content {
+    max-height: 300px;
+    overflow-y: auto;
     
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
-    
-    &.mat-mdc-option-active {
-      background-color: rgba(25, 118, 210, 0.12);
+    .mat-timepicker-option {
+      height: 48px;
+      line-height: 48px;
+      padding: 0 16px;
+      font-size: 14px;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+      
+      &.mat-timepicker-option-selected {
+        background-color: rgba(25, 118, 210, 0.12);
+        color: #1976d2;
+        font-weight: 500;
+      }
     }
   }
 }
 
-// Backdrop específico para select
-::ng-deep .cdk-overlay-backdrop.mat-select-backdrop {
+// Backdrop específico para timepicker
+::ng-deep .cdk-overlay-backdrop.mat-timepicker-backdrop {
   z-index: 1100 !important;
 }
 
