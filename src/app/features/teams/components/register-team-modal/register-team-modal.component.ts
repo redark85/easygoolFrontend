@@ -10,9 +10,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
-import { TeamService, ToastService } from '@core/services';
+import { TeamService as CoreTeamService, ToastService } from '@core/services';
 import { ManagerTeam } from '@core/models';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
+import { TeamService as TournamentTeamService } from '@features/tournaments/services/team.service';
+import { CreateTeamRequest } from '@features/tournaments/models/team.interface';
 
 export interface RegisterTeamModalData {
   tournamentId: number;
@@ -50,7 +52,8 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private teamService: TeamService,
+    private teamService: CoreTeamService,
+    private tournamentTeamService: TournamentTeamService,
     private toastService: ToastService,
     public dialogRef: MatDialogRef<RegisterTeamModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: RegisterTeamModalData
@@ -82,7 +85,7 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
 
   private loadMyTeams(): void {
     this.isLoadingTeams = true;
-    this.teamService.getManagerTeams()
+    this.teamService.getAllManagerTeams()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (teams) => {
@@ -104,6 +107,11 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
     this.newTeamForm.get('logo')?.markAsTouched();
   }
 
+  selectTeam(teamId: number): void {
+    this.existingTeamForm.patchValue({ teamId });
+    this.existingTeamForm.get('teamId')?.markAsTouched();
+  }
+
   onSubmit(): void {
     if (this.selectedTabIndex === 0) {
       this.registerExistingTeam();
@@ -122,15 +130,20 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     const teamId = this.existingTeamForm.value.teamId;
 
-    // TODO: Implementar el servicio para registrar equipo existente en torneo
-    console.log('Registrar equipo existente:', { teamId, tournamentId: this.data.tournamentId });
-    
-    // Simulación temporal
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.toastService.showSuccess('Equipo registrado exitosamente en el torneo');
-      this.dialogRef.close({ success: true, isNewTeam: false, teamId });
-    }, 1000);
+    this.teamService.registerTournamentTeam(this.data.tournamentId, teamId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.toastService.showSuccess('Equipo registrado exitosamente en el torneo');
+          this.dialogRef.close({ success: true, isNewTeam: false, teamId });
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          console.error('Error al registrar equipo:', error);
+          this.toastService.showError(error.message || 'Error al registrar el equipo en el torneo');
+        }
+      });
   }
 
   private registerNewTeam(): void {
@@ -144,7 +157,7 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
     const formValue = this.newTeamForm.value;
     const logoData = formValue.logo as ImageUploadData;
 
-    const teamData = {
+    const teamData: CreateTeamRequest = {
       tournamentId: this.data.tournamentId,
       name: formValue.name,
       shortName: formValue.shortName || '',
@@ -152,15 +165,19 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
       logoContentType: logoData ? this.extractFileExtension(logoData.contentType) : ''
     };
 
-    // TODO: Implementar el servicio para crear y registrar nuevo equipo en torneo
-    console.log('Crear y registrar nuevo equipo:', teamData);
-    
-    // Simulación temporal
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.toastService.showSuccess('Equipo creado y registrado exitosamente en el torneo');
-      this.dialogRef.close({ success: true, isNewTeam: true, teamData });
-    }, 1000);
+    this.tournamentTeamService.createTeam(teamData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (team) => {
+          this.isSubmitting = false;
+          this.dialogRef.close({ success: true, isNewTeam: true, team });
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          console.error('Error al crear equipo:', error);
+          // El toast de error ya se muestra en el servicio
+        }
+      });
   }
 
   onCancel(): void {

@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { ApiResponse } from '../models/api.interface';
 import { ManagerTeam, ManagerTeamsResponse } from '../models/team.interface';
-import { MANAGER_GET_TEAMS_ENDPOINT, MANAGER_TOKEN_VALIDATION_ENDPOINT } from '../config/endpoints';
+import { MANAGER_GET_TEAMS_ENDPOINT, MANAGER_TOKEN_VALIDATION_ENDPOINT, MANAGER_GET_ALL_TEAMS_ENDPOINT, MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT } from '../config/endpoints';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +38,39 @@ export class TeamService {
           return response.result;
         }
         return null;
+      })
+    );
+  }
+
+  /**
+   * Obtiene todos los equipos del manager (sin filtro de torneo)
+   * @returns Observable con array de equipos
+   */
+  getAllManagerTeams(): Observable<ManagerTeam[]> {
+    return this.apiService.get<ManagerTeamsResponse>(MANAGER_GET_ALL_TEAMS_ENDPOINT).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        return [];
+      })
+    );
+  }
+
+  /**
+   * Registra un equipo existente en un torneo
+   * @param tournamentId ID del torneo
+   * @param teamId ID del equipo a registrar
+   * @returns Observable con la respuesta
+   */
+  registerTournamentTeam(tournamentId: number, teamId: number): Observable<void> {
+    const body = { tournamentId, teamId };
+    return this.apiService.post<ApiResponse<void>>(MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT, body).pipe(
+      map(response => {
+        if (!response.succeed) {
+          throw new Error(response.message || 'Error al registrar equipo en el torneo');
+        }
+        return void 0;
       })
     );
   }

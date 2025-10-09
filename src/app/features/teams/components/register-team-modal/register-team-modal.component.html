@@ -1,13 +1,12 @@
 <div class="register-team-modal">
-  <h2 mat-dialog-title>
-    <mat-icon>sports_soccer</mat-icon>
-    Registrar Equipo en Torneo
-  </h2>
-
   <!-- Tournament Info Banner -->
   <div class="tournament-info">
     <img [src]="data.tournamentImageUrl" [alt]="data.tournamentName" class="tournament-logo">
     <div class="tournament-details">
+      <h2 class="modal-title">
+        <mat-icon>sports_soccer</mat-icon>
+        Registrar Equipo en Torneo
+      </h2>
       <h3>{{ data.tournamentName }}</h3>
       <p>Selecciona un equipo existente o crea uno nuevo</p>
     </div>
@@ -18,32 +17,38 @@
       <!-- Tab 1: Equipo Existente -->
       <mat-tab label="Equipo Existente">
         <div class="tab-content">
-          <form [formGroup]="existingTeamForm">
-            <div *ngIf="isLoadingTeams" class="loading-container">
-              <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
-              <p>Cargando tus equipos...</p>
-            </div>
+          <div *ngIf="isLoadingTeams" class="loading-container">
+            <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+            <p>Cargando tus equipos...</p>
+          </div>
 
-            <div *ngIf="!isLoadingTeams && myTeams.length === 0" class="no-teams">
-              <mat-icon>info</mat-icon>
-              <p>No tienes equipos registrados aún.</p>
-              <p>Crea un nuevo equipo en la pestaña "Nuevo Equipo"</p>
-            </div>
+          <div *ngIf="!isLoadingTeams && myTeams.length === 0" class="no-teams">
+            <mat-icon>info</mat-icon>
+            <p>No tienes equipos registrados aún.</p>
+            <p>Crea un nuevo equipo en la pestaña "Nuevo Equipo"</p>
+          </div>
 
-            <mat-form-field *ngIf="!isLoadingTeams && myTeams.length > 0" appearance="outline" class="w-100">
-              <mat-label>Selecciona un Equipo</mat-label>
-              <mat-select formControlName="teamId">
-                <mat-option *ngFor="let team of myTeams" [value]="team.id">
-                  <div class="team-option">
-                    <img [src]="team.logoUrl || 'assets/logo.png'" [alt]="team.name" class="team-logo-small">
-                    <span>{{ team.name }}</span>
-                  </div>
-                </mat-option>
-              </mat-select>
-              <mat-icon matSuffix>sports_soccer</mat-icon>
-              <mat-error *ngIf="teamIdErrors">{{ teamIdErrors }}</mat-error>
-            </mat-form-field>
-          </form>
+          <div *ngIf="!isLoadingTeams && myTeams.length > 0" class="teams-list">
+            <div
+              *ngFor="let team of myTeams"
+              class="team-card"
+              [class.selected]="existingTeamForm.get('teamId')?.value === team.id"
+              (click)="selectTeam(team.id)">
+              <div class="team-logo-container">
+                <img [src]="team.logoUrl || 'assets/logo.png'" [alt]="team.name" class="team-logo">
+              </div>
+              <div class="team-info">
+                <h4 class="team-name">{{ team.name }}</h4>
+                <p class="team-short-name" *ngIf="team.shortName">{{ team.shortName }}</p>
+              </div>
+              <mat-icon class="check-icon" *ngIf="existingTeamForm.get('teamId')?.value === team.id">check_circle</mat-icon>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoadingTeams && myTeams.length > 0 && teamIdErrors" class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ teamIdErrors }}</span>
+          </div>
         </div>
       </mat-tab>
 
