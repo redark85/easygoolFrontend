@@ -137,12 +137,23 @@
                             (click)="$event.stopPropagation()">
                       <mat-icon>upload_file</mat-icon>
                     </button>
+                    <!-- Botón para descalificar (solo si está activo) -->
                     <button mat-icon-button
+                            *ngIf="canDisqualifyTeam(team)"
                             (click)="disqualifyTeam(team); $event.stopPropagation()"
-                            [disabled]="!canDisqualifyTeam(team)"
-                            [matTooltip]="canDisqualifyTeam(team) ? 'Descalificar equipo' : 'Equipo ya descalificado'"
-                            [class]="canDisqualifyTeam(team) ? 'text-warning' : 'text-muted'">
+                            matTooltip="Descalificar equipo"
+                            class="text-warning">
                       <mat-icon>gavel</mat-icon>
+                    </button>
+                    
+                    <!-- Botón para reactivar (solo si está descalificado) -->
+                    <button mat-icon-button
+                            *ngIf="canReactivateTeam(team)"
+                            (click)="reactivateTeam(team); $event.stopPropagation()"
+                            matTooltip="Volver a validar equipo"
+                            class="reactivate-team-btn"
+                            style="color: #4caf50;">
+                      <mat-icon>verified</mat-icon>
                     </button>
                     <button mat-icon-button
                             *ngIf="!team.hasUsedLink"

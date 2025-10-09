@@ -194,14 +194,25 @@
                         </div>
 
                         <div class="team-actions">
+                          <!-- Botón para descalificar (solo si está activo) -->
                           <button mat-icon-button
+                                  *ngIf="canDisqualifyTeam(team)"
                                   (click)="disqualifyTeam(team, group)"
-                                  [disabled]="!canDisqualifyTeam(team)"
-                                  [matTooltip]="canDisqualifyTeam(team) ? 'Descalificar equipo' : 'Equipo ya descalificado'"
-                                  [class]="canDisqualifyTeam(team) ? 'text-warning' : 'text-muted'"
-                                  class="disqualify-team-btn">
+                                  matTooltip="Descalificar equipo"
+                                  class="disqualify-team-btn text-warning">
                             <mat-icon>gavel</mat-icon>
                           </button>
+                          
+                          <!-- Botón para reactivar (solo si está descalificado) -->
+                          <button mat-icon-button
+                                  *ngIf="canReactivateTeam(team)"
+                                  (click)="reactivateTeam(team, group)"
+                                  matTooltip="Volver a validar equipo"
+                                  class="reactivate-team-btn"
+                                  style="color: #4caf50;">
+                            <mat-icon>verified</mat-icon>
+                          </button>
+                          
                           <button mat-icon-button
                                   color="warn"
                                   (click)="removeTeamFromGroup(team, group)"
@@ -243,14 +254,25 @@
                         </div>
                       </div>
                       <div class="team-actions-knockout">
+                        <!-- Botón para descalificar (solo si está activo) -->
                         <button mat-icon-button
-                                  (click)="disqualifyTeam(team)"
-                                  [disabled]="!canDisqualifyTeam(team)"
-                                  [matTooltip]="canDisqualifyTeam(team) ? 'Descalificar equipo' : 'Equipo ya descalificado'"
-                                  [class]="canDisqualifyTeam(team) ? 'text-warning' : 'text-muted'"
-                                  class="disqualify-team-btn">
-                            <mat-icon>gavel</mat-icon>
-                          </button>
+                                *ngIf="canDisqualifyTeam(team)"
+                                (click)="disqualifyTeam(team)"
+                                matTooltip="Descalificar equipo"
+                                class="disqualify-team-btn text-warning">
+                          <mat-icon>gavel</mat-icon>
+                        </button>
+                        
+                        <!-- Botón para reactivar (solo si está descalificado) -->
+                        <button mat-icon-button
+                                *ngIf="canReactivateTeam(team)"
+                                (click)="reactivateTeam(team)"
+                                matTooltip="Volver a validar equipo"
+                                class="reactivate-team-btn"
+                                style="color: #4caf50;">
+                          <mat-icon>verified</mat-icon>
+                        </button>
+                        
                         <button mat-icon-button
                                 color="warn"
                                 (click)="removeTeamFromPhase(team, phase)"

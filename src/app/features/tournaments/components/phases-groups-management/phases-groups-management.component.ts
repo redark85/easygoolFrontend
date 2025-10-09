@@ -50,7 +50,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
 
   // Control de expansión de grupos
   expandedGroupIndex: number = -1;
-  
+
   // Loading states
   isLoadingPhases = false;
 
@@ -259,7 +259,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
     const phase = this.phases.find(p => p.id === phaseId);
     const phaseGroups = this.getPhaseGroups(phase);
     const group = phaseGroups.find((g: Group) => g.id === groupId);
-    
+
     if (!phase || !group) {
       console.error('Phase or group not found');
       return;
@@ -341,7 +341,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
             timer: 3000,
             showConfirmButton: false
         });
-        return;        
+        return;
     }
 
     this.teamService.assignRandomTeams(phase.id).subscribe({
@@ -407,7 +407,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
   loadPhases(): void {
     this.isLoadingPhases = true;
     this.cdr.detectChanges();
-    
+
     this.phaseService.getPhasesByTournament(this.tournamentId).subscribe({
       next: (phases) => {
         this.phases = phases;
@@ -572,6 +572,49 @@ export class PhasesGroupsManagementComponent implements OnInit {
   }
 
   /**
+   * Verifica si un equipo puede ser reactivado
+   * @param team Equipo a verificar
+   * @returns true si puede ser reactivado
+   */
+  canReactivateTeam(team: Team): boolean {
+    return team.status === TeamStatus.Disqualified;
+  }
+
+  /**
+   * Reactiva un equipo descalificado con confirmación
+   * @param team Equipo a reactivar
+   * @param group Grupo del equipo (opcional)
+   */
+  reactivateTeam(team: Team, group?: Group): void {
+    Swal.fire({
+      title: '¿Volver a validar el equipo?',
+      html: `¿Estás seguro de que deseas reactivar al equipo <strong>"${team.name}"</strong>?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#4caf50',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, reactivar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Por ahora solo cerramos el alert como solicitado
+        // TODO: Implementar API call cuando esté disponible
+        console.log('Reactivating team:', team.name);
+
+        // Simulamos éxito por ahora
+        Swal.fire({
+          title: '¡Equipo reactivado!',
+          text: `El equipo "${team.name}" ha sido reactivado exitosamente`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  /**
    * Quita un equipo del grupo con confirmación
    * @param team Equipo a quitar
    * @param group Grupo del equipo
@@ -639,7 +682,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       case TeamStatus.Active:
         return 'status-badge status-active';
       case TeamStatus.Disqualified:
-        return 'status-badge status-disqualified';
+        return 'status-badge status-reactivate'; // Verde para indicar que puede ser reactivado
       case TeamStatus.Deleted:
         return 'status-badge status-deleted';
       default:
@@ -677,7 +720,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       case TeamStatus.Active:
         return 'check_circle';
       case TeamStatus.Disqualified:
-        return 'gavel';
+        return 'verified'; // Ícono de validación para equipos descalificados
       case TeamStatus.Deleted:
         return 'delete';
       default:

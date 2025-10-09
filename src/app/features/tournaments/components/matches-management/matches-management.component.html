@@ -16,8 +16,12 @@
               class="fab-create-match"
               (click)="createMatch()"
               [matTooltip]="getFabButtonText()"
-              [disabled]="!selectedPhaseId">
-        <mat-icon>add</mat-icon>
+              [disabled]="!selectedPhaseId || loading || isCreatingMatchDay">
+        <mat-icon *ngIf="!loading && !isCreatingMatchDay">add</mat-icon>
+        <mat-progress-spinner *ngIf="loading || isCreatingMatchDay" 
+                              diameter="24" 
+                              mode="indeterminate">
+        </mat-progress-spinner>
       </button>
 
       <!-- Phase and Group Selection Container - Centered -->

@@ -265,15 +265,36 @@
     }
   }
 
-  .loading-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  // Estilos específicos para botones con loading
+  button {
+    .loading-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      min-height: 20px;
+      width: 100%;
 
-    mat-progress-spinner {
-      ::ng-deep circle {
-        stroke: currentColor;
+      mat-progress-spinner {
+        flex-shrink: 0;
+        
+        ::ng-deep circle {
+          stroke: currentColor;
+        }
       }
+
+      span {
+        white-space: nowrap;
+        font-size: 0.875rem;
+        line-height: 1;
+      }
+    }
+
+    // Asegurar que el botón tenga suficiente padding
+    &[mat-flat-button] {
+      padding: 0 16px;
+      min-width: 120px;
+      height: 40px;
     }
   }
 }

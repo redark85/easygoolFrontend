@@ -28,7 +28,7 @@
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Tipo de Fase</mat-label>
-              <mat-select formControlName="phaseType" 
+              <mat-select formControlName="phaseType"
                          (selectionChange)="onPhaseTypeChange($event)">
                 <mat-option
                   *ngFor="let option of phaseTypeOptions"
@@ -47,8 +47,8 @@
           <div class="col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Tipo de Fase</mat-label>
-              <input matInput 
-                     [value]="getPhaseTypeLabel(data.phase.phaseType)" 
+              <input matInput
+                     [value]="getPhaseTypeLabel(data.phase.phaseType)"
                      readonly
                      disabled>
               <mat-icon matSuffix>category</mat-icon>
@@ -76,7 +76,7 @@
       <span *ngIf="!isSubmitting">{{ isEdit ? 'Actualizar' : 'Crear' }} Fase</span>
       <span *ngIf="isSubmitting" class="loading-content">
         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-        <span>Procesando...</span>
+<!--        <span>Procesando...</span>-->
       </span>
     </button>
   </mat-dialog-actions>

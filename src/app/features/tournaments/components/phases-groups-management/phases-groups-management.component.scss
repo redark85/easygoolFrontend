@@ -486,6 +486,11 @@
     background-color: #f44336; // Rojo para descalificado
   }
 
+  &.status-reactivate {
+    background-color: #4caf50; // Verde para indicar que puede ser reactivado
+    animation: pulse-green 2s infinite; // Animación para llamar la atención
+  }
+
   &.status-deleted {
     background-color: #9e9e9e; // Gris para eliminado
   }

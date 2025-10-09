@@ -488,3 +488,8 @@ html, body {
   overflow-y: auto !important;
   max-height: 700px !important;
 }
+
+.mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background, .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+  border-color: var(--primary-dark) !important;
+  background-color: var(--primary-dark) !important;
+}

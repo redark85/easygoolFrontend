@@ -437,6 +437,39 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Reactiva un equipo descalificado con confirmación
+   * @param team Equipo a reactivar
+   */
+  reactivateTeam(team: Team): void {
+    Swal.fire({
+      title: '¿Volver a validar el equipo?',
+      html: `¿Estás seguro de que deseas reactivar al equipo <strong>"${team.name}"</strong>?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#4caf50',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, reactivar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Por ahora solo cerramos el alert como solicitado
+        // TODO: Implementar API call cuando esté disponible
+        console.log('Reactivating team:', team.name);
+
+        // Simulamos éxito por ahora
+        Swal.fire({
+          title: '¡Equipo reactivado!',
+          text: `El equipo "${team.name}" ha sido reactivado exitosamente`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  /**
    * Obtiene la clase CSS para el badge de estado del equipo
    * @param status Estado del equipo
    * @returns Clase CSS correspondiente
@@ -446,7 +479,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       case TeamStatus.Active:
         return 'status-badge status-active';
       case TeamStatus.Disqualified:
-        return 'status-badge status-disqualified';
+        return 'status-badge status-reactivate'; // Verde para indicar que puede ser reactivado
       case TeamStatus.Deleted:
         return 'status-badge status-deleted';
       default:
@@ -482,7 +515,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       case TeamStatus.Active:
         return 'check_circle';
       case TeamStatus.Disqualified:
-        return 'gavel';
+        return 'verified'; // Ícono de validación para equipos descalificados
       case TeamStatus.Deleted:
         return 'delete';
       default:
@@ -497,6 +530,15 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
    */
   canDisqualifyTeam(team: Team): boolean {
     return team.status === TeamStatus.Active;
+  }
+
+  /**
+   * Verifica si un equipo puede ser reactivado
+   * @param team Equipo a verificar
+   * @returns true si puede ser reactivado
+   */
+  canReactivateTeam(team: Team): boolean {
+    return team.status === TeamStatus.Disqualified;
   }
 
   /**

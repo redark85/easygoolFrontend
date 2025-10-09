@@ -145,7 +145,7 @@
               </span>
               <span *ngIf="isCreatingPhase" class="loading-content">
                 <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-                Creando...
+                <span>Creando...</span>
               </span>
             </button>
           </mat-card-actions>
@@ -210,7 +210,7 @@
                       </span>
                       <span *ngIf="isCreatingGroup" class="loading-content">
                         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-                        Creando...
+                        <span>Creando...</span>
                       </span>
                     </button>
                   </mat-card-actions>
@@ -241,7 +241,7 @@
       <span *ngIf="!isSubmitting">{{ submitButtonText }}</span>
       <span *ngIf="isSubmitting" class="loading-content">
         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-        <span>Procesando...</span>
+<!--        <span>Procesando...</span>-->
       </span>
     </button>
 
