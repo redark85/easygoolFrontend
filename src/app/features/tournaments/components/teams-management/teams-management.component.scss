@@ -210,6 +210,33 @@
     }
   }
 
+  .download-example-btn {
+    font-size: 12px;
+    padding: 8px 16px;
+    min-width: auto;
+    white-space: nowrap;
+    
+    mat-icon {
+      margin-right: 4px;
+      font-size: 16px;
+    }
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    // Responsive para móviles
+    @media (max-width: 768px) {
+      font-size: 10px;
+      padding: 6px 12px;
+      
+      mat-icon {
+        font-size: 14px;
+      }
+    }
+  }
+
   .team-panel {
     margin-bottom: 12px;
 
@@ -549,21 +576,12 @@
     padding: 0 8px;
   }
 
-  .fab-fixed {
-    bottom: 16px;
-    right: 16px;
-  }
-
-  .teams-list {
-    padding-bottom: 60px;
-  }
-
-  // Ajustes para expansion panels en móvil
-  .team-panel {
-    .mat-expansion-panel-header {
-      min-height: 90px; // Aumentar aún más en móvil para mejor visualización
-      padding: 8px 12px;
-
+  .search-field {
+    width: 250px;
+    margin-bottom: 0;
+    
+    .mat-mdc-form-field-wrapper {
+      padding-bottom: 0;
       .mat-content {
         min-height: 70px;
       }

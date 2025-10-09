@@ -43,7 +43,7 @@
         <div class="document-icon-container">
           <mat-icon class="document-icon">description</mat-icon>
         </div>
-        
+
         <div class="document-info">
           <div class="document-name">
             <span class="file-name">{{ getFileDisplayName() }}</span>
@@ -55,11 +55,6 @@
         </div>
 
         <div class="document-actions">
-          <button mat-icon-button class="change-btn" (click)="fileInput.click()"
-                  [disabled]="isDisabled"
-                  matTooltip="Cambiar archivo">
-            <mat-icon>edit</mat-icon>
-          </button>
           <button mat-icon-button class="remove-btn" (click)="removeDocument()"
                   [disabled]="isDisabled"
                   matTooltip="Eliminar archivo">
@@ -67,7 +62,7 @@
           </button>
         </div>
       </div>
-      
+
       <input type="file" #fileInput (change)="onFileSelected($event)"
              [accept]="acceptAttribute"
              [disabled]="isDisabled" hidden>

@@ -1,2 +1,3 @@
-// Barrel export para utilidades compartidas
+// Shared Utils Barrel
+export * from './file-download.util';
 export * from './phone-validator.util';

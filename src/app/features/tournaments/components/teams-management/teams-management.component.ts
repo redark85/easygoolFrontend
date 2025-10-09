@@ -17,15 +17,18 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { Team, TeamStatus } from '../../models/team.interface';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { TeamFormComponent } from '../team-form/team-form.component';
 import { PlayerFormComponent } from '../player-form/player-form.component';
 import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
-import { Player, PlayerFormData, PlayerModalResult } from '../../../../core/models/player.interface';
-import { DocumentUploadModalComponent, DocumentUploadModalData, DocumentUploadModalResult } from '../../../../shared/components/document-upload-modal/document-upload-modal.component';
 import { DocumentUploadService } from '../../../../shared/services/document-upload.service';
+import { DocumentUploadModalComponent, DocumentUploadModalData, DocumentUploadModalResult } from '../../../../shared/components/document-upload-modal/document-upload-modal.component';
+import { FileDownloadUtil } from '../../../../shared/utils/file-download.util';
+
+// Importaciones de interfaces y modelos
+import { Team, TeamStatus } from '../../models/team.interface';
+import { Player, PlayerFormData, PlayerModalResult } from '../../../../core/models/player.interface';
 import Swal from 'sweetalert2';
 
 export interface TeamFormData {
@@ -287,7 +290,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
       reverseButtons: true
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         this.teamService.removeTeam(team.id).pipe(
           takeUntil(this.destroy$)
@@ -410,7 +413,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Sí, descalificar',
       cancelButtonText: 'Cancelar',
       reverseButtons: true
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         this.teamService.disqualifyTeam(team.id).pipe(
           takeUntil(this.destroy$)
@@ -453,7 +456,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Sí, reactivar',
       cancelButtonText: 'Cancelar',
       reverseButtons: true
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         // Por ahora solo cerramos el alert como solicitado
         // TODO: Implementar API call cuando esté disponible
@@ -557,7 +560,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Confirmar',
       cancelButtonText: 'Cancelar',
       reverseButtons: true
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         // Usuario confirmó, cambiar el switch y proceder con la API
         event.source.checked = isChecked;
@@ -703,6 +706,40 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  /**
+   * Descarga el archivo de ejemplo de Excel para equipos
+   */
+  async downloadExampleExcel(): Promise<void> {
+    try {
+      const success = await FileDownloadUtil.downloadTeamExampleFile();
+      
+      if (success) {
+        Swal.fire({
+          title: '¡Descarga iniciada!',
+          text: 'El archivo de ejemplo se está descargando',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } else {
+        Swal.fire({
+          title: 'Error en la descarga',
+          text: 'No se pudo descargar el archivo de ejemplo',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      }
+    } catch (error) {
+      console.error('Error downloading example file:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Ocurrió un error al intentar descargar el archivo',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    }
   }
 
   /**
