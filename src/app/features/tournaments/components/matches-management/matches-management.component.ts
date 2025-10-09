@@ -180,8 +180,17 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     this.selectedGroupId = null;
     this.matchDays = [];
     
-    // Consumir API para cargar grupos de la fase seleccionada
-    this.loadGroupsForPhase(phaseId, true);
+    // Buscar la fase seleccionada
+    const selectedPhase = this.phases.find(p => p.id === phaseId);
+    
+    if (selectedPhase && selectedPhase.phaseType === PhaseType.Knockout) {
+      // Si es fase eliminatoria (Knockout), cargar partidos directamente
+      console.log('Fase eliminatoria detectada, cargando partidos...');
+      this.loadMatchesByPhase(phaseId);
+    } else {
+      // Si no es eliminatoria, cargar grupos como antes
+      this.loadGroupsForPhase(phaseId, true);
+    }
     
     // Forzar detección de cambios múltiple
     setTimeout(() => {
