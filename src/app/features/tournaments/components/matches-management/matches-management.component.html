@@ -141,6 +141,12 @@
                               <!-- Actions Left -->
                               <div class="match-actions-top">
                                 <button mat-icon-button
+                                        (click)="updateMatchDate(match)"
+                                        matTooltip="Actualizar fecha"
+                                        class="action-btn-mini update-date">
+                                  <mat-icon>calendar_today</mat-icon>
+                                </button>
+                                <button mat-icon-button
                                         (click)="changeMatchStatus(match)"
                                         matTooltip="Cambiar estado"
                                         class="action-btn-mini change-status">
@@ -188,45 +194,14 @@
                               <!-- VS Section -->
                               <div class="vs-section">
                                 <span class="vs-text">VS</span>
-                                
-                                <!-- Date Section with Overlay Input -->
-                                <div class="match-date" matTooltip="Click para cambiar fecha">
+                                <div class="match-date">
                                   <mat-icon class="date-icon">calendar_today</mat-icon>
-                                  <div class="input-overlay">
-                                    <span class="date-text" 
-                                          [style.display]="isEditingDate(match.id) ? 'none' : 'block'">
-                                      {{ formatMatchDate(match.matchDate) }}
-                                    </span>
-                                    <input type="date" 
-                                           [id]="'date-' + match.id"
-                                           [value]="getDateInputValue(match.matchDate)"
-                                           (change)="onDateChange(match, $event)"
-                                           (blur)="setEditingDate(match.id, false)"
-                                           (focus)="setEditingDate(match.id, true)"
-                                           (click)="setEditingDate(match.id, true)"
-                                           class="date-input">
-                                  </div>
+                                  <span class="date-text">{{ formatMatchDate(match.matchDate) }}</span>
                                 </div>
-                                
-                                <!-- Time Section with Overlay Input -->
-                                <div class="match-time" matTooltip="Click para cambiar hora">
+                                <div class="match-time">
                                   <mat-icon class="time-icon">schedule</mat-icon>
-                                  <div class="input-overlay">
-                                    <span class="time-text" 
-                                          [style.display]="isEditingTime(match.id) ? 'none' : 'block'">
-                                      {{ formatMatchTime(match.matchTime || match.matchDate) }}
-                                    </span>
-                                    <input type="time" 
-                                           [id]="'time-' + match.id"
-                                           [value]="getTimeInputValue(match.matchTime || match.matchDate)"
-                                           (change)="onTimeChange(match, $event)"
-                                           (blur)="setEditingTime(match.id, false)"
-                                           (focus)="setEditingTime(match.id, true)"
-                                           (click)="setEditingTime(match.id, true)"
-                                           class="time-input">
-                                  </div>
+                                  <span class="time-text">{{ formatMatchTime(match.matchTime || match.matchDate) }}</span>
                                 </div>
-                                
                                 <div class="match-venue">
                                   <span class="venue-text">{{ match.venue || 'Estadio Principal' }}</span>
                                 </div>
