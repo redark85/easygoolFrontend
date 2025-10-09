@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TeamService, ToastService } from '@core/services';
 import { ManagerTeam } from '@core/models';
 import { Subject, takeUntil } from 'rxjs';
+import { RegisterTeamModalComponent, RegisterTeamModalData } from '../register-team-modal/register-team-modal.component';
 
 @Component({
   selector: 'app-my-teams',
@@ -38,7 +40,8 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
     private teamService: TeamService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private dialog: MatDialog
   ) {
     // Capturar el token del history.state (persiste después de la navegación)
     const state = this.router.getCurrentNavigation()?.extras?.state || window.history.state;
@@ -50,12 +53,77 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Mostrar mensaje si hay token
+    // Validar token si existe
     if (this.tournamentToken) {
-      this.toastService.showInfo(`Token de torneo recibido: ${this.tournamentToken}`);
-      console.log('Tournament Token:', this.tournamentToken);
+      this.validateTournamentToken(this.tournamentToken);
     }
     this.loadTeams();
+  }
+
+  /**
+   * Valida el token del torneo y obtiene información
+   */
+  private validateTournamentToken(token: string): void {
+    this.teamService.validateTournamentToken(token)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentInfo) => {
+          if (tournamentInfo && tournamentInfo.id > 0) {
+            console.log('Información del torneo:', tournamentInfo);
+            this.toastService.showSuccess(`Token validado para el torneo: ${tournamentInfo.name}`);
+            // Abrir modal para registrar equipo
+            this.openRegisterTeamModal(tournamentInfo);
+          } else {
+            this.tournamentToken = null;
+            if (window.history.state && window.history.state['tournamentToken']) {
+              const newState = { ...window.history.state };
+              delete newState['tournamentToken'];
+              window.history.replaceState(newState, '');
+            }
+          }
+        },
+        error: (error) => {
+            this.tournamentToken = null;
+            if (window.history.state && window.history.state['tournamentToken']) {
+              const newState = { ...window.history.state };
+              delete newState['tournamentToken'];
+              window.history.replaceState(newState, '');
+            }
+        }
+      });
+  }
+
+  /**
+   * Abre el modal para registrar un equipo en el torneo
+   */
+  private openRegisterTeamModal(tournamentInfo: { id: number; name: string; imageUrl: string }): void {
+    const dialogData: RegisterTeamModalData = {
+      tournamentId: tournamentInfo.id,
+      tournamentName: tournamentInfo.name,
+      tournamentImageUrl: tournamentInfo.imageUrl
+    };
+
+    const dialogRef = this.dialog.open(RegisterTeamModalComponent, {
+      width: '600px',
+      disableClose: true,
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        console.log('Equipo registrado:', result);
+        // Recargar la lista de equipos
+        this.loadTeams();
+        // Limpiar el token del state después de cerrar el modal
+        this.tournamentToken = null;
+        if (window.history.state && window.history.state['tournamentToken']) {
+          const newState = { ...window.history.state };
+          delete newState['tournamentToken'];
+          window.history.replaceState(newState, '');
+        }
+      }
+      
+    });
   }
 
   ngOnDestroy(): void {

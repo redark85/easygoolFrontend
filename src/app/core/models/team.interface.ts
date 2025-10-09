@@ -7,7 +7,7 @@ export interface TeamTournament {
 
 export interface ManagerTeam {
   id: number;
-  teamName: string;
+  name: string;
   shortName: string;
   logoUrl: string;
   tournaments: TeamTournament[];
