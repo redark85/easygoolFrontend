@@ -751,19 +751,6 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
-   * Actualiza la fecha de un partido
-   */
-  updateMatchDate(match: any): void {
-    // Implementar lógica para actualizar fecha del partido
-    console.log('Updating match date for:', match);
-  }
-
-  /**
-   * Cambia el estado de un partido
-   */
-  changeMatchStatus(match: any): void {
-    // Implementar lógica para cambiar estado del partido
-    console.log('Changing match status for:', match);
   }
 
   /**
@@ -820,5 +807,61 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           });
       }
     });
+  }
+
+  /**
+   * Formatea la fecha del partido
+   */
+  formatMatchDate(dateString: string): string {
+    if (!dateString || dateString === '0001-01-01T00:00:00') {
+      return 'Por definir';
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Fecha inválida';
+    
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short'
+    });
+  }
+
+  /**
+   * Formatea la hora del partido
+   */
+  formatMatchTime(timeString?: string): string {
+    if (!timeString) {
+      return '15:00h';
+    }
+    
+    // Si es una fecha completa, extraer solo la hora
+    if (timeString.includes('T')) {
+      const date = new Date(timeString);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit'
+        }) + 'h';
+      }
+    }
+    
+    // Si ya es solo hora, formatear
+    return timeString.includes('h') ? timeString : timeString + 'h';
+  }
+
+  /**
+   * Actualiza la fecha de un partido
+   */
+  updateMatchDate(match: any): void {
+    // Implementar lógica para actualizar fecha del partido
+    console.log('Updating match date for:', match);
+  }
+
+  /**
+   * Cambia el estado de un partido
+   */
+  changeMatchStatus(match: any): void {
+    // Implementar lógica para cambiar estado del partido
+    console.log('Changing match status for:', match);
   }
 }

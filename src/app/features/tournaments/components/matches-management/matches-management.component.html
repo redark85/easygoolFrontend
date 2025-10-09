@@ -194,12 +194,16 @@
                               <!-- VS Section -->
                               <div class="vs-section">
                                 <span class="vs-text">VS</span>
+                                <div class="match-date">
+                                  <mat-icon class="date-icon">calendar_today</mat-icon>
+                                  <span class="date-text">{{ formatMatchDate(match.matchDate) }}</span>
+                                </div>
                                 <div class="match-time">
                                   <mat-icon class="time-icon">schedule</mat-icon>
-                                  <span class="time-text">15:00h</span>
+                                  <span class="time-text">{{ formatMatchTime(match.matchTime || match.matchDate) }}</span>
                                 </div>
                                 <div class="match-venue">
-                                  <span class="venue-text">Estadio Principal</span>
+                                  <span class="venue-text">{{ match.venue || 'Estadio Principal' }}</span>
                                 </div>
                               </div>
 

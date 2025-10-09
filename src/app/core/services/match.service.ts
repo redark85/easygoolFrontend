@@ -17,9 +17,13 @@ export interface MatchInfo {
   homeTeam: string;
   awayTeam: string;
   matchDate: string;
+  matchTime?: string;
   status: number;
   homeTeamLogoUrl? : string;
   awayTeamLogoUrl? : string;
+  venue?: string;
+  homeScore?: number;
+  awayScore?: number;
 }
 
 export interface MatchesByGroupResponse {
