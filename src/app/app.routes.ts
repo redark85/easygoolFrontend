@@ -85,9 +85,15 @@ export const routes: Routes = [
     loadComponent: () => import('./features/fixture-viewer/fixture-viewer.component').then(c => c.FixtureViewerComponent)
   },
   
-  // Wildcard route - redirect to landing
+  // Not Found page
+  {
+    path: 'not-found',
+    loadComponent: () => import('./features/not-found/not-found.component').then(c => c.NotFoundComponent)
+  },
+  
+  // Wildcard route - redirect to not found
   { 
     path: '**', 
-    redirectTo: '/' 
+    redirectTo: '/not-found' 
   }
 ];

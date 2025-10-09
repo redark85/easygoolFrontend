@@ -100,7 +100,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.loadingTournament = false;
-          console.error('Error al cargar torneo:', error);
+          if (error.response.data.messageId === 'EGOL_121') {
+              this.router.navigate(['/not-found']);
+          }
         }
       });
   }
@@ -284,7 +286,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
               next: () => {
                 // Login automático exitoso, el servicio ya maneja la navegación
                  const loginData: LoginRequest = { userName: email, password: password };
-                this.authService.login(loginData).subscribe({
+                this.authService.login(loginData, this.tokenFromUrl).subscribe({
                     next: (response) => {
                     
                     },

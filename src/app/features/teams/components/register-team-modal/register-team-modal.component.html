@@ -1,0 +1,116 @@
+<div class="register-team-modal">
+  <h2 mat-dialog-title>
+    <mat-icon>sports_soccer</mat-icon>
+    Registrar Equipo en Torneo
+  </h2>
+
+  <!-- Tournament Info Banner -->
+  <div class="tournament-info">
+    <img [src]="data.tournamentImageUrl" [alt]="data.tournamentName" class="tournament-logo">
+    <div class="tournament-details">
+      <h3>{{ data.tournamentName }}</h3>
+      <p>Selecciona un equipo existente o crea uno nuevo</p>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="team-tabs">
+      <!-- Tab 1: Equipo Existente -->
+      <mat-tab label="Equipo Existente">
+        <div class="tab-content">
+          <form [formGroup]="existingTeamForm">
+            <div *ngIf="isLoadingTeams" class="loading-container">
+              <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+              <p>Cargando tus equipos...</p>
+            </div>
+
+            <div *ngIf="!isLoadingTeams && myTeams.length === 0" class="no-teams">
+              <mat-icon>info</mat-icon>
+              <p>No tienes equipos registrados aún.</p>
+              <p>Crea un nuevo equipo en la pestaña "Nuevo Equipo"</p>
+            </div>
+
+            <mat-form-field *ngIf="!isLoadingTeams && myTeams.length > 0" appearance="outline" class="w-100">
+              <mat-label>Selecciona un Equipo</mat-label>
+              <mat-select formControlName="teamId">
+                <mat-option *ngFor="let team of myTeams" [value]="team.id">
+                  <div class="team-option">
+                    <img [src]="team.logoUrl || 'assets/logo.png'" [alt]="team.name" class="team-logo-small">
+                    <span>{{ team.name }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>sports_soccer</mat-icon>
+              <mat-error *ngIf="teamIdErrors">{{ teamIdErrors }}</mat-error>
+            </mat-form-field>
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Nuevo Equipo -->
+      <mat-tab label="Nuevo Equipo">
+        <div class="tab-content">
+          <form [formGroup]="newTeamForm">
+            <!-- Logo Upload -->
+            <div class="form-group">
+              <label class="image-label">Logo del Equipo</label>
+              <app-image-uploader
+                formControlName="logo"
+                [maxFileSizeMB]="2"
+                (imageUploaded)="onImageUploaded($event)">
+              </app-image-uploader>
+            </div>
+
+            <!-- Team Name -->
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nombre del Equipo</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="Ej: Real Madrid Club de Fútbol"
+                maxlength="100">
+              <mat-icon matSuffix>sports_soccer</mat-icon>
+              <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+            </mat-form-field>
+
+            <!-- Short Name -->
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Nombre Corto (Opcional)</mat-label>
+              <input
+                matInput
+                formControlName="shortName"
+                placeholder="Ej: RMA"
+                maxlength="100">
+              <mat-icon matSuffix>label</mat-icon>
+            </mat-form-field>
+          </form>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="onCancel()"
+      [disabled]="isSubmitting">
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      (click)="onSubmit()"
+      [disabled]="isSubmitting || (selectedTabIndex === 0 && existingTeamForm.invalid) || (selectedTabIndex === 1 && newTeamForm.invalid)">
+      <span *ngIf="!isSubmitting">
+        <mat-icon>check</mat-icon>
+        {{ selectedTabIndex === 0 ? 'Registrar Equipo' : 'Crear y Registrar' }}
+      </span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Procesando...</span>
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +15,7 @@ import { AuthService, ToastService } from '@core/services';
 import { LoginRequest } from '@core/models';
 import { DeletionErrorHandlerHook } from '@shared/hooks/deletion-error-handler.hook';
 import { OtpVerificationModalComponent } from '@shared/components/otp-verification-modal/otp-verification-modal.component';
+import { TournamentService } from '@features/tournaments/services/tournament.service';
 
 @Component({
   selector: 'app-login',
@@ -38,20 +39,59 @@ export class LoginComponent implements OnInit, OnDestroy {
   hidePassword = true;
   loading = false;
   private destroy$ = new Subject<void>();
+  tokenFromUrl: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private errorHandler: DeletionErrorHandlerHook,
     private dialog: MatDialog,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private tournamentService: TournamentService    
   ) {}
 
   ngOnInit(): void {
+    this.captureTokenFromUrl();
     this.initializeForm();
     this.subscribeToAuthState();
   }
+
+  /**
+   * Captura el parámetro 'token' de la URL si existe
+   */
+  private captureTokenFromUrl(): void {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        if (params['token']) {
+          this.tokenFromUrl = params['token'];
+          console.log('Token capturado de la URL en login:', this.tokenFromUrl);
+          this.loadTournamentByToken(params['token']);
+        }
+      });
+  }
+
+  /**
+   * Carga la información del torneo usando el token
+   */
+  private loadTournamentByToken(token: string): void {
+    this.tournamentService.getTournamentByToken(token)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournament) => {
+          if (tournament) {
+          }
+        },
+        error: (error) => {
+          if (error.response.data.messageId === 'EGOL_121') {
+              this.router.navigate(['/not-found']);
+          }
+        }
+      });
+  }
+
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -84,7 +124,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     const loginData: LoginRequest = this.loginForm.value;
-    this.authService.login(loginData).subscribe({
+    this.authService.login(loginData, this.tokenFromUrl).subscribe({
         next: (response) => {
          
         },
@@ -134,32 +174,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   private openOtpVerificationModal(email: string): void {
     const dialogRef = this.dialog.open(OtpVerificationModalComponent, {
       width: '550px',
-      disableClose: true,
       data: {
         email: email,
         expiryMinutes: 5, // Tiempo de expiración del código OTP: 5 minutos
         onVerify: async (code: string) => {
           return new Promise<boolean>((resolve) => {
-            this.authService.verifyOTP(email, code).subscribe({
+            this.authService.verifyOTP(email, code, false, true).subscribe({
               next: () => {
-                // La navegación se maneja en el servicio después de la verificación exitosa
-                const loginData: LoginRequest = this.loginForm.value;
-                this.authService.login(loginData).subscribe({
-                    next: (response) => {
-                    
-                    },
-                    error: (error: any) => {
-                      this.loading = false;
-                      if (error.response.data.messageId === 'EGOL_120') {
-                        this.toastService.showError('Su cuenta de correo no ha sido verificada.');
-                        const email = loginData.userName; // El email es el userName
-                        this.openOtpVerificationModal(email);
-                      }
-                      else {
-                        this.toastService.showError('Usuario o contraseña incorrectos.');
-                      }
-                    }
-                  });
+                // Login automático exitoso, el servicio ya maneja la navegación
+                this.toastService.showSuccess('¡Cuenta verificada e inicio de sesión exitoso!');
                 resolve(true); // Cerrar el modal
               },
               error: (error) => {

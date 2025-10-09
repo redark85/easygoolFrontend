@@ -26,10 +26,10 @@
       <!-- Team Header -->
       <div class="team-header">
         <div class="team-logo">
-          <img [src]="getTeamLogo(team.logoUrl)" [alt]="team.teamName" (error)="$event.target.src='assets/logo.png'">
+          <img [src]="getTeamLogo(team.logoUrl)" [alt]="team.name" (error)="$event.target.src='assets/logo.png'">
         </div>
         <div class="team-info">
-          <h2 class="team-name">{{ team.teamName }}</h2>
+          <h2 class="team-name">{{ team.name }}</h2>
           <p class="team-short-name">{{ team.shortName }}</p>
         </div>
       </div>
