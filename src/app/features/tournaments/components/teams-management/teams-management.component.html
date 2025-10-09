@@ -99,8 +99,17 @@
                     <span class="badge bg-primary rounded-pill">{{ team.totalPlayers }}</span>
                   </div>
                   <div class="manager-info flex-grow-1">
-                    <small class="text-muted d-block">{{team.manager ? 'Manager: ' + team.manager.managerName : 'Sin manager asignado'}}</small>
-                    <small class="text-muted d-block" *ngIf="team.manager">Contacto: {{ team.manager.phoneNumber }}</small>
+                    <div class="manager-name-container" *ngIf="team.manager; else noManager">
+                      <small class="manager-link" 
+                             (click)="openManagerInfoModal(team); $event.stopPropagation()"
+                             matTooltip="Click para ver información completa del manager"
+                             matTooltipPosition="above">
+                        Manager: {{ team.manager.managerName }}
+                      </small>
+                    </div>
+                    <ng-template #noManager>
+                      <small class="text-muted d-block no-manager-text">Sin manager asignado</small>
+                    </ng-template>
                   </div>
                 </div>
 

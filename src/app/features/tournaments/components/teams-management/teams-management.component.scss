@@ -42,6 +42,46 @@
   // Estilos para la información del manager
   .manager-info {
     min-width: 0; // Permitir que el texto se ajuste
+    display: flex;
+    align-items: center; // Centrado vertical del contenedor principal
+    justify-content: flex-start; // Alineación a la izquierda
+    height: 100%; // Ocupar toda la altura disponible
+
+    .manager-name-container {
+      display: flex;
+      align-items: center; // Centrado vertical
+      justify-content: flex-start; // Alineación a la izquierda
+      height: 100%; // Ocupar toda la altura disponible
+      width: 100%; // Ocupar todo el ancho disponible
+
+      .manager-link {
+        font-size: 0.75rem;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        display: inline-block;
+        color: #1976d2 !important; // Color azul primary
+        font-weight: 700 !important; // Bold
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-align: left; // Alineación del texto a la izquierda
+
+        &:hover {
+          color: #1565c0 !important; // Azul más oscuro al hover
+          background: rgba(25, 118, 210, 0.1);
+          text-decoration: underline;
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
 
     small {
       font-size: 0.75rem;
@@ -51,6 +91,18 @@
       text-overflow: ellipsis;
       max-width: 200px;
       display: inline-block;
+      text-align: left; // Alineación a la izquierda
+      width: 100%; // Ocupar todo el ancho disponible
+    }
+
+    .no-manager-text {
+      font-size: 0.75rem;
+      line-height: 1.3;
+      text-align: left !important; // Forzar alineación a la izquierda
+      display: block !important;
+      width: 100%;
+      padding: 4px 8px; // Mismo padding que el enlace del manager
+      margin: 0;
     }
   }
 
@@ -916,5 +968,14 @@
   &:hover {
     transform: scale(1.1);
     color: #388e3c !important;
+  }
+}
+
+// Estilos globales para el modal de manager info
+::ng-deep .manager-info-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
   }
 }

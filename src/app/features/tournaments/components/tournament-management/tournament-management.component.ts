@@ -744,10 +744,16 @@ trackByTeamId(index: number, team: Team): number {
     // - Si checked = false -> registro cerrado -> allow = false
     const allowRegistration = isChecked;
 
+    // Determinar el mensaje según la acción
+    const title = allowRegistration ? 'Habilitar registro de equipos' : 'Deshabilitar registro de equipos';
+    const message = allowRegistration 
+      ? '¿Estás seguro de permitir el registro de equipos de cualquier usuario dentro de la aplicación para este torneo?'
+      : '¿Estás seguro de impedir el registro de equipos para este torneo?';
+
     // Mostrar confirmación con SweetAlert2
     Swal.fire({
-      title: 'Confirmar cambio',
-      text: '¿Estás seguro de cambiar el estado de esta opción?',
+      title: title,
+      text: message,
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#1976d2',

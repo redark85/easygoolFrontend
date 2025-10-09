@@ -36,6 +36,7 @@ export interface Team {
 export interface Manager{
   managerName: string;
   phoneNumber: string;
+  email?: string;
 }
 
 export interface CreateTeamRequest {

@@ -25,9 +25,10 @@ import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-erro
 import { DocumentUploadService } from '../../../../shared/services/document-upload.service';
 import { DocumentUploadModalComponent, DocumentUploadModalData, DocumentUploadModalResult } from '../../../../shared/components/document-upload-modal/document-upload-modal.component';
 import { FileDownloadUtil } from '../../../../shared/utils/file-download.util';
+import { ManagerInfoModalComponent, ManagerInfoData } from '../manager-info-modal/manager-info-modal.component';
 
 // Importaciones de interfaces y modelos
-import { Team, TeamStatus } from '../../models/team.interface';
+import { Team, TeamStatus, Manager } from '../../models/team.interface';
 import { Player, PlayerFormData, PlayerModalResult } from '../../../../core/models/player.interface';
 import Swal from 'sweetalert2';
 
@@ -549,10 +550,16 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
     // Extraer el valor checked del evento
     const isChecked = event?.checked !== undefined ? event.checked : event?.source?.checked;
 
+    // Determinar el mensaje según la acción
+    const title = isChecked ? 'Habilitar registro de jugadores' : 'Deshabilitar registro de jugadores';
+    const message = isChecked 
+      ? 'El dueño del equipo podrá registrar nuevos jugadores.'
+      : 'El dueño del equipo no podrá registrar nuevos jugadores.';
+
     // Mostrar confirmación con SweetAlert2
     Swal.fire({
-      title: 'Confirmar cambio',
-      text: '¿Estás seguro de cambiar el estado de esta opción?',
+      title: title,
+      text: message,
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#1976d2',
@@ -740,6 +747,29 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         confirmButtonText: 'Aceptar'
       });
     }
+  }
+
+  /**
+   * Abre el modal con la información completa del manager
+   */
+  openManagerInfoModal(team: Team): void {
+    if (!team.manager) {
+      return;
+    }
+
+    const dialogData: ManagerInfoData = {
+      managerName: team.manager.managerName,
+      phoneNumber: team.manager.phoneNumber,
+      email: team.manager.email,
+      teamName: team.name
+    };
+
+    this.dialog.open(ManagerInfoModalComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      data: dialogData,
+      panelClass: 'manager-info-dialog'
+    });
   }
 
   /**
