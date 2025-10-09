@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { ApiService } from '@core/services/api.service';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '@core/services/toast.service';
-import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT, TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT, TOURNAMENT_GET_BY_TOKEN_ENDPOINT } from '@core/config/endpoints';
+import { TOURNAMENT_CREATE_ENDPOINT, TOURNAMENT_GET_ALL_BY_USER_ENDPOINT, TOURNAMENT_GET_BY_ID_ENDPOINT, TOURNAMENT_UPDATE_ENDPOINT, TOURNAMENT_UPDATE_STATUS_ENDPOINT, TOURNAMENT_CHANGE_STATUS_ENDPOINT, TOURNAMENT_DELETE_ENDPOINT, TOURNAMENT_ALLOW_REGISTER_TEAM_ENDPOINT, TOURNAMENT_GET_BY_TOKEN_ENDPOINT, TOURNAMENT_GET_TO_ALLOW_TEAM_REGISTRATION_ENDPOINT } from '@core/config/endpoints';
 import { ApiResponse } from '@core/models/api.interface';
 
 import { CreateTournamentRequest, UpdateTournamentRequest, Tournament, TournamentApiResponse, TournamentStatusType, UpdateTournamentStatusRequest, ChangeStatusRequest, TournamentDetailResponse, TournamentDetail } from '../models/tournament.interface';
@@ -179,6 +179,21 @@ export class TournamentService {
           this.toastService.showError(response.message || 'No se pudo cambiar el estado del registro de equipos.');
         }
         return response;
+      })
+    );
+  }
+
+  /**
+   * Obtiene los torneos que permiten registro de equipos
+   * @returns Observable con array de torneos disponibles
+   */
+  getTournamentsToAllowTeamRegistration(): Observable<{ id: number; name: string }[]> {
+    return this.apiService.get<ApiResponse<{ id: number; name: string }[]>>(TOURNAMENT_GET_TO_ALLOW_TEAM_REGISTRATION_ENDPOINT).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        return [];
       })
     );
   }

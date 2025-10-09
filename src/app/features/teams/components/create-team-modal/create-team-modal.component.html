@@ -1,0 +1,96 @@
+<div class="create-team-modal">
+  <h2 mat-dialog-title>
+    <mat-icon>add_circle</mat-icon>
+    Crear Nuevo Equipo
+  </h2>
+
+  <mat-dialog-content>
+    <!-- Loading Tournaments -->
+    <div *ngIf="isLoadingTournaments" class="loading-container">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      <p>Cargando torneos disponibles...</p>
+    </div>
+
+    <!-- No Tournaments Message -->
+    <div *ngIf="!isLoadingTournaments && tournaments.length === 0" class="no-tournaments">
+      <mat-icon class="warning-icon">info</mat-icon>
+      <h3>No existen torneos en curso</h3>
+      <p>Actualmente no hay torneos disponibles que permitan el registro de equipos.</p>
+      <p class="hint">Por favor, contacta al administrador o espera a que se creen nuevos torneos.</p>
+    </div>
+
+    <!-- Team Form -->
+    <form [formGroup]="teamForm" *ngIf="!isLoadingTournaments && tournaments.length > 0">
+      <!-- Tournament Select -->
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Selecciona un Torneo</mat-label>
+        <mat-select formControlName="tournamentId">
+          <mat-option *ngFor="let tournament of tournaments" [value]="tournament.id">
+            {{ tournament.name }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>emoji_events</mat-icon>
+        <mat-error *ngIf="tournamentIdErrors">{{ tournamentIdErrors }}</mat-error>
+      </mat-form-field>
+
+      <!-- Logo Upload -->
+      <div class="form-group">
+        <label class="image-label">Logo del Equipo</label>
+        <app-image-uploader
+          formControlName="logo"
+          [maxFileSizeMB]="2"
+          (imageUploaded)="onImageUploaded($event)">
+        </app-image-uploader>
+      </div>
+
+      <!-- Team Name -->
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Nombre del Equipo</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          placeholder="Ej: Real Madrid Club de Fútbol"
+          maxlength="100">
+        <mat-icon matSuffix>sports_soccer</mat-icon>
+        <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+      </mat-form-field>
+
+      <!-- Short Name -->
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Nombre Corto (Opcional)</mat-label>
+        <input
+          matInput
+          formControlName="shortName"
+          placeholder="Ej: RMA"
+          maxlength="100">
+        <mat-icon matSuffix>label</mat-icon>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="onCancel()"
+      [disabled]="isSubmitting">
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      (click)="onSubmit()"
+      *ngIf="!isLoadingTournaments && tournaments.length > 0"
+      [disabled]="isSubmitting || teamForm.invalid">
+      <span *ngIf="!isSubmitting">
+        <mat-icon>check</mat-icon>
+        Crear Equipo
+      </span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+        <span>Creando...</span>
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>

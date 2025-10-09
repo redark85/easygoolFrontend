@@ -12,6 +12,7 @@ import { TeamService, ToastService } from '@core/services';
 import { ManagerTeam } from '@core/models';
 import { Subject, takeUntil } from 'rxjs';
 import { RegisterTeamModalComponent, RegisterTeamModalData } from '../register-team-modal/register-team-modal.component';
+import { CreateTeamModalComponent } from '../create-team-modal/create-team-modal.component';
 
 @Component({
   selector: 'app-my-teams',
@@ -158,5 +159,23 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
 
   getTeamLogo(logoUrl: string): string {
     return logoUrl || 'assets/logo.png';
+  }
+
+  /**
+   * Abre el modal para crear un nuevo equipo
+   */
+  openCreateTeamModal(): void {
+    const dialogRef = this.dialog.open(CreateTeamModalComponent, {
+      width: '600px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        console.log('Equipo creado:', result);
+        // Recargar la lista de equipos
+        this.loadTeams();
+      }
+    });
   }
 }

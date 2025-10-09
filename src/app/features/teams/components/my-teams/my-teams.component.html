@@ -8,7 +8,7 @@
         <p class="page-subtitle">Gestiona tus equipos y jugadores</p>
       </div>
     </div>
-    <button mat-raised-button color="primary" class="add-button">
+    <button mat-raised-button color="primary" class="add-button" (click)="openCreateTeamModal()">
       <mat-icon>add</mat-icon>
       Nuevo Equipo
     </button>
@@ -85,7 +85,7 @@
     <mat-icon class="empty-icon">groups_off</mat-icon>
     <h2>No tienes equipos registrados</h2>
     <p>Comienza creando tu primer equipo</p>
-    <button mat-raised-button color="primary">
+    <button mat-raised-button color="primary" (click)="openCreateTeamModal()">
       <mat-icon>add</mat-icon>
       Crear Primer Equipo
     </button>
