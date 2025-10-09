@@ -55,7 +55,12 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   selectedGroupId: number | null = null;
   matchDays: MatchDay[] = [];
   loading = false;
+  isCreatingMatchDay = false;
   private destroy$ = new Subject<void>();
+
+  // Estados de edición para fecha y hora
+  private editingDateIds = new Set<number>();
+  private editingTimeIds = new Set<number>();
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -72,19 +77,14 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   ngOnChanges(changes: SimpleChanges): void {
     // Reinicializar cuando cambien las fases
     if (changes['phases']) {
-      console.log('Phases changed, current:', changes['phases'].currentValue?.length || 0, 'previous:', changes['phases'].previousValue?.length || 0);
       
       // Resetear estado antes de reinicializar
       this.selectedPhaseId = null;
       this.selectedGroupId = null;
       this.matchDays = [];
+      // Estados de carga
       this.loading = false;
       this.isCreatingMatchDay = false;
-      
-      // Reinicializar con nuevo timeout para asegurar renderizado
-      setTimeout(() => {
-        this.initializeDefaultSelections();
-      }, 50);
     }
   }
 
@@ -307,15 +307,11 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
 
   /**
    * Maneja el clic en el botón FAB principal
+   * Crea una nueva jornada
    */
   createMatch(): void {
-    const phase = this.getSelectedPhase();
-    if (!phase) return;
     this.createNewMatchDay();
   }
-
-  // Variable para prevenir dobles clicks
-  isCreatingMatchDay = false;
 
   /**
    * Crea una nueva jornada
@@ -863,5 +859,151 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   changeMatchStatus(match: any): void {
     // Implementar lógica para cambiar estado del partido
     console.log('Changing match status for:', match);
+  }
+
+  /**
+   * Abre el selector de fecha
+   */
+  openDatePicker(inputId: string): void {
+    // Buscar el input específico por ID y hacer click
+    const dateInput = document.getElementById(inputId) as HTMLInputElement;
+    if (dateInput) {
+      dateInput.click();
+    }
+  }
+
+  /**
+   * Abre el selector de hora
+   */
+  openTimePicker(inputId: string): void {
+    // Buscar el input específico por ID y hacer click
+    const timeInput = document.getElementById(inputId) as HTMLInputElement;
+    if (timeInput) {
+      timeInput.click();
+    }
+  }
+
+  /**
+   * Obtiene el valor para el input de fecha
+   */
+  getDateInputValue(dateString: string): string {
+    if (!dateString || dateString === '0001-01-01T00:00:00') {
+      return '';
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    
+    // Formato YYYY-MM-DD para input type="date"
+    return date.toISOString().split('T')[0];
+  }
+
+  /**
+   * Obtiene el valor para el input de hora
+   */
+  getTimeInputValue(timeString: string): string {
+    if (!timeString) {
+      return '15:00';
+    }
+    
+    // Si es una fecha completa, extraer solo la hora
+    if (timeString.includes('T')) {
+      const date = new Date(timeString);
+      if (!isNaN(date.getTime())) {
+        return date.toTimeString().slice(0, 5); // HH:MM
+      }
+    }
+    
+    // Si ya es solo hora, formatear para input
+    return timeString.replace('h', '').padStart(5, '0');
+  }
+
+  /**
+   * Maneja el cambio de fecha
+   */
+  onDateChange(match: any, event: any): void {
+    const newDate = event.target.value;
+    if (newDate) {
+      // Actualizar la fecha del partido
+      match.matchDate = newDate + 'T' + this.getTimeInputValue(match.matchTime || match.matchDate);
+      
+      // Aquí se puede llamar al API para actualizar
+      console.log('Date changed for match:', match.id, 'New date:', newDate);
+      
+      // Mostrar confirmación
+      this.showUpdateConfirmation('Fecha actualizada correctamente');
+    }
+  }
+
+  /**
+   * Maneja el cambio de hora
+   */
+  onTimeChange(match: any, event: any): void {
+    const newTime = event.target.value;
+    if (newTime) {
+      // Actualizar la hora del partido
+      const currentDate = this.getDateInputValue(match.matchDate);
+      match.matchDate = currentDate + 'T' + newTime + ':00';
+      match.matchTime = newTime;
+      
+      // Aquí se puede llamar al API para actualizar
+      console.log('Time changed for match:', match.id, 'New time:', newTime);
+      
+      // Mostrar confirmación
+      this.showUpdateConfirmation('Hora actualizada correctamente');
+    }
+  }
+
+  /**
+   * Muestra confirmación de actualización
+   */
+  private showUpdateConfirmation(message: string): void {
+    // Usar SweetAlert2 para mostrar confirmación
+    Swal.fire({
+      title: '¡Actualizado!',
+      text: message,
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end'
+    });
+  }
+
+  /**
+   * Verifica si se está editando la fecha de un partido
+   */
+  isEditingDate(matchId: number): boolean {
+    return this.editingDateIds.has(matchId);
+  }
+
+  /**
+   * Establece el estado de edición de fecha para un partido
+   */
+  setEditingDate(matchId: number, editing: boolean): void {
+    if (editing) {
+      this.editingDateIds.add(matchId);
+    } else {
+      this.editingDateIds.delete(matchId);
+    }
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Verifica si se está editando la hora de un partido
+   */
+  isEditingTime(matchId: number): boolean {
+    return this.editingTimeIds.has(matchId);
+  }
+
+  /**
+   * Establece el estado de edición de hora para un partido
+   */
+  setEditingTime(matchId: number, editing: boolean): void {
+    if (editing) {
+      this.editingTimeIds.add(matchId);
+    } else {
+      this.editingTimeIds.delete(matchId);
+    }
+    this.cdr.detectChanges();
   }
 }
