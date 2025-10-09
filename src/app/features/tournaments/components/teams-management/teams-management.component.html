@@ -131,10 +131,11 @@
                             class="text-danger">
                       <mat-icon>delete</mat-icon>
                     </button>
-                    <button *ngIf="!team.hasExcelUploaded" mat-icon-button
-                            matTooltip="Subir excel de registro de jugadores"
-                            class="text-info"
-                            (click)="$event.stopPropagation()">
+                    <button mat-icon-button
+                            [matTooltip]="team.hasExcelUploaded ? 'Excel ya subido' : 'Subir excel de registro de jugadores'"
+                            [class]="team.hasExcelUploaded ? 'text-muted' : 'text-info'"
+                            [disabled]="team.hasExcelUploaded"
+                            (click)="uploadExcelDocument(team); $event.stopPropagation()">
                       <mat-icon>upload_file</mat-icon>
                     </button>
                     <!-- Botón para descalificar (solo si está activo) -->

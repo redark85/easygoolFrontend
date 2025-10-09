@@ -24,6 +24,8 @@ import { TeamFormComponent } from '../team-form/team-form.component';
 import { PlayerFormComponent } from '../player-form/player-form.component';
 import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
 import { Player, PlayerFormData, PlayerModalResult } from '../../../../core/models/player.interface';
+import { DocumentUploadModalComponent, DocumentUploadModalData, DocumentUploadModalResult } from '../../../../shared/components/document-upload-modal/document-upload-modal.component';
+import { DocumentUploadService } from '../../../../shared/services/document-upload.service';
 import Swal from 'sweetalert2';
 
 export interface TeamFormData {
@@ -69,13 +71,13 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   filteredTeams: Team[] = [];
   private destroy$ = new Subject<void>();
   private updatingTeamRegistration = new Set<number>(); // Track loading state per team
-
   constructor(
     private teamService: TeamService,
     private playerService: PlayerService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
-    private deletionErrorHandler: DeletionErrorHandlerHook
+    private errorHandler: DeletionErrorHandlerHook,
+    private documentUploadService: DocumentUploadService
   ) {}
 
   ngOnInit(): void {
@@ -291,20 +293,20 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
           takeUntil(this.destroy$)
         ).subscribe({
           next: (response: any) => {
-            const config = this.deletionErrorHandler.createConfig('Equipo', {
+            const config = this.errorHandler.createConfig('Equipo', {
               'EGOL_113': 'No se puede eliminar el equipo porque pertenece a una fase activa.',
               'EGOL_114': 'No se puede eliminar el equipo porque tiene partidos programados.',
               'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
             });
 
-            if (this.deletionErrorHandler.handleResponse(response, config)) {
+            if (this.errorHandler.handleResponse(response, config)) {
               this.refreshTeams();
             }
           },
           error: (error) => {
             console.error('Error deleting team:', error);
-            const config = this.deletionErrorHandler.createConfig('Equipo');
-            this.deletionErrorHandler.handleResponseError(error, config);
+            const config = this.errorHandler.createConfig('Equipo');
+            this.errorHandler.handleResponseError(error, config);
           }
         });
       }
@@ -528,24 +530,6 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
    * @param team Equipo a verificar
    * @returns true si puede ser descalificado
    */
-  canDisqualifyTeam(team: Team): boolean {
-    return team.status === TeamStatus.Active;
-  }
-
-  /**
-   * Verifica si un equipo puede ser reactivado
-   * @param team Equipo a verificar
-   * @returns true si puede ser reactivado
-   */
-  canReactivateTeam(team: Team): boolean {
-    return team.status === TeamStatus.Disqualified;
-  }
-
-  /**
-   * Cambia el estado de registro de jugadores para un equipo con confirmación
-   * @param team Equipo al que cambiar el estado
-   * @param event Evento del slide toggle
-   */
   onTogglePlayerRegistration(team: Team, event: any): void {
     if (this.updatingTeamRegistration.has(team.id)) {
       // Si está en loading, prevenir cualquier cambio
@@ -669,6 +653,56 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
    */
   isUpdatingTeamRegistration(team: Team): boolean {
     return this.updatingTeamRegistration.has(team.id);
+  }
+
+  /**
+   * Verifica si un equipo puede ser descalificado
+   * @param team Equipo a verificar
+   * @returns true si puede ser descalificado
+   */
+  canDisqualifyTeam(team: Team): boolean {
+    return team.status === TeamStatus.Active;
+  }
+
+  /**
+   * Verifica si un equipo puede ser reactivado
+   * @param team Equipo a verificar
+   * @returns true si puede ser reactivado
+   */
+  canReactivateTeam(team: Team): boolean {
+    return team.status === TeamStatus.Disqualified;
+  }
+
+  /**
+   * Abre el modal para subir excel de jugadores
+   * @param team Equipo al que subir el excel
+   */
+  uploadExcelDocument(team: Team): void {
+    const dialogRef = this.dialog.open(DocumentUploadModalComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: {
+        title: 'Subir excel de Jugadores',
+        maxFileSizeMB: 1,
+        allowedTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+        allowedExtensions: ['.xlsx'],
+        acceptAttribute: '.xlsx',
+        message: 'Estas a punto de subir el excel para el equipo ten en cuenta que solo podrás subir una vez el archivo.',
+        teamName: team.name
+      } as DocumentUploadModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: DocumentUploadModalResult) => {
+      if (result && result.success && result.document) {
+        // TODO: Integrar con API cuando esté disponible
+        console.log('Excel uploaded for team:', team.name, result.document);
+        
+        // Marcar el equipo como que ya subió el excel
+        team.hasExcelUploaded = true;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   /**

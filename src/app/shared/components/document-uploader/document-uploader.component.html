@@ -1,0 +1,76 @@
+<div class="upload-container"
+     [class.dragging]="isDragging"
+     [class.disabled]="isDisabled"
+     [class.has-document]="selectedFile">
+
+  <ng-container *ngIf="!selectedFile; else documentPreview">
+    <div class="drop-zone">
+      <input type="file" #fileInput (change)="onFileSelected($event)"
+             [accept]="acceptAttribute"
+             [disabled]="isDisabled" hidden>
+
+      <div class="upload-content">
+        <div class="upload-icon-container">
+          <mat-icon class="upload-icon">upload_file</mat-icon>
+        </div>
+
+        <div class="upload-text">
+          <h4 class="upload-title">{{ title }}</h4>
+          <p class="upload-description">
+            Arrastra y suelta tu archivo aquí o
+            <button type="button" class="upload-link" (click)="fileInput.click()" [disabled]="isDisabled">
+              Selecciona un archivo
+            </button>
+          </p>
+          <div class="upload-specs">
+            <span class="spec-item">
+              <mat-icon class="spec-icon">description</mat-icon>
+              {{ allowedExtensions.join(', ').toUpperCase() }}
+            </span>
+            <span class="spec-item">
+              <mat-icon class="spec-icon">storage</mat-icon>
+              Máximo {{ maxFileSizeMB }}MB
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #documentPreview>
+    <div class="preview-container">
+      <div class="document-preview-wrapper">
+        <div class="document-icon-container">
+          <mat-icon class="document-icon">description</mat-icon>
+        </div>
+        
+        <div class="document-info">
+          <div class="document-name">
+            <span class="file-name">{{ getFileDisplayName() }}</span>
+            <span class="file-extension">{{ getFileExtension() }}</span>
+          </div>
+          <div class="document-size">
+            {{ selectedFile ? formatFileSize(selectedFile.size) : '' }}
+          </div>
+        </div>
+
+        <div class="document-actions">
+          <button mat-icon-button class="change-btn" (click)="fileInput.click()"
+                  [disabled]="isDisabled"
+                  matTooltip="Cambiar archivo">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="remove-btn" (click)="removeDocument()"
+                  [disabled]="isDisabled"
+                  matTooltip="Eliminar archivo">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <input type="file" #fileInput (change)="onFileSelected($event)"
+             [accept]="acceptAttribute"
+             [disabled]="isDisabled" hidden>
+    </div>
+  </ng-template>
+</div>

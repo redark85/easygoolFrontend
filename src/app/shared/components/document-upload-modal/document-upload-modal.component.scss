@@ -1,0 +1,216 @@
+@use '../../styles/mixins.scss' as mixins;
+
+.document-upload-modal {
+  min-width: 500px;
+  max-width: 600px;
+  @include mixins.modal-layout;
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    margin-bottom: 1rem;
+
+    .modal-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+
+      .title-icon {
+        color: var(--primary-color, #1976d2);
+        font-size: 1.75rem;
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+    }
+
+    .close-btn {
+      color: #666;
+      
+      &:hover:not(:disabled) {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: #333;
+      }
+    }
+  }
+
+  .modal-content {
+    padding: 0 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .warning-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+
+    .warning-icon {
+      color: #856404;
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+    }
+
+    p {
+      margin: 0;
+      color: #856404;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+  }
+
+  .team-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+
+    .team-icon {
+      color: var(--primary-color, #1976d2);
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .team-name {
+      color: #1565c0;
+      font-size: 0.95rem;
+    }
+  }
+
+  .upload-form {
+    .form-field {
+      margin-bottom: 1rem;
+
+      &.invalid {
+        app-document-uploader {
+          ::ng-deep .upload-container {
+            border-color: #f44336;
+            background-color: #ffebee;
+          }
+        }
+      }
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      color: #f44336;
+      font-size: 0.875rem;
+
+      .error-icon {
+        font-size: 1rem;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 1.5rem;
+
+    .cancel-btn {
+      color: #666;
+      
+      &:hover:not(:disabled) {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    .submit-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 140px;
+      
+      .btn-spinner {
+        ::ng-deep circle {
+          stroke: white;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .document-upload-modal {
+    min-width: 90vw;
+    max-width: 95vw;
+
+    .modal-header {
+      padding: 1rem 1rem 0 1rem;
+
+      .modal-title {
+        font-size: 1.25rem;
+        gap: 0.5rem;
+
+        .title-icon {
+          font-size: 1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+      }
+    }
+
+    .modal-content {
+      padding: 0 1rem;
+    }
+
+    .modal-actions {
+      padding: 1rem;
+      flex-direction: column-reverse;
+      gap: 0.75rem;
+
+      .cancel-btn,
+      .submit-btn {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    .warning-message,
+    .team-info {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Loading states
+.submit-btn {
+  transition: all 0.3s ease;
+
+  &.loading {
+    pointer-events: none;
+  }
+}

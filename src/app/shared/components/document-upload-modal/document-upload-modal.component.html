@@ -1,0 +1,71 @@
+<div class="document-upload-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title class="modal-title">
+      <mat-icon class="title-icon">upload_file</mat-icon>
+      {{ data.title }}
+    </h2>
+    <button mat-icon-button
+            class="close-btn"
+            (click)="onCancel()"
+            [disabled]="isSubmitting">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="modal-content">
+    <!-- Mensaje de advertencia -->
+    <div class="warning-message" *ngIf="data.message">
+      <mat-icon class="warning-icon">info</mat-icon>
+      <p>{{ data.message }}</p>
+    </div>
+
+    <!-- Información del equipo si está disponible -->
+    <div class="team-info" *ngIf="data.teamName">
+      <mat-icon class="team-icon">groups</mat-icon>
+      <span class="team-name">Equipo: <strong>{{ data.teamName }}</strong></span>
+    </div>
+
+    <!-- Formulario de subida -->
+    <form [formGroup]="documentForm" (ngSubmit)="onSubmit()" class="upload-form">
+      <div class="form-field">
+        <app-document-uploader
+          formControlName="document"
+          [title]="data.title"
+          [maxFileSizeMB]="data.maxFileSizeMB"
+          [allowedTypes]="data.allowedTypes"
+          [allowedExtensions]="data.allowedExtensions"
+          [acceptAttribute]="data.acceptAttribute"
+          (documentUploaded)="onDocumentUploaded($event)"
+          [class.invalid]="documentForm.get('document')?.invalid && documentForm.get('document')?.touched">
+        </app-document-uploader>
+
+        <!-- Error message -->
+        <div class="error-message" *ngIf="documentForm.get('document')?.invalid && documentForm.get('document')?.touched">
+          <mat-icon class="error-icon">error</mat-icon>
+          <span>Por favor selecciona un archivo válido</span>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting"
+            class="cancel-btn">
+      Cancelar
+    </button>
+
+    <button mat-raised-button
+            color="primary"
+            type="button"
+            (click)="onSubmit()"
+            [disabled]="!hasDocument || isSubmitting"
+            class="submit-btn">
+      <mat-spinner *ngIf="isSubmitting" diameter="20" class="btn-spinner"></mat-spinner>
+      <mat-icon *ngIf="!isSubmitting">cloud_upload</mat-icon>
+      Subir Archivo
+    </button>
+  </mat-dialog-actions>
+</div>
