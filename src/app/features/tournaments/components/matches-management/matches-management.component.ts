@@ -20,6 +20,7 @@ import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
 import { MatchService, MatchDay } from '@core/services/match.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
+import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -867,8 +868,51 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Actualiza la fecha de un partido
    */
   updateMatchDate(match: any): void {
-    // Implementar lógica para actualizar fecha del partido
-    console.log('Updating match date for:', match);
+    const dialogData: MatchDateTimeData = {
+      matchId: match.id,
+      currentDate: match.matchDate,
+      currentTime: match.matchTime,
+      homeTeam: match.homeTeam,
+      awayTeam: match.awayTeam
+    };
+
+    const dialogRef = this.dialog.open(MatchDatetimeModalComponent, {
+      width: 'auto',
+      height: 'auto',
+      maxWidth: '600px',
+      data: dialogData,
+      disableClose: true,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: MatchDateTimeResult) => {
+      if (result && result.success) {
+        // Actualizar los datos del partido
+        match.matchDate = result.date;
+        match.matchTime = result.time;
+        
+        // Aquí se puede llamar al API para actualizar en el servidor
+        console.log('Match updated:', {
+          matchId: match.id,
+          newDate: result.date,
+          newTime: result.time
+        });
+        
+        // Mostrar confirmación de éxito
+        Swal.fire({
+          title: '¡Actualizado!',
+          text: 'La fecha y hora del partido se han actualizado correctamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+        
+        // Forzar detección de cambios para actualizar la UI
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   /**

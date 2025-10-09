@@ -1,0 +1,73 @@
+<div class="match-datetime-modal">
+  <!-- Modal Header -->
+  <h1 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">schedule</mat-icon>
+    Actualizar Fecha y Hora
+  </h1>
+  
+  <div class="match-info">
+    <strong>{{ data.homeTeam }}</strong> vs <strong>{{ data.awayTeam }}</strong>
+  </div>
+
+  <!-- Modal Content -->
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="dateTimeForm" class="datetime-form">
+      <div class="form-row">
+        <!-- Fecha Column -->
+        <div class="form-column">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha del Partido</mat-label>
+            <input matInput 
+                   [matDatepicker]="datePicker" 
+                   formControlName="matchDate"
+                   placeholder="Seleccionar fecha"
+                   readonly>
+            <mat-datepicker-toggle matIconSuffix [for]="datePicker">
+              <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #datePicker></mat-datepicker>
+            <mat-error *ngIf="dateTimeForm.get('matchDate')?.hasError('required')">
+              La fecha es requerida
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Hora Column -->
+        <div class="form-column">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Hora del Partido</mat-label>
+            <input matInput 
+                   type="time" 
+                   formControlName="matchTime"
+                   placeholder="15:00">
+            <mat-icon matSuffix>schedule</mat-icon>
+            <mat-error *ngIf="dateTimeForm.get('matchTime')?.hasError('required')">
+              La hora es requerida
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Modal Actions -->
+  <mat-dialog-actions align="end" class="modal-actions">
+    <button mat-button 
+            type="button" 
+            (click)="onCancel()"
+            [disabled]="isSubmitting">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    
+    <button mat-raised-button 
+            color="primary"
+            type="button"
+            (click)="onUpdate()"
+            [disabled]="!isFormValid || isSubmitting">
+      <mat-icon *ngIf="!isSubmitting">check</mat-icon>
+      <mat-icon *ngIf="isSubmitting" class="spinning">refresh</mat-icon>
+      {{ isSubmitting ? 'Actualizando...' : 'Actualizar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

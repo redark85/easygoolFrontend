@@ -1,0 +1,213 @@
+// Estilos del modal principal
+.match-datetime-modal {
+  padding: 24px;
+  min-width: 500px;
+  max-width: 600px;
+  
+  // Título del modal
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #333;
+    
+    .title-icon {
+      font-size: 24px;
+      color: #1976d2;
+    }
+  }
+  
+  // Información del partido
+  .match-info {
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    
+    strong {
+      color: #333;
+      font-weight: 600;
+    }
+  }
+  
+  // Contenido del modal
+  .modal-content {
+    padding: 0;
+    margin: 0 0 24px 0;
+    
+    .datetime-form {
+      .form-row {
+        display: flex;
+        gap: 16px;
+        
+        .form-column {
+          flex: 1;
+          
+          .full-width {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+  
+  // Acciones del modal
+  .modal-actions {
+    padding: 16px 0 0 0;
+    border-top: 1px solid #e0e0e0;
+    
+    button {
+      margin-left: 8px;
+      
+      &:first-child {
+        margin-left: 0;
+      }
+      
+      mat-icon {
+        margin-right: 8px;
+        
+        &.spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+}
+
+// Responsive para móviles
+@media (max-width: 768px) {
+  .match-datetime-modal {
+    min-width: 300px;
+    max-width: 95vw;
+    padding: 16px;
+    
+    .modal-content {
+      .datetime-form {
+        .form-row {
+          flex-direction: column;
+          gap: 12px;
+        }
+      }
+    }
+    
+    .modal-actions {
+      button {
+        width: 100%;
+        margin: 4px 0;
+      }
+    }
+  }
+}
+
+// Animación de carga
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Estilos globales para Material Design
+:host ::ng-deep {
+  // Form fields
+  .mat-mdc-form-field {
+    .mat-mdc-form-field-wrapper {
+      padding-bottom: 1.25em;
+    }
+    
+    .mat-mdc-form-field-flex {
+      align-items: center;
+      padding: 0.75em 0.75em 0 0.75em;
+    }
+    
+    .mat-mdc-form-field-infix {
+      padding: 0.5em 0;
+      min-height: 1.5em;
+      border-top: 0.84375em solid transparent;
+    }
+    
+    .mat-mdc-form-field-subscript-wrapper {
+      padding: 0 1em;
+    }
+    
+    // Íconos
+    .mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      
+      &.mat-datepicker-toggle-default-icon {
+        color: #1976d2;
+      }
+    }
+    
+    // Input de tiempo
+    input[type="time"] {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+      
+      &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  
+  // Datepicker toggle
+  .mat-datepicker-toggle {
+    .mat-icon-button {
+      width: 40px;
+      height: 40px;
+      
+      &:hover {
+        background-color: rgba(25, 118, 210, 0.1);
+      }
+    }
+  }
+  
+  // Botones
+  .mat-mdc-button {
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+  
+  .mat-mdc-raised-button {
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// Estilos globales para el datepicker popup
+::ng-deep .mat-datepicker-popup {
+  z-index: 10000 !important;
+  
+  .mat-calendar {
+    .mat-calendar-header {
+      padding: 8px 16px;
+    }
+    
+    .mat-calendar-content {
+      padding: 0 16px 16px;
+    }
+    
+    .mat-calendar-body-cell-content {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+    }
+  }
+}
