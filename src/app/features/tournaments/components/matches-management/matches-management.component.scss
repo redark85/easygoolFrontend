@@ -67,10 +67,80 @@
   }
 }
 
-// Group Selection
+// Selection Container Centered - New Layout
+.selection-container-centered {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  padding: 20px 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .d-flex {
+    .gap-4 {
+      gap: 2rem !important;
+    }
+  }
+
+  .phase-selection, .group-selection {
+    .phase-select, .group-select {
+      width: 200px;
+      min-width: 180px;
+
+      // Estilos mejorados para los selects
+      .mat-mdc-form-field-wrapper {
+        padding-bottom: 0;
+      }
+
+      .mat-mdc-text-field-wrapper {
+        border-radius: 20px;
+        height: 48px;
+      }
+
+      .mat-mdc-form-field-infix {
+        padding: 12px 0;
+        min-height: auto;
+      }
+
+      .mat-mdc-select-value {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .mat-mdc-form-field-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      // Estados focus y hover
+      &.mat-focused {
+        .mat-mdc-text-field-wrapper {
+          border-color: var(--primary-color);
+        }
+      }
+
+      &:hover:not(.mat-focused) {
+        .mat-mdc-text-field-wrapper {
+          border-color: var(--primary-color);
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+
+  // Separador vertical mejorado
+  .vertical-separator {
+    width: 2px;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
+    border-radius: 1px;
+  }
+}
+
+// Group Selection (Legacy - mantener para compatibilidad)
 .group-selection {
-  padding: 20px 0;
-  
+  padding: 10px 0;
+
   .group-select {
     width: 100%;
     max-width: 400px;
@@ -84,10 +154,9 @@
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  
+
   .loading-text {
     margin-top: 16px;
-    color: var(--text-secondary);
     font-size: 0.95rem;
   }
 }
@@ -96,76 +165,385 @@
 .matchdays-accordion {
   .matchday-panel {
     margin-bottom: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
-    .panel-header {
-      background-color: #f5f5f5;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
       
+      .panel-header {
+        background: linear-gradient(135deg, #f0f0f0 0%, #d8d8d8 100%);
+      }
+    }
+
+    .panel-header {
+      background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+      color: #333;
+      padding: 16px 24px;
+      min-height: 64px;
+      border-bottom: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+
       .panel-title {
+        margin: 0;
         width: 100%;
-        
+
         .matchday-info {
           display: flex;
           align-items: center;
-          gap: 12px;
+          justify-content: space-between;
           width: 100%;
-          
-          .matchday-icon {
-            color: var(--primary-color);
+          position: relative;
+
+          .matchday-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+
+            .matchday-icon {
+              font-size: 20px;
+            }
+
+            .matchday-name {
+              font-size: 16px;
+              font-weight: 600;
+            }
           }
-          
-          .matchday-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-          }
-          
-          .matches-count-chip {
-            margin-left: auto;
+
+          .matchday-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+
+            .matches-count-chip {
+              background: transparent;
+              color: black;
+              border: none;
+              font-weight: 700;
+              font-size: 14px;
+              padding: 0;
+              border-radius: 0;
+              min-width: auto;
+              text-align: center;
+            }
           }
 
           .matchday-actions {
             display: flex;
-            align-items: center;
             gap: 4px;
-            margin-left: 12px;
+            align-items: center;
 
-            .action-btn {
-              width: 36px;
-              height: 36px;
+            .action-btn-small {
+              background: transparent !important;
+              border: none !important;
+              width: 40px;
+              height: 40px;
               transition: all 0.3s ease;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 0 !important;
+              box-shadow: none !important;
 
-              mat-icon {
-                font-size: 1.2rem;
-                width: 1.2rem;
-                height: 1.2rem;
+              &:hover {
+                transform: scale(1.1);
+                background: transparent !important;
+                box-shadow: none !important;
               }
 
               &.create-btn {
-                color: #4caf50;
-
+                color: #1976d2;
+                
                 &:hover {
-                  background-color: rgba(76, 175, 80, 0.1);
+                  color: #1565c0;
+                  background: transparent !important;
                 }
               }
 
               &.random-btn {
-                color: #ff9800;
-
+                color: #4caf50;
+                
                 &:hover {
-                  background-color: rgba(255, 152, 0, 0.1);
+                  color: #388e3c;
+                  background: transparent !important;
                 }
               }
 
               &.delete-btn {
                 color: #f44336;
-
+                
                 &:hover {
-                  background-color: rgba(244, 67, 54, 0.1);
+                  color: #d32f2f;
+                  background: transparent !important;
                 }
               }
+
+              mat-icon {
+                font-size: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
             }
+          }
+        }
+      }
+    }
+
+    &.mat-expanded {
+      .panel-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
+// Matches Grid - Centered Layout
+.matches-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+
+  .col {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 350px;
+
+    @media (min-width: 768px) {
+      width: calc(50% - 10px);
+    }
+
+    @media (min-width: 1200px) {
+      width: calc(33.333% - 14px);
+    }
+  }
+}
+
+// Match Card Styles - Optimized Layout
+.match-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  background: white;
+  margin-top: 15px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .match-content {
+    padding: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      min-height: 32px;
+
+      .match-actions-top {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+
+        .action-btn-mini {
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent;
+          border: none;
+
+          &:hover {
+            transform: scale(1.1);
+          }
+
+          &.update-date {
+            color: #1976d2;
+            
+            &:hover {
+              color: #1565c0;
+            }
+          }
+
+          &.change-status {
+            color: #4caf50;
+            
+            &:hover {
+              color: #388e3c;
+            }
+          }
+
+          &.delete {
+            color: #f44336;
+            
+            &:hover {
+              color: #d32f2f;
+            }
+          }
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+
+      .match-status-top {
+        .status-circle {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+          &:hover {
+            transform: scale(1.2);
+          }
+
+          .check-icon {
+            font-size: 14px;
+            color: white !important;
+            font-weight: 900;
+            line-height: 1;
+            z-index: 2;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          // Status colors
+          &.status-upcoming {
+            background-color: #1976d2;
+          }
+
+          &.status-live {
+            background-color: #4caf50;
+            animation: pulse 2s infinite;
+          }
+
+          &.status-completed {
+            background-color: #9c27b0;
+          }
+
+          &.status-cancelled {
+            background-color: #f44336;
+          }
+        }
+      }
+    }
+
+    .match-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+
+      .team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+
+        .team-top {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          justify-content: center;
+
+          .team-score {
+            .score {
+              font-size: 24px;
+              font-weight: 700;
+              color: #1976d2;
+            }
+          }
+
+          .team-info {
+            .team-name {
+              font-size: 12px;
+              font-weight: 600;
+              color: #333;
+              text-align: center;
+              line-height: 1.2;
+            }
+          }
+        }
+
+        .team-logo-container {
+          .team-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+
+      .vs-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 0 16px;
+
+        .vs-text {
+          font-size: 12px;
+          font-weight: 700;
+          color: #666;
+        }
+
+        .match-time {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .time-icon {
+            font-size: 14px;
+            color: #666;
+          }
+
+          .time-text {
+            font-size: 11px;
+            color: #666;
+          }
+        }
+
+        .match-venue {
+          .venue-text {
+            font-size: 10px;
+            color: #999;
+            text-align: center;
           }
         }
       }
@@ -173,142 +551,16 @@
   }
 }
 
-// New Match Card Styles - Based on image design
-.match-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 12px;
-  border: 1px solid var(--border-color, #e0e0e0);
-  background: white;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+// Pulse animation for live matches
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
   }
-  
-  .match-content {
-    padding: 16px;
-    
-    // Match header with day label
-    .match-header {
-      text-align: center;
-      margin-bottom: 12px;
-      
-      .match-day-label {
-        font-size: 0.85rem;
-        color: var(--text-secondary, #666);
-        font-weight: 500;
-      }
-    }
-    
-    // Main match layout
-    .match-main {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      
-      .team {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        flex: 1;
-        
-        &.home-team {
-          .team-logo-container {
-            order: 1;
-          }
-          .team-info {
-            order: 2;
-          }
-          .team-score {
-            order: 3;
-          }
-        }
-        
-        &.away-team {
-          .team-score {
-            order: 1;
-          }
-          .team-info {
-            order: 2;
-          }
-          .team-logo-container {
-            order: 3;
-          }
-        }
-        
-        .team-logo-container {
-          .team-logo {
-            width: 50px;
-            height: 50px;
-            @include mixins.square-rounded-image($border-radius: 8px, $border-width: 2px);
-          }
-        }
-        
-        .team-info {
-          text-align: center;
-          
-          .team-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            line-height: 1.2;
-          }
-        }
-        
-        .team-score {
-          .score {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color, #1976d2);
-          }
-        }
-      }
-      
-      // VS Section in the center
-      .vs-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        min-width: 80px;
-        
-        .vs-text {
-          font-size: 1rem;
-          font-weight: 700;
-          color: var(--text-secondary, #666);
-        }
-        
-        .match-time {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          
-          .time-icon {
-            font-size: 0.9rem;
-            width: 0.9rem;
-            height: 0.9rem;
-            color: var(--text-secondary, #666);
-          }
-          
-          .time-text {
-            font-size: 0.8rem;
-            color: var(--text-secondary, #666);
-            font-weight: 500;
-          }
-        }
-        
-        .match-venue {
-          .venue-text {
-            font-size: 0.75rem;
-            color: var(--text-secondary, #666);
-            text-align: center;
-          }
-        }
-      }
-    }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
   }
 }
 
@@ -343,7 +595,7 @@
     padding: 10px 24px;
     font-size: 1rem;
     font-weight: 500;
-    
+
     mat-icon {
       margin-right: 8px;
     }
@@ -352,7 +604,7 @@
 
 // Matches Content
 .matches-content {
-  padding-top: 20px;
+  padding-top: 0;
 }
 
 .matches-list {
@@ -557,31 +809,65 @@
 
 // New selection container design - Based on image layout
 .selection-container {
-  margin-bottom: 24px;
-  padding: 12px 16px;
   background: white;
   border-radius: 8px;
   border: 1px solid var(--border-color, #e0e0e0);
+  padding-top: 15px;
 
   .row {
     margin: 0;
   }
 
-  // Group Selection (Left Side - 4 columns)
-  .group-selection {
-    .group-select {
+  // Phase Selection (Left Side - 4 columns)
+  .phase-selection {
+    .phase-select {
       width: 100%;
-      
+
       // Make select thinner and rounded
       .mat-form-field-wrapper {
         padding-bottom: 0;
       }
-      
+
       .mat-form-field-infix {
         padding: 8px 0;
         border-top: none;
       }
-      
+
+      .mat-form-field-appearance-outline .mat-form-field-outline {
+        border-radius: 20px;
+        color: var(--border-color, #e0e0e0);
+      }
+
+      .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+        color: var(--primary-color, #1976d2);
+        border-radius: 20px;
+      }
+
+      .mat-select-value {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Group Selection (Right Side - 4 columns)
+  .group-selection {
+    :global(.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper) {
+      height: 40px !important;
+    }
+    .group-select {
+      width: 100%;
+
+      // Make select thinner and rounded
+      .mat-form-field-wrapper {
+        padding-bottom: 0;
+      }
+
+      .mat-form-field-infix {
+        padding: 8px 0;
+        border-top: none;
+      }
+
       .mat-form-field-appearance-outline .mat-form-field-outline {
         border-radius: 20px;
         color: var(--border-color, #e0e0e0);
@@ -658,6 +944,30 @@
 @media (max-width: 768px) {
   .matches-management-container {
     padding: 0 8px;
+  }
+
+  // Layout centrado responsive
+  .selection-container-centered {
+    padding: 16px;
+    margin-bottom: 16px;
+
+    .d-flex {
+      flex-direction: column;
+      gap: 1rem !important;
+
+      .phase-selection, .group-selection {
+        .phase-select, .group-select {
+          width: 100%;
+          max-width: none;
+        }
+      }
+
+      .vertical-separator {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, var(--border-color), transparent);
+      }
+    }
   }
 
   .fab-create-match {
@@ -808,17 +1118,17 @@
     background-color: #e3f2fd;
     color: #1976d2;
   }
-  
+
   &.status-in-progress {
     background-color: #fff3e0;
     color: #f57c00;
   }
-  
+
   &.status-finished {
     background-color: #e8f5e8;
     color: #388e3c;
   }
-  
+
   &.status-cancelled {
     background-color: #ffebee;
     color: #d32f2f;
@@ -856,16 +1166,16 @@
   mat-spinner circle, .mat-spinner circle {
     stroke: #1976d2 !important;
   }
-  
+
   mat-progress-spinner circle, .mat-progress-spinner circle {
     stroke: #1976d2 !important;
   }
-  
+
   .mdc-circular-progress__determinate-circle,
   .mdc-circular-progress__indeterminate-circle-graphic {
     stroke: #1976d2 !important;
   }
-  
+
   svg.mat-spinner circle,
   svg.mat-progress-spinner circle {
     stroke: #1976d2 !important;

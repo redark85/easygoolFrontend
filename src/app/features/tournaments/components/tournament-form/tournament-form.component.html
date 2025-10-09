@@ -165,14 +165,14 @@
                   <mat-chip [color]="phase.phaseType === 0 ? 'primary' : 'accent'" selected>
                     {{ getPhaseTypeText(phase.phaseType) }}
                   </mat-chip>
-                  <span class="group-count">{{ phase.groups?.length || 0 }} grupos</span>
+                  <span class="group-count">{{ getGroupsForPhase(phase).length || 0 }} grupos</span>
                 </mat-panel-description>
               </mat-expansion-panel-header>
 
               <!-- Groups in this phase -->
               <div class="phase-content">
-                <div *ngIf="phase.groups && phase.groups.length > 0" class="groups-grid">
-                  <mat-card *ngFor="let group of phase.groups; trackBy: trackByGroupId" class="group-card">
+                <div *ngIf="getGroupsForPhase(phase).length > 0" class="groups-grid">
+                  <mat-card *ngFor="let group of getGroupsForPhase(phase); trackBy: trackByGroupId" class="group-card">
                     <mat-card-header>
                       <mat-card-title>{{ group.name }}</mat-card-title>
                       <mat-card-subtitle>{{ group.teams?.length || 0 }} equipos</mat-card-subtitle>

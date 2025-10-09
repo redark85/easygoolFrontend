@@ -257,7 +257,8 @@ export class PhasesGroupsManagementComponent implements OnInit {
   addTeamToGroup(phaseId: number, groupId: number): void {
     // Encontrar la fase y el grupo
     const phase = this.phases.find(p => p.id === phaseId);
-    const group = phase?.groups?.find(g => g.id === groupId);
+    const phaseGroups = this.getPhaseGroups(phase);
+    const group = phaseGroups.find((g: Group) => g.id === groupId);
     
     if (!phase || !group) {
       console.error('Phase or group not found');
@@ -332,7 +333,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * @param phase Fase de grupos donde asignar equipos
    */
   assignTeamsRandomly(phase: Phase): void {
-    if (phase.groups?.length == 0) {
+    if (this.getPhaseGroups(phase).length == 0) {
         Swal.fire({
             title: '¡Atención!',
             text: `Debes agregar al menos un grupo para esta fase`,
@@ -482,10 +483,11 @@ export class PhasesGroupsManagementComponent implements OnInit {
       return !phase.knockoutTeams || phase.knockoutTeams.length === 0;
     } else {
       // Para fases de grupos, verificar si algún grupo tiene equipos
-      if (!phase.groups || phase.groups.length === 0) {
+      const phaseGroups = this.getPhaseGroups(phase);
+      if (!phaseGroups || phaseGroups.length === 0) {
         return true;
       }
-      return !phase.groups.some(group => group.teams && group.teams.length > 0);
+      return !phaseGroups.some((group: Group) => group.teams && group.teams.length > 0);
     }
   }
 
@@ -496,6 +498,24 @@ export class PhasesGroupsManagementComponent implements OnInit {
    */
   canDeleteGroup(group: Group): boolean {
     return !group.teams || group.teams.length === 0;
+  }
+
+  /**
+   * Obtiene los grupos de una fase de manera compatible
+   * @param phase Fase de la cual obtener los grupos
+   */
+  private getPhaseGroups(phase?: Phase): Group[] {
+    if (!phase) return [];
+    // Priorizar 'groups' sobre 'grups' para compatibilidad
+    return phase.groups || phase.grups || [];
+  }
+
+  /**
+   * Obtiene los grupos de una fase (para uso en templates)
+   * @param phase Fase de la cual obtener los grupos
+   */
+  getGroupsForPhase(phase: Phase): Group[] {
+    return this.getPhaseGroups(phase);
   }
 
   /**

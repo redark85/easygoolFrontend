@@ -53,12 +53,12 @@
               <div class="phase-stats">
                 <!-- Show groups for GroupStage, teams for Knockout -->
                 <mat-icon class="groups-count-icon"
-                          matBadge="{{ phase.phaseType === 1 ? (phase.knockoutTeams?.length || 0) : (phase.groups?.length || 0) }}"
+                          matBadge="{{ phase.phaseType === 1 ? (phase.knockoutTeams?.length || 0) : (getGroupsForPhase(phase).length || 0) }}"
                           matBadgeColor="accent"
                           matBadgeSize="small"
                           [matTooltip]="phase.phaseType === 1 ?
                             ((phase.knockoutTeams?.length || 0) === 1 ? '1 equipo' : (phase.knockoutTeams?.length || 0) + ' equipos') :
-                            ((phase.groups?.length || 0) === 1 ? '1 grupo' : (phase.groups?.length || 0) + ' grupos')">
+                            ((getGroupsForPhase(phase).length || 0) === 1 ? '1 grupo' : (getGroupsForPhase(phase).length || 0) + ' grupos')">
                   {{ phase.phaseType === 1 ? 'groups' : 'group_work' }}
                 </mat-icon>
 
@@ -101,7 +101,7 @@
           <!-- Phase Content -->
           <mat-card-content class="phase-card-content">
             <!-- No Groups/Teams Message -->
-            <div class="no-groups" *ngIf="phase.phaseType === 0 && (!phase.groups || phase.groups.length === 0)">
+            <div class="no-groups" *ngIf="phase.phaseType === 0 && getGroupsForPhase(phase).length === 0">
               <mat-icon class="no-groups-icon">group_work</mat-icon>
               <p>No hay grupos en esta fase</p>
             </div>
@@ -112,8 +112,8 @@
             </div>
 
             <!-- Groups Grid - 3 columns with expansion panels (Only for GroupStage) -->
-            <div *ngIf="phase.phaseType === 0 && phase.groups && phase.groups.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-              <div *ngFor="let group of phase.groups; trackBy: trackByGroupId; let i = index" class="col mb-4">
+            <div *ngIf="phase.phaseType === 0 && getGroupsForPhase(phase).length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+              <div *ngFor="let group of getGroupsForPhase(phase); trackBy: trackByGroupId; let i = index" class="col mb-4">
                 <mat-expansion-panel class="group-panel"
                                      [expanded]="expandedGroupIndex === i"
                                      (opened)="expandedGroupIndex = i">

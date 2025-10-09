@@ -20,7 +20,7 @@ import { LocationMapComponent, LocationData } from '@shared/components/location-
 import { TournamentService } from '../../services/tournament.service';
 import { PhaseService } from '../../services/phase.service';
 import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType } from '../../models/tournament.interface';
-import { Phase, CreatePhaseRequest, CreateGroupRequest, PhaseType } from '../../models/phase.interface';
+import { Phase, Group, CreatePhaseRequest, CreateGroupRequest, PhaseType } from '../../models/phase.interface';
 import { dateRangeValidator } from '@shared/validators/date-range.validator';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
@@ -567,5 +567,15 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
    */
   trackByGroupId(index: number, group: any): number {
     return group.id;
+  }
+
+  /**
+   * Obtiene los grupos de una fase de manera compatible
+   * @param phase Fase de la cual obtener los grupos
+   */
+  getGroupsForPhase(phase: Phase): Group[] {
+    if (!phase) return [];
+    // Priorizar 'groups' sobre 'grups' para compatibilidad
+    return phase.groups || phase.grups || [];
   }
 }

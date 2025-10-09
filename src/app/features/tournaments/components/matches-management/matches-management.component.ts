@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,7 +44,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./matches-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MatchesManagementComponent implements OnInit, OnDestroy {
+export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges {
   @Input() tournamentId!: number;
   @Input() phases: Phase[] = [];
   @Input() teams: Team[] = [];
@@ -64,16 +64,88 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Seleccionar la primera fase por defecto si existe
-    if (this.phases.length > 0) {
-      this.selectedPhaseId = this.phases[0].id;
-      // Seleccionar el primer grupo si existe
-      const firstPhase = this.phases[0];
-      if (firstPhase.groups && firstPhase.groups.length > 0) {
-        this.selectedGroupId = firstPhase.groups[0].id;
-        this.loadMatchesByGroup(this.selectedGroupId);
-      }
+    console.log('ngOnInit - phases available:', this.phases?.length || 0);
+    // Inicializar con datos disponibles
+    this.initializeDefaultSelections();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Reinicializar cuando cambien las fases
+    if (changes['phases']) {
+      console.log('Phases changed, current:', changes['phases'].currentValue?.length || 0, 'previous:', changes['phases'].previousValue?.length || 0);
+      
+      // Resetear estado antes de reinicializar
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.matchDays = [];
+      
+      // Reinicializar con nuevo timeout para asegurar renderizado
+      setTimeout(() => {
+        this.initializeDefaultSelections();
+      }, 50);
     }
+  }
+
+  /**
+   * Inicializa las selecciones por defecto al abrir el tab
+   */
+  private initializeDefaultSelections(): void {
+    console.log('Initializing default selections, phases:', this.phases?.length || 0);
+    
+    if (this.phases && this.phases.length > 0) {
+      // Seleccionar la primera fase por defecto
+      this.selectedPhaseId = this.phases[0].id;
+      console.log('Selected default phase:', this.selectedPhaseId);
+      
+      // Cargar grupos de la fase seleccionada automáticamente
+      this.loadGroupsForPhase(this.selectedPhaseId, true);
+      
+      // Forzar múltiples detecciones de cambios con timeouts escalonados
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 10);
+      
+      setTimeout(() => {
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      }, 100);
+    } else {
+      // Si no hay fases, limpiar todo
+      console.log('No phases available, clearing data');
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.matchDays = [];
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Valida y carga los datos por defecto de manera robusta
+   */
+  private validateAndLoadDefaults(): void {
+    // Validar que hay fases disponibles
+    if (!this.phases || this.phases.length === 0) {
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.matchDays = [];
+      return;
+    }
+
+    // Si no hay fase seleccionada, seleccionar la primera
+    if (!this.selectedPhaseId) {
+      this.selectedPhaseId = this.phases[0].id;
+    }
+
+    // Validar que la fase seleccionada existe
+    const selectedPhase = this.phases.find(p => p.id === this.selectedPhaseId);
+    if (!selectedPhase) {
+      this.selectedPhaseId = this.phases[0].id;
+      this.selectedGroupId = null;
+      this.matchDays = [];
+    }
+
+    // Cargar grupos y seleccionar el primero si es necesario
+    this.loadGroupsForPhase(this.selectedPhaseId!, true);
   }
 
   ngOnDestroy(): void {
@@ -90,51 +162,119 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja el cambio de fase seleccionada
+   * Maneja el cambio de fase seleccionada (método legacy para compatibilidad)
    */
   onPhaseChange(phaseIndex: number): void {
     if (phaseIndex >= 0 && phaseIndex < this.phases.length) {
       const selectedPhase = this.phases[phaseIndex];
-      this.selectedPhaseId = selectedPhase.id;
-      this.selectedGroupId = null;
-      this.matchDays = [];
-      
-      // Consumir API para cargar grupos de la fase seleccionada
-      this.loadGroupsForPhase(selectedPhase.id);
-      
-      this.cdr.detectChanges();
+      this.onPhaseSelectionChange(selectedPhase.id);
     }
   }
 
   /**
-   * Carga los grupos para una fase específica
+   * Maneja el cambio de fase seleccionada desde el select
    */
-  private loadGroupsForPhase(phaseId: number): void {
-    // Aquí se haría la llamada a la API para cargar grupos
+  onPhaseSelectionChange(phaseId: number): void {
+    console.log('Phase selection changed to:', phaseId);
+    this.selectedPhaseId = phaseId;
+    this.selectedGroupId = null;
+    this.matchDays = [];
+    
+    // Consumir API para cargar grupos de la fase seleccionada
+    this.loadGroupsForPhase(phaseId, true);
+    
+    // Forzar detección de cambios múltiple
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      this.cdr.markForCheck();
+    }, 10);
+  }
+
+  /**
+   * Carga los grupos para una fase específica
+   * @param phaseId ID de la fase
+   * @param autoSelectFirst Si debe seleccionar automáticamente el primer grupo
+   */
+  private loadGroupsForPhase(phaseId: number, autoSelectFirst: boolean = false): void {
+    // TODO: Implementar llamada a API para cargar grupos por fase
+    // Endpoint sugerido: GET /api/Group/GetByPhase/{phaseId}
     // Por ahora usamos los grupos que ya están en la fase
     const selectedPhase = this.phases.find(p => p.id === phaseId);
-    if (selectedPhase && selectedPhase.groups && selectedPhase.groups.length > 0) {
-      // Seleccionar el primer grupo automáticamente
-      this.selectedGroupId = selectedPhase.groups[0].id;
-      this.loadMatchesByGroup(this.selectedGroupId);
+    const phaseGroups = this.getPhaseGroups(selectedPhase);
+    
+    if (selectedPhase && phaseGroups.length > 0) {
+      if (autoSelectFirst) {
+        // Seleccionar el primer grupo automáticamente
+        this.selectedGroupId = phaseGroups[0].id;
+        console.log(`Auto-selecting first group: ${this.selectedGroupId} for phase: ${phaseId}`);
+        
+        // Cargar partidos del grupo seleccionado
+        this.loadMatchesByGroup(this.selectedGroupId!);
+      } else if (this.selectedGroupId) {
+        // Si ya hay un grupo seleccionado, verificar que existe en esta fase
+        const groupExists = phaseGroups.some(g => g.id === this.selectedGroupId);
+        if (groupExists) {
+          this.loadMatchesByGroup(this.selectedGroupId!);
+        } else {
+          // El grupo seleccionado no existe en esta fase, seleccionar el primero
+          this.selectedGroupId = phaseGroups[0].id;
+          this.loadMatchesByGroup(this.selectedGroupId!);
+        }
+      }
+    } else {
+      // Si no hay grupos, limpiar selección
+      console.log(`No groups found for phase: ${phaseId}`);
+      this.selectedGroupId = null;
+      this.matchDays = [];
     }
+    
+    // Forzar detección de cambios después de cargar grupos con timeout más largo
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      this.cdr.markForCheck();
+    }, 50);
   }
 
   /**
    * Cambia el grupo seleccionado y carga sus partidos
    */
   onGroupChange(groupId: number): void {
+    console.log('Group selection changed to:', groupId);
     this.selectedGroupId = groupId;
     this.loadMatchesByGroup(groupId);
+    
+    // Forzar detección de cambios
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      this.cdr.markForCheck();
+    }, 10);
   }
 
   /**
-   * Obtiene los grupos de la fase seleccionada
+   * Obtiene los grupos de la fase seleccionada (compatible con ambos formatos)
    */
   getGroupsForSelectedPhase(): Group[] {
     if (!this.selectedPhaseId) return [];
     const phase = this.phases.find(p => p.id === this.selectedPhaseId);    
-    return phase?.groups || [];
+    return this.getPhaseGroups(phase) || [];
+  }
+
+  /**
+   * Obtiene los grupos de una fase de manera compatible
+   * @param phase Fase de la cual obtener los grupos
+   */
+  private getPhaseGroups(phase?: Phase): Group[] {
+    if (!phase) return [];
+    // Priorizar 'groups' sobre 'grups' para compatibilidad
+    return phase.groups || phase.grups || [];
+  }
+
+  /**
+   * Obtiene los grupos de una fase (para uso en templates)
+   * @param phase Fase de la cual obtener los grupos
+   */
+  getGroupsForPhase(phase: Phase): Group[] {
+    return this.getPhaseGroups(phase);
   }
 
   /**
@@ -241,20 +381,32 @@ export class MatchesManagementComponent implements OnInit, OnDestroy {
    * Carga los partidos de un grupo organizados por jornadas
    */
   private loadMatchesByGroup(groupId: number): void {
+    console.log(`Loading matches for group: ${groupId}`);
     this.loading = true;
+    
     this.matchService.getAllMatchesByGroup(groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (matchDays) => {
+          console.log(`Loaded ${matchDays.length} match days for group ${groupId}`);
           this.matchDays = matchDays;
           this.loading = false;
-          this.cdr.detectChanges();
+          
+          // Forzar detección de cambios múltiple
+          setTimeout(() => {
+            this.cdr.detectChanges();
+            this.cdr.markForCheck();
+          }, 0);
         },
         error: (error) => {
           console.error('Error loading matches by group:', error);
           this.matchDays = [];
           this.loading = false;
-          this.cdr.detectChanges();
+          
+          setTimeout(() => {
+            this.cdr.detectChanges();
+            this.cdr.markForCheck();
+          }, 0);
         }
       });
   }

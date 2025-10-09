@@ -20,44 +20,36 @@
         <mat-icon>add</mat-icon>
       </button>
 
-      <!-- Phase and Group Selection Container -->
-      <div class="selection-container" *ngIf="phases.length > 0">
-        <div class="row align-items-center">
-          <!-- Group Selection (Left Side - 4 columns) -->
-          <div class="col-4">
-            <div class="group-selection" *ngIf="getGroupsForSelectedPhase().length > 0">
-              <mat-form-field appearance="outline" class="group-select">
-                <mat-label>Grupo</mat-label>
-                <mat-select [(value)]="selectedGroupId" (selectionChange)="onGroupChange($event.value)">
-                  <mat-option *ngFor="let group of getGroupsForSelectedPhase()" [value]="group.id">
-                    {{ group.name }}
-                  </mat-option>
-                </mat-select>
-                <mat-icon matSuffix>expand_more</mat-icon>
-              </mat-form-field>
-            </div>
+      <!-- Phase and Group Selection Container - Centered -->
+      <div class="selection-container-centered" *ngIf="phases.length > 0">
+        <div class="d-flex justify-content-center align-items-center gap-4">
+          <!-- Phase Selection -->
+          <div class="phase-selection" style="min-width: 300px;">
+            <mat-form-field appearance="outline" class="phase-select" style="width: 100%;">
+              <mat-label>Fase</mat-label>
+              <mat-select [(value)]="selectedPhaseId" (selectionChange)="onPhaseSelectionChange($event.value)">
+                <mat-option *ngFor="let phase of phases; trackBy: trackByPhaseId" [value]="phase.id">
+                  {{ phase.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>expand_more</mat-icon>
+            </mat-form-field>
           </div>
 
-          <!-- Vertical Divider -->
-          <div class="col-auto px-0">
-            <div class="vertical-separator"></div>
-          </div>
+          <!-- Vertical Separator -->
+          <div class="vertical-separator" *ngIf="getGroupsForSelectedPhase().length > 0"></div>
 
-          <!-- Phase Selection Buttons (Right Side - 8 columns) -->
-          <div class="col-8">
-            <div class="phase-selection">
-              <div class="phase-buttons-container">
-                <div class="phase-buttons-scroll">
-                  <button *ngFor="let phase of phases; let i = index; trackBy: trackByPhaseId"
-                          mat-button
-                          [class.active]="selectedPhaseId === phase.id"
-                          (click)="onPhaseChange(i)"
-                          class="phase-button">
-                    {{ phase.name }}
-                  </button>
-                </div>
-              </div>
-            </div>
+          <!-- Group Selection -->
+          <div class="group-selection" style="min-width: 300px;" *ngIf="getGroupsForSelectedPhase().length > 0">
+            <mat-form-field appearance="outline" class="group-select" style="width: 100%;">
+              <mat-label>Grupo</mat-label>
+              <mat-select [(value)]="selectedGroupId" (selectionChange)="onGroupChange($event.value)">
+                <mat-option *ngFor="let group of getGroupsForSelectedPhase()" [value]="group.id">
+                  {{ group.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>expand_more</mat-icon>
+            </mat-form-field>
           </div>
         </div>
       </div>
@@ -75,8 +67,8 @@
                 <mat-icon class="no-matches-icon">sports_soccer</mat-icon>
                 <h3>No hay partidos programados</h3>
                 <p>No se encontraron partidos para este grupo</p>
-                <button mat-raised-button 
-                        color="primary" 
+                <button mat-raised-button
+                        color="primary"
                         (click)="generateRandomMatchesForGroup()"
                         class="generate-matches-btn">
                   <mat-icon>shuffle</mat-icon>
@@ -86,40 +78,45 @@
 
               <!-- Match Days Accordion -->
               <mat-accordion class="matchdays-accordion" *ngIf="matchDays.length > 0">
-                <mat-expansion-panel *ngFor="let matchDay of matchDays; let i = index; trackBy: trackByMatchDayId" 
+                <mat-expansion-panel *ngFor="let matchDay of matchDays; let i = index; trackBy: trackByMatchDayId"
                                      [expanded]="i === 0"
                                      class="matchday-panel">
-                  
+
                   <!-- Panel Header -->
                   <mat-expansion-panel-header class="panel-header">
                     <mat-panel-title class="panel-title">
                       <div class="matchday-info">
-                        <mat-icon class="matchday-icon">event</mat-icon>
-                        <span class="matchday-name">{{ matchDay.matchDayName }}</span>
-                        <mat-chip class="matches-count-chip">
-                          {{ matchDay.matches.length }} {{ matchDay.matches.length === 1 ? 'partido' : 'partidos' }}
-                        </mat-chip>
+                        <div class="matchday-left">
+                          <mat-icon class="matchday-icon">event</mat-icon>
+                          <span class="matchday-name">{{ matchDay.matchDayName }}</span>
+                        </div>
                         
+                        <div class="matchday-center">
+                          <mat-chip class="matches-count-chip">
+                            {{ matchDay.matches.length }} {{ matchDay.matches.length === 1 ? 'partido' : 'partidos' }}
+                          </mat-chip>
+                        </div>
+
                         <!-- Action Buttons -->
                         <div class="matchday-actions" (click)="$event.stopPropagation()">
                           <button mat-icon-button
                                   (click)="createMatchForMatchDay(matchDay)"
                                   matTooltip="Crear nuevo partido"
-                                  class="action-btn create-btn">
+                                  class="action-btn-small create-btn">
                             <mat-icon>add_circle</mat-icon>
                           </button>
                           <button mat-icon-button
                                   *ngIf="getSelectedPhase()?.phaseType !== 1"
                                   (click)="generateRandomMatches(matchDay)"
                                   matTooltip="Generar partidos aleatorios"
-                                  class="action-btn random-btn">
+                                  class="action-btn-small random-btn">
                             <mat-icon>shuffle</mat-icon>
                           </button>
                           <button mat-icon-button
                                   *ngIf="isLastMatchDay(matchDay)"
                                   (click)="deleteMatchDay(matchDay)"
                                   matTooltip="Eliminar jornada"
-                                  class="action-btn delete-btn">
+                                  class="action-btn-small delete-btn">
                             <mat-icon>delete</mat-icon>
                           </button>
                         </div>
@@ -129,30 +126,62 @@
 
                   <!-- Panel Content - Matches List -->
                   <div class="container-fluid">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                    <div class="matches-grid">
                       <div *ngFor="let match of matchDay.matches; trackBy: trackByMatchInfoId" class="col">
                         <mat-card class="match-card h-100">
                           <mat-card-content class="match-content">
-                            <!-- Match Header -->
+                            <!-- Match Header with Actions and Status -->
                             <div class="match-header">
-                              <span class="match-day-label">{{ matchDay.matchDayName }}</span>
+                              <!-- Actions Left -->
+                              <div class="match-actions-top">
+                                <button mat-icon-button
+                                        (click)="updateMatchDate(match)"
+                                        matTooltip="Actualizar fecha"
+                                        class="action-btn-mini update-date">
+                                  <mat-icon>calendar_today</mat-icon>
+                                </button>
+                                <button mat-icon-button
+                                        (click)="changeMatchStatus(match)"
+                                        matTooltip="Cambiar estado"
+                                        class="action-btn-mini change-status">
+                                  <mat-icon>swap_horiz</mat-icon>
+                                </button>
+                                <button mat-icon-button
+                                        (click)="deleteMatchById(match)"
+                                        matTooltip="Eliminar partido"
+                                        class="action-btn-mini delete">
+                                  <mat-icon>delete</mat-icon>
+                                </button>
+                              </div>
+                              
+                              <!-- Status Badge Right -->
+                              <div class="match-status-top">
+                                <div
+                                  [class]="getMatchStatusClassByNumber(match.status)"
+                                  [matTooltip]="getMatchStatusTextByNumber(match.status)"
+                                  class="status-circle">
+                                  <mat-icon class="check-icon">check</mat-icon>
+                                </div>
+                              </div>
                             </div>
 
                             <!-- Teams and Score -->
                             <div class="match-main">
                               <!-- Home Team -->
                               <div class="team home-team">
+                                <div class="team-top">
+                                  <div class="team-score">
+                                    <span class="score">3</span>
+                                  </div>
+                                  <div class="team-info">
+                                    <span class="team-name">{{ match.homeTeam }}</span>
+                                  </div>
+                                </div>
                                 <div class="team-logo-container">
-                                  <img [src]="match.homeTeamLogoUrl || 'assets/logo.png'" 
-                                       alt="Home Team" 
+                                  <img [src]="match.homeTeamLogoUrl || 'assets/logo.png'"
+                                       alt="Home Team"
                                        class="team-logo"
                                        (error)="$event.target.src='assets/logo.png'">
-                                </div>
-                                <div class="team-info">
-                                  <span class="team-name">{{ match.homeTeam }}</span>
-                                </div>
-                                <div class="team-score">
-                                  <span class="score">3</span>
                                 </div>
                               </div>
 
@@ -170,51 +199,21 @@
 
                               <!-- Away Team -->
                               <div class="team away-team">
-                                <div class="team-score">
-                                  <span class="score">1</span>
-                                </div>
-                                <div class="team-info">
-                                  <span class="team-name">{{ match.awayTeam }}</span>
+                                <div class="team-top">
+                                  <div class="team-score">
+                                    <span class="score">1</span>
+                                  </div>
+                                  <div class="team-info">
+                                    <span class="team-name">{{ match.awayTeam }}</span>
+                                  </div>
                                 </div>
                                 <div class="team-logo-container">
-                                  <img [src]="match.awayTeamLogoUrl || 'assets/logo.png'" 
-                                       alt="Away Team" 
+                                  <img [src]="match.awayTeamLogoUrl || 'assets/logo.png'"
+                                       alt="Away Team"
                                        class="team-logo"
                                        (error)="$event.target.src='assets/logo.png'">
                                 </div>
                               </div>
-                            </div>
-
-                            <!-- Match Status -->
-                            <div class="match-status-section">
-                              <mat-chip 
-                                [class]="getMatchStatusClassByNumber(match.status)"
-                                class="status-chip">
-                                {{ getMatchStatusTextByNumber(match.status) }}
-                              </mat-chip>
-                            </div>
-
-                            <!-- Match Actions -->
-                            <mat-divider></mat-divider>
-                            <div class="match-actions">
-                              <button mat-icon-button
-                                      (click)="updateMatchDate(match)"
-                                      matTooltip="Actualizar fecha"
-                                      class="action-btn-small">
-                                <mat-icon>calendar_today</mat-icon>
-                              </button>
-                              <button mat-icon-button
-                                      (click)="changeMatchStatus(match)"
-                                      matTooltip="Cambiar estado"
-                                      class="action-btn-small">
-                                <mat-icon>swap_horiz</mat-icon>
-                              </button>
-                              <button mat-icon-button
-                                      (click)="deleteMatchById(match)"
-                                      matTooltip="Eliminar partido"
-                                      class="action-btn-small delete">
-                                <mat-icon>delete</mat-icon>
-                              </button>
                             </div>
                           </mat-card-content>
                         </mat-card>

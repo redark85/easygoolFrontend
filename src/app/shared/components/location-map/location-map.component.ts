@@ -48,7 +48,7 @@ export interface LocationMapData {
         <div class="search-container">
           <mat-form-field appearance="outline" class="search-field">
             <mat-label>Buscar dirección</mat-label>
-            <input matInput [(ngModel)]="searchQuery" (keyup.enter)="searchAddress()" 
+            <input matInput [(ngModel)]="searchQuery" (keyup.enter)="searchAddress()"
                    placeholder="Ej: Av. Amazonas y Naciones Unidas, Quito">
             <button mat-icon-button matSuffix (click)="searchAddress()" [disabled]="isSearching">
               <mat-icon *ngIf="!isSearching">search</mat-icon>
@@ -75,7 +75,7 @@ export interface LocationMapData {
         <button mat-stroked-button (click)="onCancel()">
           Cancelar
         </button>
-        <button mat-flat-button color="primary" (click)="onConfirm()" 
+        <button mat-flat-button color="primary" (click)="onConfirm()"
                 [disabled]="!selectedLocation">
           Confirmar Ubicación
         </button>
@@ -86,6 +86,8 @@ export interface LocationMapData {
     .location-map-container {
       width: 100%;
       max-width: 800px;
+      overflow-y: auto;
+      max-height: 700px;
     }
 
     .search-container {
@@ -162,7 +164,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
       // Modo edición: usar ubicación del torneo
       this.selectedLocation = { ...this.data.initialLocation };
       this.searchQuery = this.data.initialLocation.address;
-      
+
       // Mapear desde Address interface si viene del backend
       if (!this.selectedLocation.primaryStreet && !this.selectedLocation.secondaryStreet) {
         // Intentar mapear desde mainStreet/secondStreet si existen
@@ -213,7 +215,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
       // Coordenadas por defecto (Quito, Ecuador)
       let initialLat = -0.1807;
       let initialLng = -78.4678;
-      
+
       // Si hay ubicación inicial (modo edición), usarla
       if (this.selectedLocation) {
         initialLat = this.selectedLocation.latitude;
@@ -238,11 +240,11 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
           container.style.cursor = 'pointer';
           container.innerHTML = '<div style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px;">📍</div>';
           container.title = 'Obtener mi ubicación actual';
-          
+
           container.onclick = () => {
             this.getCurrentLocation();
           };
-          
+
           return container;
         }
       });
@@ -284,7 +286,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            
+
             // Actualizar mapa si ya está inicializado
             if (this.map && this.marker) {
               this.map.setView([lat, lng], 15);
@@ -354,11 +356,11 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updateSelectedLocation(lat: number, lng: number, displayName: string, addressDetails?: any): void {
     console.log('AddressDetails received:', addressDetails);
-    
+
     const fullStreet = addressDetails?.road || addressDetails?.pedestrian || '';
     let mainStreet = fullStreet;
     let secondaryStreet = addressDetails?.neighbourhood || addressDetails?.suburb || '';
-    
+
     // Si no hay calle específica, extraer mainStreet del displayName
     if (!mainStreet && displayName) {
       const addressParts = displayName.split(',').map((part: string) => part.trim());
@@ -367,7 +369,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
         secondaryStreet = addressParts[1] || ''; // Segundo elemento como secondaryStreet
       }
     }
-    
+
     // Fallback adicional para secondaryStreet si aún está vacío
     if (!secondaryStreet && displayName) {
       const addressParts = displayName.split(',').map((part: string) => part.trim());
@@ -375,7 +377,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
         secondaryStreet = addressParts[1] || '';
       }
     }
-    
+
     // Procesar la calle principal para separar mainStreet y secondaryStreet
     if (fullStreet) {
       const streetParts = fullStreet.split(',').map((part: string) => part.trim());
@@ -388,9 +390,9 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     }
-    
+
     console.log('Processed streets - mainStreet:', mainStreet, 'secondaryStreet:', secondaryStreet);
-    
+
     this.selectedLocation = {
       address: displayName,
       latitude: lat,
@@ -405,7 +407,7 @@ export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   getAddressData(): Address | null {
     if (!this.selectedLocation) return null;
-    
+
     return {
       address: this.selectedLocation.address,
       mainStreet: this.selectedLocation.primaryStreet || '',
