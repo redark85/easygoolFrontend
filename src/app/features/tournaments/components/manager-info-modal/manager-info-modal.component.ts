@@ -273,7 +273,7 @@ export interface ManagerInfoData {
       }
     }
 
-    // Responsive
+    /* Responsive */
     @media (max-width: 480px) {
       .manager-info-modal {
         max-width: 100%;
