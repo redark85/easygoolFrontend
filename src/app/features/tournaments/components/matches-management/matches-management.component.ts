@@ -877,12 +877,17 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     };
 
     const dialogRef = this.dialog.open(MatchDatetimeModalComponent, {
-      width: 'auto',
-      height: 'auto',
-      maxWidth: '600px',
+      width: '500px',
+      maxWidth: '90vw',
       data: dialogData,
-      disableClose: true,
-      autoFocus: true
+      disableClose: false,
+      autoFocus: true,
+      hasBackdrop: true,
+      backdropClass: 'custom-backdrop',
+      panelClass: 'custom-dialog-panel',
+      position: {
+        top: '10vh'
+      }
     });
 
     dialogRef.afterClosed().subscribe((result: MatchDateTimeResult) => {

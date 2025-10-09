@@ -15,17 +15,21 @@
       <div class="form-row">
         <!-- Fecha Column -->
         <div class="form-column">
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="full-width date-field">
             <mat-label>Fecha del Partido</mat-label>
             <input matInput 
                    [matDatepicker]="datePicker" 
                    formControlName="matchDate"
+                   [min]="minDate"
                    placeholder="Seleccionar fecha"
                    readonly>
             <mat-datepicker-toggle matIconSuffix [for]="datePicker">
               <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
             </mat-datepicker-toggle>
-            <mat-datepicker #datePicker></mat-datepicker>
+            <mat-datepicker #datePicker 
+                           [touchUi]="false"
+                           [disabled]="false">
+            </mat-datepicker>
             <mat-error *ngIf="dateTimeForm.get('matchDate')?.hasError('required')">
               La fecha es requerida
             </mat-error>
@@ -34,12 +38,14 @@
 
         <!-- Hora Column -->
         <div class="form-column">
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="full-width time-field">
             <mat-label>Hora del Partido</mat-label>
-            <input matInput 
-                   type="time" 
-                   formControlName="matchTime"
-                   placeholder="15:00">
+            <mat-select formControlName="matchTime" 
+                       placeholder="Seleccionar hora">
+              <mat-option *ngFor="let time of timeOptions" [value]="time">
+                {{ time }}
+              </mat-option>
+            </mat-select>
             <mat-icon matSuffix>schedule</mat-icon>
             <mat-error *ngIf="dateTimeForm.get('matchTime')?.hasError('required')">
               La hora es requerida

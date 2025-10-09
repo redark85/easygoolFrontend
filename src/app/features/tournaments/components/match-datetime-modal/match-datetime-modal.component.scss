@@ -3,6 +3,8 @@
   padding: 24px;
   min-width: 500px;
   max-width: 600px;
+  overflow: visible;
+  position: relative;
   
   // Título del modal
   .modal-title {
@@ -40,6 +42,7 @@
   .modal-content {
     padding: 0;
     margin: 0 0 24px 0;
+    overflow: visible;
     
     .datetime-form {
       .form-row {
@@ -48,9 +51,20 @@
         
         .form-column {
           flex: 1;
+          position: relative;
           
           .full-width {
             width: 100%;
+          }
+          
+          // Estilos específicos para el campo de fecha
+          .date-field {
+            z-index: 1000;
+          }
+          
+          // Estilos específicos para el campo de hora
+          .time-field {
+            z-index: 999;
           }
         }
       }
@@ -91,17 +105,36 @@
       .datetime-form {
         .form-row {
           flex-direction: column;
-          gap: 12px;
+          gap: 16px;
+          
+          .form-column {
+            width: 100%;
+          }
         }
       }
     }
     
     .modal-actions {
+      flex-direction: column;
+      gap: 8px;
+      
       button {
         width: 100%;
-        margin: 4px 0;
+        margin: 0;
       }
     }
+  }
+  
+  // Ajustes específicos para móvil en los pickers
+  ::ng-deep .mat-datepicker-popup {
+    .mat-calendar {
+      width: 100%;
+      max-width: 320px;
+    }
+  }
+  
+  ::ng-deep .mat-mdc-select-panel {
+    max-width: 95vw;
   }
 }
 
@@ -116,22 +149,38 @@
   // Form fields
   .mat-mdc-form-field {
     .mat-mdc-form-field-wrapper {
-      padding-bottom: 1.25em;
+      padding-bottom: 1.5em;
     }
     
     .mat-mdc-form-field-flex {
       align-items: center;
-      padding: 0.75em 0.75em 0 0.75em;
+      padding: 1em 0.75em 0 0.75em;
+      min-height: 56px;
     }
     
     .mat-mdc-form-field-infix {
-      padding: 0.5em 0;
-      min-height: 1.5em;
-      border-top: 0.84375em solid transparent;
+      padding: 1em 0 0.5em 0;
+      min-height: 2em;
+      border-top: 1em solid transparent;
+      line-height: 1.5;
     }
     
     .mat-mdc-form-field-subscript-wrapper {
       padding: 0 1em;
+      margin-top: 0.5em;
+    }
+    
+    // Etiquetas flotantes
+    .mat-mdc-form-field-label {
+      top: 50%;
+      transform: translateY(-50%);
+      line-height: 1.2;
+    }
+    
+    &.mat-mdc-form-field-has-icon-suffix {
+      .mat-mdc-form-field-infix {
+        padding-right: 0;
+      }
     }
     
     // Íconos
@@ -145,18 +194,20 @@
       }
     }
     
-    // Input de tiempo
-    input[type="time"] {
-      font-family: 'Roboto Mono', monospace;
+    // Select de tiempo
+    .mat-mdc-select {
+      font-family: 'Roboto', sans-serif;
       font-size: 14px;
+      line-height: 1.5;
       
-      &::-webkit-calendar-picker-indicator {
-        cursor: pointer;
-        opacity: 0.6;
-        
-        &:hover {
-          opacity: 1;
-        }
+      .mat-mdc-select-trigger {
+        min-height: 1.5em;
+        display: flex;
+        align-items: center;
+      }
+      
+      .mat-mdc-select-value {
+        line-height: 1.5;
       }
     }
   }
@@ -193,7 +244,8 @@
 
 // Estilos globales para el datepicker popup
 ::ng-deep .mat-datepicker-popup {
-  z-index: 10000 !important;
+  z-index: 1100 !important;
+  position: relative;
   
   .mat-calendar {
     .mat-calendar-header {
@@ -210,4 +262,109 @@
       line-height: 32px;
     }
   }
+}
+
+// Backdrop específico para datepicker
+::ng-deep .cdk-overlay-backdrop.mat-datepicker-popup-backdrop {
+  z-index: 1099 !important;
+}
+
+// Estilos globales para el select dropdown
+::ng-deep .mat-mdc-select-panel {
+  z-index: 1101 !important;
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+  
+  .mat-mdc-option {
+    height: 48px;
+    line-height: 48px;
+    padding: 0 16px;
+    font-size: 14px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+    
+    &.mat-mdc-option-active {
+      background-color: rgba(25, 118, 210, 0.12);
+    }
+  }
+}
+
+// Backdrop específico para select
+::ng-deep .cdk-overlay-backdrop.mat-select-backdrop {
+  z-index: 1100 !important;
+}
+
+// Estilos globales para el modal dialog
+::ng-deep .mat-mdc-dialog-container {
+  z-index: 1000 !important;
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+              0 24px 38px 3px rgba(0, 0, 0, 0.14),
+              0 9px 46px 8px rgba(0, 0, 0, 0.12);
+}
+
+// Overlay backdrop del modal principal
+::ng-deep .cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  z-index: 999 !important;
+  background-color: rgba(0, 0, 0, 0.32);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+// Container del overlay principal
+::ng-deep .cdk-overlay-container {
+  z-index: 1000 !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+// Pane del overlay
+::ng-deep .cdk-overlay-pane {
+  z-index: 1000 !important;
+  position: absolute;
+  pointer-events: auto;
+}
+
+// Clases personalizadas para el modal
+::ng-deep .custom-backdrop {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  z-index: 999 !important;
+}
+
+::ng-deep .custom-dialog-panel {
+  z-index: 1000 !important;
+  
+  .mat-mdc-dialog-container {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    overflow: visible;
+    box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+                0 24px 38px 3px rgba(0, 0, 0, 0.14),
+                0 9px 46px 8px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// Corrección específica para Angular Material 20
+::ng-deep .mat-mdc-dialog-surface {
+  background: white !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+}
+
+::ng-deep .mat-mdc-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
 }

@@ -493,3 +493,108 @@ html, body {
   border-color: var(--primary-dark) !important;
   background-color: var(--primary-dark) !important;
 }
+
+/* ==========================================================================
+   ESTILOS GLOBALES PARA OVERLAYS Y MODALES - Angular Material 20
+   ========================================================================== */
+
+// Corrección para overlays de Angular Material 20
+.cdk-overlay-container {
+  z-index: 1000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  pointer-events: none !important;
+}
+
+// Backdrop del overlay principal
+.cdk-overlay-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 999 !important;
+  pointer-events: auto !important;
+  transition: opacity 400ms cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  opacity: 1 !important;
+  background-color: rgba(0, 0, 0, 0.32) !important;
+}
+
+// Pane del overlay
+.cdk-overlay-pane {
+  position: absolute !important;
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+}
+
+// Contenedor del diálogo
+.mat-mdc-dialog-container {
+  z-index: 1000 !important;
+  position: relative !important;
+  background: white !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+              0 24px 38px 3px rgba(0, 0, 0, 0.14),
+              0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+// Surface del diálogo (Angular Material 20)
+.mat-mdc-dialog-surface {
+  background: white !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+}
+
+// Contenido del diálogo
+.mat-mdc-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+// Datepicker popup
+.mat-datepicker-popup {
+  z-index: 1100 !important;
+  position: relative !important;
+}
+
+// Select panel
+.mat-mdc-select-panel {
+  z-index: 1101 !important;
+  position: relative !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+// Backdrop específico para datepicker
+.cdk-overlay-backdrop.mat-datepicker-popup-backdrop {
+  z-index: 1099 !important;
+}
+
+// Backdrop específico para select
+.cdk-overlay-backdrop.mat-select-backdrop {
+  z-index: 1100 !important;
+}
+
+// Clases personalizadas para el modal de fecha/hora
+.custom-backdrop {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  z-index: 999 !important;
+}
+
+.custom-dialog-panel {
+  z-index: 1000 !important;
+  
+  .mat-mdc-dialog-container {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}
