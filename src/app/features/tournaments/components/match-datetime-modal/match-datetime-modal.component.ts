@@ -67,16 +67,20 @@ export class MatchDatetimeModalComponent implements OnInit {
   
 
   private initializeForm(): void {
-    // Convertir la fecha actual a Date object
-    let initialDate: Date | null = null;
-    let initialTime: Date | null = null;
+    // Obtener fecha y hora actuales
+    const now = new Date();
+    let initialDate: Date = new Date(now);
+    let initialTime: Date = new Date(now);
 
+    // Si hay datos existentes, usarlos en lugar de los actuales
     if (this.data.currentDate && this.data.currentDate !== '0001-01-01T00:00:00') {
-      const date = new Date(this.data.currentDate);
-      if (!isNaN(date.getTime())) {
-        initialDate = date;
-        // Usar la misma fecha para el time picker
-        initialTime = new Date(date);
+      const existingDate = new Date(this.data.currentDate);
+      if (!isNaN(existingDate.getTime())) {
+        initialDate = existingDate;
+        // Usar la misma fecha para el time picker si no hay hora específica
+        if (!this.data.currentTime) {
+          initialTime = new Date(existingDate);
+        }
       }
     }
 
@@ -93,11 +97,16 @@ export class MatchDatetimeModalComponent implements OnInit {
       }
     }
 
-    // Si no hay tiempo inicial, usar 15:00 por defecto
-    if (!initialTime) {
-      const defaultTime = new Date();
-      defaultTime.setHours(15, 0, 0, 0);
-      initialTime = defaultTime;
+    // Redondear la hora actual a los 15 minutos más cercanos si no hay datos existentes
+    if (!this.data.currentDate && !this.data.currentTime) {
+      const minutes = now.getMinutes();
+      const roundedMinutes = Math.ceil(minutes / 15) * 15;
+      initialTime.setMinutes(roundedMinutes, 0, 0);
+      
+      // Si se pasa de 60 minutos, ajustar la hora
+      if (roundedMinutes >= 60) {
+        initialTime.setHours(initialTime.getHours() + 1, 0, 0, 0);
+      }
     }
 
     this.dateTimeForm.patchValue({
