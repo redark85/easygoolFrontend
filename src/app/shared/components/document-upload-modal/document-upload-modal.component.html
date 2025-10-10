@@ -13,6 +13,18 @@
   </div>
 
   <mat-dialog-content class="modal-content">
+    <!-- Botón de descarga de ejemplo -->
+    <div class="download-example-container">
+      <button mat-raised-button
+              color="primary"
+              class="download-example-btn"
+              (click)="downloadExampleExcel()"
+              matTooltip="Descargar plantilla de Excel de ejemplo">
+        <mat-icon>download</mat-icon>
+        Excel Ejemplo
+      </button>
+    </div>
+
     <!-- Mensaje de advertencia -->
     <div class="warning-message" *ngIf="data.message">
       <mat-icon class="warning-icon">info</mat-icon>

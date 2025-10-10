@@ -47,6 +47,7 @@ export const PLAYER_CREATE_ENDPOINT = '/api/Player/CreatePlayer';
 export const PLAYER_GET_BY_TEAM_ENDPOINT = '/api/Player/GetByTeam';
 export const PLAYER_UPDATE_ENDPOINT = '/api/Player/UpdatePlayer';
 export const PLAYER_DELETE_ENDPOINT = '/api/Player/DeletePlayer';
+export const PLAYER_UPLOAD_EXCEL_ENDPOINT = '/api/Player/UploadPlayerThrowExcel';
 
 // Match Endpoints
 export const MATCH_GET_ALL_BY_GROUP_ENDPOINT = '/api/Match/GetAllMatchesByGroup';

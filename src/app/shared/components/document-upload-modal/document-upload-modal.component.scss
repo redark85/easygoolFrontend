@@ -45,6 +45,34 @@
     overflow-y: auto;
   }
 
+  .download-example-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f5f5f5;
+    border-radius: 8px;
+
+    .download-example-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      mat-icon {
+        font-size: 1.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+      }
+    }
+  }
+
   .warning-message {
     display: flex;
     align-items: flex-start;
@@ -202,6 +230,15 @@
     .team-info {
       padding: 0.75rem;
       font-size: 0.9rem;
+    }
+
+    .download-example-container {
+      padding: 0.75rem;
+
+      .download-example-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   }
 }

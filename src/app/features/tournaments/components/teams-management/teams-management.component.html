@@ -12,17 +12,8 @@
               Administra los equipos participantes en tu torneo
             </mat-card-subtitle>
           </div>
-          <div class="col-2 d-flex justify-content-center">
-            <button mat-raised-button
-                    color="primary"
-                    class="download-example-btn"
-                    (click)="downloadExampleExcel()"
-                    matTooltip="Descargar plantilla de Excel de ejemplo">
-              <mat-icon>download</mat-icon>
-              Excel Ejemplo
-            </button>
-          </div>
-          <div class="col-4">
+          
+          <div class="col-6">
             <div class="row justify-content-end">
               <div class="col-auto">
                 <mat-form-field appearance="outline" class="search-field">
@@ -151,6 +142,7 @@
                       <mat-icon>delete</mat-icon>
                     </button>
                     <button mat-icon-button
+                            *ngIf="!team.hasExcelUploaded"
                             [matTooltip]="team.hasExcelUploaded ? 'Excel ya subido' : 'Subir excel de registro de jugadores'"
                             [class]="team.hasExcelUploaded ? 'text-muted' : 'text-info'"
                             [disabled]="team.hasExcelUploaded"

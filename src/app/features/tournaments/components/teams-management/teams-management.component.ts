@@ -712,7 +712,8 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         allowedExtensions: ['.xlsx'],
         acceptAttribute: '.xlsx',
         message: 'Estas a punto de subir el excel para el equipo ten en cuenta que solo podrás subir una vez el archivo.',
-        teamName: team.name
+        teamName: team.name,
+        tournamentTeamId: team.tournamentTeamId
       } as DocumentUploadModalData
     });
 
@@ -726,40 +727,6 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
-  }
-
-  /**
-   * Descarga el archivo de ejemplo de Excel para equipos
-   */
-  async downloadExampleExcel(): Promise<void> {
-    try {
-      const success = await FileDownloadUtil.downloadTeamExampleFile();
-      
-      if (success) {
-        Swal.fire({
-          title: '¡Descarga iniciada!',
-          text: 'El archivo de ejemplo se está descargando',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-      } else {
-        Swal.fire({
-          title: 'Error en la descarga',
-          text: 'No se pudo descargar el archivo de ejemplo',
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
-      }
-    } catch (error) {
-      console.error('Error downloading example file:', error);
-      Swal.fire({
-        title: 'Error',
-        text: 'Ocurrió un error al intentar descargar el archivo',
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-      });
-    }
   }
 
   /**

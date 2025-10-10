@@ -5,7 +5,11 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DocumentUploaderComponent, DocumentUploadData } from '../document-uploader/document-uploader.component';
+import { PlayerService } from '@core/services/player.service';
+import { ToastService } from '@core/services/toast.service';
+import { FileDownloadUtil } from '@shared/utils/file-download.util';
 import Swal from 'sweetalert2';
 
 export interface DocumentUploadModalData {
@@ -16,6 +20,7 @@ export interface DocumentUploadModalData {
   acceptAttribute: string;
   message?: string;
   teamName?: string;
+  tournamentTeamId?: number;
 }
 
 export interface DocumentUploadModalResult {
@@ -33,6 +38,7 @@ export interface DocumentUploadModalResult {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
     DocumentUploaderComponent
   ],
   templateUrl: './document-upload-modal.component.html',
@@ -46,7 +52,9 @@ export class DocumentUploadModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<DocumentUploadModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DocumentUploadModalData
+    @Inject(MAT_DIALOG_DATA) public data: DocumentUploadModalData,
+    private playerService: PlayerService,
+    private toastService: ToastService
   ) {
     this.documentForm = this.fb.group({
       document: [null, Validators.required]
@@ -62,7 +70,8 @@ export class DocumentUploadModalComponent implements OnInit {
       allowedExtensions: this.data.allowedExtensions || ['.xlsx'],
       acceptAttribute: this.data.acceptAttribute || '.xlsx',
       message: this.data.message || '',
-      teamName: this.data.teamName || ''
+      teamName: this.data.teamName || '',
+      tournamentTeamId: this.data.tournamentTeamId
     };
   }
 
@@ -74,27 +83,47 @@ export class DocumentUploadModalComponent implements OnInit {
     if (this.documentForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       
-      // Simular delay de subida
-      setTimeout(() => {
-        const documentData = this.documentForm.get('document')?.value;
-        
-        // Mostrar mensaje de éxito
-        Swal.fire({
-          title: '¡Documento subido exitosamente!',
-          text: `El archivo "${documentData.fileName}" ha sido subido correctamente`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          // Cerrar modal con resultado exitoso
-          this.dialogRef.close({
-            success: true,
-            document: documentData
-          } as DocumentUploadModalResult);
-        });
-        
+      const documentData = this.documentForm.get('document')?.value;
+      
+      // Verificar si se proporcionó el tournamentTeamId
+      if (!this.data.tournamentTeamId) {
+        this.toastService.showError('No se proporcionó el ID del equipo');
         this.isSubmitting = false;
-      }, 1500);
+        return;
+      }
+      
+      // Preparar el request
+      const request = {
+        base64File: this.cleanBase64(documentData.base64) 
+      };
+      
+      // Llamar al servicio
+      this.playerService.uploadPlayerExcel(this.data.tournamentTeamId, request)
+        .subscribe({
+          next: (response) => {
+            // Mostrar mensaje de éxito
+            Swal.fire({
+              title: '¡Documento subido exitosamente!',
+              text: `El archivo "${documentData.fileName}" ha sido subido correctamente`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              // Cerrar modal con resultado exitoso
+              this.dialogRef.close({
+                success: true,
+                document: documentData
+              } as DocumentUploadModalResult);
+            });
+            
+            this.isSubmitting = false;
+          },
+          error: (error) => {
+            console.error('Error al subir el archivo:', error);
+            this.toastService.showError(error.message || 'Error al subir el archivo Excel');
+            this.isSubmitting = false;
+          }
+        });
     }
   }
 
@@ -106,5 +135,43 @@ export class DocumentUploadModalComponent implements OnInit {
 
   get hasDocument(): boolean {
     return !!this.documentForm.get('document')?.value;
+  }
+
+  private cleanBase64(base64String: string): string {
+    if (!base64String) return '';
+    const base64Prefix = base64String.indexOf(',');
+    if (base64Prefix !== -1) {
+      return base64String.substring(base64Prefix + 1);
+    }
+    return base64String;
+  }
+
+  /**
+   * Descarga el archivo de ejemplo de Excel para jugadores
+   */
+  async downloadExampleExcel(): Promise<void> {
+    try {
+      const success = await FileDownloadUtil.downloadTeamExampleFile();
+      
+      if (success) {
+        Swal.fire({
+          title: '¡Descarga iniciada!',
+          text: 'El archivo de ejemplo se está descargando',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } else {
+        Swal.fire({
+          title: 'Error en la descarga',
+          text: 'No se pudo descargar el archivo de ejemplo',
+          icon: 'error',
+          confirmButtonText: 'Entendido'
+        });
+      }
+    } catch (error) {
+      console.error('Error al descargar el archivo de ejemplo:', error);
+      this.toastService.showError('Error al descargar el archivo de ejemplo');
+    }
   }
 }
