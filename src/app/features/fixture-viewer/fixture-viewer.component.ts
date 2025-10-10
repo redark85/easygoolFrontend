@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Subject, takeUntil } from 'rxjs';
+import { FixtureService, TournamentListItem } from '@core/services/fixture.service';
+import { ToastService } from '@core/services';
 
 @Component({
   selector: 'app-fixture-viewer',
@@ -19,34 +22,74 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   templateUrl: './fixture-viewer.component.html',
   styleUrls: ['./fixture-viewer.component.scss']
 })
-export class FixtureViewerComponent implements OnInit {
+export class FixtureViewerComponent implements OnInit, OnDestroy {
   loading = false;
-  tournaments: any[] = [];
+  tournaments: TournamentListItem[] = [];
+  private destroy$ = new Subject<void>();
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private fixtureService: FixtureService,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
-    // TODO: Cargar torneos en curso desde el servicio
     this.loadTournaments();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadTournaments(): void {
     this.loading = true;
-    // Simulación de carga de torneos
-    setTimeout(() => {
-      this.tournaments = [
-        { id: 1, name: 'Campeonato Regional 2025', status: 'En curso' },
-        { id: 2, name: 'Liga Provincial', status: 'En curso' },
-        { id: 3, name: 'Torneo Apertura', status: 'En curso' }
-      ];
-      this.loading = false;
-    }, 1000);
+    
+    this.fixtureService.getTournamentList()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournaments) => {
+          this.tournaments = tournaments;
+          this.loading = false;
+          console.log('Torneos cargados:', tournaments);
+        },
+        error: (error) => {
+          console.error('Error al cargar torneos:', error);
+          this.toastService.showError('Error al cargar la lista de torneos');
+          this.loading = false;
+        }
+      });
+  }
+
+  /**
+   * Obtiene el texto del estado del torneo
+   */
+  getStatusText(status: number): string {
+    switch (status) {
+      case 0: return 'Programado';
+      case 1: return 'En curso';
+      case 2: return 'Finalizado';
+      case 3: return 'Cancelado';
+      default: return 'Desconocido';
+    }
+  }
+
+  /**
+   * Obtiene la clase CSS del estado del torneo
+   */
+  getStatusClass(status: number): string {
+    switch (status) {
+      case 0: return 'status-scheduled';
+      case 1: return 'status-active';
+      case 2: return 'status-finished';
+      case 3: return 'status-cancelled';
+      default: return '';
+    }
   }
 
   viewFixture(tournamentId: number): void {
-    // TODO: Navegar a la vista del fixture del torneo
     console.log('Ver fixture del torneo:', tournamentId);
-    // this.router.navigate(['/fixture', tournamentId]);
+    this.router.navigate(['/public-standings', tournamentId]);
   }
 
   goBack(): void {

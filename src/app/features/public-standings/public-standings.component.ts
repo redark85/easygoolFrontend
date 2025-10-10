@@ -38,7 +38,7 @@ interface TopScorer {
 }
 
 @Component({
-  selector: 'app-standings',
+  selector: 'app-public-standings',
   standalone: true,
   imports: [
     CommonModule,
@@ -54,10 +54,10 @@ interface TopScorer {
     MatInputModule,
     FormsModule
   ],
-  templateUrl: './standings.component.html',
-  styleUrls: ['./standings.component.scss']
+  templateUrl: './public-standings.component.html',
+  styleUrls: ['./public-standings.component.scss']
 })
-export class StandingsComponent implements OnInit, OnDestroy {
+export class PublicStandingsComponent implements OnInit, OnDestroy {
   standings: FixtureTeam[] = [];
   matches: Match[] = [];
   filteredMatches: Match[] = [];
@@ -79,12 +79,12 @@ export class StandingsComponent implements OnInit, OnDestroy {
   tournamentDetails: TournamentDetails | null = null;
   tournamentInfo = {
     name: '',
-    phase: '',
-    group: '',
     season: '',
-    status: ''
+    status: '',
+    phase: '',
+    group: ''
   };
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -114,33 +114,38 @@ export class StandingsComponent implements OnInit, OnDestroy {
       });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   /**
-   * Carga las fases del torneo desde el API
+   * Carga las fases del torneo
    */
   private loadPhases(): void {
     this.isLoading = true;
-    this.cdr.detectChanges();
-
+    
     this.managerService.getTournamentPhases(this.tournamentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (tournamentDetails) => {
-          console.log('Tournament details:', tournamentDetails);
+          console.log('Detalles del torneo recibidos:', tournamentDetails);
           
-          // Guardar los detalles del torneo
+          // Guardar detalles del torneo
           this.tournamentDetails = tournamentDetails;
           
           // Actualizar información del torneo
           this.tournamentInfo = {
             name: tournamentDetails.name,
-            phase: '',
-            group: '',
             season: new Date(tournamentDetails.startDate).getFullYear().toString(),
-            status: this.getStatusText(tournamentDetails.status)
+            status: this.getStatusText(tournamentDetails.status),
+            phase: '',
+            group: ''
           };
           
-          // Cargar las fases
+          // Cargar fases
           this.phases = tournamentDetails.phases || [];
+          console.log('Fases cargadas:', this.phases);
           
           // Seleccionar la primera fase por defecto
           if (this.phases.length > 0) {
@@ -148,41 +153,24 @@ export class StandingsComponent implements OnInit, OnDestroy {
             this.onPhaseChange();
           } else {
             this.isLoading = false;
-            this.cdr.detectChanges();
           }
         },
         error: (error) => {
-          console.error('Error loading tournament phases:', error);
+          console.error('Error al cargar fases:', error);
           this.toastService.showError('Error al cargar las fases del torneo');
           this.isLoading = false;
-          this.cdr.detectChanges();
         }
       });
-  }
-
-  /**
-   * Obtiene el texto del estado del torneo
-   */
-  private getStatusText(status: number): string {
-    switch (status) {
-      case 0: return 'Programado';
-      case 1: return 'En curso';
-      case 2: return 'Finalizado';
-      case 3: return 'Cancelado';
-      default: return 'Desconocido';
-    }
   }
 
   /**
    * Maneja el cambio de fase seleccionada
    */
   onPhaseChange(): void {
-    const selectedPhase = this.phases.find(p => p.id === this.selectedPhaseId);
+    const selectedPhase = this.selectedPhase;
     
     if (selectedPhase) {
       console.log('Fase seleccionada:', selectedPhase);
-      
-      // Actualizar información del torneo
       this.tournamentInfo.phase = selectedPhase.name;
       
       // Si es fase de grupos, cargar los grupos
@@ -244,11 +232,6 @@ export class StandingsComponent implements OnInit, OnDestroy {
     return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   private loadStandings(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -261,24 +244,35 @@ export class StandingsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (standings) => {
-          console.log('standings', standings);
-          this.isLoading = false;
-
+          console.log('Standings recibidos:', standings);
           this.standings = standings;
-            this.cdr.detectChanges();
+          this.isLoading = false;
+          this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error loading standings:', error);
+          console.error('Error al cargar standings:', error);
           this.toastService.showError('Error al cargar la tabla de posiciones');
           this.isLoading = false;
           this.cdr.detectChanges();
-
         }
       });
   }
 
+  /**
+   * Obtiene el texto del estado del torneo
+   */
+  private getStatusText(status: number): string {
+    switch (status) {
+      case 0: return 'Programado';
+      case 1: return 'En curso';
+      case 2: return 'Finalizado';
+      case 3: return 'Cancelado';
+      default: return 'Desconocido';
+    }
+  }
+
   goBack(): void {
-    this.router.navigate(['/teams/my-teams']);
+    this.router.navigate(['/fixture-viewer']);
   }
 
   getPositionClass(position: number): string {

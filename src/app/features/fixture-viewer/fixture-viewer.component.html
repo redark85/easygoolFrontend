@@ -25,13 +25,20 @@
       <div *ngIf="!loading && tournaments.length > 0" class="tournaments-section">
         <div *ngFor="let tournament of tournaments" class="tournament-item">
           <div class="tournament-info">
-            <mat-icon class="tournament-icon">emoji_events</mat-icon>
+            <img *ngIf="tournament.imageUrl" 
+                 [src]="tournament.imageUrl" 
+                 alt="{{ tournament.name }}" 
+                 class="tournament-image">
+            <mat-icon *ngIf="!tournament.imageUrl" class="tournament-icon">emoji_events</mat-icon>
             <div class="tournament-details">
               <h3 class="tournament-name">{{ tournament.name }}</h3>
-              <span class="tournament-status">{{ tournament.status }}</span>
+              <span class="tournament-status" [ngClass]="getStatusClass(tournament.status)">
+                {{ getStatusText(tournament.status) }}
+              </span>
             </div>
           </div>
           <button mat-raised-button 
+                  color="primary"
                   class="view-button"
                   (click)="viewFixture(tournament.id)">
             <mat-icon>visibility</mat-icon>

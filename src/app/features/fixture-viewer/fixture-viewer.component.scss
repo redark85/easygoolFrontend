@@ -87,6 +87,13 @@
           gap: 1rem;
           flex: 1;
 
+          .tournament-image {
+            width: 2.5rem;
+            height: 2.5rem;
+            object-fit: contain;
+            border-radius: 8px;
+          }
+
           .tournament-icon {
             font-size: 2rem;
             width: 2rem;
@@ -108,8 +115,31 @@
 
             .tournament-status {
               font-size: 0.75rem;
-              color: #4caf50;
               font-weight: 500;
+              padding: 0.25rem 0.5rem;
+              border-radius: 4px;
+              display: inline-block;
+              width: fit-content;
+
+              &.status-scheduled {
+                background: #e3f2fd;
+                color: #1976d2;
+              }
+
+              &.status-active {
+                background: #e8f5e9;
+                color: #2e7d32;
+              }
+
+              &.status-finished {
+                background: #f5f5f5;
+                color: #616161;
+              }
+
+              &.status-cancelled {
+                background: #ffebee;
+                color: #c62828;
+              }
             }
           }
         }
@@ -213,6 +243,11 @@
           gap: 1rem;
 
           .tournament-info {
+            .tournament-image {
+              width: 2rem;
+              height: 2rem;
+            }
+
             .tournament-icon {
               font-size: 1.5rem;
               width: 1.5rem;

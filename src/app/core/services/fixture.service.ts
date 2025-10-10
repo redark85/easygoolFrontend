@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
-import { FIXTURE_GET_ENDPOINT } from '../config/endpoints';
+import { FIXTURE_GET_ENDPOINT, FIXTURE_GET_TOURNAMENT_LIST_ENDPOINT } from '../config/endpoints';
 import { ApiResponse } from '../models/api.interface';
 
 export interface FixtureTeam {
@@ -16,6 +16,7 @@ export interface FixtureTeam {
   goalsAgainst: number;
   goalDifference: number;
   points: number;
+  lastFiveResults: string[];
 }
 
 export interface FixtureResponse {
@@ -24,6 +25,22 @@ export interface FixtureResponse {
   messageId: string;
   messageType: number;
   result: FixtureTeam[];
+  records: number;
+}
+
+export interface TournamentListItem {
+  id: number;
+  name: string;
+  status: number;
+  imageUrl: string;
+}
+
+export interface TournamentListResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: TournamentListItem[];
   records: number;
 }
 
@@ -48,6 +65,21 @@ export class FixtureService {
               }
               throw new Error(response.message || 'Error al obtener partidos del grupo');
             }),
+    );
+  }
+
+  /**
+   * Obtiene la lista de torneos disponibles
+   * @returns Observable con la lista de torneos
+   */
+  getTournamentList(): Observable<TournamentListItem[]> {
+    return this.apiService.get<TournamentListResponse>(FIXTURE_GET_TOURNAMENT_LIST_ENDPOINT).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        throw new Error(response.message || 'Error al obtener la lista de torneos');
+      })
     );
   }
 }

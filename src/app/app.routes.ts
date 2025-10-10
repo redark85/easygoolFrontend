@@ -98,6 +98,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/fixture-viewer/fixture-viewer.component').then(c => c.FixtureViewerComponent)
   },
   
+  // Public standings (public access, no layout)
+  {
+    path: 'public-standings/:tournamentId',
+    loadComponent: () => import('./features/public-standings/public-standings.component').then(c => c.PublicStandingsComponent)
+  },
+  
   // Not Found page
   {
     path: 'not-found',
