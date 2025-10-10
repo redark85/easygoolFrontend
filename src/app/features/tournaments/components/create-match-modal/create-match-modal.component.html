@@ -5,8 +5,8 @@
       <mat-icon class="title-icon">sports_soccer</mat-icon>
       Crear Partido - {{ data.matchDayName }}
     </h2>
-    <button mat-icon-button 
-            mat-dialog-close 
+    <button mat-icon-button
+            mat-dialog-close
             class="close-button"
             matTooltip="Cerrar">
       <mat-icon>close</mat-icon>
@@ -15,11 +15,11 @@
 
   <!-- Dialog Content -->
   <div mat-dialog-content class="dialog-content">
-    
+
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-container">
-      <mat-progress-spinner 
-        diameter="40" 
+      <mat-progress-spinner
+        diameter="40"
         mode="indeterminate">
       </mat-progress-spinner>
       <p class="loading-text">Cargando equipos disponibles...</p>
@@ -27,7 +27,7 @@
 
     <!-- Content when loaded -->
     <div *ngIf="!isLoading">
-      
+
       <!-- Selection Summary -->
       <div class="selection-summary" *ngIf="selectedHomeTeam || selectedAwayTeam">
         <div class="summary-item">
@@ -53,11 +53,54 @@
       <!-- Teams List -->
       <div *ngIf="availableTeams.length > 0" class="teams-section">
         <h3 class="section-title">Selecciona los equipos para el partido:</h3>
-        
+
+        <!-- Fecha y Hora del Partido - Solo si hay equipos disponibles -->
+        <div class="datetime-section" *ngIf="isFormInitialized()">
+          <h4 class="datetime-title">Fecha y Hora del Partido</h4>
+          <form [formGroup]="matchForm" class="datetime-form">
+            <div class="datetime-row">
+              <!-- Campo de Fecha -->
+              <mat-form-field appearance="outline" class="datetime-field">
+                <mat-label>Fecha del Partido</mat-label>
+                <input matInput
+                       [matDatepicker]="datePicker"
+                       formControlName="matchDate"
+                       [min]="minDate"
+                       placeholder="Seleccionar fecha"
+                       readonly>
+                <mat-datepicker-toggle matIconSuffix [for]="datePicker">
+                  <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
+                </mat-datepicker-toggle>
+                <mat-datepicker #datePicker [touchUi]="false"></mat-datepicker>
+                <mat-error *ngIf="matchForm.get('matchDate')?.hasError('required')">
+                  La fecha es requerida
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Campo de Hora -->
+              <mat-form-field appearance="outline" class="datetime-field">
+                <mat-label>Hora del Partido</mat-label>
+                <input matInput
+                       [matTimepicker]="timePicker"
+                       formControlName="matchTime"
+                       placeholder="Seleccionar hora"
+                       readonly>
+                <mat-timepicker-toggle matIconSuffix [for]="timePicker">
+                  <mat-icon matTimepickerToggleIcon>access_time</mat-icon>
+                </mat-timepicker-toggle>
+                <mat-timepicker #timePicker interval="15m"></mat-timepicker>
+                <mat-error *ngIf="matchForm.get('matchTime')?.hasError('required')">
+                  La hora es requerida
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </form>
+        </div>
+
         <div class="teams-list">
-          <div *ngFor="let team of availableTeams; trackBy: trackByTeamId" 
+          <div *ngFor="let team of availableTeams; trackBy: trackByTeamId"
                class="team-item">
-            
+
             <div class="team-avatar">
               <img [src]="getTeamImageUrl(team)"
                    [alt]="team.name"
@@ -79,7 +122,7 @@
                 <mat-icon>home</mat-icon>
                 {{ isHomeTeamSelected(team) ? '✓ Local' : 'Local' }}
               </button>
-              
+
               <button mat-raised-button
                       [color]="isAwayTeamSelected(team) ? 'accent' : 'default'"
                       (click)="selectAwayTeam(team)"
@@ -97,13 +140,13 @@
 
   <!-- Dialog Actions -->
   <div mat-dialog-actions class="dialog-actions">
-    <button mat-button 
+    <button mat-button
             (click)="onCancel()"
             class="cancel-button">
       Cancelar
     </button>
-    
-    <button mat-raised-button 
+
+    <button mat-raised-button
             color="primary"
             (click)="onConfirm()"
             [disabled]="!canConfirm() || isLoading"

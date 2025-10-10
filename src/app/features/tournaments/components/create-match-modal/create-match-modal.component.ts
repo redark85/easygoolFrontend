@@ -1,12 +1,18 @@
 import { Component, Inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatTimepickerModule } from '@angular/material/timepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 
@@ -24,6 +30,8 @@ export interface CreateMatchResult {
   success: boolean;
   homeTeamId?: number;
   awayTeamId?: number;
+  matchDate?: string;
+  matchTime?: string;
 }
 
 @Component({
@@ -32,16 +40,23 @@ export interface CreateMatchResult {
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDividerModule
+    MatDividerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatTimepickerModule,
+    MatNativeDateModule
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './create-match-modal.component.html',
-  styleUrls: ['./create-match-modal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./create-match-modal.component.scss']
+  // changeDetection: ChangeDetectionStrategy.OnPush // Temporalmente deshabilitado para debugging
 })
 export class CreateMatchModalComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -50,16 +65,50 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
   selectedHomeTeam: FreeTeam | null = null;
   selectedAwayTeam: FreeTeam | null = null;
   isLoading = false;
+  matchForm!: FormGroup;
+  minDate = new Date();
 
   constructor(
     private dialogRef: MatDialogRef<CreateMatchModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CreateMatchDialogData,
     private matchService: MatchService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.initializeForm();
     this.loadFreeTeams();
+  }
+
+  /**
+   * Inicializa el formulario con fecha y hora por defecto
+   */
+  private initializeForm(): void {
+    const now = new Date();
+    
+    // Redondear la hora actual a los 15 minutos más cercanos
+    const minutes = now.getMinutes();
+    const roundedMinutes = Math.ceil(minutes / 15) * 15;
+    const initialTime = new Date(now);
+    initialTime.setMinutes(roundedMinutes, 0, 0);
+    
+    // Si se pasa de 60 minutos, ajustar la hora
+    if (roundedMinutes >= 60) {
+      initialTime.setHours(initialTime.getHours() + 1, 0, 0, 0);
+    }
+    
+    this.matchForm = this.fb.group({
+      matchDate: [new Date(now), Validators.required],
+      matchTime: [initialTime, Validators.required]
+    });
+    
+    console.log('Form initialized:', this.matchForm);
+    console.log('Form valid:', this.matchForm.valid);
+    console.log('Form value:', this.matchForm.value);
+    
+    // Forzar detección de cambios
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -181,7 +230,9 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
    * Verifica si se puede confirmar la creación
    */
   canConfirm(): boolean {
-    return this.selectedHomeTeam !== null && this.selectedAwayTeam !== null;
+    return this.selectedHomeTeam !== null && 
+           this.selectedAwayTeam !== null && 
+           this.matchForm.valid;
   }
 
   /**
@@ -202,11 +253,30 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.cdr.detectChanges();
 
+    // Obtener fecha y hora del formulario
+    const formValue = this.matchForm.value;
+    const selectedDate = formValue.matchDate as Date;
+    const selectedTime = formValue.matchTime as Date;
+
+    // Combinar fecha y hora
+    const combinedDateTime = new Date(selectedDate);
+    combinedDateTime.setHours(
+      selectedTime.getHours(),
+      selectedTime.getMinutes(),
+      0,
+      0
+    );
+
     const request = {
       phaseId: this.data.phaseId,
       matchDayId: this.data.matchDayId,
       homeTeamId: this.selectedHomeTeam!.phaseTeamId,
-      awayTeamId: this.selectedAwayTeam!.phaseTeamId
+      awayTeamId: this.selectedAwayTeam!.phaseTeamId,
+      matchDate: combinedDateTime.toISOString(),
+      matchTime: selectedTime.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
     };
 
     this.matchService.createMatch(request)
@@ -222,7 +292,12 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
             this.dialogRef.close({
               success: true,
               homeTeamId: this.selectedHomeTeam!.tournamentTeamId,
-              awayTeamId: this.selectedAwayTeam!.tournamentTeamId
+              awayTeamId: this.selectedAwayTeam!.tournamentTeamId,
+              matchDate: combinedDateTime.toISOString(),
+              matchTime: selectedTime.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })
             });
           });
         },
@@ -236,6 +311,13 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
           });
         }
       });
+  }
+
+  /**
+   * Verifica si el formulario está inicializado
+   */
+  isFormInitialized(): boolean {
+    return !!this.matchForm;
   }
 
   /**

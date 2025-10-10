@@ -123,6 +123,73 @@
         color: var(--text-primary);
       }
 
+      .datetime-section {
+        margin-bottom: 24px;
+        padding: 16px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        
+        .datetime-title {
+          margin: 0 0 16px 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          &::before {
+            content: '📅';
+            font-size: 1.2rem;
+          }
+        }
+        
+        .datetime-form {
+          .datetime-row {
+            display: flex;
+            gap: 16px;
+            
+            .datetime-field {
+              flex: 1;
+              
+              ::ng-deep {
+                .mat-mdc-form-field-flex {
+                  min-height: 48px;
+                }
+                
+                .mat-mdc-form-field-infix {
+                  min-height: 1.5em;
+                }
+                
+                .mat-datepicker-toggle,
+                .mat-timepicker-toggle {
+                  .mat-icon-button {
+                    width: 36px;
+                    height: 36px;
+                    
+                    .mat-icon {
+                      font-size: 18px;
+                      color: var(--primary-color);
+                    }
+                    
+                    &:hover {
+                      background-color: rgba(25, 118, 210, 0.1);
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Responsive para móviles
+            @media (max-width: 768px) {
+              flex-direction: column;
+              gap: 12px;
+            }
+          }
+        }
+      }
+
       .teams-list {
         display: flex;
         flex-direction: column;
@@ -214,6 +281,53 @@
         font-size: 1.2rem;
         width: 1.2rem;
         height: 1.2rem;
+      }
+    }
+  }
+}
+
+// Estilos globales para pickers
+::ng-deep {
+  // Datepicker popup
+  .mat-datepicker-popup {
+    z-index: 1200 !important;
+    
+    .mat-calendar {
+      .mat-calendar-body-cell-content {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        border-radius: 50%;
+        
+        &:hover {
+          background-color: rgba(25, 118, 210, 0.1);
+        }
+      }
+      
+      .mat-calendar-body-selected {
+        background-color: var(--primary-color);
+        color: white;
+      }
+    }
+  }
+  
+  // Timepicker popup
+  .mat-timepicker-popup {
+    z-index: 1201 !important;
+    
+    .mat-timepicker-content {
+      max-height: 280px;
+      overflow-y: auto;
+      
+      .mat-timepicker-option {
+        height: 44px;
+        line-height: 44px;
+        
+        &.mat-timepicker-option-selected {
+          background-color: rgba(25, 118, 210, 0.12);
+          color: var(--primary-color);
+          font-weight: 500;
+        }
       }
     }
   }
