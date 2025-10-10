@@ -152,9 +152,10 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
       });
   }
 
-  viewTeamDetails(teamId: number): void {
-    console.log('Ver detalles del equipo:', teamId);
-    // TODO: Navegar a detalles del equipo
+  viewTeamDetails(tournamentId: number): void {
+    console.log('Ver detalles del torneo:', tournamentId);
+    // Navegar a la tabla de posiciones enviando el tournamentId
+    this.router.navigate(['/teams/standings', tournamentId]);
   }
 
   getTeamLogo(logoUrl: string): string {

@@ -18,7 +18,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
-import { MatchService, MatchDay, MatchStatusType } from '@core/services/match.service';
+import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest } from '@core/services/match.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
 import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
 import Swal from 'sweetalert2';
@@ -516,17 +516,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     this.loading = true;
-    // Método no existe en el servicio, implementar lógica alternativa
-    console.log('Generating random matches for group:', this.selectedGroupId);
-    this.loading = false;
-    Swal.fire({
-      title: 'Función no disponible',
-      text: 'La generación de partidos aleatorios para grupo no está implementada',
-      icon: 'info',
-      confirmButtonText: 'Aceptar'
-    });
-    /*
-    this.matchService.generateRandomMatchesForGroup(this.selectedGroupId)
+
+    const request : CreateRandomMatchesRequest = {
+      phaseId: this.selectedPhaseId!,
+      groupId: this.selectedGroupId
+    }
+
+    this.matchService.createRandomMatches(request)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -555,7 +551,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           this.cdr.detectChanges();
         }
       });
-    */
+    
   }
 
   /**

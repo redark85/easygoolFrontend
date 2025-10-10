@@ -66,11 +66,15 @@ export const VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT = '/api/Vocalia/GetAvailable
 export const VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT = '/api/Vocalia/RegisterMatchEvent';
 export const VOCALIA_FINISH_MATCH_ENDPOINT = '/api/Vocalia/FinishMatch';
 
+// Fixture Endpoints
+export const FIXTURE_GET_ENDPOINT = '/api/Fixture/GetFixture';
+
 // Manager Endpoints
 export const MANAGER_GET_TEAMS_ENDPOINT = '/api/Manager/ManagerTeams';
 export const MANAGER_TOKEN_VALIDATION_ENDPOINT = '/api/Manager/TokenValidation';
 export const MANAGER_GET_ALL_TEAMS_ENDPOINT = '/api/Manager/GetAllTeams';
 export const MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT = '/api/Manager/RegisterTournamentTeam';
+export const MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT = '/api/Manager/GetTournamentPhases';
 
 // Configuración de endpoints
 export const EndpointsConfig = {

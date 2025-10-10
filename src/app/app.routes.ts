@@ -37,7 +37,21 @@ export const routes: Routes = [
       // Teams routes
       {
         path: 'teams',
-        loadComponent: () => import('./features/teams/components/my-teams/my-teams.component').then(c => c.MyTeamsComponent)
+        children: [
+          {
+            path: 'my-teams',
+            loadComponent: () => import('./features/teams/components/my-teams/my-teams.component').then(c => c.MyTeamsComponent)
+          },
+          {
+            path: 'standings/:tournamentId',
+            loadComponent: () => import('./features/teams/components/standings/standings.component').then(c => c.StandingsComponent)
+          },
+          {
+            path: '',
+            redirectTo: 'my-teams',
+            pathMatch: 'full'
+          }
+        ]
       },
       
       // Players routes - Placeholder
@@ -75,8 +89,7 @@ export const routes: Routes = [
   // Vocalia routes (lazy loaded, protected, fullscreen without sidebar)
   {
     path: 'vocalia',
-    loadChildren: () => import('./features/vocalia/vocalia.routes').then(r => r.VOCALIA_ROUTES),
-    canActivate: [AuthGuard]
+    loadChildren: () => import('./features/vocalia/vocalia.routes').then(r => r.VOCALIA_ROUTES)
   },
   
   // Fixture viewer (public access)

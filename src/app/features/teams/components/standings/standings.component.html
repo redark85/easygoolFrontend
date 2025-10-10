@@ -1,0 +1,232 @@
+<div class="standings-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <img *ngIf="tournamentDetails?.imageUrl" 
+           [src]="tournamentDetails?.imageUrl" 
+           alt="Tournament Logo" 
+           class="header-image"
+           (error)="onImageError($event)">
+      <mat-icon *ngIf="!tournamentDetails?.imageUrl" class="header-icon">emoji_events</mat-icon>
+      <div class="header-text">
+        <h1 class="page-title">{{ tournamentInfo.name }}</h1>
+        <p class="page-subtitle">{{ tournamentInfo.phase }} - {{ tournamentInfo.group }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tournament Info Card -->
+  <mat-card class="tournament-info-card">
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-item">
+          <mat-icon class="info-icon">event</mat-icon>
+          <div class="info-details">
+            <span class="info-label">Temporada</span>
+            <span class="info-value">{{ tournamentInfo.season }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon class="info-icon">sports_soccer</mat-icon>
+          <div class="info-details">
+            <span class="info-label">Fase</span>
+            <span class="info-value">{{ tournamentInfo.phase }}</span>
+          </div>
+        </div>
+        <div class="info-item" *ngIf="selectedGroupId">
+          <mat-icon class="info-icon">groups</mat-icon>
+          <div class="info-details">
+            <span class="info-label">Grupo</span>
+            <span class="info-value">{{ tournamentInfo.group }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon class="info-icon">info</mat-icon>
+          <div class="info-details">
+            <span class="info-label">Estado</span>
+            <mat-chip class="status-chip">{{ tournamentInfo.status }}</mat-chip>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Filters Card -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-container">
+        <!-- Select de Fase -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Fase del Torneo</mat-label>
+          <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
+            <mat-option *ngFor="let phase of phases" [value]="phase.id">
+              <mat-icon class="option-icon">
+                {{ phase.phaseType === PhaseType.Groups ? 'groups' : 'emoji_events' }}
+              </mat-icon>
+              {{ phase.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Select de Grupo (solo si es fase de grupos) -->
+        <mat-form-field appearance="outline" class="filter-field" *ngIf="shouldShowGroupSelect">
+          <mat-label>Grupo</mat-label>
+          <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+            <mat-option *ngFor="let group of groups" [value]="group.id">
+              <mat-icon class="option-icon">flag</mat-icon>
+              {{ group.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando tabla de posiciones...</p>
+  </div>
+
+  <!-- Tabs Content -->
+  <mat-card class="content-card" *ngIf="!isLoading">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="tournament-tabs">
+      
+      <!-- Tab 1: Tabla de Posiciones -->
+      <mat-tab label="Tabla de Posiciones" *ngIf="selectedGroupId">
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">leaderboard</mat-icon>
+          Tabla de Posiciones
+        </ng-template>
+        
+        <div class="tab-content">
+          <div class="table-container">
+        <table mat-table [dataSource]="standings" class="standings-table">
+          
+          <!-- Position Column -->
+          <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef class="position-col">Pos</th>
+            <td mat-cell *matCellDef="let team" class="position-col" [ngClass]="getPositionClass(team.position)">
+              {{ team.position }}
+            </td>
+          </ng-container>
+
+          <!-- Team Name Column -->
+          <ng-container matColumnDef="teamName">
+            <th mat-header-cell *matHeaderCellDef class="team-col">Equipo</th>
+            <td mat-cell *matCellDef="let team" class="team-col">
+              <strong>{{ team.teamName }}</strong>
+            </td>
+          </ng-container>
+
+          <!-- Played Column -->
+          <ng-container matColumnDef="played">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">PJ</th>
+            <td mat-cell *matCellDef="let team" class="stat-col">{{ team.played }}</td>
+          </ng-container>
+
+          <!-- Wins Column -->
+          <ng-container matColumnDef="wins">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">G</th>
+            <td mat-cell *matCellDef="let team" class="stat-col wins">{{ team.wins }}</td>
+          </ng-container>
+
+          <!-- Draws Column -->
+          <ng-container matColumnDef="draws">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">E</th>
+            <td mat-cell *matCellDef="let team" class="stat-col draws">{{ team.draws }}</td>
+          </ng-container>
+
+          <!-- Losses Column -->
+          <ng-container matColumnDef="losses">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">P</th>
+            <td mat-cell *matCellDef="let team" class="stat-col losses">{{ team.losses }}</td>
+          </ng-container>
+
+          <!-- Goals For Column -->
+          <ng-container matColumnDef="goalsFor">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">GF</th>
+            <td mat-cell *matCellDef="let team" class="stat-col">{{ team.goalsFor }}</td>
+          </ng-container>
+
+          <!-- Goals Against Column -->
+          <ng-container matColumnDef="goalsAgainst">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">GC</th>
+            <td mat-cell *matCellDef="let team" class="stat-col">{{ team.goalsAgainst }}</td>
+          </ng-container>
+
+          <!-- Goal Difference Column -->
+          <ng-container matColumnDef="goalDifference">
+            <th mat-header-cell *matHeaderCellDef class="stat-col">DG</th>
+            <td mat-cell *matCellDef="let team" class="stat-col" [ngClass]="{
+              'positive': team.goalDifference > 0,
+              'negative': team.goalDifference < 0
+            }">
+              {{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}
+            </td>
+          </ng-container>
+
+          <!-- Points Column -->
+          <ng-container matColumnDef="points">
+            <th mat-header-cell *matHeaderCellDef class="points-col">Pts</th>
+            <td mat-cell *matCellDef="let team" class="points-col">
+              <strong>{{ team.points }}</strong>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-color qualify"></span>
+          <span class="legend-text">Clasificación directa</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color playoff"></span>
+          <span class="legend-text">Playoff</span>
+        </div>
+      </div>
+
+      <!-- Abbreviations -->
+      <div class="abbreviations">
+        <p><strong>PJ:</strong> Partidos Jugados | <strong>G:</strong> Ganados | <strong>E:</strong> Empatados | <strong>P:</strong> Perdidos</p>
+        <p><strong>GF:</strong> Goles a Favor | <strong>GC:</strong> Goles en Contra | <strong>DG:</strong> Diferencia de Goles | <strong>Pts:</strong> Puntos</p>
+      </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Partidos del Campeonato -->
+      <mat-tab label="Partidos del Campeonato">
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">sports</mat-icon>
+          Partidos del Campeonato
+        </ng-template>
+        
+        <div class="tab-content">
+          <div class="matches-container">
+            <div class="coming-soon">
+              <mat-icon class="coming-soon-icon">schedule</mat-icon>
+              <h3>Próximamente</h3>
+              <p>Los partidos del campeonato estarán disponibles pronto</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && standings.length === 0">
+    <mat-icon class="empty-icon">table_chart</mat-icon>
+    <h2>No hay datos disponibles</h2>
+    <p>Aún no se han jugado partidos en este grupo</p>
+  </div>
+</div>
