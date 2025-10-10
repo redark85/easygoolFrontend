@@ -9,6 +9,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatchService } from '@core/services/match.service';
+import { ToastService } from '@core/services/toast.service';
 
 export interface MatchDateTimeData {
   matchId: number;
@@ -53,7 +55,9 @@ export class MatchDatetimeModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<MatchDatetimeModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: MatchDateTimeData
+    @Inject(MAT_DIALOG_DATA) public data: MatchDateTimeData,
+    private matchService: MatchService,
+    private toastService: ToastService
   ) {
     this.dateTimeForm = this.fb.group({
       matchDate: [null, Validators.required],
@@ -136,22 +140,37 @@ export class MatchDatetimeModalComponent implements OnInit {
         0
       );
 
-      // Formatear la hora para mostrar
-      const timeString = selectedTime.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
+      // Obtener las horas y minutos en hora local
+      const hours = selectedTime.getHours();
+      const minutes = selectedTime.getMinutes();
+
+      // Formatear la hora como HH:mm:ss
+      const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+
+      // Formatear la fecha completa en hora local (YYYY-MM-DDTHH:mm:ss)
+      const year = combinedDateTime.getFullYear();
+      const month = (combinedDateTime.getMonth() + 1).toString().padStart(2, '0');
+      const day = combinedDateTime.getDate().toString().padStart(2, '0');
+      const formattedDateTime = `${year}-${month}-${day}T${formattedTime}`;
+
+      // Llamar al servicio para actualizar la fecha del partido
+      this.matchService.updateMatchDate(this.data.matchId, formattedDateTime).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          
+          const result: MatchDateTimeResult = {
+            success: true,
+            date: formattedDateTime,
+            time: formattedTime
+          };
+          
+          this.dialogRef.close(result);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          this.toastService.showError("La fecha debe ser posterior a la fecha actual.");
+        }
       });
-
-      const result: MatchDateTimeResult = {
-        success: true,
-        date: combinedDateTime.toISOString(),
-        time: timeString
-      };
-
-      // Simular un pequeño delay para mostrar el estado de carga
-      setTimeout(() => {
-        this.dialogRef.close(result);
-      }, 300);
     }
   }
 

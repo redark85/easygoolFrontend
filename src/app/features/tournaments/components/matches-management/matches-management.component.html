@@ -139,7 +139,7 @@
                             <!-- Match Header with Actions and Status -->
                             <div class="match-header">
                               <!-- Actions Left -->
-                              <div class="match-actions-top">
+                              <div class="match-actions-top" *ngIf="match.status !== matchStatusType.finished">
                                 <button mat-icon-button
                                         (click)="updateMatchDate(match)"
                                         matTooltip="Actualizar fecha"
@@ -177,7 +177,7 @@
                               <div class="team home-team">
                                 <div class="team-top">
                                   <div class="team-score">
-                                    <span class="score">3</span>
+                                    <span class="score">{{ match.homeScore }}</span>
                                   </div>
                                   <div class="team-info">
                                     <span class="team-name">{{ match.homeTeam }}</span>
@@ -211,7 +211,7 @@
                               <div class="team away-team">
                                 <div class="team-top">
                                   <div class="team-score">
-                                    <span class="score">1</span>
+                                    <span class="score">{{ match.awayScore }}</span>
                                   </div>
                                   <div class="team-info">
                                     <span class="team-name">{{ match.awayTeam }}</span>

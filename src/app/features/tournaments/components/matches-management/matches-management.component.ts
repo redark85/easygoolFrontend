@@ -18,7 +18,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
-import { MatchService, MatchDay } from '@core/services/match.service';
+import { MatchService, MatchDay, MatchStatusType } from '@core/services/match.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
 import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
 import Swal from 'sweetalert2';
@@ -57,6 +57,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   matchDays: MatchDay[] = [];
   loading = false;
   isCreatingMatchDay = false;
+  matchStatusType = MatchStatusType;
   private destroy$ = new Subject<void>();
 
 
@@ -754,13 +755,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   /**
    * Obtiene la clase CSS para el estado del partido por número
    */
-  getMatchStatusClassByNumber(status: number): string {
+  getMatchStatusClassByNumber(status: MatchStatusType): string {
     switch (status) {
-      case 0: return 'status-scheduled';
-      case 1: return 'status-in-progress';
-      case 2: return 'status-finished';
-      case 3: return 'status-suspended';
-      case 4: return 'status-cancelled';
+      case MatchStatusType.scheduled: return 'status-scheduled';
+      case MatchStatusType.inProgress: return 'status-in-progress';
+      case MatchStatusType.finished: return 'status-finished';
+      case MatchStatusType.postponed: return 'status-suspended';
+      case MatchStatusType.canceled: return 'status-cancelled';
       default: return 'status-unknown';
     }
   }
@@ -845,13 +846,22 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Formatea la hora del partido
    */
   formatMatchTime(timeString?: string): string {
+  
+    console.log(timeString);
     if (!timeString) {
-      return '15:00h';
+      return '--:--';
     }
     
     // Si es una fecha completa, extraer solo la hora
     if (timeString.includes('T')) {
+      // Verificar si la hora es 00:00:00
+      const timePart = timeString.split('T')[1];
+      if (timePart && timePart.startsWith('00:00:00')) {
+        return '--:--';
+      }
+      
       const date = new Date(timeString);
+      console.log('da',date);
       if (!isNaN(date.getTime())) {
         return date.toLocaleTimeString('es-ES', {
           hour: '2-digit',

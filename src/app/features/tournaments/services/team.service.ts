@@ -12,6 +12,7 @@ import {
   TEAM_ASSIGN_TO_GROUP_ENDPOINT,
   TEAM_REMOVE_FROM_GROUP_ENDPOINT,
   TEAM_DISQUALIFY_ENDPOINT,
+  TEAM_QUALIFY_ENDPOINT,
   TEAM_REMOVE_ENDPOINT,
   TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT,
   TEAM_ASSIGN_RANDOM_REAMS
@@ -205,6 +206,25 @@ export class TeamService {
         }
         this.toastService.showError(response.message || 'Error al descalificar equipo');
         throw new Error(response.message || 'Error al descalificar equipo');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Califica un equipo (revertir descalificación)
+   * @param teamId ID del equipo a calificar
+   * @returns Observable con el resultado de la operación
+   */
+  qualifyTeam(teamId: number): Observable<boolean> {
+    return this.apiService.post<ApiResponse<any>>(`${TEAM_QUALIFY_ENDPOINT}/${teamId}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          this.toastService.showSuccess(response.message || 'Equipo calificado con éxito');
+          return true;
+        }
+        this.toastService.showError(response.message || 'Error al calificar equipo');
+        throw new Error(response.message || 'Error al calificar equipo');
       }),
       catchError(this.handleError)
     );

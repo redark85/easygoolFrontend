@@ -598,18 +598,31 @@ export class PhasesGroupsManagementComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        // Por ahora solo cerramos el alert como solicitado
-        // TODO: Implementar API call cuando esté disponible
-        console.log('Reactivating team:', team.name);
-
-        // Simulamos éxito por ahora
-        Swal.fire({
-          title: '¡Equipo reactivado!',
-          text: `El equipo "${team.name}" ha sido reactivado exitosamente`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
+        this.teamService.qualifyTeam(team.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Recargar datos para reflejar el cambio
+              this.loadPhases();
+              
+              Swal.fire({
+                title: '¡Equipo reactivado!',
+                text: `El equipo "${team.name}" ha sido reactivado exitosamente`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (error) => {
+              console.error('Error al reactivar equipo:', error);
+              Swal.fire({
+                title: 'Error',
+                text: 'No se pudo reactivar el equipo',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+              });
+            }
+          });
       }
     });
   }

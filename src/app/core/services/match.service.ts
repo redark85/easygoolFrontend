@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -18,12 +18,20 @@ export interface MatchInfo {
   awayTeam: string;
   matchDate: string;
   matchTime?: string;
-  status: number;
+  status: MatchStatusType;
   homeTeamLogoUrl? : string;
   awayTeamLogoUrl? : string;
   venue?: string;
   homeScore?: number;
   awayScore?: number;
+}
+
+export enum MatchStatusType {
+  scheduled, //Programado
+  inProgress, //En curso, se esta jugando
+  finished, //Jugado
+  canceled, //Cancelado // eliminado
+  postponed //Portergado
 }
 
 export interface MatchesByGroupResponse {
@@ -250,6 +258,24 @@ export class MatchService {
         throw new Error(response.message || 'Error al eliminar la jornada');
       }),
       catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Actualiza la fecha de un partido
+   * @param matchId ID del partido
+   * @param matchDate Nueva fecha del partido
+   * @returns Observable con el resultado de la operación
+   */
+  updateMatchDate(matchId: number, matchDate: string): Observable<boolean> {
+    const request = { matchDate };
+    return this.apiService.put<any>(`${MATCH_UPDATE_DATE_ENDPOINT}/${matchId}`, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return true;
+        }
+        return false;
+      }),
     );
   }
 

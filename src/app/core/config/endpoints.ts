@@ -36,6 +36,7 @@ export const TEAM_DELETE_ENDPOINT = '/api/Team/RemovePhaseTeam';
 export const TEAM_ASSIGN_TO_GROUP_ENDPOINT = '/api/Team/AsignTeamGroup';
 export const TEAM_REMOVE_FROM_GROUP_ENDPOINT = '/api/Team/RemoveFromGroup';
 export const TEAM_DISQUALIFY_ENDPOINT = '/api/Team/DisqualifyTeam';
+export const TEAM_QUALIFY_ENDPOINT = '/api/Team/QualifyTeam';
 export const TEAM_GET_WITHOUT_PHASE_ENDPOINT = '/api/Team/GetAllTeamsWithoutPhase';
 export const TEAM_REMOVE_ENDPOINT = '/api/Team/RemoveTeam';
 export const TEAM_ALLOW_PLAYER_REGISTRATION_ENDPOINT = '/api/Team/AllowPlayerRegistration';
@@ -57,6 +58,7 @@ export const MATCH_CREATE_RANDOM_ENDPOINT = '/api/Match/CreateRandomMatches';
 export const MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT = '/api/Match/GenerateMatchesForMatchDay';
 export const MATCH_DELETE_ENDPOINT = '/api/Match/DeleteMatch';
 export const MATCH_DELETE_MATCHDAY_ENDPOINT = '/api/Match/DeleteMatchDay';
+export const MATCH_UPDATE_DATE_ENDPOINT = '/api/Match/UpdateMatchDate';
 
 // Vocalia Endpoints
 export const VOCALIA_GET_MATCH_ENDPOINT = '/api/Vocalia/GetMatch';

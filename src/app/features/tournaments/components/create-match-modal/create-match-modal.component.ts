@@ -257,26 +257,31 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
     const formValue = this.matchForm.value;
     const selectedDate = formValue.matchDate as Date;
     const selectedTime = formValue.matchTime as Date;
+    
+    // Obtener las horas y minutos en hora local
+    const hours = selectedTime.getHours();
+    const minutes = selectedTime.getMinutes();
 
     // Combinar fecha y hora
     const combinedDateTime = new Date(selectedDate);
-    combinedDateTime.setHours(
-      selectedTime.getHours(),
-      selectedTime.getMinutes(),
-      0,
-      0
-    );
+    combinedDateTime.setHours(hours, minutes, 0, 0);
+
+    // Formatear la hora como HH:mm:ss
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+
+    // Formatear la fecha completa en hora local (YYYY-MM-DDTHH:mm:ss)
+    const year = combinedDateTime.getFullYear();
+    const month = (combinedDateTime.getMonth() + 1).toString().padStart(2, '0');
+    const day = combinedDateTime.getDate().toString().padStart(2, '0');
+    const formattedDateTime = `${year}-${month}-${day}T${formattedTime}`;
 
     const request = {
       phaseId: this.data.phaseId,
       matchDayId: this.data.matchDayId,
       homeTeamId: this.selectedHomeTeam!.phaseTeamId,
       awayTeamId: this.selectedAwayTeam!.phaseTeamId,
-      matchDate: combinedDateTime.toISOString(),
-      matchTime: selectedTime.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      matchDate: formattedDateTime,
+      matchTime: formattedTime
     };
 
     this.matchService.createMatch(request)
@@ -293,11 +298,8 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
               success: true,
               homeTeamId: this.selectedHomeTeam!.tournamentTeamId,
               awayTeamId: this.selectedAwayTeam!.tournamentTeamId,
-              matchDate: combinedDateTime.toISOString(),
-              matchTime: selectedTime.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })
+              matchDate: formattedDateTime,
+              matchTime: formattedTime
             });
           });
         },
