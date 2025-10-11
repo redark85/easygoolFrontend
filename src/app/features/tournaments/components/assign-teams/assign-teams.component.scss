@@ -6,17 +6,18 @@
 
 .assign-teams-dialog {
   // Estilos específicos del componente
-  
+  overflow-y: auto !important;
+
   .select-all-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 0;
-    
+
     .select-all-checkbox {
       font-weight: 500;
     }
-    
+
     .selection-info {
       .selected-count {
         color: var(--primary-color);
@@ -24,7 +25,7 @@
       }
     }
   }
-  
+
   .loading-container {
     display: flex;
     flex-direction: column;
@@ -32,13 +33,13 @@
     justify-content: center;
     padding: 3rem 2rem;
     gap: 1rem;
-    
+
     .loading-text {
       color: #666;
       margin: 0;
     }
   }
-  
+
   .no-teams {
     display: flex;
     flex-direction: column;
@@ -46,29 +47,29 @@
     justify-content: center;
     padding: 3rem 2rem;
     text-align: center;
-    
+
     .no-teams-icon {
       font-size: 4rem;
       color: #999;
       margin-bottom: 1rem;
     }
-    
+
     h3 {
       margin: 0 0 0.5rem 0;
       color: #666;
     }
-    
+
     p {
       margin: 0;
       color: #999;
     }
   }
-  
+
   .teams-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    
+
     .team-item {
       display: flex;
       align-items: center;
@@ -76,32 +77,32 @@
       border: 1px solid #e0e0e0;
       border-radius: 8px;
       transition: all 0.2s ease;
-      
+
       &:hover:not(.disabled) {
         border-color: var(--primary-color);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
-      
+
       &.disabled {
         opacity: 0.6;
         background-color: #f5f5f5;
       }
-      
+
       .team-checkbox {
         margin-right: 16px;
       }
-      
+
       .team-avatar {
         position: relative;
         margin-right: 16px;
-        
+
         .team-logo {
           width: 48px;
           height: 48px;
           border-radius: 8px;
           object-fit: cover;
         }
-        
+
         .status-badge {
           position: absolute;
           top: -4px;
@@ -112,52 +113,52 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          
+
           &.disqualified {
             background-color: #f44336;
           }
-          
+
           &.eliminated {
             background-color: #ff9800;
           }
-          
+
           .status-icon {
             font-size: 12px;
             color: white;
           }
         }
       }
-      
+
       .team-info {
         flex: 1;
-        
+
         .team-name {
           font-weight: 600;
           margin-bottom: 4px;
         }
-        
+
         .team-details {
           display: flex;
           align-items: center;
           gap: 16px;
           font-size: 0.875rem;
           color: #666;
-          
+
           .team-short-name {
             font-weight: 500;
           }
-          
+
           .team-players {
             display: flex;
             align-items: center;
             gap: 4px;
-            
+
             .players-icon {
               font-size: 16px;
             }
           }
         }
-        
+
         .team-manager {
           display: flex;
           align-items: center;
@@ -165,29 +166,29 @@
           font-size: 0.75rem;
           color: #999;
           margin-top: 4px;
-          
+
           .manager-icon {
             font-size: 14px;
           }
-          
+
           .manager-phone {
             color: #666;
           }
         }
       }
-      
+
       .team-status {
         .status-chip {
           padding: 4px 8px;
           border-radius: 12px;
           font-size: 0.75rem;
           font-weight: 500;
-          
+
           &.disqualified {
             background-color: #ffebee;
             color: #c62828;
           }
-          
+
           &.eliminated {
             background-color: #fff3e0;
             color: #ef6c00;
