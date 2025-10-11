@@ -1,10 +1,12 @@
 @use '../../styles/mixins.scss' as mixins;
 
-.document-upload-modal {
-  min-width: 500px;
-  max-width: 600px;
-  @include mixins.modal-layout;
+:host {
+  @include mixins.modal-layout('modal-container');
+}
 
+.modal-container {
+  // Estilos específicos del componente
+  
   .modal-header {
     display: flex;
     align-items: center;
@@ -12,7 +14,7 @@
     padding: 1.5rem 1.5rem 0 1.5rem;
     margin-bottom: 1rem;
 
-    .modal-title {
+    h2[mat-dialog-title] {
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -20,6 +22,7 @@
       font-size: 1.5rem;
       font-weight: 600;
       color: #333;
+      padding: 0; // Remover padding del mixin
 
       .title-icon {
         color: var(--primary-color, #1976d2);
@@ -40,9 +43,8 @@
   }
 
   .modal-content {
+    // El scroll ya está manejado por el mixin
     padding: 0 1.5rem;
-    max-height: 70vh;
-    overflow-y: auto;
   }
 
   .download-example-container {
@@ -154,13 +156,8 @@
   }
 
   .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 1.5rem;
-
+    // Los estilos base ya están en el mixin
+    
     .cancel-btn {
       color: #666;
       
@@ -185,20 +182,22 @@
         opacity: 0.6;
         cursor: not-allowed;
       }
+
+      // Loading states
+      &.loading {
+        pointer-events: none;
+      }
+
+      transition: all 0.3s ease;
     }
   }
-}
 
-// Responsive Design
-@media (max-width: 768px) {
-  .document-upload-modal {
-    min-width: 90vw;
-    max-width: 95vw;
-
+  // Responsive Design específico del componente
+  @media (max-width: 768px) {
     .modal-header {
       padding: 1rem 1rem 0 1rem;
 
-      .modal-title {
+      h2[mat-dialog-title] {
         font-size: 1.25rem;
         gap: 0.5rem;
 
@@ -243,11 +242,21 @@
   }
 }
 
-// Loading states
-.submit-btn {
-  transition: all 0.3s ease;
+// Sobrescribir el scroll interno de mat-dialog-content específicamente para este modal
+// Usando clase específica para máxima precisión sin afectar otros modales
+.document-upload-container ::ng-deep .mat-mdc-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
+  flex: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
 
-  &.loading {
-    pointer-events: none;
-  }
+// Alternativa adicional con :host para mayor especificidad si es necesario
+:host(.document-upload-modal) ::ng-deep .mat-mdc-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
+  flex: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
