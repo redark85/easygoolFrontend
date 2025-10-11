@@ -29,7 +29,9 @@
               </mat-datepicker-toggle>
               <mat-datepicker #datePicker 
                              [touchUi]="false"
-                             [disabled]="false">
+                             [disabled]="false"
+                             [restoreFocus]="true"
+                             (dateChange)="onDateSelected($event)">
               </mat-datepicker>
               <mat-error *ngIf="dateTimeForm.get('matchDate')?.hasError('required')">
                 La fecha es requerida

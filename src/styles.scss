@@ -578,7 +578,19 @@ html, body {
 // Datepicker popup
 .mat-datepicker-popup {
   z-index: 1100 !important;
+  position: absolute !important;
+}
+
+// Contenedor específico del datepicker
+.mat-datepicker-content {
   position: relative !important;
+}
+
+// Overlay pane específico para datepicker
+.cdk-overlay-pane[data-mat-datepicker] {
+  position: absolute !important;
+  max-width: none !important;
+  max-height: none !important;
 }
 
 // Select panel
@@ -592,6 +604,8 @@ html, body {
 // Backdrop específico para datepicker
 .cdk-overlay-backdrop.mat-datepicker-popup-backdrop {
   z-index: 1099 !important;
+  pointer-events: auto !important;
+  background-color: rgba(0, 0, 0, 0.32) !important;
 }
 
 // Backdrop específico para select
@@ -676,4 +690,21 @@ html, body {
 
 .cdk-overlay-pane.mat-mdc-dialog-panel {
   max-width: 600px !important;
+}
+
+// Excepción para datepicker - permitir posicionamiento natural
+.cdk-overlay-pane:has(.mat-datepicker-popup),
+.cdk-overlay-pane.mat-datepicker-popup-pane,
+.cdk-overlay-pane:has(.mat-datepicker-content) {
+  max-width: none !important;
+  max-height: none !important;
+  position: absolute !important;
+  transform: none !important;
+}
+
+// Asegurar que el datepicker no sea afectado por restricciones globales
+.cdk-overlay-pane .mat-datepicker-popup {
+  position: relative !important;
+  width: auto !important;
+  height: auto !important;
 }

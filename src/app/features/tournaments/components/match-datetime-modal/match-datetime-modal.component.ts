@@ -1,11 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDatepickerModule, MatDatepicker } from '@angular/material/datepicker';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,6 +46,8 @@ export interface MatchDateTimeResult {
   styleUrls: ['./match-datetime-modal.component.scss']
 })
 export class MatchDatetimeModalComponent implements OnInit {
+  @ViewChild('datePicker') datePicker!: MatDatepicker<Date>;
+  
   dateTimeForm: FormGroup;
   isSubmitting = false;
   
@@ -171,6 +173,15 @@ export class MatchDatetimeModalComponent implements OnInit {
           this.toastService.showError("La fecha debe ser posterior a la fecha actual.");
         }
       });
+    }
+  }
+
+  onDateSelected(event: any): void {
+    // Cerrar el datepicker automáticamente después de seleccionar una fecha
+    if (event.value && this.datePicker) {
+      setTimeout(() => {
+        this.datePicker.close();
+      }, 100);
     }
   }
 
