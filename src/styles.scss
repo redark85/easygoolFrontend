@@ -673,3 +673,7 @@ html, body {
   max-width: calc(100vw - 40px) !important;
   max-height: calc(100vh - 40px) !important;
 }
+
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  max-width: 600px !important;
+}
