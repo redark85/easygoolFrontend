@@ -5,6 +5,8 @@
 }
 
 .team-form-container {
+  overflow-y: auto !important;
+
   .image-label {
     display: block;
     font-weight: 500;
