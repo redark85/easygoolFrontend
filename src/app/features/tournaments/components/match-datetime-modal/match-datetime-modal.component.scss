@@ -1,10 +1,10 @@
 @use '../../../../shared/styles/mixins.scss' as mixins;
 
 :host {
-  @include mixins.modal-layout('match-datetime-modal');
+  @include mixins.modal-layout('modal-container');
 }
 
-.match-datetime-modal {
+.modal-container {
   // Estilos específicos del componente
   
   .match-info {
@@ -20,29 +20,22 @@
     }
   }
   
-  .datetime-form {
-    .form-row {
-      display: flex;
-      gap: 1rem;
-      
-      .form-column {
-        flex: 1;
-        
-        .full-width {
-          width: 100%;
-        }
-        
-        .date-field,
-        .time-field {
-          width: 100%;
-        }
-      }
-      
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-    }
+  // Bootstrap Grid System ya manejado por el mixin
+  
+  // Estilos específicos para mejorar el posicionamiento de pickers
+  ::ng-deep .mat-datepicker-popup {
+    z-index: 1200 !important;
+    position: fixed !important;
+  }
+  
+  ::ng-deep .mat-timepicker-popup {
+    z-index: 1200 !important;
+    position: fixed !important;
+  }
+  
+  // Asegurar que los form fields ocupen todo el ancho disponible
+  mat-form-field {
+    width: 100%;
   }
   
   .spinning {
