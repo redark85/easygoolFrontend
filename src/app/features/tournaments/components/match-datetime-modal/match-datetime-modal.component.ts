@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -45,7 +45,7 @@ export interface MatchDateTimeResult {
   templateUrl: './match-datetime-modal.component.html',
   styleUrls: ['./match-datetime-modal.component.scss']
 })
-export class MatchDatetimeModalComponent implements OnInit {
+export class MatchDatetimeModalComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('datePicker') datePicker!: MatDatepicker<Date>;
   
   dateTimeForm: FormGroup;
@@ -183,6 +183,53 @@ export class MatchDatetimeModalComponent implements OnInit {
         this.datePicker.close();
       }, 100);
     }
+  }
+
+  ngAfterViewInit(): void {
+    // Configurar el comportamiento del datepicker después de que la vista se inicialice
+    if (this.datePicker) {
+      // Suscribirse al evento de apertura para configurar el backdrop
+      this.datePicker.openedStream.subscribe(() => {
+        setTimeout(() => {
+          this.addGlobalClickListener();
+        }, 200); // Aumentar el timeout para asegurar que el DOM esté listo
+      });
+      
+      // Limpiar event listeners cuando se cierre
+      this.datePicker.closedStream.subscribe(() => {
+        this.removeGlobalClickListener();
+      });
+    }
+  }
+
+  private addGlobalClickListener(): void {
+    // Agregar event listener global para detectar clicks fuera
+    document.addEventListener('click', this.globalClickHandler, true);
+  }
+
+  private removeGlobalClickListener(): void {
+    // Remover event listener global
+    document.removeEventListener('click', this.globalClickHandler, true);
+  }
+
+  private globalClickHandler = (event: Event) => {
+    const target = event.target as HTMLElement;
+    
+    // Verificar si el click fue fuera del datepicker
+    if (target && 
+        !target.closest('.mat-datepicker-popup') && 
+        !target.closest('.mat-datepicker-toggle') &&
+        !target.closest('mat-datepicker') &&
+        this.datePicker && 
+        this.datePicker.opened) {
+      
+      this.datePicker.close();
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar event listeners al destruir el componente
+    this.removeGlobalClickListener();
   }
 
   get isFormValid(): boolean {
