@@ -309,11 +309,31 @@ html, body {
 // Para usar el mixin, importa: @use 'path/to/shared/styles/mixins.scss' as mixins;
 // Y usa: @include mixins.modal-layout('container-class');
 
-// Configuración global de diálogos
-.mdc-dialog--open .mat-mdc-dialog-surface, .mdc-dialog--closing .mat-mdc-dialog-surface {
-  transform: none;
-  width: auto !important;
-  min-width: 600px !important;
+// Configuración global de diálogos - CORREGIDA
+.mat-mdc-dialog-container {
+  max-height: 90vh !important;
+  max-width: 95vw !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mat-mdc-dialog-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+.mat-mdc-dialog-title {
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+}
+
+.mat-mdc-dialog-actions {
+  flex-shrink: 0 !important;
+  margin-top: auto !important;
 }
 
 // Corrección completa para sidebar móvil
@@ -484,10 +504,7 @@ html, body {
   height: auto !important;
 }
 
-.modal-container {
-  overflow-y: auto !important;
-  max-height: 700px !important;
-}
+// Estilos de modal-container movidos al mixin para mejor control
 
 .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background, .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
   border-color: var(--primary-dark) !important;
@@ -590,11 +607,69 @@ html, body {
 
 .custom-dialog-panel {
   z-index: 1000 !important;
-  
+
   .mat-mdc-dialog-container {
     background: white !important;
     border-radius: 12px !important;
     padding: 0 !important;
     overflow: visible !important;
   }
+}
+
+.mat-mdc-dialog-inner-container {
+  display: block !important;
+}
+
+.modal-container {
+  overflow-y: auto !important;
+  display: block !important;
+}
+
+.mat-mdc-dialog-surface {
+  padding: 20px !important;
+}
+
+// Configuración global de modales - EasyGool
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-max-width: 600px !important;
+  --mdc-dialog-container-max-height: 700px !important;
+
+  // Márgenes para que no llegue hasta el tope
+  margin: 20px !important;
+
+  .mat-mdc-dialog-surface {
+    max-width: 600px !important;
+    width: 100% !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden !important;
+
+    // Asegurar que el contenido no sobresalga
+    .mat-mdc-dialog-content {
+      border-radius: 0 !important;
+      overflow-y: auto !important;
+      max-height: calc(700px - 120px) !important; // Restar header y footer
+    }
+  }
+}
+
+// Configuración específica para viewport pequeños
+@media (max-width: 768px) {
+  .mat-mdc-dialog-container {
+    margin: 10px !important;
+
+    .mat-mdc-dialog-surface {
+      max-height: calc(100vh - 20px) !important;
+
+      .mat-mdc-dialog-content {
+        max-height: calc(100vh - 140px) !important;
+      }
+    }
+  }
+}
+
+// Asegurar que el overlay no interfiera
+.cdk-overlay-pane {
+  max-width: calc(100vw - 40px) !important;
+  max-height: calc(100vh - 40px) !important;
 }

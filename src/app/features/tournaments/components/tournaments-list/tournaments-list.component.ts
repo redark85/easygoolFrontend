@@ -49,7 +49,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
   filteredTournaments: Tournament[] = [];
   isLoading = false;
   searchControl = new FormControl('');
-  
+
   // Map para controlar loading específico por torneo
   tournamentLoadingStates = new Map<number, boolean>();
 
@@ -187,7 +187,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
    */
   createTournament(): void {
     const dialogRef = this.dialog.open(TournamentFormComponent, {
-      width: '800px',
+      width: '600px',
       maxWidth: '90vw',
       disableClose: true,
       data: { mode: 'create' }
@@ -413,7 +413,7 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
     try {
       // Convertir HTTP a HTTPS para evitar Mixed Content en producción
       const httpsUrl = convertCloudinaryToHttps(imageUrl);
-      
+
       const response = await fetch(httpsUrl, {
         mode: 'cors',
         credentials: 'omit',
@@ -421,11 +421,11 @@ export class TournamentsListComponent implements OnInit, OnDestroy {
           'Accept': 'image/*'
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const blob = await response.blob();
 
       return new Promise((resolve, reject) => {

@@ -1,18 +1,18 @@
 <div class="register-team-modal">
-  <!-- Tournament Info Banner -->
-  <div class="tournament-info">
-    <img [src]="data.tournamentImageUrl" [alt]="data.tournamentName" class="tournament-logo">
-    <div class="tournament-details">
-      <h2 class="modal-title">
-        <mat-icon>sports_soccer</mat-icon>
-        Registrar Equipo en Torneo
-      </h2>
-      <h3>{{ data.tournamentName }}</h3>
-      <p>Selecciona un equipo existente o crea uno nuevo</p>
-    </div>
-  </div>
+  <h2 mat-dialog-title>
+    <mat-icon>sports_soccer</mat-icon>
+    Registrar Equipo en Torneo
+  </h2>
 
   <mat-dialog-content>
+    <!-- Tournament Info Banner -->
+    <div class="tournament-info">
+      <img [src]="data.tournamentImageUrl" [alt]="data.tournamentName" class="tournament-logo">
+      <div class="tournament-details">
+        <h3>{{ data.tournamentName }}</h3>
+        <p>Selecciona un equipo existente o crea uno nuevo</p>
+      </div>
+    </div>
     <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="team-tabs">
       <!-- Tab 1: Equipo Existente -->
       <mat-tab label="Equipo Existente">
@@ -94,7 +94,7 @@
     </mat-tab-group>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
+  <mat-dialog-actions align="end" class="dialog-actions">
     <button
       mat-button
       type="button"

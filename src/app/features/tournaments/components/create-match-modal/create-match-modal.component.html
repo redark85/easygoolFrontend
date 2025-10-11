@@ -1,20 +1,10 @@
 <div class="create-match-dialog">
-  <!-- Dialog Header -->
-  <div class="dialog-header">
-    <h2 mat-dialog-title class="dialog-title">
-      <mat-icon class="title-icon">sports_soccer</mat-icon>
-      Crear Partido - {{ data.matchDayName }}
-    </h2>
-    <button mat-icon-button
-            mat-dialog-close
-            class="close-button"
-            matTooltip="Cerrar">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
+  <h2 mat-dialog-title>
+    <mat-icon>sports_soccer</mat-icon>
+    Crear Partido - {{ data.matchDayName }}
+  </h2>
 
-  <!-- Dialog Content -->
-  <div mat-dialog-content class="dialog-content">
+  <mat-dialog-content>
 
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-container">
@@ -136,10 +126,9 @@
         </div>
       </div>
     </div>
-  </div>
+  </mat-dialog-content>
 
-  <!-- Dialog Actions -->
-  <div mat-dialog-actions class="dialog-actions">
+  <mat-dialog-actions align="end" class="dialog-actions">
     <button mat-button
             (click)="onCancel()"
             class="cancel-button">
@@ -154,5 +143,5 @@
       <mat-icon>add</mat-icon>
       Crear Partido
     </button>
-  </div>
+  </mat-dialog-actions>
 </div>

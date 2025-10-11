@@ -1,26 +1,119 @@
 // Mixins compartidos para EasyGool
 
-// Modal Layout Compartido - EasyGool con Bootstrap
+// Modal Layout Compartido - EasyGool con Bootstrap y Scroll Automático
 @mixin modal-layout($container-class: 'modal-container') {
   .#{$container-class} {
-    padding: 1.5rem;
-    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 580px; // Ajustado para dejar espacio a márgenes
+    max-width: 560px;  // Ajustado para dejar espacio a márgenes
     width: 100%;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
 
+    .modal-header {
+      flex-shrink: 0;
+      padding: 1.5rem 1.5rem 0 1.5rem;
+
+      h2[mat-dialog-title] {
+        margin: 0 0 1rem 0;
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        &::before {
+          content: '⚽';
+          font-size: 1.2rem;
+          padding-top: 3px;
+        }
+      }
+    }
+
+    .modal-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      max-height: calc(580px - 160px); // Restar header y footer
+      padding: 0 1.5rem;
+
+      // Scroll personalizado
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+        
+        &:hover {
+          background: #a8a8a8;
+        }
+      }
+    }
+
+    // Asegurar que mat-dialog-content también tenga scroll
+    mat-dialog-content {
+      flex: 1;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      min-height: 0;
+      max-height: calc(580px - 160px) !important;
+      padding: 1rem 1.5rem !important;
+      margin: 0 !important;
+
+      // Scroll personalizado para mat-dialog-content
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+        
+        &:hover {
+          background: #a8a8a8;
+        }
+      }
+    }
+
+    // Estilos para el título del modal
     h2[mat-dialog-title] {
-      margin: 0 0 1.5rem 0;
+      flex-shrink: 0;
+      padding: 1.5rem 1.5rem 0 1.5rem;
+      margin: 0 0 1rem 0 !important;
       color: var(--primary-color);
       font-weight: 600;
       font-size: 1.5rem;
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1rem;
 
-      &::before {
-        content: '⚽';
-        font-size: 1.2rem;
-        padding-top: 3px;
+      mat-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
       }
+    }
+
+    // Compatibilidad con estructura antigua (sin padding propio)
+    &:not(:has(.modal-header)) h2[mat-dialog-title] {
+      padding: 1.5rem 1.5rem 0 1.5rem;
     }
 
     // Bootstrap container para formularios
@@ -103,13 +196,15 @@
     }
 
     // Acciones del diálogo
+    .modal-actions,
     .dialog-actions {
+      flex-shrink: 0;
+      padding: 1rem 1.5rem 1.5rem 1.5rem;
+      border-top: 1px solid var(--border-light);
       display: flex;
       justify-content: flex-end;
       gap: 0.75rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border-light);
+      margin-top: auto;
 
       button {
         min-width: 100px;
@@ -181,6 +276,31 @@
 
     // Responsive para el modal completo
     @media (max-width: 768px) {
+      .modal-header {
+        padding: 1rem 1rem 0 1rem;
+
+        h2[mat-dialog-title] {
+          font-size: 1.25rem;
+          margin-bottom: 1rem;
+          gap: 1rem;
+        }
+      }
+
+      .modal-content {
+        padding: 0 1rem;
+      }
+
+      .modal-actions,
+      .dialog-actions {
+        padding: 1rem;
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+
+      // Compatibilidad con estructura antigua
       padding: 1rem;
       max-width: 100%;
 

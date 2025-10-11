@@ -1,10 +1,12 @@
-<div class="otp-modal-container">
-  <h2 mat-dialog-title>
-    <mat-icon class="title-icon">verified_user</mat-icon>
-    Verificación de Cuenta
-  </h2>
+<div class="modal-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="title-icon">verified_user</mat-icon>
+      Verificación de Cuenta
+    </h2>
+  </div>
 
-  <mat-dialog-content>
+  <div class="modal-content" mat-dialog-content>
     <div class="verification-info">
       <p class="info-text">
         Hemos enviado un código de verificación de 6 dígitos a:
@@ -106,9 +108,9 @@
         Revisa tu carpeta de spam o correo no deseado si no encuentras el mensaje.
       </p>
     </div>
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="dialog-actions">
+  <div class="modal-actions" mat-dialog-actions>
     <button mat-stroked-button (click)="onCancel()" [disabled]="loading">
       Cancelar
     </button>
@@ -127,5 +129,5 @@
         Verificando...
       </span>
     </button>
-  </mat-dialog-actions>
+  </div>
 </div>

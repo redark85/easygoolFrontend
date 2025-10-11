@@ -1,28 +1,22 @@
-.otp-modal-container {
-  padding: 1.5rem;
-  max-width: 550px;
-  width: 100%;
+@use '../../styles/mixins.scss' as mixins;
 
-  h2[mat-dialog-title] {
-    margin: 0 0 1.5rem 0;
-    color: var(--primary-color);
-    font-weight: 600;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+:host {
+  @include mixins.modal-layout('modal-container');
+}
 
-    .title-icon {
-      font-size: 1.75rem;
-      width: 1.75rem;
-      height: 1.75rem;
-      color: var(--primary-color);
+.modal-container {
+  .modal-header {
+    h2[mat-dialog-title] {
+      .title-icon {
+        font-size: 1.75rem;
+        width: 1.75rem;
+        height: 1.75rem;
+        color: var(--primary-color);
+      }
     }
   }
 
-  mat-dialog-content {
-    padding: 0 0 1.5rem 0;
-    overflow: visible;
+  .modal-content {
 
     .verification-info {
       text-align: center;
@@ -187,12 +181,7 @@
     }
   }
 
-  .dialog-actions {
-    padding: 1.5rem 0 0 0;
-    gap: 0.75rem;
-    border-top: 1px solid var(--divider-color);
-    margin-top: 1rem;
-    justify-content: right;
+  .modal-actions {
 
     button {
       min-width: 120px;
@@ -240,21 +229,9 @@
     }
   }
 
+  // Estilos específicos responsive para OTP
   @media (max-width: 768px) {
-    padding: 1rem;
-
-    h2[mat-dialog-title] {
-      font-size: 1.25rem;
-      margin-bottom: 1rem;
-
-      .title-icon {
-        font-size: 1.5rem;
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-    }
-
-    mat-dialog-content {
+    .modal-content {
       .otp-form {
         .otp-inputs {
           gap: 0.5rem;

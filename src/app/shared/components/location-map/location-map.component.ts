@@ -85,7 +85,7 @@ export interface LocationMapData {
   styles: [`
     .location-map-container {
       width: 100%;
-      max-width: 800px;
+      max-width: 600px;
       overflow-y: auto;
       max-height: 700px;
     }
