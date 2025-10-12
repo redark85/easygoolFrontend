@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, AfterViewInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDatepickerModule, MatDatepicker } from '@angular/material/datepicker';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -58,7 +58,9 @@ export interface CreateMatchResult {
   styleUrls: ['./create-match-modal.component.scss']
   // changeDetection: ChangeDetectionStrategy.OnPush // Temporalmente deshabilitado para debugging
 })
-export class CreateMatchModalComponent implements OnInit, OnDestroy {
+export class CreateMatchModalComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('datePicker') datePicker!: MatDatepicker<Date>;
+  
   private destroy$ = new Subject<void>();
   
   availableTeams: FreeTeam[] = [];
@@ -112,6 +114,9 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Limpiar event listeners al destruir el componente
+    this.removeGlobalClickListener();
+    
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -327,5 +332,80 @@ export class CreateMatchModalComponent implements OnInit, OnDestroy {
    */
   trackByTeamId(index: number, team: FreeTeam): number {
     return team.tournamentTeamId;
+  }
+
+  /**
+   * Maneja la selección de fecha en el datepicker
+   */
+  onDateSelected(event: any): void {
+    // Cerrar el datepicker automáticamente después de seleccionar una fecha
+    if (event.value && this.datePicker) {
+      setTimeout(() => {
+        this.datePicker.close();
+      }, 100);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Configurar el comportamiento del datepicker después de que la vista se inicialice
+    // Usar timeout para asegurar que el formulario y el datepicker estén inicializados
+    setTimeout(() => {
+      console.log('ngAfterViewInit - datePicker:', this.datePicker);
+      if (this.datePicker) {
+        // Suscribirse al evento de apertura para configurar el backdrop
+        this.datePicker.openedStream
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(() => {
+            console.log('Datepicker opened, setting up click listener');
+            setTimeout(() => {
+              this.addGlobalClickListener();
+            }, 200); // Aumentar el timeout para asegurar que el DOM esté listo
+          });
+        
+        // Limpiar event listeners cuando se cierre
+        this.datePicker.closedStream
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(() => {
+            this.removeGlobalClickListener();
+          });
+      } else {
+        console.warn('DatePicker not found in ngAfterViewInit');
+      }
+    }, 100);
+  }
+
+  private addGlobalClickListener(): void {
+    // Agregar event listener global para detectar clicks fuera
+    console.log('Adding global click listener for datepicker');
+    document.addEventListener('click', this.globalClickHandler, true);
+  }
+
+  private removeGlobalClickListener(): void {
+    // Remover event listener global
+    document.removeEventListener('click', this.globalClickHandler, true);
+  }
+
+  private globalClickHandler = (event: Event) => {
+    const target = event.target as HTMLElement;
+    
+    // Verificar si el datepicker está abierto
+    if (!this.datePicker || !this.datePicker.opened) {
+      return;
+    }
+    
+    // Verificar si el click fue fuera del datepicker y sus elementos relacionados
+    const isOutsideClick = target && 
+      !target.closest('.mat-datepicker-popup') && 
+      !target.closest('.mat-datepicker-toggle') &&
+      !target.closest('.mat-datepicker-content') &&
+      !target.closest('.mat-calendar') &&
+      !target.closest('.cdk-overlay-pane') &&
+      !target.closest('mat-datepicker') &&
+      !target.closest('.mat-form-field');
+    
+    if (isOutsideClick) {
+      console.log('Closing datepicker due to outside click', target);
+      this.datePicker.close();
+    }
   }
 }

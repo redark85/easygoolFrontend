@@ -61,7 +61,12 @@
                 <mat-datepicker-toggle matIconSuffix [for]="datePicker">
                   <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
                 </mat-datepicker-toggle>
-                <mat-datepicker #datePicker [touchUi]="false"></mat-datepicker>
+                <mat-datepicker #datePicker 
+                               [touchUi]="false"
+                               [disabled]="false"
+                               [restoreFocus]="true"
+                               (dateChange)="onDateSelected($event)">
+                </mat-datepicker>
                 <mat-error *ngIf="matchForm.get('matchDate')?.hasError('required')">
                   La fecha es requerida
                 </mat-error>
