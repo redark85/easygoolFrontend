@@ -1,8 +1,16 @@
 <div class="create-match-dialog">
-  <h2 mat-dialog-title>
-    <mat-icon>sports_soccer</mat-icon>
-    Crear Partido - {{ data.matchDayName }}
-  </h2>
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon>sports_soccer</mat-icon>
+      Crear Partido - {{ data.matchDayName }}
+    </h2>
+    <button mat-icon-button
+            class="close-btn"
+            (click)="onCancel()"
+            [disabled]="isLoading">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
   <mat-dialog-content>
 
@@ -47,47 +55,53 @@
         <!-- Fecha y Hora del Partido - Solo si hay equipos disponibles -->
         <div class="datetime-section" *ngIf="isFormInitialized()">
           <h4 class="datetime-title">Fecha y Hora del Partido</h4>
-          <form [formGroup]="matchForm" class="datetime-form">
-            <div class="datetime-row">
-              <!-- Campo de Fecha -->
-              <mat-form-field appearance="outline" class="datetime-field">
-                <mat-label>Fecha del Partido</mat-label>
-                <input matInput
-                       [matDatepicker]="datePicker"
-                       formControlName="matchDate"
-                       [min]="minDate"
-                       placeholder="Seleccionar fecha"
-                       readonly>
-                <mat-datepicker-toggle matIconSuffix [for]="datePicker">
-                  <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
-                </mat-datepicker-toggle>
-                <mat-datepicker #datePicker 
-                               [touchUi]="false"
-                               [disabled]="false"
-                               [restoreFocus]="true"
-                               (dateChange)="onDateSelected($event)">
-                </mat-datepicker>
-                <mat-error *ngIf="matchForm.get('matchDate')?.hasError('required')">
-                  La fecha es requerida
-                </mat-error>
-              </mat-form-field>
+          <form [formGroup]="matchForm">
+            <div class="container-fluid">
+              <div class="row">
+                <!-- Campo de Fecha -->
+                <div class="col-md-6 col-12 mb-3">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Fecha del Partido</mat-label>
+                    <input matInput
+                           [matDatepicker]="datePicker"
+                           formControlName="matchDate"
+                           [min]="minDate"
+                           placeholder="Seleccionar fecha"
+                           readonly>
+                    <mat-datepicker-toggle matIconSuffix [for]="datePicker">
+                      <mat-icon matDatepickerToggleIcon>calendar_today</mat-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #datePicker
+                                    [touchUi]="false"
+                                    [disabled]="false"
+                                    [restoreFocus]="true"
+                                    (dateChange)="onDateSelected($event)">
+                    </mat-datepicker>
+                    <mat-error *ngIf="matchForm.get('matchDate')?.hasError('required')">
+                      La fecha es requerida
+                    </mat-error>
+                  </mat-form-field>
+                </div>
 
-              <!-- Campo de Hora -->
-              <mat-form-field appearance="outline" class="datetime-field">
-                <mat-label>Hora del Partido</mat-label>
-                <input matInput
-                       [matTimepicker]="timePicker"
-                       formControlName="matchTime"
-                       placeholder="Seleccionar hora"
-                       readonly>
-                <mat-timepicker-toggle matIconSuffix [for]="timePicker">
-                  <mat-icon matTimepickerToggleIcon>access_time</mat-icon>
-                </mat-timepicker-toggle>
-                <mat-timepicker #timePicker interval="15m"></mat-timepicker>
-                <mat-error *ngIf="matchForm.get('matchTime')?.hasError('required')">
-                  La hora es requerida
-                </mat-error>
-              </mat-form-field>
+                <!-- Campo de Hora -->
+                <div class="col-md-6 col-12 mb-3">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Hora del Partido</mat-label>
+                    <input matInput
+                           [matTimepicker]="timePicker"
+                           formControlName="matchTime"
+                           placeholder="Seleccionar hora"
+                           readonly>
+                    <mat-timepicker-toggle matIconSuffix [for]="timePicker">
+                      <mat-icon matTimepickerToggleIcon>access_time</mat-icon>
+                    </mat-timepicker-toggle>
+                    <mat-timepicker #timePicker interval="15m"></mat-timepicker>
+                    <mat-error *ngIf="matchForm.get('matchTime')?.hasError('required')">
+                      La hora es requerida
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
             </div>
           </form>
         </div>

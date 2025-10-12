@@ -6,35 +6,35 @@
 
 .modal-container {
   // Estilos específicos del componente
-  
+
   .match-info {
     text-align: center;
     padding: 1rem;
     background: #f8f9fa;
     border-radius: 8px;
     margin-bottom: 1.5rem;
-    
+
     strong {
       color: var(--primary-color);
       font-weight: 600;
     }
   }
-  
+
   // Bootstrap Grid System ya manejado por el mixin
-  
+
   // Estilos específicos para mejorar el posicionamiento de pickers
   ::ng-deep .mat-datepicker-popup {
     z-index: 1200 !important;
     position: absolute !important;
   }
-  
+
   // Configuración simplificada del backdrop
   ::ng-deep .cdk-overlay-backdrop {
     pointer-events: auto !important;
     background-color: rgba(0, 0, 0, 0.32) !important;
     cursor: pointer !important;
   }
-  
+
   // Específico para datepicker backdrop
   ::ng-deep .mat-datepicker-popup-backdrop,
   ::ng-deep .cdk-overlay-backdrop.mat-datepicker-popup-backdrop {
@@ -42,12 +42,12 @@
     background-color: rgba(0, 0, 0, 0.32) !important;
     cursor: pointer !important;
   }
-  
+
   ::ng-deep .mat-timepicker-popup {
     z-index: 1200 !important;
     position: absolute !important;
   }
-  
+
   // Asegurar que el overlay del datepicker se posicione correctamente
   ::ng-deep .cdk-overlay-pane {
     &:has(.mat-datepicker-popup) {
@@ -56,24 +56,12 @@
       max-height: none !important;
     }
   }
-  
-  // Alternativa más específica para el contenedor del datepicker
-  ::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-datepicker-popup {
-    position: relative !important;
-  }
-  
-  // Forzar posicionamiento correcto del overlay del datepicker
-  ::ng-deep .cdk-overlay-pane.mat-datepicker-popup-pane {
-    position: absolute !important;
-    max-width: none !important;
-    max-height: none !important;
-  }
-  
+
   // Asegurar que los form fields ocupen todo el ancho disponible
   mat-form-field {
     width: 100%;
   }
-  
+
   .spinning {
     animation: spin 1s linear infinite;
   }

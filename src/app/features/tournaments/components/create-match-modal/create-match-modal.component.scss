@@ -8,6 +8,55 @@
   // Estilos específicos del componente
   overflow-y: auto !important;
 
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+
+    h2[mat-dialog-title] {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-color);
+
+      mat-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
+    .close-btn {
+      color: #666;
+      transition: all 0.2s ease;
+      width: 40px;
+      height: 40px;
+
+      &:hover {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      mat-icon {
+        font-size: 1.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+  }
+
   .loading-container {
     display: flex;
     flex-direction: column;
@@ -88,8 +137,8 @@
     }
 
     .datetime-section {
-      margin-bottom: 2rem;
-      padding: 1rem;
+      margin-bottom: 0;
+      padding: 1rem 1rem 0;
       background: #f8f9fa;
       border-radius: 8px;
 
@@ -100,21 +149,7 @@
         color: #333;
       }
 
-      .datetime-form {
-        .datetime-row {
-          display: flex;
-          gap: 1rem;
-
-          .datetime-field {
-            flex: 1;
-          }
-
-          @media (max-width: 768px) {
-            flex-direction: column;
-            gap: 0.75rem;
-          }
-        }
-      }
+      // Bootstrap Grid System ya manejado por el mixin
     }
 
     .teams-list {
@@ -174,6 +209,41 @@
           }
         }
       }
+    }
+  }
+
+  // Estilos específicos para mejorar el posicionamiento de pickers
+  ::ng-deep .mat-datepicker-popup {
+    z-index: 1200 !important;
+    position: absolute !important;
+  }
+
+  // Configuración simplificada del backdrop
+  ::ng-deep .cdk-overlay-backdrop {
+    pointer-events: auto !important;
+    background-color: rgba(0, 0, 0, 0.32) !important;
+    cursor: pointer !important;
+  }
+
+  // Específico para datepicker backdrop
+  ::ng-deep .mat-datepicker-popup-backdrop,
+  ::ng-deep .cdk-overlay-backdrop.mat-datepicker-popup-backdrop {
+    pointer-events: auto !important;
+    background-color: rgba(0, 0, 0, 0.32) !important;
+    cursor: pointer !important;
+  }
+
+  ::ng-deep .mat-timepicker-popup {
+    z-index: 1200 !important;
+    position: absolute !important;
+  }
+
+  // Asegurar que el overlay del datepicker se posicione correctamente
+  ::ng-deep .cdk-overlay-pane {
+    &:has(.mat-datepicker-popup) {
+      position: absolute !important;
+      max-width: none !important;
+      max-height: none !important;
     }
   }
 }
