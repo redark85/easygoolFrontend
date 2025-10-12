@@ -1,0 +1,160 @@
+<div class="matches-calendar-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>event</mat-icon>
+        Calendario y Partidos
+      </h1>
+      <p class="page-subtitle">Gestiona el calendario de partidos de tu equipo</p>
+    </div>
+  </div>
+
+  <mat-tab-group class="calendar-tabs">
+    <!-- Tab: Próximos Partidos -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>schedule</mat-icon>
+        Próximos Partidos
+        <span class="tab-badge" *ngIf="upcomingMatches.length > 0">{{ upcomingMatches.length }}</span>
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="upcoming-matches-grid">
+          <mat-card *ngFor="let match of upcomingMatches" class="match-card">
+            <mat-card-header>
+              <mat-card-subtitle>
+                <div class="match-info-header">
+                  <mat-chip-set>
+                    <mat-chip>Jornada {{ match.matchday }}</mat-chip>
+                  </mat-chip-set>
+                  <span class="days-until" *ngIf="getDaysUntilMatch(match) >= 0">
+                    <mat-icon>schedule</mat-icon>
+                    {{ getDaysUntilMatch(match) === 0 ? 'Hoy' : getDaysUntilMatch(match) === 1 ? 'Mañana' : 'En ' + getDaysUntilMatch(match) + ' días' }}
+                  </span>
+                </div>
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="match-teams">
+                <div class="team home" [class.my-team]="match.isHome">
+                  <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo">
+                  <span class="team-name">{{ match.homeTeam.name }}</span>
+                </div>
+
+                <div class="match-vs">
+                  <span class="vs-text">VS</span>
+                  <div class="match-datetime">
+                    <span class="match-date">{{ match.date | date:'dd/MM/yyyy' }}</span>
+                    <span class="match-time">{{ match.date | date:'HH:mm' }}</span>
+                  </div>
+                </div>
+
+                <div class="team away" [class.my-team]="!match.isHome">
+                  <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo">
+                  <span class="team-name">{{ match.awayTeam.name }}</span>
+                </div>
+              </div>
+
+              <div class="match-venue">
+                <mat-icon>stadium</mat-icon>
+                <span>{{ match.venue }}</span>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-button color="primary" (click)="onViewMatchDetails(match.id)">
+                <mat-icon>visibility</mat-icon>
+                Ver Detalles
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="upcomingMatches.length === 0">
+            <mat-icon>event_busy</mat-icon>
+            <p>No hay próximos partidos programados</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Calendario Mensual -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>calendar_month</mat-icon>
+        Calendario
+      </ng-template>
+      
+      <div class="tab-content">
+        <mat-card class="calendar-card">
+          <mat-card-header>
+            <div class="calendar-header">
+              <button mat-icon-button (click)="onPreviousMonth()">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              
+              <h2 class="calendar-title">{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
+              
+              <button mat-icon-button (click)="onNextMonth()">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+            <button mat-stroked-button (click)="onToday()">
+              <mat-icon>today</mat-icon>
+              Hoy
+            </button>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="calendar-grid">
+              <!-- Week days header -->
+              <div class="calendar-weekdays">
+                <div *ngFor="let day of weekDays" class="weekday">{{ day }}</div>
+              </div>
+
+              <!-- Calendar days -->
+              <div class="calendar-days">
+                <div *ngFor="let day of calendarDays" 
+                     class="calendar-day"
+                     [class.other-month]="!day.isCurrentMonth"
+                     [class.today]="day.isToday"
+                     [class.has-matches]="day.matches.length > 0">
+                  
+                  <div class="day-number">{{ day.date.getDate() }}</div>
+                  
+                  <div class="day-matches" *ngIf="day.matches.length > 0">
+                    <div *ngFor="let match of day.matches" 
+                         class="match-indicator"
+                         [class.home]="match.isHome"
+                         [matTooltip]="match.homeTeam.name + ' vs ' + match.awayTeam.name"
+                         (click)="onViewMatchDetails(match.id)">
+                      <mat-icon>sports_soccer</mat-icon>
+                      <span class="match-time">{{ match.date | date:'HH:mm' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="calendar-legend">
+              <div class="legend-item">
+                <div class="legend-color home"></div>
+                <span>Local</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color away"></div>
+                <span>Visitante</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color today"></div>
+                <span>Hoy</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

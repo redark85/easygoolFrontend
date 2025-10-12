@@ -1,0 +1,485 @@
+.matches-calendar-container {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+
+  .page-header {
+    margin-bottom: 24px;
+
+    .header-content {
+      .page-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 8px 0;
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+
+        mat-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+          color: #1976d2;
+        }
+      }
+
+      .page-subtitle {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+      }
+    }
+  }
+
+  .calendar-tabs {
+    ::ng-deep .mat-mdc-tab-label {
+      mat-icon {
+        margin-right: 8px;
+      }
+
+      .tab-badge {
+        margin-left: 8px;
+        padding: 2px 8px;
+        background-color: #1976d2;
+        color: white;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+
+    .tab-content {
+      padding: 24px 0;
+
+      .upcoming-matches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 24px;
+
+        .match-card {
+          mat-card-header {
+            mat-card-subtitle {
+              .match-info-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+
+                .days-until {
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                  font-size: 13px;
+                  color: #1976d2;
+                  font-weight: 600;
+
+                  mat-icon {
+                    font-size: 18px;
+                    width: 18px;
+                    height: 18px;
+                  }
+                }
+              }
+            }
+          }
+
+          mat-card-content {
+            .match-teams {
+              display: grid;
+              grid-template-columns: 1fr auto 1fr;
+              gap: 24px;
+              align-items: center;
+              margin-bottom: 20px;
+
+              .team {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+                padding: 16px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+
+                &.my-team {
+                  background-color: #e3f2fd;
+                  border: 2px solid #1976d2;
+                }
+
+                .team-logo {
+                  width: 64px;
+                  height: 64px;
+                  object-fit: contain;
+                  border-radius: 8px;
+                }
+
+                .team-name {
+                  font-size: 14px;
+                  font-weight: 600;
+                  text-align: center;
+                  color: #1a1a1a;
+                }
+              }
+
+              .match-vs {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+
+                .vs-text {
+                  font-size: 24px;
+                  font-weight: 700;
+                  color: #666;
+                }
+
+                .match-datetime {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 4px;
+
+                  .match-date {
+                    font-size: 13px;
+                    color: #666;
+                  }
+
+                  .match-time {
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #1976d2;
+                  }
+                }
+              }
+            }
+
+            .match-venue {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 12px;
+              background-color: #f5f5f5;
+              border-radius: 8px;
+              font-size: 14px;
+              color: #666;
+
+              mat-icon {
+                font-size: 20px;
+                width: 20px;
+                height: 20px;
+                color: #1976d2;
+              }
+            }
+          }
+
+          mat-card-actions {
+            button mat-icon {
+              margin-right: 8px;
+            }
+          }
+        }
+
+        .empty-state {
+          grid-column: 1 / -1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 64px 24px;
+          text-align: center;
+
+          mat-icon {
+            font-size: 96px;
+            width: 96px;
+            height: 96px;
+            color: #ccc;
+            margin-bottom: 24px;
+          }
+
+          p {
+            font-size: 18px;
+            color: #666;
+            margin: 0;
+          }
+        }
+      }
+
+      .calendar-card {
+        mat-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          margin-bottom: 24px;
+
+          .calendar-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .calendar-title {
+              margin: 0;
+              font-size: 24px;
+              font-weight: 600;
+              color: #1a1a1a;
+              min-width: 200px;
+              text-align: center;
+            }
+          }
+
+          button mat-icon {
+            margin-right: 8px;
+          }
+        }
+
+        mat-card-content {
+          .calendar-grid {
+            .calendar-weekdays {
+              display: grid;
+              grid-template-columns: repeat(7, 1fr);
+              gap: 8px;
+              margin-bottom: 8px;
+
+              .weekday {
+                text-align: center;
+                font-weight: 600;
+                font-size: 14px;
+                color: #666;
+                padding: 12px;
+              }
+            }
+
+            .calendar-days {
+              display: grid;
+              grid-template-columns: repeat(7, 1fr);
+              gap: 8px;
+
+              .calendar-day {
+                min-height: 100px;
+                padding: 8px;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                background-color: white;
+                transition: all 0.3s ease;
+                cursor: pointer;
+
+                &:hover {
+                  background-color: #f5f5f5;
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                &.other-month {
+                  background-color: #fafafa;
+                  
+                  .day-number {
+                    color: #ccc;
+                  }
+                }
+
+                &.today {
+                  border: 2px solid #1976d2;
+                  background-color: #e3f2fd;
+
+                  .day-number {
+                    background-color: #1976d2;
+                    color: white;
+                  }
+                }
+
+                &.has-matches {
+                  border-color: #4caf50;
+                }
+
+                .day-number {
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  font-weight: 600;
+                  font-size: 14px;
+                  color: #1a1a1a;
+                  margin-bottom: 8px;
+                }
+
+                .day-matches {
+                  display: flex;
+                  flex-direction: column;
+                  gap: 4px;
+
+                  .match-indicator {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+
+                    &.home {
+                      background-color: #e3f2fd;
+                      color: #1976d2;
+                      border-left: 3px solid #1976d2;
+                    }
+
+                    &:not(.home) {
+                      background-color: #fff3e0;
+                      color: #f57c00;
+                      border-left: 3px solid #f57c00;
+                    }
+
+                    &:hover {
+                      transform: translateX(4px);
+                    }
+
+                    mat-icon {
+                      font-size: 14px;
+                      width: 14px;
+                      height: 14px;
+                    }
+
+                    .match-time {
+                      font-weight: 600;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .calendar-legend {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            padding: 16px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+
+            .legend-item {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .legend-color {
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+
+                &.home {
+                  background-color: #e3f2fd;
+                  border: 2px solid #1976d2;
+                }
+
+                &.away {
+                  background-color: #fff3e0;
+                  border: 2px solid #f57c00;
+                }
+
+                &.today {
+                  background-color: #e3f2fd;
+                  border: 2px solid #1976d2;
+                }
+              }
+
+              span {
+                font-size: 13px;
+                color: #666;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .matches-calendar-container {
+    .calendar-tabs {
+      .tab-content {
+        .upcoming-matches-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .matches-calendar-container {
+    padding: 12px;
+
+    .page-header {
+      .header-content {
+        .page-title {
+          font-size: 24px;
+
+          mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+          }
+        }
+      }
+    }
+
+    .calendar-tabs {
+      .tab-content {
+        .upcoming-matches-grid {
+          .match-card {
+            mat-card-content {
+              .match-teams {
+                grid-template-columns: 1fr;
+                gap: 16px;
+
+                .match-vs {
+                  order: -1;
+                }
+              }
+            }
+          }
+        }
+
+        .calendar-card {
+          mat-card-content {
+            .calendar-grid {
+              .calendar-days {
+                .calendar-day {
+                  min-height: 80px;
+                  padding: 4px;
+
+                  .day-number {
+                    width: 24px;
+                    height: 24px;
+                    font-size: 12px;
+                  }
+
+                  .day-matches {
+                    .match-indicator {
+                      padding: 2px 4px;
+                      font-size: 10px;
+
+                      mat-icon {
+                        font-size: 12px;
+                        width: 12px;
+                        height: 12px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            .calendar-legend {
+              flex-direction: column;
+              gap: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -100,6 +100,24 @@
           </mat-list-item>
           <mat-list-item
             class="nav-item"
+            routerLink="/manager/matches-calendar"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Calendario de Partidos' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">event</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Calendario</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
+            routerLink="/manager/matches-history"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Historial de Partidos' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">history</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Historial</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
             routerLink="/settings"
             routerLinkActive="active"
             [matTooltip]="isCollapsed && !isMobile ? 'Configuración' : ''"

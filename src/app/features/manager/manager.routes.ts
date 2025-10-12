@@ -25,5 +25,15 @@ export const managerRoutes: Routes = [
     path: 'team-lineup',
     loadComponent: () => import('./components/my-team/team-lineup/team-lineup.component').then(c => c.TeamLineupComponent),
     title: 'Plantilla y Alineaciones - Manager'
+  },
+  {
+    path: 'matches-calendar',
+    loadComponent: () => import('./components/matches/matches-calendar/matches-calendar.component').then(c => c.MatchesCalendarComponent),
+    title: 'Calendario de Partidos - Manager'
+  },
+  {
+    path: 'matches-history',
+    loadComponent: () => import('./components/matches/matches-history/matches-history.component').then(c => c.MatchesHistoryComponent),
+    title: 'Historial de Partidos - Manager'
   }
 ];

@@ -1,0 +1,225 @@
+<div class="matches-history-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>history</mat-icon>
+        Historial de Partidos
+      </h1>
+      <p class="page-subtitle">Revisa los resultados de partidos anteriores</p>
+    </div>
+    <button mat-stroked-button (click)="onExport()">
+      <mat-icon>download</mat-icon>
+      Exportar
+    </button>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon total">
+          <mat-icon>sports_soccer</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total }}</span>
+          <span class="stat-label">Partidos Jugados</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon wins">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.wins }}</span>
+          <span class="stat-label">Victorias</span>
+          <span class="stat-percentage">{{ winPercentage | number:'1.0-0' }}%</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon draws">
+          <mat-icon>remove_circle</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.draws }}</span>
+          <span class="stat-label">Empates</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon losses">
+          <mat-icon>cancel</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.losses }}</span>
+          <span class="stat-label">Derrotas</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon goals-for">
+          <mat-icon>sports_score</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.goalsFor }}</span>
+          <span class="stat-label">Goles a Favor</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon goals-against">
+          <mat-icon>sports_score</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.goalsAgainst }}</span>
+          <span class="stat-label">Goles en Contra</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar partido</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Equipo, sede...">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Resultado</mat-label>
+          <mat-select [formControl]="resultFilter">
+            <mat-option *ngFor="let option of resultOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>filter_list</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Lugar</mat-label>
+          <mat-select [formControl]="venueFilter">
+            <mat-option *ngFor="let option of venueOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>location_on</mat-icon>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Matches Table -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="matches-table">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+            <td mat-cell *matCellDef="let match">
+              <div class="date-cell">
+                <span class="date">{{ match.date | date:'dd/MM/yyyy' }}</span>
+                <span class="time">{{ match.date | date:'HH:mm' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Matchday Column -->
+          <ng-container matColumnDef="matchday">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Jornada</th>
+            <td mat-cell *matCellDef="let match">
+              <mat-chip-set>
+                <mat-chip>J{{ match.matchday }}</mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Teams Column -->
+          <ng-container matColumnDef="teams">
+            <th mat-header-cell *matHeaderCellDef>Partido</th>
+            <td mat-cell *matCellDef="let match">
+              <div class="teams-cell">
+                <div class="team-row">
+                  <span class="team-name" [class.my-team]="match.isHome">{{ match.homeTeam }}</span>
+                  <span class="score">{{ match.homeGoals }}</span>
+                </div>
+                <div class="team-row">
+                  <span class="team-name" [class.my-team]="!match.isHome">{{ match.awayTeam }}</span>
+                  <span class="score">{{ match.awayGoals }}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Result Column -->
+          <ng-container matColumnDef="result">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Resultado</th>
+            <td mat-cell *matCellDef="let match">
+              <mat-chip-set>
+                <mat-chip [color]="getResultColor(match.result)" highlighted>
+                  <mat-icon>{{ getResultIcon(match.result) }}</mat-icon>
+                  {{ getResultLabel(match.result) }}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Venue Column -->
+          <ng-container matColumnDef="venue">
+            <th mat-header-cell *matHeaderCellDef>Sede</th>
+            <td mat-cell *matCellDef="let match">
+              <div class="venue-cell">
+                <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
+                <span>{{ match.venue }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let match">
+              <button mat-icon-button color="primary" (click)="onViewMatchDetails(match.id)" matTooltip="Ver Detalles">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="match-row"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>search_off</mat-icon>
+                <p>No se encontraron partidos</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator 
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        [pageSize]="10"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>
