@@ -138,26 +138,28 @@
                           <mat-card-content class="match-content">
                             <!-- Match Header with Actions and Status -->
                             <div class="match-header">
-                              <!-- Actions Left -->
-                              <div class="match-actions-top" *ngIf="match.status !== matchStatusType.finished">
-                                <button mat-icon-button
-                                        (click)="updateMatchDate(match)"
-                                        matTooltip="Actualizar fecha"
-                                        class="action-btn-mini update-date">
-                                  <mat-icon>calendar_today</mat-icon>
-                                </button>
-                                <button mat-icon-button
-                                        (click)="changeMatchStatus(match)"
-                                        matTooltip="Cambiar estado"
-                                        class="action-btn-mini change-status">
-                                  <mat-icon>swap_horiz</mat-icon>
-                                </button>
-                                <button mat-icon-button
-                                        (click)="deleteMatchById(match)"
-                                        matTooltip="Eliminar partido"
-                                        class="action-btn-mini delete">
-                                  <mat-icon>delete</mat-icon>
-                                </button>
+                              <!-- Actions Left - Always present to maintain layout -->
+                              <div class="match-actions-top">
+                                <ng-container *ngIf="match.status !== matchStatusType.played">
+                                  <button mat-icon-button
+                                          (click)="updateMatchDate(match)"
+                                          matTooltip="Actualizar fecha"
+                                          class="action-btn-mini update-date">
+                                    <mat-icon>calendar_today</mat-icon>
+                                  </button>
+                                  <button mat-icon-button
+                                          (click)="changeMatchStatus(match)"
+                                          matTooltip="Cambiar estado"
+                                          class="action-btn-mini change-status">
+                                    <mat-icon>swap_horiz</mat-icon>
+                                  </button>
+                                  <button mat-icon-button
+                                          (click)="deleteMatchById(match)"
+                                          matTooltip="Eliminar partido"
+                                          class="action-btn-mini delete">
+                                    <mat-icon>delete</mat-icon>
+                                  </button>
+                                </ng-container>
                               </div>
                               
                               <!-- Status Badge Right -->

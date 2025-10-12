@@ -27,11 +27,10 @@ export interface MatchInfo {
 }
 
 export enum MatchStatusType {
-  scheduled, //Programado
-  inProgress, //En curso, se esta jugando
-  finished, //Jugado
-  canceled, //Cancelado // eliminado
-  postponed //Portergado
+  scheduled = 0, // Programado
+  played = 1,    // Jugado
+  canceled = 2,  // Cancelado
+  postponed = 3  // Postergado
 }
 
 export interface MatchesByGroupResponse {
