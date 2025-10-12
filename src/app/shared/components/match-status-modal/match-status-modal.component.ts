@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectModule, MatSelect } from '@angular/material/select';
 import { MatchStatusType } from '@core/services/match.service';
 
 export interface MatchStatusModalData {
@@ -61,12 +61,13 @@ export class MatchStatusModalComponent implements OnInit {
     this.initializeAvailableStatuses();
   }
 
+
   private initializeAvailableStatuses(): void {
     // Todos los estados disponibles
     this.availableStatuses = [
       { value: MatchStatusType.scheduled, text: 'Programado' },
       { value: MatchStatusType.played, text: 'Jugado' },
-      { value: MatchStatusType.canceled, text: 'Cancelado' },
+      { value: MatchStatusType.canceled, text: 'Cancelado Eliminado' },
       { value: MatchStatusType.postponed, text: 'Postergado' }
     ];
 
@@ -103,11 +104,11 @@ export class MatchStatusModalComponent implements OnInit {
   onSubmit(): void {
     if (this.statusForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
-      
+
       // Por ahora solo cerramos el modal con el nuevo estado
       // En el futuro aquí se haría la llamada a la API
       const newStatus = this.statusForm.get('newStatus')?.value;
-      
+
       setTimeout(() => {
         this.dialogRef.close({
           success: true,

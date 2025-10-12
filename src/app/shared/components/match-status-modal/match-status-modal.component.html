@@ -27,7 +27,8 @@
       <div class="form-field">
         <mat-form-field appearance="outline" class="status-select">
           <mat-label>Nuevo Estado</mat-label>
-          <mat-select formControlName="newStatus" [compareWith]="compareStatusValues">
+          <mat-select formControlName="newStatus" 
+                      [compareWith]="compareStatusValues">
             <mat-option *ngFor="let status of availableStatuses" [value]="status.value">
               <div class="status-option">
                 <div class="status-indicator" [class]="getStatusClass(status.value)"></div>
