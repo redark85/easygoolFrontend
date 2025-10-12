@@ -142,7 +142,6 @@
                       <mat-icon>delete</mat-icon>
                     </button>
                     <button mat-icon-button
-                            *ngIf="!team.hasExcelUploaded"
                             [matTooltip]="team.hasExcelUploaded ? 'Excel ya subido' : 'Subir excel de registro de jugadores'"
                             [class]="team.hasExcelUploaded ? 'text-muted' : 'text-info'"
                             [disabled]="team.hasExcelUploaded"
@@ -168,7 +167,8 @@
                       <mat-icon>verified</mat-icon>
                     </button>
                     <button mat-icon-button
-                            *ngIf="!team.hasUsedLink"
+                            [disabled]="team.hasUsedLink"
+                            [class]="team.hasUsedLink ? 'text-muted' : 'text-info'"
                             (click)="copyRegistrationUrl(team.urlRegistration); $event.stopPropagation()"
                             matTooltip="Copiar URL de registro"
                             class="text-secondary">

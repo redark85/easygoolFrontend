@@ -55,7 +55,7 @@ export interface ManagerInfoData {
                 <span>Teléfono</span>
               </div>
               <div class="info-value">
-                <a [href]="'tel:' + data.phoneNumber" class="phone-link">
+                <a [href]="getPhoneLink(data.phoneNumber)" target="_blank"  class="whatsapp-link" matTooltip="Enviar mensaje">
                   {{ data.phoneNumber }}
                 </a>
                 <button mat-icon-button 
@@ -340,5 +340,9 @@ export class ManagerInfoModalComponent {
     }
 
     document.body.removeChild(textArea);
+  }
+
+  getPhoneLink(phone: string): string {
+    return `https://wa.me/+593${phone}`;
   }
 }
