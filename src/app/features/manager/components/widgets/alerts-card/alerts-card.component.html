@@ -1,0 +1,43 @@
+<mat-card class="alerts-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon [matBadge]="alerts.length" matBadgeColor="warn">notifications</mat-icon>
+      Alertas y Notificaciones
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="alerts-container" *ngIf="alerts.length > 0; else noAlerts">
+      <div *ngFor="let alert of alerts" class="alert-item" [class]="'alert-' + alert.type">
+        <div class="alert-icon" [style.background-color]="getAlertColor(alert.type) + '20'">
+          <mat-icon [style.color]="getAlertColor(alert.type)">{{ alert.icon }}</mat-icon>
+        </div>
+        
+        <div class="alert-content">
+          <div class="alert-header">
+            <h4 class="alert-title">{{ alert.title }}</h4>
+            <span class="alert-date">{{ alert.date | date:'short' }}</span>
+          </div>
+          <p class="alert-message">{{ alert.message }}</p>
+          
+          <div class="alert-actions" *ngIf="alert.actionLabel">
+            <button mat-button color="primary" [routerLink]="alert.actionRoute">
+              {{ alert.actionLabel }}
+            </button>
+          </div>
+        </div>
+
+        <button mat-icon-button class="dismiss-btn" (click)="dismissAlert(alert.id)" matTooltip="Descartar">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <ng-template #noAlerts>
+      <div class="no-alerts">
+        <mat-icon>check_circle</mat-icon>
+        <p>No hay alertas pendientes</p>
+      </div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

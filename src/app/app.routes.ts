@@ -82,6 +82,12 @@ export const routes: Routes = [
       {
         path: 'leagues',
         loadComponent: () => import('./features/dashboard/components/home/home.component').then(c => c.HomeComponent)
+      },
+      
+      // Manager routes (Dashboard del Manager)
+      {
+        path: 'manager',
+        loadChildren: () => import('./features/manager/manager.routes').then(r => r.managerRoutes)
       }
     ]
   },

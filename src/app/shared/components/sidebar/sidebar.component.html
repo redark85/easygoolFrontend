@@ -64,6 +64,15 @@
           </div>
           <mat-list-item
             class="nav-item"
+            routerLink="/manager/dashboard"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Dashboard' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">dashboard</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Dashboard</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
             routerLink="/teams"
             routerLinkActive="active"
             [matTooltip]="isCollapsed && !isMobile ? 'Mis Equipos' : ''"

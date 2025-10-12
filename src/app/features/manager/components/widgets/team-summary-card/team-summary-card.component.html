@@ -1,0 +1,105 @@
+<mat-card class="team-summary-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>groups</mat-icon>
+      Mi Equipo
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Team Info -->
+    <div class="team-info">
+      <img [src]="teamSummary.logoUrl" [alt]="teamSummary.teamName" class="team-logo">
+      <div class="team-details">
+        <h2 class="team-name">{{ teamSummary.teamName }}</h2>
+        <div class="team-position">
+          <mat-icon>emoji_events</mat-icon>
+          <span>{{ teamSummary.currentPosition }}° Posición</span>
+          <span class="points-badge">{{ teamSummary.points }} pts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <!-- Matches Played -->
+      <div class="stat-item">
+        <mat-icon>sports_soccer</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Partidos</span>
+          <span class="stat-value">{{ teamSummary.matchesPlayed }}</span>
+        </div>
+      </div>
+
+      <!-- Wins -->
+      <div class="stat-item wins">
+        <mat-icon>check_circle</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Victorias</span>
+          <span class="stat-value">{{ teamSummary.wins }}</span>
+        </div>
+      </div>
+
+      <!-- Draws -->
+      <div class="stat-item draws">
+        <mat-icon>remove_circle</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Empates</span>
+          <span class="stat-value">{{ teamSummary.draws }}</span>
+        </div>
+      </div>
+
+      <!-- Losses -->
+      <div class="stat-item losses">
+        <mat-icon>cancel</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Derrotas</span>
+          <span class="stat-value">{{ teamSummary.losses }}</span>
+        </div>
+      </div>
+
+      <!-- Goals For -->
+      <div class="stat-item goals-for">
+        <mat-icon>sports_score</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Goles a Favor</span>
+          <span class="stat-value">{{ teamSummary.goalsFor }}</span>
+        </div>
+      </div>
+
+      <!-- Goals Against -->
+      <div class="stat-item goals-against">
+        <mat-icon>shield</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Goles en Contra</span>
+          <span class="stat-value">{{ teamSummary.goalsAgainst }}</span>
+        </div>
+      </div>
+
+      <!-- Goal Difference -->
+      <div class="stat-item goal-diff" [class.positive]="goalDifference > 0" [class.negative]="goalDifference < 0">
+        <mat-icon>trending_up</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Diferencia</span>
+          <span class="stat-value">{{ goalDifference > 0 ? '+' : '' }}{{ goalDifference }}</span>
+        </div>
+      </div>
+
+      <!-- Win Percentage -->
+      <div class="stat-item win-rate">
+        <mat-icon>percent</mat-icon>
+        <div class="stat-content">
+          <span class="stat-label">Efectividad</span>
+          <span class="stat-value">{{ winPercentage | number:'1.0-0' }}%</span>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-button color="primary" routerLink="/teams">
+      <mat-icon>visibility</mat-icon>
+      Ver Detalles
+    </button>
+  </mat-card-actions>
+</mat-card>

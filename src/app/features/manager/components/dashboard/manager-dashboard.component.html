@@ -1,0 +1,49 @@
+<div class="manager-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <mat-icon>dashboard</mat-icon>
+        Dashboard del Manager
+      </h1>
+      <p class="dashboard-subtitle">Resumen ejecutivo de tu equipo</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="onRefresh()" [disabled]="isLoading">
+      <mat-icon>refresh</mat-icon>
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando dashboard...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content" *ngIf="!isLoading">
+    <!-- Row 1: Team Summary & Next Match -->
+    <div class="dashboard-row">
+      <div class="dashboard-col col-lg">
+        <app-team-summary-card></app-team-summary-card>
+      </div>
+      <div class="dashboard-col col-md">
+        <app-next-match-card></app-next-match-card>
+      </div>
+    </div>
+
+    <!-- Row 2: Quick Stats -->
+    <div class="dashboard-row">
+      <div class="dashboard-col col-full">
+        <app-quick-stats-card></app-quick-stats-card>
+      </div>
+    </div>
+
+    <!-- Row 3: Alerts -->
+    <div class="dashboard-row">
+      <div class="dashboard-col col-full">
+        <app-alerts-card></app-alerts-card>
+      </div>
+    </div>
+  </div>
+</div>

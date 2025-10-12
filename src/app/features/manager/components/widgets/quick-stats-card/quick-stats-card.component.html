@@ -1,0 +1,32 @@
+<mat-card class="quick-stats-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>bar_chart</mat-icon>
+      Estadísticas Rápidas
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="stats-grid">
+      <div *ngFor="let stat of quickStats" class="stat-box">
+        <div class="stat-icon" [style.background-color]="stat.color + '20'">
+          <mat-icon [style.color]="stat.color">{{ stat.icon }}</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">{{ stat.label }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value">{{ stat.value }}</span>
+            <span *ngIf="stat.trend && stat.trendValue" 
+                  class="stat-trend" 
+                  [class.up]="stat.trend === 'up'"
+                  [class.down]="stat.trend === 'down'">
+              <mat-icon *ngIf="stat.trend === 'up'">trending_up</mat-icon>
+              <mat-icon *ngIf="stat.trend === 'down'">trending_down</mat-icon>
+              {{ stat.trendValue }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,236 @@
+.team-summary-card {
+  height: 100%;
+
+  mat-card-header {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 600;
+
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+  }
+
+  mat-card-content {
+    .team-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 20px;
+
+      .team-logo {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 2px solid #f5f5f5;
+      }
+
+      .team-details {
+        flex: 1;
+
+        .team-name {
+          margin: 0 0 8px 0;
+          font-size: 22px;
+          font-weight: 600;
+          color: #1a1a1a;
+        }
+
+        .team-position {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          color: #666;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: #ffa726;
+          }
+
+          .points-badge {
+            margin-left: 8px;
+            padding: 4px 12px;
+            background-color: #1976d2;
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+          }
+        }
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: #eeeeee;
+          transform: translateY(-2px);
+        }
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+          color: #666;
+        }
+
+        .stat-content {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 500;
+          }
+
+          .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+          }
+        }
+
+        &.wins {
+          mat-icon {
+            color: #4caf50;
+          }
+        }
+
+        &.draws {
+          mat-icon {
+            color: #ff9800;
+          }
+        }
+
+        &.losses {
+          mat-icon {
+            color: #f44336;
+          }
+        }
+
+        &.goals-for {
+          mat-icon {
+            color: #2196f3;
+          }
+        }
+
+        &.goals-against {
+          mat-icon {
+            color: #9c27b0;
+          }
+        }
+
+        &.goal-diff {
+          mat-icon {
+            color: #607d8b;
+          }
+
+          &.positive {
+            background-color: #e8f5e9;
+
+            mat-icon {
+              color: #4caf50;
+            }
+
+            .stat-value {
+              color: #4caf50;
+            }
+          }
+
+          &.negative {
+            background-color: #ffebee;
+
+            mat-icon {
+              color: #f44336;
+            }
+
+            .stat-value {
+              color: #f44336;
+            }
+          }
+        }
+
+        &.win-rate {
+          mat-icon {
+            color: #00bcd4;
+          }
+        }
+      }
+    }
+  }
+
+  mat-card-actions {
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .team-summary-card {
+    mat-card-content {
+      .team-info {
+        .team-logo {
+          width: 60px;
+          height: 60px;
+        }
+
+        .team-details {
+          .team-name {
+            font-size: 18px;
+          }
+        }
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+
+        .stat-item {
+          padding: 10px;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+
+          .stat-content {
+            .stat-value {
+              font-size: 18px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
