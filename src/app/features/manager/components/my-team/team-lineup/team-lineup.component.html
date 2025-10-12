@@ -1,0 +1,217 @@
+<div class="team-lineup-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>sports</mat-icon>
+        Plantilla y Alineaciones
+      </h1>
+      <p class="page-subtitle">Crea y gestiona las alineaciones de tu equipo</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="onCreateNewLineup()">
+      <mat-icon>add</mat-icon>
+      Nueva Alineación
+    </button>
+  </div>
+
+  <mat-tab-group class="lineup-tabs">
+    <!-- Tab: Crear Alineación -->
+    <mat-tab label="Crear Alineación">
+      <div class="tab-content">
+        <div class="lineup-grid">
+          <!-- Formation Selector -->
+          <mat-card class="formation-card">
+            <mat-card-header>
+              <mat-card-title>Formación Táctica</mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Selecciona una formación</mat-label>
+                <mat-select [(value)]="selectedFormation" (selectionChange)="onFormationChange($event.value)">
+                  <mat-option *ngFor="let formation of formations" [value]="formation">
+                    <div class="formation-option">
+                      <span class="formation-name">{{ formation.name }}</span>
+                      <span class="formation-desc">{{ formation.description }}</span>
+                    </div>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="formation-info">
+                <mat-chip-set>
+                  <mat-chip highlighted color="primary">
+                    <mat-icon>sports_soccer</mat-icon>
+                    {{ selectedFormation.name }}
+                  </mat-chip>
+                </mat-chip-set>
+                <p class="formation-description">{{ selectedFormation.description }}</p>
+              </div>
+
+              <button mat-raised-button color="primary" class="full-width" (click)="onSaveLineup()">
+                <mat-icon>save</mat-icon>
+                Guardar Alineación
+              </button>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Field Visualization -->
+          <mat-card class="field-card">
+            <mat-card-header>
+              <mat-card-title>Campo de Juego</mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="soccer-field">
+                <div class="field-lines">
+                  <!-- Center Circle -->
+                  <div class="center-circle"></div>
+                  <!-- Center Line -->
+                  <div class="center-line"></div>
+                  <!-- Penalty Areas -->
+                  <div class="penalty-area top"></div>
+                  <div class="penalty-area bottom"></div>
+                </div>
+
+                <!-- Formation Display -->
+                <div class="formation-display">
+                  <div class="formation-text">{{ selectedFormation.name }}</div>
+                  <p class="drag-instruction">
+                    <mat-icon>info</mat-icon>
+                    Arrastra jugadores desde la lista para posicionarlos
+                  </p>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Available Players -->
+          <mat-card class="players-card">
+            <mat-card-header>
+              <mat-card-title>Jugadores Disponibles</mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="players-list">
+                <div *ngFor="let player of availablePlayers" class="player-item" draggable="true">
+                  <img [src]="player.photo" [alt]="player.name" class="player-photo">
+                  <div class="player-info">
+                    <span class="player-name">{{ player.name }}</span>
+                    <span class="player-position">{{ player.position }}</span>
+                  </div>
+                  <span class="player-number">{{ player.jerseyNumber }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Alineaciones Guardadas -->
+    <mat-tab label="Alineaciones Guardadas">
+      <div class="tab-content">
+        <div class="saved-lineups-grid">
+          <mat-card *ngFor="let lineup of savedLineups" class="lineup-card">
+            <mat-card-header>
+              <mat-card-title>
+                <div class="lineup-title">
+                  <span>{{ lineup.name }}</span>
+                  <button mat-icon-button (click)="onToggleFavorite(lineup)" [color]="lineup.isFavorite ? 'warn' : ''">
+                    <mat-icon>{{ lineup.isFavorite ? 'star' : 'star_border' }}</mat-icon>
+                  </button>
+                </div>
+              </mat-card-title>
+              <mat-card-subtitle>
+                <mat-chip-set>
+                  <mat-chip>{{ lineup.formation }}</mat-chip>
+                </mat-chip-set>
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <!-- Stats -->
+              <div class="lineup-stats">
+                <div class="stat-item wins">
+                  <mat-icon>check_circle</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ lineup.wins }}</span>
+                    <span class="stat-label">Victorias</span>
+                  </div>
+                </div>
+                <div class="stat-item draws">
+                  <mat-icon>remove_circle</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ lineup.draws }}</span>
+                    <span class="stat-label">Empates</span>
+                  </div>
+                </div>
+                <div class="stat-item losses">
+                  <mat-icon>cancel</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ lineup.losses }}</span>
+                    <span class="stat-label">Derrotas</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Win Percentage -->
+              <div class="win-percentage">
+                <div class="percentage-bar">
+                  <div class="percentage-fill" [style.width.%]="getWinPercentage(lineup)"></div>
+                </div>
+                <span class="percentage-text">{{ getWinPercentage(lineup) | number:'1.0-0' }}% Efectividad</span>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-button color="primary" (click)="onLoadLineup(lineup)">
+                <mat-icon>visibility</mat-icon>
+                Ver
+              </button>
+              <button mat-button (click)="onDeleteLineup(lineup)">
+                <mat-icon>delete</mat-icon>
+                Eliminar
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="savedLineups.length === 0">
+            <mat-icon>sports</mat-icon>
+            <p>No tienes alineaciones guardadas</p>
+            <button mat-raised-button color="primary" (click)="onCreateNewLineup()">
+              <mat-icon>add</mat-icon>
+              Crear Primera Alineación
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Análisis -->
+    <mat-tab label="Análisis">
+      <div class="tab-content">
+        <mat-card class="analysis-card">
+          <mat-card-header>
+            <mat-card-title>Análisis de Alineaciones</mat-card-title>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="analysis-content">
+              <mat-icon>analytics</mat-icon>
+              <h3>Próximamente</h3>
+              <p>Aquí podrás ver estadísticas detalladas y análisis de tus alineaciones:</p>
+              <ul>
+                <li>Formaciones más efectivas</li>
+                <li>Jugadores clave en victorias</li>
+                <li>Comparativa de rendimiento</li>
+                <li>Recomendaciones tácticas</li>
+              </ul>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

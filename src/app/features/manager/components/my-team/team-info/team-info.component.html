@@ -1,0 +1,203 @@
+<div class="team-info-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>info</mat-icon>
+        Información del Equipo
+      </h1>
+      <p class="page-subtitle">Gestiona la información básica de tu equipo</p>
+    </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" *ngIf="!isEditing" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+      <button mat-raised-button *ngIf="isEditing" (click)="onCancel()">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+      <button mat-raised-button color="primary" *ngIf="isEditing" (click)="onSave()" [disabled]="teamForm.invalid || isLoading">
+        <mat-icon>save</mat-icon>
+        Guardar
+      </button>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- Card: Logo y Datos Básicos -->
+    <mat-card class="team-basic-card">
+      <mat-card-header>
+        <mat-card-title>Datos Básicos</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="logo-section">
+          <div class="logo-container">
+            <img [src]="teamInfo.logoUrl" [alt]="teamInfo.name" class="team-logo">
+            <button mat-mini-fab color="primary" class="change-logo-btn" *ngIf="isEditing" (click)="fileInput.click()">
+              <mat-icon>photo_camera</mat-icon>
+            </button>
+            <input #fileInput type="file" accept="image/*" style="display: none" (change)="onLogoSelected($event)">
+          </div>
+        </div>
+
+        <form [formGroup]="teamForm" class="team-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre del Equipo</mat-label>
+            <input matInput formControlName="name" placeholder="Ej: Club Deportivo Ejemplo">
+            <mat-icon matPrefix>groups</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre Corto</mat-label>
+            <input matInput formControlName="shortName" placeholder="Ej: CDE" maxlength="10">
+            <mat-icon matPrefix>text_fields</mat-icon>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Año de Fundación</mat-label>
+              <input matInput type="number" formControlName="foundedYear" placeholder="2020">
+              <mat-icon matPrefix>calendar_today</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Ciudad</mat-label>
+              <input matInput formControlName="city" placeholder="Ciudad">
+              <mat-icon matPrefix>location_city</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Estadio</mat-label>
+            <input matInput formControlName="stadium" placeholder="Estadio Municipal">
+            <mat-icon matPrefix>stadium</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description" rows="4" maxlength="500" placeholder="Descripción del equipo..."></textarea>
+            <mat-icon matPrefix>description</mat-icon>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Color Primario</mat-label>
+              <input matInput type="color" formControlName="primaryColor">
+              <mat-icon matPrefix>palette</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Color Secundario</mat-label>
+              <input matInput type="color" formControlName="secondaryColor">
+              <mat-icon matPrefix>palette</mat-icon>
+            </mat-form-field>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card: Estadísticas del Equipo -->
+    <mat-card class="team-stats-card">
+      <mat-card-header>
+        <mat-card-title>Estadísticas</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="stats-list">
+          <div class="stat-item">
+            <mat-icon>people</mat-icon>
+            <div class="stat-content">
+              <span class="stat-label">Total de Jugadores</span>
+              <span class="stat-value">{{ teamInfo.totalPlayers }}</span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="stat-item">
+            <mat-icon>check_circle</mat-icon>
+            <div class="stat-content">
+              <span class="stat-label">Jugadores Activos</span>
+              <span class="stat-value">{{ teamInfo.activePlayers }}</span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="stat-item">
+            <mat-icon>event</mat-icon>
+            <div class="stat-content">
+              <span class="stat-label">Año de Fundación</span>
+              <span class="stat-value">{{ teamInfo.foundedYear }}</span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="stat-item">
+            <mat-icon>stadium</mat-icon>
+            <div class="stat-content">
+              <span class="stat-label">Estadio</span>
+              <span class="stat-value">{{ teamInfo.stadium }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card: Código de Registro -->
+    <mat-card class="registration-card">
+      <mat-card-header>
+        <mat-card-title>Código de Registro</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p class="registration-description">
+          Comparte este código o URL con tus jugadores para que puedan registrarse en el equipo.
+        </p>
+
+        <div class="registration-status">
+          <mat-chip-set>
+            <mat-chip [class.enabled]="teamInfo.registrationEnabled" [class.disabled]="!teamInfo.registrationEnabled">
+              <mat-icon>{{ teamInfo.registrationEnabled ? 'check_circle' : 'cancel' }}</mat-icon>
+              {{ teamInfo.registrationEnabled ? 'Registro Habilitado' : 'Registro Deshabilitado' }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <div class="code-section">
+          <div class="code-display">
+            <mat-icon>qr_code</mat-icon>
+            <span class="code-text">{{ teamInfo.registrationCode }}</span>
+          </div>
+          
+          <button mat-icon-button color="primary" (click)="onCopyCode()" matTooltip="Copiar URL">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </div>
+
+        <div class="url-section">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>URL de Registro</mat-label>
+            <input matInput [value]="getRegistrationUrl()" readonly>
+            <mat-icon matPrefix>link</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="registration-actions">
+          <button mat-stroked-button (click)="onGenerateNewCode()">
+            <mat-icon>refresh</mat-icon>
+            Generar Nuevo Código
+          </button>
+          
+          <button mat-stroked-button [color]="teamInfo.registrationEnabled ? 'warn' : 'primary'" (click)="onToggleRegistration()">
+            <mat-icon>{{ teamInfo.registrationEnabled ? 'block' : 'check' }}</mat-icon>
+            {{ teamInfo.registrationEnabled ? 'Deshabilitar' : 'Habilitar' }} Registro
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

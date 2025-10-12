@@ -10,5 +10,20 @@ export const managerRoutes: Routes = [
     path: 'dashboard',
     loadComponent: () => import('./components/dashboard/manager-dashboard.component').then(c => c.ManagerDashboardComponent),
     title: 'Dashboard - Manager'
+  },
+  {
+    path: 'team-info',
+    loadComponent: () => import('./components/my-team/team-info/team-info.component').then(c => c.TeamInfoComponent),
+    title: 'Información del Equipo - Manager'
+  },
+  {
+    path: 'team-players',
+    loadComponent: () => import('./components/my-team/team-players/team-players.component').then(c => c.TeamPlayersComponent),
+    title: 'Gestión de Jugadores - Manager'
+  },
+  {
+    path: 'team-lineup',
+    loadComponent: () => import('./components/my-team/team-lineup/team-lineup.component').then(c => c.TeamLineupComponent),
+    title: 'Plantilla y Alineaciones - Manager'
   }
 ];

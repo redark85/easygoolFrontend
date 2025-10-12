@@ -73,21 +73,30 @@
           </mat-list-item>
           <mat-list-item
             class="nav-item"
-            routerLink="/teams"
+            routerLink="/manager/team-info"
             routerLinkActive="active"
-            [matTooltip]="isCollapsed && !isMobile ? 'Mis Equipos' : ''"
+            [matTooltip]="isCollapsed && !isMobile ? 'Información del Equipo' : ''"
             matTooltipPosition="right">
-            <mat-icon matListItemIcon class="nav-icon">groups</mat-icon>
-            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Mis Equipos</span>
+            <mat-icon matListItemIcon class="nav-icon">info</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Información</span>
           </mat-list-item>
           <mat-list-item
             class="nav-item"
-            routerLink="/players"
+            routerLink="/manager/team-players"
             routerLinkActive="active"
-            [matTooltip]="isCollapsed && !isMobile ? 'Jugadores' : ''"
+            [matTooltip]="isCollapsed && !isMobile ? 'Gestión de Jugadores' : ''"
             matTooltipPosition="right">
-            <mat-icon matListItemIcon class="nav-icon">person</mat-icon>
+            <mat-icon matListItemIcon class="nav-icon">people</mat-icon>
             <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Jugadores</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
+            routerLink="/manager/team-lineup"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Plantilla y Alineaciones' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">sports</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Alineaciones</span>
           </mat-list-item>
           <mat-list-item
             class="nav-item"
