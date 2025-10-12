@@ -21,6 +21,7 @@ import { Team } from '../../models/team.interface';
 import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest } from '@core/services/match.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
 import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
+import { MatchStatusModalComponent, MatchStatusModalData, MatchStatusModalResult } from '@shared/components/match-status-modal/match-status-modal.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -77,14 +78,14 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     // Reinicializar cuando cambien las fases
     if (changes['phases']) {
       console.log('Phases changed, reinitializing:', this.phases?.length || 0);
-      
+
       // Resetear estado antes de reinicializar
       this.selectedPhaseId = null;
       this.selectedGroupId = null;
       this.matchDays = [];
       this.loading = false;
       this.isCreatingMatchDay = false;
-      
+
       // Reinicializar con timeout para asegurar renderizado
       setTimeout(() => {
         this.initializeDefaultSelections();
@@ -97,22 +98,22 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    */
   private initializeDefaultSelections(): void {
     console.log('Initializing default selections, phases:', this.phases?.length || 0);
-    
+
     if (this.phases && this.phases.length > 0) {
       // Seleccionar la primera fase por defecto
       this.selectedPhaseId = this.phases[0].id;
       console.log('Selected default phase:', this.selectedPhaseId);
-      
+
       // Obtener los grupos de la primera fase
       const firstPhase = this.phases[0];
       const phaseGroups = this.getPhaseGroups(firstPhase);
       console.log('Groups found in first phase:', phaseGroups?.length || 0);
-      
+
       if (phaseGroups && phaseGroups.length > 0) {
         // Seleccionar el primer grupo automáticamente
         this.selectedGroupId = phaseGroups[0].id;
         console.log('Auto-selected first group:', this.selectedGroupId);
-        
+
         // Cargar partidos del primer grupo
         this.loadMatchesByGroup(this.selectedGroupId);
       } else {
@@ -125,7 +126,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           this.matchDays = [];
         }
       }
-      
+
       // Forzar detección de cambios
       setTimeout(() => {
         this.cdr.detectChanges();
@@ -202,10 +203,10 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     this.selectedGroupId = null;
     this.matchDays = [];
     this.isCreatingMatchDay = false;
-    
+
     // Buscar la fase seleccionada
     const selectedPhase = this.phases.find(p => p.id === phaseId);
-    
+
     if (selectedPhase && selectedPhase.phaseType === PhaseType.Knockout) {
       // Si es fase eliminatoria (Knockout), cargar partidos directamente
       console.log('Fase eliminatoria detectada, cargando partidos...');
@@ -214,7 +215,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       // Si no es eliminatoria, cargar grupos como antes
       this.loadGroupsForPhase(phaseId, true);
     }
-    
+
     // Forzar detección de cambios múltiple
     setTimeout(() => {
       this.cdr.detectChanges();
@@ -233,13 +234,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     // Por ahora usamos los grupos que ya están en la fase
     const selectedPhase = this.phases.find(p => p.id === phaseId);
     const phaseGroups = this.getPhaseGroups(selectedPhase);
-    
+
     if (selectedPhase && phaseGroups.length > 0) {
       if (autoSelectFirst) {
         // Seleccionar el primer grupo automáticamente
         this.selectedGroupId = phaseGroups[0].id;
         console.log(`Auto-selecting first group: ${this.selectedGroupId} for phase: ${phaseId}`);
-        
+
         // Cargar partidos del grupo seleccionado
         this.loadMatchesByGroup(this.selectedGroupId!);
       } else if (this.selectedGroupId) {
@@ -259,7 +260,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       this.selectedGroupId = null;
       this.matchDays = [];
     }
-    
+
     // Forzar detección de cambios después de cargar grupos con timeout más largo
     setTimeout(() => {
       this.cdr.detectChanges();
@@ -275,7 +276,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     this.selectedGroupId = groupId;
     this.isCreatingMatchDay = false;
     this.loadMatchesByGroup(groupId);
-    
+
     // Forzar detección de cambios
     setTimeout(() => {
       this.cdr.detectChanges();
@@ -288,7 +289,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    */
   getGroupsForSelectedPhase(): Group[] {
     if (!this.selectedPhaseId) return [];
-    const phase = this.phases.find(p => p.id === this.selectedPhaseId);    
+    const phase = this.phases.find(p => p.id === this.selectedPhaseId);
     return this.getPhaseGroups(phase) || [];
   }
 
@@ -378,10 +379,10 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       .subscribe({
         next: (response) => {
           console.log('Match day created successfully:', response);
-          
+
           this.loading = false;
           this.isCreatingMatchDay = false;
-          
+
           Swal.fire({
             title: '¡Jornada creada!',
             text: 'La nueva jornada se ha creado exitosamente',
@@ -389,7 +390,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
             timer: 2000,
             showConfirmButton: false
           });
-          
+
           // Recargar los partidos según el tipo de fase
           if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
             console.log('Reloading matches by group:', this.selectedGroupId);
@@ -401,17 +402,17 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
         },
         error: (error) => {
           console.error('Error creating match day:', error);
-          
+
           this.loading = false;
           this.isCreatingMatchDay = false;
-          
+
           Swal.fire({
             title: 'Error',
             text: error.message || 'No se pudo crear la jornada',
             icon: 'error',
             confirmButtonText: 'Aceptar'
           });
-          
+
           this.cdr.detectChanges();
         }
       });
@@ -438,7 +439,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   private loadMatchesByGroup(groupId: number): void {
     console.log(`Loading matches for group: ${groupId}`);
     this.loading = true;
-    
+
     this.matchService.getAllMatchesByGroup(groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -446,7 +447,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           console.log(`Loaded ${matchDays.length} match days for group ${groupId}`);
           this.matchDays = matchDays;
           this.loading = false;
-          
+
           // Forzar detección de cambios múltiple
           setTimeout(() => {
             this.cdr.detectChanges();
@@ -457,7 +458,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           console.error('Error loading matches by group:', error);
           this.matchDays = [];
           this.loading = false;
-          
+
           setTimeout(() => {
             this.cdr.detectChanges();
             this.cdr.markForCheck();
@@ -473,7 +474,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   private reloadCurrentMatches(context: string = ''): void {
     const phase = this.getSelectedPhase();
     const logPrefix = context ? `[${context}]` : '';
-    
+
     if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
       console.log(`${logPrefix} Reloading matches by group:`, this.selectedGroupId);
       this.loadMatchesByGroup(this.selectedGroupId);
@@ -495,7 +496,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     console.log(`Loading matches for phase: ${phaseId}`);
     this.loading = true;
     this.cdr.detectChanges();
-    
+
     this.matchService.getAllMatchesByPhase(phaseId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -503,7 +504,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           console.log(`Loaded ${matchDays.length} match days for phase ${phaseId}`);
           this.matchDays = matchDays;
           this.loading = false;
-          
+
           // Forzar detección de cambios múltiple
           setTimeout(() => {
             this.cdr.detectChanges();
@@ -514,7 +515,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           console.error('Error loading matches by phase:', error);
           this.matchDays = [];
           this.loading = false;
-          
+
           setTimeout(() => {
             this.cdr.detectChanges();
             this.cdr.markForCheck();
@@ -555,7 +556,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
             timer: 2000,
             showConfirmButton: false
           });
-          
+
           // Recargar los partidos según el tipo de fase
           this.reloadCurrentMatches('Random Generation');
         },
@@ -571,7 +572,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           this.cdr.detectChanges();
         }
       });
-    
+
   }
 
   /**
@@ -639,10 +640,10 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
 
     this.loading = true;
     this.cdr.detectChanges();
-    
+
     const phase = this.getSelectedPhase();
     const groupId = phase?.phaseType === PhaseType.GroupStage ? this.selectedGroupId! : 0;
-    
+
     this.matchService.createRandomMatchesForMatchDay({
       matchDayId: matchDay.matchDayId,
       phaseId: this.selectedPhaseId!,
@@ -652,7 +653,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       .subscribe({
         next: (response: any) => {
           this.loading = false;
-          
+
           Swal.fire({
             title: '¡Partidos generados!',
             text: `Se han generado ${response.matchesCreated || 'varios'} partidos para ${matchDay.matchDayName}`,
@@ -660,7 +661,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
             timer: 2000,
             showConfirmButton: false
           });
-          
+
           // Recargar los partidos según el tipo de fase
           if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
             this.loadMatchesByGroup(this.selectedGroupId);
@@ -671,14 +672,14 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
         error: (error: any) => {
           console.error('Error generating random matches:', error);
           this.loading = false;
-          
+
           Swal.fire({
             title: 'Error',
             text: error.message || 'No se pudieron generar los partidos',
             icon: 'error',
             confirmButtonText: 'Aceptar'
           });
-          
+
           this.cdr.detectChanges();
         }
       });
@@ -700,13 +701,13 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       if (result.isConfirmed) {
         this.loading = true;
         this.cdr.detectChanges();
-        
+
         this.matchService.deleteMatchDay(matchDay.matchDayId)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
               this.loading = false;
-              
+
               Swal.fire({
                 title: '¡Eliminada!',
                 text: 'La jornada ha sido eliminada exitosamente',
@@ -714,7 +715,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
                 timer: 2000,
                 showConfirmButton: false
               });
-              
+
               // Recargar los partidos según el tipo de fase
               const phase = this.getSelectedPhase();
               if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
@@ -726,14 +727,14 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
             error: (error) => {
               console.error('Error deleting match day:', error);
               this.loading = false;
-              
+
               Swal.fire({
                 title: 'Error',
                 text: error.message || 'No se pudo eliminar la jornada',
                 icon: 'error',
                 confirmButtonText: 'Aceptar'
               });
-              
+
               this.cdr.detectChanges();
             }
           });
@@ -757,7 +758,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     switch (status) {
       case MatchStatusType.scheduled: return 'Programado';
       case MatchStatusType.played: return 'Jugado';
-      case MatchStatusType.canceled: return 'Cancelado';
+      case MatchStatusType.canceled: return 'Cancelado Eliminado';
       case MatchStatusType.postponed: return 'Postergado';
       default: return 'Desconocido';
     }
@@ -842,7 +843,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     }
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Fecha inválida';
-    
+
     return date.toLocaleDateString('es-ES', {
       weekday: 'short',
       day: 'numeric',
@@ -854,12 +855,12 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Formatea la hora del partido
    */
   formatMatchTime(timeString?: string): string {
-  
+
     console.log(timeString);
     if (!timeString) {
       return '--:--';
     }
-    
+
     // Si es una fecha completa, extraer solo la hora
     if (timeString.includes('T')) {
       // Verificar si la hora es 00:00:00
@@ -867,7 +868,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       if (timePart && timePart.startsWith('00:00:00')) {
         return '--:--';
       }
-      
+
       const date = new Date(timeString);
       console.log('da',date);
       if (!isNaN(date.getTime())) {
@@ -877,7 +878,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
         }) + 'h';
       }
     }
-    
+
     // Si ya es solo hora, formatear
     return timeString.includes('h') ? timeString : timeString + 'h';
   }
@@ -913,14 +914,14 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
         // Actualizar los datos del partido
         match.matchDate = result.date;
         match.matchTime = result.time;
-        
+
         // Aquí se puede llamar al API para actualizar en el servidor
         console.log('Match updated:', {
           matchId: match.id,
           newDate: result.date,
           newTime: result.time
         });
-        
+
         // Mostrar confirmación de éxito
         Swal.fire({
           title: '¡Actualizado!',
@@ -931,7 +932,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           toast: true,
           position: 'top-end'
         });
-        
+
         // Forzar detección de cambios para actualizar la UI
         this.cdr.detectChanges();
       }
@@ -942,8 +943,36 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Cambia el estado de un partido
    */
   changeMatchStatus(match: any): void {
-    // Implementar lógica para cambiar estado del partido
-    console.log('Changing match status for:', match);
+    const dialogRef = this.dialog.open(MatchStatusModalComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        matchId: match.id,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        currentStatus: match.status
+      } as MatchStatusModalData
+    });
+
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result: MatchStatusModalResult) => {
+        if (result && result.success) {
+          // Por ahora solo mostramos un mensaje de éxito
+          // En el futuro aquí se actualizará el estado en el backend
+          Swal.fire({
+            title: '¡Estado actualizado!',
+            text: `El estado del partido se ha cambiado exitosamente.`,
+            icon: 'success',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#1976d2'
+          });
+          
+          console.log('Match status changed to:', result.newStatus);
+          // TODO: Actualizar el estado en la lista local y recargar datos
+        }
+      });
   }
 
 

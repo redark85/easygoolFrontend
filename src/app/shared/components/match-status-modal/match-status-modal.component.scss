@@ -1,0 +1,255 @@
+.modal-container {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1976d2;
+
+      .title-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: #1976d2;
+      }
+    }
+
+    .close-btn {
+      color: #666;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .modal-content {
+    padding: 24px;
+    min-height: 200px;
+
+    .match-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border-left: 4px solid #1976d2;
+
+      .match-icon {
+        font-size: 2rem;
+        width: 2rem;
+        height: 2rem;
+        color: #1976d2;
+      }
+
+      .match-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .match-teams {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .current-status {
+          font-size: 0.9rem;
+          color: #666;
+
+          strong {
+            color: #1976d2;
+          }
+        }
+      }
+    }
+
+    .status-form {
+      .form-field {
+        margin-bottom: 16px;
+
+        .status-select {
+          width: 100%;
+
+          .mat-mdc-form-field-wrapper {
+            padding-bottom: 0;
+          }
+
+          .mat-mdc-form-field-infix {
+            padding: 12px 0;
+          }
+        }
+
+        .status-option {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 4px 0;
+
+          .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+
+            &.status-scheduled {
+              background-color: #1976d2;
+            }
+
+            &.status-played {
+              background-color: #4caf50;
+            }
+
+            &.status-canceled {
+              background-color: #f44336;
+            }
+
+            &.status-postponed {
+              background-color: #ff9800;
+            }
+          }
+        }
+
+        .error-message {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 8px;
+          color: #f44336;
+          font-size: 0.875rem;
+
+          .error-icon {
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #fafafa;
+
+    .cancel-btn {
+      color: #666;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(158, 158, 158, 0.1);
+        color: #333;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .submit-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      min-width: 140px;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .btn-spinner {
+        margin-right: 8px;
+      }
+
+      mat-icon {
+        font-size: 1.2rem;
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .modal-container {
+    max-width: 95vw;
+    margin: 8px;
+
+    .modal-header {
+      padding: 16px 16px 12px;
+
+      h2 {
+        font-size: 1.1rem;
+      }
+    }
+
+    .modal-content {
+      padding: 16px;
+
+      .match-info {
+        padding: 12px;
+        gap: 12px;
+
+        .match-icon {
+          font-size: 1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+
+        .match-details {
+          .match-teams {
+            font-size: 1rem;
+          }
+
+          .current-status {
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+
+    .modal-actions {
+      padding: 12px 16px 16px;
+      flex-direction: column-reverse;
+      gap: 8px;
+
+      .cancel-btn,
+      .submit-btn {
+        width: 100%;
+      }
+    }
+  }
+}

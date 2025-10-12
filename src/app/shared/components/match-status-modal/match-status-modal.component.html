@@ -1,0 +1,70 @@
+<div class="modal-container match-status-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="title-icon">swap_horiz</mat-icon>
+      Cambiar Estado del Partido
+    </h2>
+    <button mat-icon-button
+            class="close-btn"
+            (click)="onCancel()"
+            [disabled]="isSubmitting">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="modal-content" mat-dialog-content>
+    <!-- Información del partido -->
+    <div class="match-info">
+      <mat-icon class="match-icon">sports_soccer</mat-icon>
+      <div class="match-details">
+        <span class="match-teams">{{ data.homeTeam }} vs {{ data.awayTeam }}</span>
+        <span class="current-status">Estado actual: <strong>{{ getCurrentStatusText() }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Formulario de cambio de estado -->
+    <form [formGroup]="statusForm" (ngSubmit)="onSubmit()" class="status-form">
+      <div class="form-field">
+        <mat-form-field appearance="outline" class="status-select">
+          <mat-label>Nuevo Estado</mat-label>
+          <mat-select formControlName="newStatus" [compareWith]="compareStatusValues">
+            <mat-option *ngFor="let status of availableStatuses" [value]="status.value">
+              <div class="status-option">
+                <div class="status-indicator" [class]="getStatusClass(status.value)"></div>
+                <span>{{ status.text }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>expand_more</mat-icon>
+        </mat-form-field>
+
+        <!-- Error message -->
+        <div class="error-message" *ngIf="statusForm.get('newStatus')?.invalid && statusForm.get('newStatus')?.touched">
+          <mat-icon class="error-icon">error</mat-icon>
+          <span>Por favor selecciona un estado válido</span>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-actions" mat-dialog-actions>
+    <button mat-button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting"
+            class="cancel-btn">
+      Cancelar
+    </button>
+
+    <button mat-raised-button
+            color="primary"
+            type="button"
+            (click)="onSubmit()"
+            [disabled]="!statusForm.valid || isSubmitting"
+            class="submit-btn">
+      <mat-spinner *ngIf="isSubmitting" diameter="20" class="btn-spinner"></mat-spinner>
+      <mat-icon *ngIf="!isSubmitting">update</mat-icon>
+      Actualizar Estado
+    </button>
+  </div>
+</div>
