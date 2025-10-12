@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface ManagerInfoData {
   managerName: string;
@@ -22,7 +23,8 @@ export interface ManagerInfoData {
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
   ],
   template: `
     <div class="manager-info-modal">
@@ -55,14 +57,20 @@ export interface ManagerInfoData {
                 <span>Teléfono</span>
               </div>
               <div class="info-value">
-                <a [href]="getPhoneLink(data.phoneNumber)" target="_blank"  class="whatsapp-link" matTooltip="Enviar mensaje">
+                <a [href]="getPhoneLink(data.phoneNumber)" 
+                   target="_blank" 
+                   class="whatsapp-link" 
+                   matTooltip="Abrir WhatsApp"
+                   matTooltipPosition="above">
                   {{ data.phoneNumber }}
                 </a>
                 <button mat-icon-button 
                         class="copy-btn"
-                        (click)="copyToClipboard(data.phoneNumber)"
-                        matTooltip="Copiar teléfono">
-                  <mat-icon>content_copy</mat-icon>
+                        (click)="copyToClipboard(data.phoneNumber, 'phone')"
+                        [matTooltip]="getTooltipText('phone')"
+                        matTooltipPosition="above"
+                        matTooltipClass="custom-tooltip">
+                  <mat-icon>{{ getCopyIcon('phone') }}</mat-icon>
                 </button>
               </div>
             </div>
@@ -75,14 +83,19 @@ export interface ManagerInfoData {
               </div>
               <div class="info-value">
                 <span *ngIf="data.email; else noEmail" class="email-value">
-                  <a [href]="'mailto:' + data.email" class="email-link">
+                  <a [href]="'mailto:' + data.email" 
+                     class="email-link"
+                     matTooltip="Enviar email"
+                     matTooltipPosition="above">
                     {{ data.email }}
                   </a>
                   <button mat-icon-button 
                           class="copy-btn"
-                          (click)="copyToClipboard(data.email!)"
-                          matTooltip="Copiar email">
-                    <mat-icon>content_copy</mat-icon>
+                          (click)="copyToClipboard(data.email!, 'email')"
+                          [matTooltip]="getTooltipText('email')"
+                          matTooltipPosition="above"
+                          matTooltipClass="custom-tooltip">
+                    <mat-icon>{{ getCopyIcon('email') }}</mat-icon>
                   </button>
                 </span>
                 <ng-template #noEmail>
@@ -273,6 +286,19 @@ export interface ManagerInfoData {
       }
     }
 
+    /* Tooltips personalizados */
+    ::ng-deep .custom-tooltip {
+      background-color: #333 !important;
+      color: white !important;
+      font-size: 12px !important;
+      border-radius: 4px !important;
+      padding: 6px 8px !important;
+      
+      &.copied-tooltip {
+        background-color: #4caf50 !important;
+      }
+    }
+
     /* Responsive */
     @media (max-width: 480px) {
       .manager-info-modal {
@@ -299,6 +325,8 @@ export interface ManagerInfoData {
   `]
 })
 export class ManagerInfoModalComponent {
+  private copiedStates: { [key: string]: boolean } = {};
+
   constructor(
     public dialogRef: MatDialogRef<ManagerInfoModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ManagerInfoData
@@ -308,7 +336,7 @@ export class ManagerInfoModalComponent {
     this.dialogRef.close();
   }
 
-  async copyToClipboard(text: string): Promise<void> {
+  async copyToClipboard(text: string, type: string): Promise<void> {
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
@@ -316,6 +344,13 @@ export class ManagerInfoModalComponent {
         // Fallback para navegadores sin soporte de clipboard API
         this.fallbackCopyTextToClipboard(text);
       }
+      
+      // Marcar como copiado temporalmente
+      this.copiedStates[type] = true;
+      setTimeout(() => {
+        this.copiedStates[type] = false;
+      }, 2000);
+      
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       this.fallbackCopyTextToClipboard(text);
@@ -344,5 +379,16 @@ export class ManagerInfoModalComponent {
 
   getPhoneLink(phone: string): string {
     return `https://wa.me/+593${phone}`;
+  }
+
+  getTooltipText(type: string): string {
+    if (this.copiedStates[type]) {
+      return type === 'phone' ? '¡Teléfono copiado!' : '¡Email copiado!';
+    }
+    return type === 'phone' ? 'Copiar teléfono' : 'Copiar email';
+  }
+
+  getCopyIcon(type: string): string {
+    return this.copiedStates[type] ? 'check' : 'content_copy';
   }
 }
