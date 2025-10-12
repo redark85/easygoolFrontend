@@ -175,10 +175,10 @@
                       <div class="team-item"
                            *ngFor="let team of group.teams; trackBy: trackByTeamId">
                         <div class="team-avatar">
-                          <img [src]="team.logoUrl || 'assets/default-team.jpg'"
+                          <img [src]="team.logoUrl || 'assets/default-team.png'"
                                [alt]="team.name"
                                class="team-logo"
-                               (error)="$event.target.src='assets/default-team.jpg'">
+                               (error)="$event.target.src='assets/default-team.png'">
 
                           <!-- Status Badge sobre la imagen -->
                           <div [class]="getTeamStatusClass(team.status)"
@@ -236,10 +236,10 @@
                     <mat-card-content class="team-card-content">
                       <div class="team-info-knockout">
                         <div class="team-avatar-knockout">
-                          <img [src]="team.logoUrl || 'assets/default-team.jpg'"
+                          <img [src]="team.logoUrl || 'assets/default-team.png'"
                                [alt]="team.name"
                                class="team-logo-knockout"
-                               (error)="$event.target.src='assets/default-team.jpg'">
+                               (error)="$event.target.src='assets/default-team.png'">
 
                           <!-- Status Badge sobre la imagen -->
                           <div [class]="getTeamStatusClass(team.status)"

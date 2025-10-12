@@ -46,8 +46,10 @@ export const TEAM_ASSIGN_RANDOM_REAMS = '/api/Team/AssignRandomTeams';
 export const PLAYER_CREATE_ENDPOINT = '/api/Player/CreatePlayer';
 export const PLAYER_GET_BY_TEAM_ENDPOINT = '/api/Player/GetByTeam';
 export const PLAYER_UPDATE_ENDPOINT = '/api/Player/UpdatePlayer';
-export const PLAYER_DELETE_ENDPOINT = '/api/Player/DeletePlayer';
+export const PLAYER_REMOVE_ENDPOINT = '/api/Player/RemovePlayer';
 export const PLAYER_UPLOAD_EXCEL_ENDPOINT = '/api/Player/UploadPlayerThrowExcel';
+export const PLAYER_GET_BY_IDENTIFICATION_ENDPOINT = '/api/Player/GetByIdentification';
+export const PLAYER_ADD_TEAM_PLAYER_ENDPOINT = '/api/Player/AddTeamPlayer';
 
 // Match Endpoints
 export const MATCH_GET_ALL_BY_GROUP_ENDPOINT = '/api/Match/GetAllMatchesByGroup';
@@ -123,7 +125,7 @@ export const EndpointsConfig = {
   PLAYER_CREATE_ENDPOINT,
   PLAYER_GET_BY_TEAM_ENDPOINT,
   PLAYER_UPDATE_ENDPOINT,
-  PLAYER_DELETE_ENDPOINT,
+  PLAYER_REMOVE_ENDPOINT,
 
   // Match
   MATCH_GET_ALL_BY_GROUP_ENDPOINT,

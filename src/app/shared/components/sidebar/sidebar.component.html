@@ -98,7 +98,7 @@
   <div class="user-section" *ngIf="currentUser$ | async as user">
     <div class="user-info" *ngIf="!isCollapsed || isMobile">
       <div class="user-avatar">
-        <img [src]="user.avatar || 'assets/logo.png'" [alt]="user.firstName + ' ' + user.lastName">
+        <img [src]="user.avatar || 'assets/person.jpg'" [alt]="user.firstName + ' ' + user.lastName">
       </div>
       <div class="user-details">
         <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>

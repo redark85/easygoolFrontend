@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 import { PlayerService } from '../../services/player.service';
 import { ImageUploaderComponent } from '@shared/components';
@@ -22,6 +23,7 @@ import {
   UpdatePlayerRequest,
   PlayerPositionOption
 } from '@core/models';
+import { ToastService } from '@core/services';
 
 /**
  * Componente modal para crear y editar jugadores
@@ -55,6 +57,8 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   isEdit = false;
   playerPositions: PlayerPositionOption[] = [];
+  isPlayerFound = false;
+  foundPlayerId: number | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -63,6 +67,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     private playerService: PlayerService,
     private dialogRef: MatDialogRef<PlayerFormComponent>,
     private cdr: ChangeDetectorRef,
+    private toastService: ToastService,    
     @Inject(MAT_DIALOG_DATA) public data: PlayerFormData
   ) {
     this.isEdit = data.mode === 'edit';
@@ -140,6 +145,110 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Maneja el evento blur del campo de identificación
+   * Busca si existe un jugador con esa identificación
+   */
+  onIdentificationBlur(): void {
+    const identificationControl = this.playerForm.get('identification');
+    const identificationNumber = identificationControl?.value?.trim();
+
+    // Solo buscar si hay un valor y no estamos en modo edición
+    if (!identificationNumber || this.isEdit) {
+      return;
+    }
+
+    // Validar que tenga al menos 8 caracteres
+    if (identificationNumber.length < 8) {
+      return;
+    }
+
+    // Llamar al servicio para buscar el jugador
+    this.playerService.getPlayerByIdentification(identificationNumber)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (player) => {
+          if (player) {
+            // Si se encuentra un jugador, autocompletar el formulario
+            console.log('Jugador encontrado:', player);
+            this.isPlayerFound = true;
+            this.foundPlayerId = player.id; // Guardar el ID del jugador encontrado
+            
+            // Mostrar mensaje de éxito
+            Swal.fire({
+              title: '¡Jugador encontrado!',
+              text: `Hemos encontrado un jugador en nuestro sistema con el número de identificación ingresado.`,
+              icon: 'success',
+              timer: 5000,
+              showConfirmButton: false
+            });
+
+            // Autocompletar el formulario
+            this.playerForm.patchValue({
+              name: player.name,
+              secondName: player.secondName,
+              lastName: player.lastName,
+              secondLastName: player.secondLastName,
+              position: player.position,
+              jerseyNumber: player.jerseyNumber,
+              isCapitan: player.isCapitan
+            });
+
+            // Deshabilitar los campos de nombres
+            this.playerForm.get('name')?.disable();
+            this.playerForm.get('secondName')?.disable();
+            this.playerForm.get('lastName')?.disable();
+            this.playerForm.get('secondLastName')?.disable();
+
+            // Cargar la foto si existe
+            if (player.photoUrl) {
+              setTimeout(() => {
+                this.playerForm.get('photo')?.setValue(player.photoUrl);
+                this.cdr.detectChanges();
+              }, 100);
+            }
+          } else {
+            // No se encontró jugador, limpiar y habilitar campos
+            this.isPlayerFound = false;
+            this.foundPlayerId = null;
+            this.clearAndEnableFields();
+          }
+        },
+        error: (error) => {
+          // No se encontró jugador, limpiar y habilitar campos
+          console.log('No se encontró jugador con esa identificación');
+          this.isPlayerFound = false;
+          this.foundPlayerId = null;
+          this.clearAndEnableFields();
+        }
+      });
+  }
+
+  /**
+   * Limpia los campos del formulario y los habilita
+   */
+  private clearAndEnableFields(): void {
+    // Limpiar todos los campos excepto identificación
+    this.playerForm.patchValue({
+      name: '',
+      secondName: '',
+      lastName: '',
+      secondLastName: '',
+      position: '',
+      jerseyNumber: '',
+      isCapitan: false,
+      photo: ''
+    });
+
+    // Habilitar los campos de nombres
+    this.playerForm.get('name')?.enable();
+    this.playerForm.get('secondName')?.enable();
+    this.playerForm.get('lastName')?.enable();
+    this.playerForm.get('secondLastName')?.enable();
+
+    this.cdr.detectChanges();
+  }
+
+  /**
    * Maneja el envío del formulario
    */
   onSubmit(): void {
@@ -153,15 +262,60 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     if (this.isEdit) {
       this.updatePlayer();
     } else {
-      this.createPlayer();
+      if (this.isPlayerFound) {
+        this.addExistingPlayer();
+      }
+      else{
+        this.createPlayer();
+      }  
     }
+  }
+
+  /**
+   * Agrega un jugador existente al equipo
+   */
+  private addExistingPlayer(): void {
+    if (!this.foundPlayerId) {
+      this.isSubmitting = false;
+      return;
+    }
+    this.cdr.detectChanges();
+
+    const formValue = this.playerForm.getRawValue();
+
+    const addTeamPlayerRequest = {
+      playerId: this.foundPlayerId,
+      tournamentTeamId: this.data.tournamentTeamId,
+      isCapitan: formValue.isCapitan || false,
+      position: formValue.position,
+      jerseyNumber: parseInt(formValue.jerseyNumber, 10)
+    };
+
+    this.playerService.addTeamPlayer(addTeamPlayerRequest).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (player) => {
+        this.isSubmitting = false;
+        const result: PlayerModalResult = { success: true, player };
+        this.dialogRef.close(result);
+      },
+      error: (error) => {
+        if (error.response.data.messageId === 'EGOL_124') {
+           this.toastService.showError('Jugador ya pertenece al torneo.');
+          }
+        this.isSubmitting = false;
+        this.cdr.detectChanges();
+
+      }
+    });
   }
 
   /**
    * Crea un nuevo jugador
    */
   private createPlayer(): void {
-    const formValue = this.playerForm.value;
+    // Usar getRawValue() para incluir campos deshabilitados
+    const formValue = this.playerForm.getRawValue();
     const photoData = formValue.photo;
 
     // Procesar datos de imagen
@@ -202,7 +356,10 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
   private updatePlayer(): void {
     if (!this.data.player) return;
 
-    const formValue = this.playerForm.value;
+    this.cdr.detectChanges();
+
+    // Usar getRawValue() para incluir campos deshabilitados
+    const formValue = this.playerForm.getRawValue();
     const photoData = formValue.photo;
 
     const updateRequest: UpdatePlayerRequest = {

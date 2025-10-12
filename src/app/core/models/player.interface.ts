@@ -15,6 +15,7 @@ export interface Player {
   isCapitan: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  tournamentTeamPlayerId : number;
 }
 
 /**

@@ -65,10 +65,10 @@
                 <!-- Avatar e info principal -->
                 <div class="col-md-4 d-flex align-items-center">
                   <div class="team-avatar me-3 position-relative">
-                    <img [src]="team.logoUrl || 'assets/logo.png'"
+                    <img [src]="team.logoUrl || 'assets/default-team.png'"
                          [alt]="team.name"
                          class="team-logo"
-                         (error)="$event.target.src='assets/logo.png'"
+                         (error)="$event.target.src='assets/default-team.png'"
                          width="50" height="50">
                     <!-- Status Badge sobre la imagen -->
                     <div [class]="getTeamStatusClass(team.status)"
@@ -190,11 +190,11 @@
             <div *ngFor="let player of getPlayersForTeam(team); trackBy: trackByPlayerId" class="player-item d-flex align-items-center py-2 border-bottom">
               <!-- Foto -->
               <div class="player-avatar me-3 flex-shrink-0">
-                <img [src]="player.photoUrl || 'assets/logo.png'"
+                <img [src]="player.photoUrl || 'assets/person.jpg'"
                      [alt]="getPlayerFullName(player)"
                      class="player-photo"
                      width="40" height="40"
-                     (error)="$event.target.src='assets/logo.png'">
+                     (error)="$event.target.src='assets/person.jpg'">
               </div>
 
               <!-- Número de camiseta -->

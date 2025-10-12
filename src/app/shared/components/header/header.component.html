@@ -18,7 +18,7 @@
     <!-- User Info -->
     <div class="user-info" [matMenuTriggerFor]="userMenu">
       <div class="user-avatar">
-        <img [src]="user.avatar || 'assets/logo.png'" [alt]="user.firstName + ' ' + user.lastName">
+        <img [src]="user.avatar || 'assets/person.jpg'" [alt]="user.firstName + ' ' + user.lastName">
       </div>
       <div class="user-details" *ngIf="!isMobile">
         <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>

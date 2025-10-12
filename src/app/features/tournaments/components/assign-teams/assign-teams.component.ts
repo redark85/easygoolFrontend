@@ -170,7 +170,7 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
    * @returns URL de la imagen
    */
   getTeamImageUrl(team: TeamWithoutPhase): string {
-    return team.logoUrl || 'assets/default-team.jpg';
+    return team.logoUrl || 'assets/default-team.png';
   }
 
   /**

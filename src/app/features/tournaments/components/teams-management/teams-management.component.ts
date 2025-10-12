@@ -123,7 +123,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
    * Elimina un jugador del equipo
    */
   deletePlayer(player: Player, team: Team): void {
-    this.playerService.deletePlayer(player.id).pipe(
+    this.playerService.deletePlayer(player.tournamentTeamPlayerId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
@@ -293,7 +293,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       reverseButtons: true
     }).then((result: any) => {
       if (result.isConfirmed) {
-        this.teamService.removeTeam(team.id).pipe(
+        this.teamService.removeTeam(team.tournamentTeamId).pipe(
           takeUntil(this.destroy$)
         ).subscribe({
           next: (response: any) => {

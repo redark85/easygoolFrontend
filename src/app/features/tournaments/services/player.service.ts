@@ -13,11 +13,24 @@ import {
   PLAYER_POSITIONS,
   PlayerPositionOption
 } from '../../../core/models/player.interface';
+
+/**
+ * Request para agregar un jugador existente a un equipo
+ */
+export interface AddTeamPlayerRequest {
+  playerId: number;
+  tournamentTeamId: number;
+  isCapitan: boolean;
+  position: string;
+  jerseyNumber: number;
+}
 import { 
   PLAYER_CREATE_ENDPOINT,
   PLAYER_GET_BY_TEAM_ENDPOINT,
   PLAYER_UPDATE_ENDPOINT,
-  PLAYER_DELETE_ENDPOINT
+  PLAYER_REMOVE_ENDPOINT,
+  PLAYER_GET_BY_IDENTIFICATION_ENDPOINT,
+  PLAYER_ADD_TEAM_PLAYER_ENDPOINT
 } from '../../../core/config/endpoints';
 
 /**
@@ -114,7 +127,7 @@ export class PlayerService {
    * @returns Observable con resultado de la eliminación
    */
   deletePlayer(playerId: number): Observable<any> {
-    const url = `${PLAYER_DELETE_ENDPOINT}/${playerId}`;
+    const url = `${PLAYER_REMOVE_ENDPOINT}/${playerId}`;
     
     return this.apiService.delete<ApiResponse<any>>(url).pipe(
       map(response => {
@@ -176,6 +189,46 @@ export class PlayerService {
     return !players.some(player => 
       player.jerseyNumber === jerseyNumber && 
       player.id !== excludePlayerId
+    );
+  }
+
+  /**
+   * Obtiene un jugador por su número de identificación
+   * @param identificationNumber Número de identificación del jugador
+   * @returns Observable con los datos del jugador o null
+   */
+  getPlayerByIdentification(identificationNumber: string): Observable<Player | null> {
+    const url = `${PLAYER_GET_BY_IDENTIFICATION_ENDPOINT}?identificationNumber=${identificationNumber}`;
+    
+    return this.apiService.get<ApiResponse<Player>>(url).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        return null;
+      }),
+      catchError(error => {
+        console.error('Error getting player by identification:', error);
+        // No mostrar toast de error aquí, solo retornar null
+        return throwError(() => null);
+      })
+    );
+  }
+
+  /**
+   * Agrega un jugador existente a un equipo
+   * @param request Datos para agregar el jugador al equipo
+   * @returns Observable con el jugador agregado
+   */
+  addTeamPlayer(request: AddTeamPlayerRequest): Observable<Player> {
+    return this.apiService.post<ApiResponse<Player>>(PLAYER_ADD_TEAM_PLAYER_ENDPOINT, request).pipe(
+      map(response => {
+        if (response.succeed && response.result) {
+          this.toastService.showSuccess('Jugador agregado al equipo exitosamente');
+          return response.result;
+        }
+        throw new Error(response.message || 'Error al agregar jugador al equipo');
+      })
     );
   }
 
