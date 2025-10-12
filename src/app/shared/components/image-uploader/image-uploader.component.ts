@@ -1,4 +1,4 @@
-import { Component, forwardRef, HostListener, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, forwardRef, HostListener, Input, Output, EventEmitter, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,7 +37,10 @@ export class ImageUploaderComponent implements ControlValueAccessor {
   private onChange: (value: ImageUploadData | null) => void = () => {};
   private onTouched: () => void = () => {};
 
-  constructor(private toastService: ToastService) {}
+  constructor(
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   @HostListener('dragover', ['$event'])
   onDragOver(event: DragEvent): void {
@@ -88,6 +91,10 @@ export class ImageUploaderComponent implements ControlValueAccessor {
       this.onChange(imageUploadData);
       this.onTouched();
       this.imageUploaded.emit(imageUploadData);
+      
+      // Forzar detección de cambios después de cargar archivo
+      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     };
     reader.readAsDataURL(file);
   }
@@ -109,25 +116,42 @@ export class ImageUploaderComponent implements ControlValueAccessor {
   }
 
   async writeValue(value: ImageUploadData | string | null): Promise<void> {
+    console.log('ImageUploader writeValue called with:', typeof value, value);
+    
     if (value) {
       if (typeof value === 'string') {
         // Si es una URL, convertirla a base64 para evitar problemas CORS en producción
         try {
+          console.log('Converting URL to base64:', value);
           const imageData = await this.convertUrlToBase64(value);
           this.previewUrl = imageData.base64;
+          console.log('URL converted successfully to base64');
+          
+          // Forzar detección de cambios después de la conversión asíncrona
+          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         } catch (error) {
           console.warn('Error loading image from URL, using URL directly:', error);
           this.previewUrl = value; // Fallback a URL directa
+          
+          // Forzar detección de cambios incluso en caso de error
+          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         }
       } else if (value.base64) {
         // Si ya es base64, usarlo directamente
+        console.log('Using base64 data directly');
         this.previewUrl = value.base64;
+        
+        // Forzar detección de cambios
+        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
-      // Forzar detección de cambios
-      setTimeout(() => {
-      }, 0);
     } else {
+      console.log('Clearing preview image');
       this.previewUrl = null;
+      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
 
@@ -147,6 +171,8 @@ export class ImageUploaderComponent implements ControlValueAccessor {
     this.previewUrl = null;
     this.onChange(null);
     this.onTouched();
+    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   /**
@@ -154,7 +180,15 @@ export class ImageUploaderComponent implements ControlValueAccessor {
    */
   onImageError(event: Event): void {
     console.warn('Error loading image:', event);
-    this.toastService.showError('Error al cargar la imagen');
+    
+    // En caso de error, intentar recargar la imagen o mostrar placeholder
+    const imgElement = event.target as HTMLImageElement;
+    if (imgElement && imgElement.src && !imgElement.src.includes('assets/logo.png')) {
+      console.log('Attempting to use fallback image');
+      imgElement.src = 'assets/logo.png';
+    } else {
+      this.toastService.showError('Error al cargar la imagen');
+    }
   }
 
   /**

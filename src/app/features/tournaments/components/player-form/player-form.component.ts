@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -62,6 +62,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private playerService: PlayerService,
     private dialogRef: MatDialogRef<PlayerFormComponent>,
+    private cdr: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) public data: PlayerFormData
   ) {
     this.isEdit = data.mode === 'edit';
@@ -102,6 +103,8 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
    */
   private async patchForm(player: Player): Promise<void> {
     try {
+      console.log('Patching form with player data:', player);
+      
       this.playerForm.patchValue({
         name: player.name,
         secondName: player.secondName,
@@ -113,9 +116,16 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
         isCapitan: player.isCapitan
       });
 
-      // Cargar imagen si existe
+      // Cargar imagen si existe - usar setTimeout para asegurar que el componente esté listo
       if (player.photoUrl) {
-        this.playerForm.get('photo')?.setValue(player.photoUrl);
+        console.log('Setting player photo URL:', player.photoUrl);
+        
+        // Usar setTimeout para asegurar que el image-uploader esté completamente inicializado
+        setTimeout(() => {
+          this.playerForm.get('photo')?.setValue(player.photoUrl);
+          this.cdr.detectChanges();
+          console.log('Photo URL set in form control');
+        }, 100);
       }
     } catch (error) {
       console.error('Error patching form:', error);

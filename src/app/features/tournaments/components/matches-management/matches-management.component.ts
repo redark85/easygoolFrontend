@@ -467,6 +467,28 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
+   * Recarga los partidos según el tipo de fase seleccionada
+   * Método centralizado para evitar duplicación de código
+   */
+  private reloadCurrentMatches(context: string = ''): void {
+    const phase = this.getSelectedPhase();
+    const logPrefix = context ? `[${context}]` : '';
+    
+    if (phase?.phaseType === PhaseType.GroupStage && this.selectedGroupId) {
+      console.log(`${logPrefix} Reloading matches by group:`, this.selectedGroupId);
+      this.loadMatchesByGroup(this.selectedGroupId);
+    } else if (phase?.phaseType === PhaseType.Knockout && this.selectedPhaseId) {
+      console.log(`${logPrefix} Reloading matches by phase (Knockout):`, this.selectedPhaseId);
+      this.loadMatchesByPhase(this.selectedPhaseId);
+    } else if (this.selectedPhaseId) {
+      console.log(`${logPrefix} Reloading matches by phase (fallback):`, this.selectedPhaseId);
+      this.loadMatchesByPhase(this.selectedPhaseId);
+    } else {
+      console.warn(`${logPrefix} No phase or group selected for reload`);
+    }
+  }
+
+  /**
    * Carga los partidos de una phase organizados por jornadas
    */
   private loadMatchesByPhase(phaseId: number): void {
@@ -534,10 +556,8 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
             showConfirmButton: false
           });
           
-          // Recargar los partidos del grupo
-          if (this.selectedGroupId) {
-            this.loadMatchesByGroup(this.selectedGroupId);
-          }
+          // Recargar los partidos según el tipo de fase
+          this.reloadCurrentMatches('Random Generation');
         },
         error: (error: any) => {
           console.error('Error generating random matches:', error);
@@ -597,12 +617,8 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.success) {
-        // Recargar los partidos del grupo (si aplica)
-        if (this.selectedGroupId) {
-          this.loadMatchesByGroup(this.selectedGroupId);
-        } else if (this.selectedPhaseId) {
-          this.loadMatchesByPhase(this.selectedPhaseId);
-        }
+        // Recargar los partidos según el tipo de fase
+        this.reloadCurrentMatches('Match Creation');
       }
     });
   }
@@ -799,10 +815,8 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
                 timer: 2000,
                 showConfirmButton: false
               }).then(() => {
-                // Recargar los partidos del grupo
-                if (this.selectedGroupId) {
-                  this.loadMatchesByGroup(this.selectedGroupId);
-                }
+                // Recargar los partidos según el tipo de fase
+                this.reloadCurrentMatches('Match Deletion');
               });
             },
             error: (error: any) => {
