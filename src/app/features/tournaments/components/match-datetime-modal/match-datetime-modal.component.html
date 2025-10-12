@@ -49,7 +49,7 @@
                      placeholder="Seleccionar hora"
                      readonly>
               <mat-timepicker-toggle matIconSuffix [for]="timePicker">
-                <mat-icon matTimepickerToggleIcon>schedule</mat-icon>
+                <mat-icon matTimepickerToggleIcon>access_time</mat-icon>
               </mat-timepicker-toggle>
               <mat-timepicker #timePicker interval="15m"></mat-timepicker>
               <mat-error *ngIf="dateTimeForm.get('matchTime')?.hasError('required')">

@@ -16,6 +16,7 @@ export interface MatchDateTimeData {
   matchId: number;
   currentDate: string;
   currentTime?: string;
+  currentStatus: number;
   homeTeam: string;
   awayTeam: string;
 }
@@ -155,8 +156,12 @@ export class MatchDatetimeModalComponent implements OnInit, AfterViewInit, OnDes
       const day = combinedDateTime.getDate().toString().padStart(2, '0');
       const formattedDateTime = `${year}-${month}-${day}T${formattedTime}`;
 
-      // Llamar al servicio para actualizar la fecha del partido
-      this.matchService.updateMatchDate(this.data.matchId, formattedDateTime).subscribe({
+      // Llamar al API para actualizar fecha manteniendo el estado actual
+      this.matchService.updateMatchDateTime(
+        this.data.matchId,
+        formattedDateTime,
+        this.data.currentStatus
+      ).subscribe({
         next: () => {
           this.isSubmitting = false;
           
@@ -170,7 +175,7 @@ export class MatchDatetimeModalComponent implements OnInit, AfterViewInit, OnDes
         },
         error: (error) => {
           this.isSubmitting = false;
-          this.toastService.showError("La fecha debe ser posterior a la fecha actual.");
+          this.toastService.showError("Error al actualizar la fecha del partido");
         }
       });
     }

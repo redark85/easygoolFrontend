@@ -20,8 +20,8 @@ import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Team } from '../../models/team.interface';
 import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest } from '@core/services/match.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
+import { MatchStatusModalComponent, MatchStatusModalData, MatchStatusModalResult } from '@shared/components/match-status-modal';
 import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
-import { MatchStatusModalComponent, MatchStatusModalData, MatchStatusModalResult } from '@shared/components/match-status-modal/match-status-modal.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -887,56 +887,30 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Actualiza la fecha de un partido
    */
   updateMatchDate(match: any): void {
-    const dialogData: MatchDateTimeData = {
-      matchId: match.id,
-      currentDate: match.matchDate,
-      currentTime: match.matchTime,
-      homeTeam: match.homeTeam,
-      awayTeam: match.awayTeam
-    };
-
     const dialogRef = this.dialog.open(MatchDatetimeModalComponent, {
-      width: '500px',
-      maxWidth: '90vw',
-      data: dialogData,
-      disableClose: false,
-      autoFocus: true,
-      hasBackdrop: true,
-      backdropClass: 'custom-backdrop',
-      panelClass: 'custom-dialog-panel',
-      position: {
-        top: '10vh'
-      }
+      width: '600px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        matchId: match.id,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        currentDate: match.matchDate,
+        currentTime: match.matchTime,
+        currentStatus: match.status
+      } as MatchDateTimeData
     });
 
-    dialogRef.afterClosed().subscribe((result: MatchDateTimeResult) => {
-      if (result && result.success) {
-        // Actualizar los datos del partido
-        match.matchDate = result.date;
-        match.matchTime = result.time;
-
-        // Aquí se puede llamar al API para actualizar en el servidor
-        console.log('Match updated:', {
-          matchId: match.id,
-          newDate: result.date,
-          newTime: result.time
-        });
-
-        // Mostrar confirmación de éxito
-        Swal.fire({
-          title: '¡Actualizado!',
-          text: 'La fecha y hora del partido se han actualizado correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-          toast: true,
-          position: 'top-end'
-        });
-
-        // Forzar detección de cambios para actualizar la UI
-        this.cdr.detectChanges();
-      }
-    });
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result: MatchDateTimeResult) => {
+        if (result && result.success) {
+          console.log('Match date updated to:', result.date);
+          
+          // Recargar los partidos después de actualizar la fecha
+          this.reloadCurrentMatches('Match Date Update');
+        }
+      });
   }
 
   /**
@@ -951,7 +925,8 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
         matchId: match.id,
         homeTeam: match.homeTeam,
         awayTeam: match.awayTeam,
-        currentStatus: match.status
+        currentStatus: match.status,
+        currentMatchDate: match.matchDate
       } as MatchStatusModalData
     });
 
@@ -959,18 +934,10 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
       .pipe(takeUntil(this.destroy$))
       .subscribe((result: MatchStatusModalResult) => {
         if (result && result.success) {
-          // Por ahora solo mostramos un mensaje de éxito
-          // En el futuro aquí se actualizará el estado en el backend
-          Swal.fire({
-            title: '¡Estado actualizado!',
-            text: `El estado del partido se ha cambiado exitosamente.`,
-            icon: 'success',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#1976d2'
-          });
-          
           console.log('Match status changed to:', result.newStatus);
-          // TODO: Actualizar el estado en la lista local y recargar datos
+          
+          // Recargar los partidos después de cambiar el estado
+          this.reloadCurrentMatches('Match Status Change');
         }
       });
   }

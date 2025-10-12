@@ -7,13 +7,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule, MatSelect } from '@angular/material/select';
-import { MatchStatusType } from '@core/services/match.service';
+import { MatchStatusType, MatchService } from '@core/services/match.service';
+import { ToastService } from '@core/services/toast.service';
 
 export interface MatchStatusModalData {
   matchId: number;
   homeTeam: string;
   awayTeam: string;
   currentStatus: MatchStatusType;
+  currentMatchDate: string;
 }
 
 export interface MatchStatusModalResult {
@@ -50,7 +52,9 @@ export class MatchStatusModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<MatchStatusModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: MatchStatusModalData
+    @Inject(MAT_DIALOG_DATA) public data: MatchStatusModalData,
+    private matchService: MatchService,
+    private toastService: ToastService
   ) {
     this.statusForm = this.fb.group({
       newStatus: [null, [Validators.required]]
@@ -104,17 +108,27 @@ export class MatchStatusModalComponent implements OnInit {
   onSubmit(): void {
     if (this.statusForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
-
-      // Por ahora solo cerramos el modal con el nuevo estado
-      // En el futuro aquí se haría la llamada a la API
       const newStatus = this.statusForm.get('newStatus')?.value;
 
-      setTimeout(() => {
-        this.dialogRef.close({
-          success: true,
-          newStatus: newStatus
-        } as MatchStatusModalResult);
-      }, 1000);
+      // Llamar al API para cambiar el estado del partido
+      this.matchService.changeMatchStatus(
+        this.data.matchId,
+        newStatus,
+        this.data.currentMatchDate
+      ).subscribe({
+        next: (response) => {
+          this.toastService.showSuccess('Estado del partido actualizado correctamente');
+          this.dialogRef.close({
+            success: true,
+            newStatus: newStatus
+          } as MatchStatusModalResult);
+        },
+        error: (error) => {
+          console.error('Error al cambiar estado del partido:', error);
+          this.toastService.showError('Error al cambiar el estado del partido');
+          this.isSubmitting = false;
+        }
+      });
     }
   }
 

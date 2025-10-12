@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT, MATCH_CHANGE_STATUS_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -91,6 +91,17 @@ export interface DeleteMatchResponse {
 }
 
 export interface DeleteMatchDayResponse {
+  succeed: boolean;
+  message: string;
+  result?: any;
+}
+
+export interface ChangeMatchStatusRequest {
+  status: MatchStatusType;
+  matchDate: string;
+}
+
+export interface ChangeMatchStatusResponse {
   succeed: boolean;
   message: string;
   result?: any;
@@ -275,6 +286,54 @@ export class MatchService {
         }
         return false;
       }),
+    );
+  }
+
+  /**
+   * Cambia el estado de un partido manteniendo la fecha actual
+   * @param matchId ID del partido
+   * @param newStatus Nuevo estado del partido
+   * @param currentMatchDate Fecha actual del partido
+   * @returns Observable con la respuesta de la operación
+   */
+  changeMatchStatus(matchId: number, newStatus: MatchStatusType, currentMatchDate: string): Observable<ChangeMatchStatusResponse> {
+    const request: ChangeMatchStatusRequest = {
+      status: newStatus,
+      matchDate: currentMatchDate
+    };
+    
+    return this.apiService.put<ChangeMatchStatusResponse>(`${MATCH_CHANGE_STATUS_ENDPOINT}/${matchId}`, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al cambiar el estado del partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Actualiza la fecha y hora de un partido manteniendo el estado actual
+   * @param matchId ID del partido
+   * @param newMatchDate Nueva fecha del partido
+   * @param currentStatus Estado actual del partido
+   * @returns Observable con la respuesta de la operación
+   */
+  updateMatchDateTime(matchId: number, newMatchDate: string, currentStatus: MatchStatusType): Observable<ChangeMatchStatusResponse> {
+    const request: ChangeMatchStatusRequest = {
+      status: currentStatus,
+      matchDate: newMatchDate
+    };
+    
+    return this.apiService.put<ChangeMatchStatusResponse>(`${MATCH_CHANGE_STATUS_ENDPOINT}/${matchId}`, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al actualizar la fecha del partido');
+      }),
+      catchError(this.handleError)
     );
   }
 

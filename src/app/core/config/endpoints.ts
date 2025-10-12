@@ -60,6 +60,7 @@ export const MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT = '/api/Match/GenerateMat
 export const MATCH_DELETE_ENDPOINT = '/api/Match/DeleteMatch';
 export const MATCH_DELETE_MATCHDAY_ENDPOINT = '/api/Match/DeleteMatchDay';
 export const MATCH_UPDATE_DATE_ENDPOINT = '/api/Match/UpdateMatchDate';
+export const MATCH_CHANGE_STATUS_ENDPOINT = '/api/Match/ChangeMatchStatus';
 
 // Vocalia Endpoints
 export const VOCALIA_GET_MATCH_ENDPOINT = '/api/Vocalia/GetMatch';
@@ -134,6 +135,8 @@ export const EndpointsConfig = {
   MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT,
   MATCH_DELETE_ENDPOINT,
   MATCH_DELETE_MATCHDAY_ENDPOINT,
+  MATCH_UPDATE_DATE_ENDPOINT,
+  MATCH_CHANGE_STATUS_ENDPOINT,
 
   // Vocalia
   VOCALIA_GET_MATCH_ENDPOINT,
