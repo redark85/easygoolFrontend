@@ -75,6 +75,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   filteredTeams: Team[] = [];
   private destroy$ = new Subject<void>();
   private updatingTeamRegistration = new Set<number>(); // Track loading state per team
+  private deletingPlayers = new Set<number>(); // Track loading state per player
   constructor(
     private teamService: TeamService,
     private playerService: PlayerService,
@@ -120,28 +121,75 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Elimina un jugador del equipo
+   * Elimina un jugador del equipo con confirmación
    */
   deletePlayer(player: Player, team: Team): void {
-    this.playerService.deletePlayer(player.tournamentTeamPlayerId).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: () => {
-        const players = (team as any).players as Player[] | undefined;
-        if (players) {
-          const idx = players.findIndex(p => p.id === player.id);
-          if (idx !== -1) {
-            players.splice(idx, 1);
-            // Actualizar contador si está presente
-            if (typeof team.totalPlayers === 'number' && team.totalPlayers > 0) {
-              team.totalPlayers = team.totalPlayers - 1;
-            }
-          }
-        }
+    const playerName = this.getPlayerFullName(player);
+    
+    Swal.fire({
+      title: '¿Eliminar jugador?',
+      html: `¿Estás seguro de que deseas eliminar al jugador <strong>"${playerName}"</strong> del equipo <strong>"${team.name}"</strong>?<br><br>Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        // Marcar jugador como eliminándose
+        this.deletingPlayers.add(player.id);
         this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error deleting player:', error);
+
+        this.playerService.deletePlayer(player.tournamentTeamPlayerId).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe({
+          next: () => {
+            // Quitar del estado de loading
+            this.deletingPlayers.delete(player.id);
+            
+            // Actualizar localmente la lista de jugadores
+            const players = (team as any).players as Player[] | undefined;
+            if (players) {
+              const idx = players.findIndex(p => p.id === player.id);
+              if (idx !== -1) {
+                players.splice(idx, 1);
+                // Actualizar contador si está presente
+                if (typeof team.totalPlayers === 'number' && team.totalPlayers > 0) {
+                  team.totalPlayers = team.totalPlayers - 1;
+                }
+              }
+            }
+            
+            // Mostrar mensaje de éxito
+            Swal.fire({
+              title: '¡Jugador eliminado!',
+              text: `${playerName} ha sido eliminado exitosamente del equipo ${team.name}`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+
+            // Forzar detección de cambios para actualizar la UI
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error deleting player:', error);
+            
+            // Quitar del estado de loading
+            this.deletingPlayers.delete(player.id);
+            this.cdr.detectChanges();
+
+            // Mostrar mensaje de error
+            Swal.fire({
+              title: 'Error al eliminar',
+              text: error.message || 'No se pudo eliminar el jugador. Inténtalo nuevamente.',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            });
+          }
+        });
       }
     });
   }
@@ -248,6 +296,8 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: TeamModalResult) => {
       if (result && result.success) {
+        // Recargar lista de equipos después de edición exitosa
+        console.log('Team edited successfully, refreshing teams list');
         this.refreshTeams();
       }
     });
@@ -296,21 +346,18 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
         this.teamService.removeTeam(team.tournamentTeamId).pipe(
           takeUntil(this.destroy$)
         ).subscribe({
-          next: (response: any) => {
-            const config = this.errorHandler.createConfig('Equipo', {
-              'EGOL_113': 'No se puede eliminar el equipo porque pertenece a una fase activa.',
-              'EGOL_114': 'No se puede eliminar el equipo porque tiene partidos programados.',
-              'EGOL_115': 'No se puede eliminar el equipo porque el torneo ya comenzó.'
-            });
-
-            if (this.errorHandler.handleResponse(response, config)) {
+          next: (success: boolean) => {
+            console.log('Team deletion result:', success);
+            if (success) {
+              // Recargar lista de equipos después de eliminación exitosa
+              console.log('Team deleted successfully, refreshing teams list');
               this.refreshTeams();
             }
           },
           error: (error) => {
             console.error('Error deleting team:', error);
-            const config = this.errorHandler.createConfig('Equipo');
-            this.errorHandler.handleResponseError(error, config);
+            // El error ya es manejado por el TeamService, solo logueamos aquí
+            // No necesitamos usar errorHandler porque el servicio ya maneja los mensajes
           }
         });
       }
@@ -318,9 +365,11 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Refresca la lista de equipos desde el backend
+   * Refresca la lista de equipos desde el backend después de operaciones CRUD
+   * Este método centraliza la lógica de recarga para mantener la UI actualizada
    */
   private refreshTeams(): void {
+    console.log('Refreshing teams list after CRUD operation...');
     this.loadTeams();
   }
 
@@ -427,6 +476,8 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
               timer: 2000,
               showConfirmButton: false
             });
+            // Recargar lista de equipos después de descalificación exitosa
+            console.log('Team disqualified successfully, refreshing teams list');
             this.refreshTeams();
           },
           error: (error) => {
@@ -463,9 +514,6 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
-              // Recargar la lista de equipos para reflejar el cambio
-              this.loadTeams();
-              
               Swal.fire({
                 title: '¡Equipo reactivado!',
                 text: `El equipo "${team.name}" ha sido reactivado exitosamente`,
@@ -473,6 +521,10 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
                 timer: 2000,
                 showConfirmButton: false
               });
+              
+              // Recargar lista de equipos después de reactivación exitosa
+              console.log('Team reactivated successfully, refreshing teams list');
+              this.refreshTeams();
             },
             error: (error: any) => {
               console.error('Error al reactivar equipo:', error);
@@ -676,6 +728,15 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
    */
   isUpdatingTeamRegistration(team: Team): boolean {
     return this.updatingTeamRegistration.has(team.id);
+  }
+
+  /**
+   * Verifica si un jugador está siendo eliminado
+   * @param player Jugador a verificar
+   * @returns true si está siendo eliminado
+   */
+  isDeletingPlayer(player: Player): boolean {
+    return this.deletingPlayers.has(player.id);
   }
 
   /**

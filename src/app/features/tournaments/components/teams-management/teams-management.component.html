@@ -223,15 +223,18 @@
                 <div class="d-flex align-items-center gap-1">
                   <button mat-icon-button
                           (click)="editPlayer(player, team)"
+                          [disabled]="isDeletingPlayer(player)"
                           matTooltip="Editar jugador"
                           class="text-primary">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button mat-icon-button
                           (click)="deletePlayer(player, team)"
-                          matTooltip="Eliminar jugador"
+                          [disabled]="isDeletingPlayer(player)"
+                          [matTooltip]="isDeletingPlayer(player) ? 'Eliminando jugador...' : 'Eliminar jugador'"
                           class="text-danger">
-                    <mat-icon>delete</mat-icon>
+                    <mat-spinner *ngIf="isDeletingPlayer(player)" diameter="16" class="inline-spinner"></mat-spinner>
+                    <mat-icon *ngIf="!isDeletingPlayer(player)">delete</mat-icon>
                   </button>
                 </div>
               </div>

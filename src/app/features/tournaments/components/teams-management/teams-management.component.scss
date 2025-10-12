@@ -216,6 +216,38 @@
       .d-flex {
         justify-content: flex-end;
       }
+
+      // Estilos para botones de acción de jugadores
+      button[mat-icon-button] {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        // Spinner inline para eliminación
+        .inline-spinner {
+          width: 16px !important;
+          height: 16px !important;
+          
+          ::ng-deep circle {
+            stroke: #f44336 !important; // Rojo para eliminar
+          }
+        }
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
     }
   }
 
