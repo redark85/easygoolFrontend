@@ -105,45 +105,77 @@ export class HeaderComponent implements OnInit {
   getProfile(): void {
     console.log('Opening user profile modal...');
 
-    // Obtener el perfil del usuario desde la API
-    this.userProfileService.getUserProfile().pipe(
-      switchMap(userProfile => {
-        console.log('User profile loaded:', userProfile);
-
-        // Configurar datos del modal
-        const modalData: UserProfileModalData = {
-          userProfile: userProfile,
-          isEditing: false // Inicialmente en modo solo lectura
-        };
-
-        // Abrir modal
-        const dialogRef = this.dialog.open(UserProfileModalComponent, {
-          width: '800px',
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          data: modalData,
-          disableClose: false,
-          autoFocus: true,
-          restoreFocus: true
-        });
-
-        return dialogRef.afterClosed();
-      })
-    ).subscribe({
-      next: (result: UserProfileModalResult | undefined) => {
-        if (result && result.success && result.action === 'update') {
-          console.log('Profile updated successfully:', result.updatedProfile);
-          // Forzar actualización del header recargando el observable
-          this.refreshUserData();
-        } else {
-          console.log('Profile modal closed without changes');
+    // Obtener el perfil del usuario desde localStorage (optimización)
+    const userProfile = this.userProfileService.getUserProfileFromStorage();
+    
+    if (userProfile) {
+      // Si hay datos en localStorage, usarlos directamente
+      console.log('📱 Using user profile from localStorage for modal');
+      this.openProfileModal(userProfile);
+    } else {
+      // Fallback: Si no hay datos en localStorage, cargar desde API
+      console.log('🔄 No profile in localStorage, loading from API as fallback');
+      this.userProfileService.getUserProfile().pipe(
+        switchMap(apiUserProfile => {
+          console.log('User profile loaded from API:', apiUserProfile);
+          return this.openProfileModal(apiUserProfile);
+        })
+      ).subscribe({
+        next: (result: UserProfileModalResult | undefined) => {
+          this.handleProfileModalResult(result);
+        },
+        error: (error) => {
+          console.error('Error loading user profile from API:', error);
+          // El error ya se maneja en el servicio con toast
         }
-      },
-      error: (error) => {
-        console.error('Error loading user profile:', error);
-        // El error ya se maneja en el servicio con toast
-      }
+      });
+    }
+  }
+
+  /**
+   * Abre el modal de perfil con los datos proporcionados
+   */
+  private openProfileModal(userProfile: UserProfileData): Observable<UserProfileModalResult | undefined> {
+    // Configurar datos del modal
+    const modalData: UserProfileModalData = {
+      userProfile: userProfile,
+      isEditing: false // Inicialmente en modo solo lectura
+    };
+
+    // Abrir modal
+    const dialogRef = this.dialog.open(UserProfileModalComponent, {
+      width: '800px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      data: modalData,
+      disableClose: false,
+      autoFocus: true,
+      restoreFocus: true
     });
+
+    // Si se abrió desde localStorage, manejar el resultado directamente
+    if (userProfile) {
+      dialogRef.afterClosed().subscribe({
+        next: (result: UserProfileModalResult | undefined) => {
+          this.handleProfileModalResult(result);
+        }
+      });
+    }
+
+    return dialogRef.afterClosed();
+  }
+
+  /**
+   * Maneja el resultado del modal de perfil
+   */
+  private handleProfileModalResult(result: UserProfileModalResult | undefined): void {
+    if (result && result.success && result.action === 'update') {
+      console.log('Profile updated successfully:', result.updatedProfile);
+      // Forzar actualización del header recargando el observable
+      this.refreshUserData();
+    } else {
+      console.log('Profile modal closed without changes');
+    }
   }
 
   navigateToSettings(): void {
