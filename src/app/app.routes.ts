@@ -110,6 +110,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public-standings/public-standings.component').then(c => c.PublicStandingsComponent)
   },
   
+  // Tournament Home (public access, no layout)
+  {
+    path: 'tournament-home',
+    loadComponent: () => import('./features/tournament-home/tournament-home.component').then(c => c.TournamentHomeComponent),
+    title: 'Inicio - Torneo'
+  },
+  
   // Not Found page
   {
     path: 'not-found',

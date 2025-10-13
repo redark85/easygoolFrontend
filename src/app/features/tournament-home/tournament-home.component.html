@@ -1,0 +1,249 @@
+<div class="tournament-home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background" [style.background-image]="'url(' + tournament.bannerUrl + ')'">
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="tournament-logo">
+        <img [src]="tournament.logoUrl" [alt]="tournament.name">
+      </div>
+      <h1 class="tournament-title">{{ tournament.name }}</h1>
+      <p class="tournament-season">{{ tournament.season }}</p>
+      <mat-chip [style.background-color]="getStatusBadge().color" class="status-chip">
+        {{ getStatusBadge().label }}
+      </mat-chip>
+      
+      <div class="quick-stats">
+        <div class="stat-item">
+          <mat-icon>groups</mat-icon>
+          <span class="stat-number">{{ tournament.totalTeams }}</span>
+          <span class="stat-label">Equipos</span>
+        </div>
+        <div class="stat-item">
+          <mat-icon>sports_soccer</mat-icon>
+          <span class="stat-number">{{ tournament.totalMatches }}</span>
+          <span class="stat-label">Partidos</span>
+        </div>
+        <div class="stat-item">
+          <mat-icon>emoji_events</mat-icon>
+          <span class="stat-number">{{ tournament.totalGoals }}</span>
+          <span class="stat-label">Goles</span>
+        </div>
+      </div>
+
+      <div class="current-phase">
+        <mat-icon>flag</mat-icon>
+        <span>{{ tournament.currentPhase }}</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="content-wrapper">
+    <!-- Next Match Section -->
+    <section class="next-match-section">
+      <mat-card class="next-match-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>schedule</mat-icon>
+            Próximo Partido Destacado
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="match-info">
+            <div class="matchday-badge">
+              <span>Jornada {{ nextMatch.matchday }}</span>
+            </div>
+            
+            <div class="teams-container">
+              <div class="team home-team">
+                <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo">
+                <h3>{{ nextMatch.homeTeam.name }}</h3>
+                <span class="position">{{ nextMatch.homeTeam.position }}° Posición</span>
+              </div>
+
+              <div class="vs-section">
+                <span class="vs-text">VS</span>
+                <div class="match-details">
+                  <mat-icon>location_on</mat-icon>
+                  <span>{{ nextMatch.venue }}</span>
+                </div>
+              </div>
+
+              <div class="team away-team">
+                <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo">
+                <h3>{{ nextMatch.awayTeam.name }}</h3>
+                <span class="position">{{ nextMatch.awayTeam.position }}° Posición</span>
+              </div>
+            </div>
+
+            <!-- Countdown -->
+            <div class="countdown-section">
+              <h4>Faltan:</h4>
+              <div class="countdown-timer">
+                <div class="time-unit">
+                  <span class="time-value">{{ countdown.days }}</span>
+                  <span class="time-label">Días</span>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                  <span class="time-value">{{ countdown.hours }}</span>
+                  <span class="time-label">Horas</span>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                  <span class="time-value">{{ countdown.minutes }}</span>
+                  <span class="time-label">Minutos</span>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-unit">
+                  <span class="time-value">{{ countdown.seconds }}</span>
+                  <span class="time-label">Segundos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- Two Column Layout -->
+    <div class="two-column-layout">
+      <!-- Left Column: Recent Matches -->
+      <section class="recent-matches-section">
+        <mat-card class="recent-matches-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>history</mat-icon>
+              Últimos Resultados
+            </mat-card-title>
+            <button mat-button routerLink="/fixture" class="view-all-btn">
+              Ver todos
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="matches-list">
+              <div *ngFor="let match of recentMatches" class="match-item">
+                <div class="match-header">
+                  <span class="matchday">J{{ match.matchday }}</span>
+                  <span class="match-date">{{ formatMatchDate(match.date) }}</span>
+                </div>
+                <div class="match-result">
+                  <div class="team" [class.winner]="getMatchResult(match) === 'home'">
+                    <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name">
+                    <span class="team-name">{{ match.homeTeam.name }}</span>
+                  </div>
+                  <div class="score">
+                    <span class="score-value" [class.winner]="getMatchResult(match) === 'home'">{{ match.homeScore }}</span>
+                    <span class="separator">-</span>
+                    <span class="score-value" [class.winner]="getMatchResult(match) === 'away'">{{ match.awayScore }}</span>
+                  </div>
+                  <div class="team" [class.winner]="getMatchResult(match) === 'away'">
+                    <span class="team-name">{{ match.awayTeam.name }}</span>
+                    <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </section>
+
+      <!-- Right Column: Top Scorers -->
+      <section class="top-scorers-section">
+        <mat-card class="top-scorers-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>sports_soccer</mat-icon>
+              Máximos Goleadores
+            </mat-card-title>
+            <button mat-button routerLink="/scorers" class="view-all-btn">
+              Ver tabla completa
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="scorers-list">
+              <div *ngFor="let scorer of topScorers; let i = index" class="scorer-item">
+                <div class="position-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                  {{ i + 1 }}
+                </div>
+                <img [src]="scorer.photo" [alt]="scorer.name" class="player-photo">
+                <div class="scorer-info">
+                  <h4>{{ scorer.name }}</h4>
+                  <div class="team-info">
+                    <img [src]="scorer.teamLogo" [alt]="scorer.team" class="team-logo-small">
+                    <span>{{ scorer.team }}</span>
+                  </div>
+                </div>
+                <div class="goals-info">
+                  <span class="goals-count">{{ scorer.goals }}</span>
+                  <span class="goals-label">goles</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </section>
+    </div>
+
+    <!-- Quick Links Section -->
+    <section class="quick-links-section">
+      <h2 class="section-title">Explora el Torneo</h2>
+      <div class="quick-links-grid">
+        <mat-card *ngFor="let link of quickLinks" 
+                  class="quick-link-card" 
+                  [routerLink]="link.route"
+                  [style.border-top-color]="link.color">
+          <mat-card-content>
+            <div class="link-icon" [style.background-color]="link.color + '20'">
+              <mat-icon [style.color]="link.color">{{ link.icon }}</mat-icon>
+            </div>
+            <h3>{{ link.title }}</h3>
+            <p>{{ link.description }}</p>
+            <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </section>
+
+    <!-- Tournament Info Footer -->
+    <section class="tournament-info-footer">
+      <mat-card>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <mat-icon>calendar_today</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Inicio del Torneo</span>
+                <span class="info-value">{{ tournament.startDate | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>event</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Finalización</span>
+                <span class="info-value">{{ tournament.endDate | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>flag</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Fase Actual</span>
+                <span class="info-value">{{ tournament.currentPhase }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>sports</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Formato</span>
+                <span class="info-value">Todos contra Todos</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </div>
+</div>
