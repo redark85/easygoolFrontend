@@ -145,6 +145,20 @@ export const routes: Routes = [
     title: 'Equipos Participantes'
   },
   
+  // Public Team Detail (public access, no layout)
+  {
+    path: 'public-team-detail/:teamId',
+    loadComponent: () => import('./features/public-team-detail/public-team-detail.component').then(c => c.PublicTeamDetailComponent),
+    title: 'Detalle del Equipo'
+  },
+  
+  // Public Tournament Stats (public access, no layout)
+  {
+    path: 'public-tournament-stats/:tournamentId',
+    loadComponent: () => import('./features/public-tournament-stats/public-tournament-stats.component').then(c => c.PublicTournamentStatsComponent),
+    title: 'Estadísticas del Torneo'
+  },
+  
   // Not Found page
   {
     path: 'not-found',

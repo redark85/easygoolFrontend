@@ -307,8 +307,7 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
    */
   viewTeam(team: Team): void {
     console.log('Ver detalle del equipo:', team);
-    // TODO: Implementar navegación al detalle del equipo
-    // this.router.navigate(['/public-team-detail', team.id]);
+    this.router.navigate(['/public-team-detail', team.id]);
   }
 
   /**

@@ -1,0 +1,423 @@
+<div class="public-team-detail-container">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando información del equipo...</p>
+  </div>
+
+  <!-- Team Detail Content -->
+  <div class="team-detail-content" *ngIf="!isLoading && team">
+    <!-- Back Button -->
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <!-- Team Header -->
+    <mat-card class="team-header-card">
+      <div class="team-header">
+        <div class="team-logo-container">
+          <img [src]="team.logoUrl" [alt]="team.name" class="team-logo-large">
+        </div>
+        
+        <div class="team-info">
+          <h1 class="team-name">{{ team.name }}</h1>
+          <p class="team-motto" *ngIf="team.motto">{{ team.motto }}</p>
+          
+          <div class="team-meta">
+            <div class="meta-item">
+              <mat-icon>sports_soccer</mat-icon>
+              <span>Fundado en {{ team.founded }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>stadium</mat-icon>
+              <span>{{ team.stadium }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>person</mat-icon>
+              <span>DT: {{ team.coach }}</span>
+            </div>
+          </div>
+
+          <div class="team-stats-header">
+            <div class="stat">
+              <mat-icon>emoji_events</mat-icon>
+              <div class="stat-content">
+                <span class="value">{{ team.position }}°</span>
+                <span class="label">Posición</span>
+              </div>
+            </div>
+            <div class="stat">
+              <mat-icon>star</mat-icon>
+              <div class="stat-content">
+                <span class="value">{{ team.points }}</span>
+                <span class="label">Puntos</span>
+              </div>
+            </div>
+            <div class="stat">
+              <mat-icon>people</mat-icon>
+              <div class="stat-content">
+                <span class="value">{{ team.totalPlayers }}</span>
+                <span class="label">Jugadores</span>
+              </div>
+            </div>
+            <div class="stat">
+              <mat-icon>sports</mat-icon>
+              <div class="stat-content">
+                <span class="value">{{ team.matchesPlayed }}</span>
+                <span class="label">Partidos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Tabs Section -->
+    <mat-card class="tabs-card">
+      <mat-tab-group animationDuration="300ms">
+        <!-- Tab: Resumen -->
+        <mat-tab label="Resumen">
+          <div class="team-summary">
+            <!-- Record Section -->
+            <div class="summary-section record">
+              <h3>
+                <mat-icon>bar_chart</mat-icon>
+                Récord
+              </h3>
+              <div class="record-stats">
+                <div class="stat wins">
+                  <span class="number">{{ team.wins }}</span>
+                  <span class="label">Victorias</span>
+                  <div class="percentage">{{ getWinPercentage() | number:'1.0-0' }}%</div>
+                </div>
+                <div class="stat draws">
+                  <span class="number">{{ team.draws }}</span>
+                  <span class="label">Empates</span>
+                </div>
+                <div class="stat losses">
+                  <span class="number">{{ team.losses }}</span>
+                  <span class="label">Derrotas</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Goals Section -->
+            <div class="summary-section goals">
+              <h3>
+                <mat-icon>sports_soccer</mat-icon>
+                Goles
+              </h3>
+              <div class="goals-stats">
+                <div class="stat for">
+                  <span class="number">{{ team.goalsFor }}</span>
+                  <span class="label">A Favor</span>
+                  <div class="average">{{ getGoalsPerMatch() | number:'1.1-1' }} por partido</div>
+                </div>
+                <div class="stat against">
+                  <span class="number">{{ team.goalsAgainst }}</span>
+                  <span class="label">En Contra</span>
+                </div>
+                <div class="stat difference" [class.positive]="team.goalDifference > 0" [class.negative]="team.goalDifference < 0">
+                  <span class="number">{{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}</span>
+                  <span class="label">Diferencia</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="summary-section form">
+              <h3>
+                <mat-icon>trending_up</mat-icon>
+                Forma Reciente
+              </h3>
+              <div class="form-badges">
+                <div *ngFor="let result of team.lastFiveResults" 
+                     [class]="'result-badge ' + getResultClass(result)"
+                     [matTooltip]="result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'">
+                  {{ getResultText(result) }}
+                </div>
+              </div>
+              <p class="form-description">Últimos 5 partidos</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="summary-section quick-stats">
+              <h3>
+                <mat-icon>analytics</mat-icon>
+                Estadísticas Rápidas
+              </h3>
+              <div class="quick-stats-grid">
+                <div class="quick-stat">
+                  <span class="label">Partidos Jugados</span>
+                  <span class="value">{{ team.matchesPlayed }}</span>
+                </div>
+                <div class="quick-stat">
+                  <span class="label">Puntos por Partido</span>
+                  <span class="value">{{ (team.points / team.matchesPlayed) | number:'1.2-2' }}</span>
+                </div>
+                <div class="quick-stat">
+                  <span class="label">Efectividad</span>
+                  <span class="value">{{ getWinPercentage() | number:'1.0-0' }}%</span>
+                </div>
+                <div class="quick-stat">
+                  <span class="label">Goles por Partido</span>
+                  <span class="value">{{ getGoalsPerMatch() | number:'1.1-1' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Plantilla -->
+        <mat-tab label="Plantilla">
+          <div class="team-roster">
+            <div class="roster-header">
+              <h3>
+                <mat-icon>groups</mat-icon>
+                Plantilla Completa
+              </h3>
+              <p class="roster-count">{{ team.totalPlayers }} jugadores registrados</p>
+            </div>
+
+            <div class="players-by-position">
+              <div *ngFor="let position of positions" class="position-group">
+                <h4 class="position-title">
+                  <mat-icon>
+                    {{ position.value === 'GK' ? 'sports_handball' : 
+                       position.value === 'DEF' ? 'shield' : 
+                       position.value === 'MID' ? 'swap_horiz' : 'flash_on' }}
+                  </mat-icon>
+                  {{ position.name }}
+                  <span class="player-count">({{ getPlayersByPosition(position.value).length }})</span>
+                </h4>
+                
+                <div class="players-list">
+                  <div *ngFor="let player of getPlayersByPosition(position.value)" 
+                       class="player-card">
+                    <div class="player-number">{{ player.jerseyNumber }}</div>
+                    <img [src]="player.photoUrl" [alt]="player.name" class="player-photo">
+                    <div class="player-info">
+                      <span class="player-name">{{ player.name }}</span>
+                      <span class="player-matches">{{ player.matchesPlayed }} PJ</span>
+                    </div>
+                    <div class="player-stats">
+                      <span *ngIf="player.goals > 0" class="stat-badge goals" matTooltip="Goles">
+                        ⚽ {{ player.goals }}
+                      </span>
+                      <span *ngIf="player.assists > 0" class="stat-badge assists" matTooltip="Asistencias">
+                        🎯 {{ player.assists }}
+                      </span>
+                      <span *ngIf="player.yellowCards > 0" class="stat-badge yellow" matTooltip="Tarjetas Amarillas">
+                        🟨 {{ player.yellowCards }}
+                      </span>
+                      <span *ngIf="player.redCards > 0" class="stat-badge red" matTooltip="Tarjetas Rojas">
+                        🟥 {{ player.redCards }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Partidos -->
+        <mat-tab label="Partidos">
+          <div class="team-matches">
+            <!-- Upcoming Matches -->
+            <div class="matches-section" *ngIf="team.upcomingMatches.length > 0">
+              <h3>
+                <mat-icon>event</mat-icon>
+                Próximos Partidos
+              </h3>
+              <div class="matches-list">
+                <div *ngFor="let match of team.upcomingMatches" 
+                     class="match-item upcoming"
+                     (click)="viewMatchDetail(match.id)">
+                  <div class="match-date">
+                    <span class="day">{{ match.date | date:'dd' }}</span>
+                    <span class="month">{{ match.date | date:'MMM' }}</span>
+                  </div>
+                  <div class="match-info">
+                    <div class="match-teams">
+                      <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
+                      <span class="vs">vs</span>
+                      <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
+                    </div>
+                    <div class="match-venue">
+                      <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
+                      <span>{{ match.isHome ? 'Local' : 'Visitante' }}</span>
+                    </div>
+                  </div>
+                  <div class="match-action">
+                    <mat-icon>chevron_right</mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <mat-divider *ngIf="team.upcomingMatches.length > 0 && team.pastMatches.length > 0"></mat-divider>
+
+            <!-- Past Matches -->
+            <div class="matches-section" *ngIf="team.pastMatches.length > 0">
+              <h3>
+                <mat-icon>history</mat-icon>
+                Partidos Anteriores
+              </h3>
+              <div class="matches-list">
+                <div *ngFor="let match of team.pastMatches" 
+                     class="match-item finished"
+                     (click)="viewMatchDetail(match.id)">
+                  <div class="match-date">
+                    <span class="day">{{ match.date | date:'dd' }}</span>
+                    <span class="month">{{ match.date | date:'MMM' }}</span>
+                  </div>
+                  <div class="match-info">
+                    <div class="match-teams">
+                      <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
+                      <span class="score">{{ match.score }}</span>
+                      <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
+                    </div>
+                    <div class="match-venue">
+                      <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
+                      <span>{{ match.isHome ? 'Local' : 'Visitante' }}</span>
+                    </div>
+                  </div>
+                  <div class="match-result">
+                    <div [class]="'result-badge ' + getResultClass(match.result || 'D')">
+                      {{ getResultText(match.result || 'D') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Estadísticas -->
+        <mat-tab label="Estadísticas">
+          <div class="team-detailed-stats">
+            <h3>
+              <mat-icon>insights</mat-icon>
+              Estadísticas Detalladas
+            </h3>
+
+            <!-- Performance Overview -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon wins">
+                  <mat-icon>emoji_events</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-value">{{ team.wins }}</span>
+                  <span class="stat-label">Victorias</span>
+                  <span class="stat-percentage">{{ getWinPercentage() | number:'1.0-0' }}%</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon goals">
+                  <mat-icon>sports_soccer</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-value">{{ team.goalsFor }}</span>
+                  <span class="stat-label">Goles Anotados</span>
+                  <span class="stat-percentage">{{ getGoalsPerMatch() | number:'1.1-1' }} por partido</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon defense">
+                  <mat-icon>shield</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-value">{{ team.goalsAgainst }}</span>
+                  <span class="stat-label">Goles Recibidos</span>
+                  <span class="stat-percentage">{{ (team.goalsAgainst / team.matchesPlayed) | number:'1.1-1' }} por partido</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon points">
+                  <mat-icon>star</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <span class="stat-value">{{ team.points }}</span>
+                  <span class="stat-label">Puntos Totales</span>
+                  <span class="stat-percentage">{{ (team.points / team.matchesPlayed) | number:'1.2-2' }} por partido</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Players -->
+            <div class="top-players-section">
+              <h4>
+                <mat-icon>military_tech</mat-icon>
+                Jugadores Destacados
+              </h4>
+              
+              <div class="top-players-grid">
+                <!-- Top Scorer -->
+                <div class="top-player-card">
+                  <div class="card-header">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>Máximo Goleador</span>
+                  </div>
+                  <div class="player-highlight" *ngIf="team.players.length > 0">
+                    <img [src]="team.players[12].photoUrl" [alt]="team.players[12].name">
+                    <div class="player-details">
+                      <span class="name">{{ team.players[12].name }}</span>
+                      <span class="stat">{{ team.players[12].goals }} goles</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Top Assists -->
+                <div class="top-player-card">
+                  <div class="card-header">
+                    <mat-icon>assistant</mat-icon>
+                    <span>Más Asistencias</span>
+                  </div>
+                  <div class="player-highlight" *ngIf="team.players.length > 0">
+                    <img [src]="team.players[13].photoUrl" [alt]="team.players[13].name">
+                    <div class="player-details">
+                      <span class="name">{{ team.players[13].name }}</span>
+                      <span class="stat">{{ team.players[13].assists }} asistencias</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Most Played -->
+                <div class="top-player-card">
+                  <div class="card-header">
+                    <mat-icon>timer</mat-icon>
+                    <span>Más Partidos</span>
+                  </div>
+                  <div class="player-highlight" *ngIf="team.players.length > 0">
+                    <img [src]="team.players[9].photoUrl" [alt]="team.players[9].name">
+                    <div class="player-details">
+                      <span class="name">{{ team.players[9].name }}</span>
+                      <span class="stat">{{ team.players[9].matchesPlayed }} partidos</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Performance Chart Placeholder -->
+            <div class="chart-section">
+              <h4>
+                <mat-icon>show_chart</mat-icon>
+                Rendimiento en el Torneo
+              </h4>
+              <div class="chart-placeholder">
+                <mat-icon>insert_chart</mat-icon>
+                <p>Gráfico de rendimiento disponible próximamente</p>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </div>
+</div>
