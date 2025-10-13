@@ -276,6 +276,14 @@
 
     // Responsive para el modal completo
     @media (max-width: 768px) {
+      // Centrado perfecto en móviles
+      position: relative !important;
+      left: 0 !important;
+      transform: none !important;
+      margin: 0 auto !important;
+      width: calc(100vw - 20px) !important;
+      max-width: calc(100vw - 20px) !important;
+
       .modal-header {
         padding: 1rem 1rem 0 1rem;
 
@@ -302,7 +310,6 @@
 
       // Compatibilidad con estructura antigua
       padding: 1rem;
-      max-width: 100%;
 
       h2[mat-dialog-title] {
         font-size: 1.25rem;

@@ -5,6 +5,17 @@
     overflow-y: auto;
     max-height: 700px;
 
+    // Corrección para móviles - centrado perfecto
+    @media (max-width: 768px) {
+      min-width: auto !important;
+      width: calc(100vw - 20px) !important;
+      max-width: calc(100vw - 20px) !important;
+      margin: 0 auto !important;
+      position: relative !important;
+      left: auto !important;
+      transform: none !important;
+    }
+
     h2[mat-dialog-title] {
       display: flex;
       align-items: center;
