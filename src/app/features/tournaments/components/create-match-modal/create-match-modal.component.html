@@ -127,18 +127,22 @@
                       [color]="isHomeTeamSelected(team) ? 'primary' : 'default'"
                       (click)="selectHomeTeam(team)"
                       [disabled]="isAwayTeamSelected(team)"
-                      class="select-button">
+                      class="select-button home-button"
+                      [matTooltip]="isHomeTeamSelected(team) ? '✓ Local' : 'Local'"
+                      matTooltipPosition="above">
                 <mat-icon>home</mat-icon>
-                {{ isHomeTeamSelected(team) ? '✓ Local' : 'Local' }}
+                <span class="button-text">{{ isHomeTeamSelected(team) ? '✓ Local' : 'Local' }}</span>
               </button>
 
               <button mat-raised-button
                       [color]="isAwayTeamSelected(team) ? 'accent' : 'default'"
                       (click)="selectAwayTeam(team)"
                       [disabled]="isHomeTeamSelected(team)"
-                      class="select-button">
+                      class="select-button away-button"
+                      [matTooltip]="isAwayTeamSelected(team) ? '✓ Visitante' : 'Visitante'"
+                      matTooltipPosition="above">
                 <mat-icon>flight_takeoff</mat-icon>
-                {{ isAwayTeamSelected(team) ? '✓ Visitante' : 'Visitante' }}
+                <span class="button-text">{{ isAwayTeamSelected(team) ? '✓ Visitante' : 'Visitante' }}</span>
               </button>
             </div>
           </div>

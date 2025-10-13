@@ -201,10 +201,20 @@
 
           .select-button {
             min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
 
             mat-icon {
-              margin-right: 4px;
               font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+              flex-shrink: 0;
+            }
+
+            .button-text {
+              white-space: nowrap;
             }
           }
         }
@@ -244,6 +254,99 @@
       position: absolute !important;
       max-width: none !important;
       max-height: none !important;
+    }
+  }
+
+  // Responsive Design - Móvil
+  @media (max-width: 768px) {
+    .teams-section {
+      .teams-list {
+        .team-item {
+          .team-actions {
+            .select-button {
+              min-width: 48px !important;
+              width: 48px;
+              height: 48px;
+              padding: 0 !important;
+              
+              // Ocultar texto en móvil
+              .button-text {
+                display: none !important;
+              }
+
+              // Centrar ícono perfectamente
+              mat-icon {
+                margin: 0 !important;
+                font-size: 1.2rem;
+                width: 1.2rem;
+                height: 1.2rem;
+              }
+            }
+
+            // Reducir gap entre botones en móvil
+            gap: 6px;
+          }
+
+          // Ajustar padding del item en móvil
+          padding: 12px;
+
+          .team-avatar {
+            margin-right: 12px;
+
+            .team-logo {
+              width: 40px;
+              height: 40px;
+            }
+          }
+
+          .team-info {
+            .team-name {
+              font-size: 0.9rem;
+            }
+
+            .team-short-name {
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+
+    // Ajustar modal header en móvil
+    .modal-header {
+      padding: 1rem 1rem 0.75rem;
+
+      h2[mat-dialog-title] {
+        font-size: 1.1rem;
+
+        mat-icon {
+          font-size: 1.3rem;
+          width: 1.3rem;
+          height: 1.3rem;
+        }
+      }
+
+      .close-btn {
+        width: 36px;
+        height: 36px;
+
+        mat-icon {
+          font-size: 1.1rem;
+          width: 1.1rem;
+          height: 1.1rem;
+        }
+      }
+    }
+
+    // Ajustar summary en móvil
+    .selection-summary {
+      flex-direction: column;
+      gap: 8px;
+      padding: 0.75rem;
+
+      .summary-vs {
+        font-size: 1rem;
+      }
     }
   }
 }
