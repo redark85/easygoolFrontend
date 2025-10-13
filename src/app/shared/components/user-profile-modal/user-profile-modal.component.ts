@@ -112,6 +112,10 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
       
       this.profileForm.patchValue(formData);
 
+      // Deshabilitar el campo de email ya que no debe ser editable
+      this.profileForm.get('email')?.disable();
+      console.log('🔒 UserProfileModal - Email field disabled');
+
       // Cargar imagen de perfil si existe
       if (this.userProfile.profileImagePath) {
         this.profileForm.get('profileImage')?.setValue(this.userProfile.profileImagePath);
@@ -129,7 +133,8 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
       this.isSubmitting = true;
       this.cdr.detectChanges();
 
-      const formData = this.profileForm.value;
+      // Usar getRawValue() para incluir campos deshabilitados
+      const formData = this.profileForm.getRawValue();
       const updateRequest: UpdateUserProfileRequest = {
         name: formData.name,
         secondName: formData.secondName || '',
