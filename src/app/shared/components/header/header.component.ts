@@ -13,6 +13,7 @@ import { AuthService } from '@core/services';
 import { User } from '@core/models';
 import { Observable, map, switchMap, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { UserProfileService } from '@core/services/user-profile.service';
+import { UserProfileEventsService } from '@core/services/user-profile-events.service';
 import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
 import {
   UserProfileModalData,
@@ -59,6 +60,7 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private userProfileService: UserProfileService,
+    private userProfileEventsService: UserProfileEventsService,
     private cdr: ChangeDetectorRef
   ) {
     // Combinar datos del token con datos del perfil desde localStorage
@@ -179,6 +181,8 @@ export class HeaderComponent implements OnInit {
       console.log('Profile updated successfully:', result.updatedProfile);
       // Forzar actualización del header recargando el observable
       this.refreshUserData();
+      // Notificar a otros componentes (como sidebar) que el perfil se actualizó
+      this.userProfileEventsService.notifyProfileUpdated();
     } else {
       console.log('Profile modal closed without changes');
     }
