@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map, catchError, throwError, tap } from 'rxjs';
 import {
   UserProfileData,
   UserProfileApiResponse,
@@ -12,6 +12,8 @@ import {
   USER_PROFILE_UPDATE_ENDPOINT
 } from '@core/config/endpoints';
 import { ToastService } from './toast.service';
+import { StorageService } from './storage.service';
+import { AppConstants } from '../constants';
 import {ApiService} from '@core/services/api.service';
 
 @Injectable({
@@ -21,11 +23,12 @@ export class UserProfileService {
 
   constructor(
     private apiService: ApiService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private storageService: StorageService
   ) {}
 
   /**
-   * Obtiene el perfil del usuario actual
+   * Obtiene el perfil del usuario actual desde la API y lo guarda en localStorage
    */
   getUserProfile(): Observable<UserProfileData> {
     console.log('🔍 UserProfileService - Making request to:', USER_PROFILE_GET_ENDPOINT);
@@ -37,6 +40,11 @@ export class UserProfileService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener el perfil de usuario');
+      }),
+      tap(userProfile => {
+        // Guardar el perfil en localStorage para uso posterior
+        this.saveUserProfileToStorage(userProfile);
+        console.log('💾 User profile saved to localStorage');
       }),
       catchError(error => {
         console.error('❌ Error getting user profile:', {
@@ -52,6 +60,52 @@ export class UserProfileService {
   }
 
   /**
+   * Carga y guarda el perfil del usuario después del login
+   */
+  loadAndSaveUserProfile(): Observable<UserProfileData> {
+    console.log('🔄 Loading user profile after login...');
+    return this.getUserProfile();
+  }
+
+  /**
+   * Obtiene el perfil del usuario desde localStorage
+   */
+  getUserProfileFromStorage(): UserProfileData | null {
+    try {
+      const profile = this.storageService.getItem<UserProfileData>(AppConstants.STORAGE_KEYS.USER_PROFILE);
+      console.log('📱 User profile loaded from localStorage:', profile ? 'Found' : 'Not found');
+      return profile;
+    } catch (error) {
+      console.error('❌ Error loading user profile from localStorage:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Guarda el perfil del usuario en localStorage
+   */
+  saveUserProfileToStorage(userProfile: UserProfileData): void {
+    try {
+      this.storageService.setItem(AppConstants.STORAGE_KEYS.USER_PROFILE, userProfile);
+      console.log('✅ User profile saved to localStorage successfully');
+    } catch (error) {
+      console.error('❌ Error saving user profile to localStorage:', error);
+    }
+  }
+
+  /**
+   * Limpia el perfil del usuario del localStorage
+   */
+  clearUserProfileFromStorage(): void {
+    try {
+      this.storageService.removeItem(AppConstants.STORAGE_KEYS.USER_PROFILE);
+      console.log('🗑️ User profile cleared from localStorage');
+    } catch (error) {
+      console.error('❌ Error clearing user profile from localStorage:', error);
+    }
+  }
+
+  /**
    * Actualiza el perfil del usuario
    */
   updateUserProfile(updateRequest: UpdateUserProfileRequest): Observable<UserProfileData> {
@@ -62,6 +116,11 @@ export class UserProfileService {
           return response.result;
         }
         throw new Error(response.message || 'Error al actualizar el perfil');
+      }),
+      tap(userProfile => {
+        // Actualizar el perfil en localStorage después de la actualización exitosa
+        this.saveUserProfileToStorage(userProfile);
+        console.log('💾 Updated user profile saved to localStorage');
       }),
       catchError(error => {
         console.error('Error updating user profile:', error);

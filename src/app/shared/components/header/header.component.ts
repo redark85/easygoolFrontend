@@ -11,13 +11,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { AuthService } from '@core/services';
 import { User } from '@core/models';
-import { Observable, map, switchMap, of } from 'rxjs';
+import { Observable, map, switchMap, of, combineLatest } from 'rxjs';
 import { UserProfileService } from '@core/services/user-profile.service';
 import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
 import {
   UserProfileModalData,
-  UserProfileModalResult
+  UserProfileModalResult,
+  UserProfileData
 } from '@core/models/user-profile.interface';
+
+// Interfaz para los datos del usuario que usa el header
+interface HeaderUser {
+  firstName: string;
+  lastName: string;
+  email: string;
+  avatar?: string;
+}
 
 @Component({
   selector: 'app-header',
@@ -42,7 +51,7 @@ export class HeaderComponent implements OnInit {
   @Output() toggleSidebar = new EventEmitter<void>();
   @Output() toggleMobileSidebar = new EventEmitter<void>();
 
-  currentUser$: Observable<User | null>;
+  currentUser$: Observable<HeaderUser | null>;
 
   constructor(
     private authService: AuthService,
@@ -50,7 +59,37 @@ export class HeaderComponent implements OnInit {
     private dialog: MatDialog,
     private userProfileService: UserProfileService
   ) {
-    this.currentUser$ = this.authService.authState$.pipe(map(state => state.user));
+    // Combinar datos del token con datos del perfil desde localStorage
+    this.currentUser$ = this.authService.authState$.pipe(
+      map(state => {
+        if (!state.user) {
+          return null;
+        }
+
+        // Obtener datos del perfil desde localStorage
+        const userProfile = this.userProfileService.getUserProfileFromStorage();
+        
+        if (userProfile) {
+          // Si hay datos del perfil, usarlos para crear el HeaderUser
+          console.log('📱 Using user profile data from localStorage for header');
+          return {
+            firstName: userProfile.name,
+            lastName: `${userProfile.secondName ? userProfile.secondName + ' ' : ''}${userProfile.lastName}${userProfile.secondLastName ? ' ' + userProfile.secondLastName : ''}`.trim(),
+            email: userProfile.email,
+            avatar: userProfile.profileImagePath || undefined
+          } as HeaderUser;
+        } else {
+          // Fallback a datos del token si no hay perfil en localStorage
+          console.log('🔄 Using token data as fallback for header (no profile in localStorage)');
+          return {
+            firstName: state.user.firstName,
+            lastName: state.user.lastName,
+            email: state.user.email,
+            avatar: undefined // No hay avatar en los datos del token
+          } as HeaderUser;
+        }
+      })
+    );
   }
 
   ngOnInit(): void {}
@@ -94,7 +133,8 @@ export class HeaderComponent implements OnInit {
       next: (result: UserProfileModalResult | undefined) => {
         if (result && result.success && result.action === 'update') {
           console.log('Profile updated successfully:', result.updatedProfile);
-          // Aquí podrías actualizar el estado global del usuario si es necesario
+          // Forzar actualización del header recargando el observable
+          this.refreshUserData();
         } else {
           console.log('Profile modal closed without changes');
         }
@@ -112,5 +152,15 @@ export class HeaderComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  /**
+   * Fuerza la actualización de los datos del usuario en el header
+   * Útil después de actualizar el perfil
+   */
+  private refreshUserData(): void {
+    console.log('🔄 Refreshing user data in header...');
+    // El observable se actualizará automáticamente ya que está basado en authState$
+    // y getUserProfileFromStorage() siempre obtiene los datos más recientes del localStorage
   }
 }

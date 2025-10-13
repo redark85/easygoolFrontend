@@ -5,7 +5,8 @@ export class AppConstants {
   static readonly STORAGE_KEYS = {
     TOKEN: 'easygool_token',
     REFRESH_TOKEN: 'easygool_refresh_token',
-    USER: 'easygool_user'
+    USER: 'easygool_user',
+    USER_PROFILE: 'easygool_user_profile'
   } as const;
 
   // Mensajes de error

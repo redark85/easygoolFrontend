@@ -1,12 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subscription, throwError, timer } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators';
+import { map, tap, catchError, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { StorageService } from './storage.service';
 import { ApiService } from './api.service';
 import { JwtService } from './jwt.service';
 import { ToastService } from './toast.service';
+import { UserProfileService } from './user-profile.service';
 import { LoginRequest, RegisterRequest, AuthResponse, AuthState, User, RoleType, AccessCodeType, VerifyOTPRequest, AccessCodeTemplateType, ResendOTPRequest } from '../models';
 import { ApiResponse } from '../models/api.interface';
 import { AUTH_LOGIN_ENDPOINT, AUTH_REGISTER_ENDPOINT, AUTH_VERIFY_OTP_ENDPOINT, AUTH_RESEND_OTP_ENDPOINT } from '../config/endpoints';
@@ -26,7 +27,8 @@ export class AuthService implements OnDestroy {
     private apiService: ApiService,
     private jwtService: JwtService,
     private toastService: ToastService,
-    private router: Router
+    private router: Router,
+    private userProfileService: UserProfileService
   ) {
     this.initializeAuthOnLoad();
   }
@@ -184,6 +186,10 @@ export class AuthService implements OnDestroy {
 
   logout(notify: boolean = true): void {
     this.clearExpirationTimer();
+    
+    // Limpiar el perfil del usuario del localStorage
+    this.userProfileService.clearUserProfileFromStorage();
+    
     this.storageService.clear(); // Limpieza completa
     this.setAuthState(false, null, null);
     if (notify) {
@@ -232,12 +238,26 @@ export class AuthService implements OnDestroy {
       updatedAt: new Date(),
     };
 
+    // Guardar token y datos básicos del usuario
     this.storageService.setItem(AppConstants.STORAGE_KEYS.TOKEN, response.accessToken);
     this.storageService.setItem(AppConstants.STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken);
     this.storageService.setItem(AppConstants.STORAGE_KEYS.USER, user);
 
     this.setAuthState(true, response.accessToken, user);
     this.scheduleTokenExpirationCheck(response.accessToken);
+
+    // Cargar el perfil completo del usuario desde la API
+    console.log('🔄 Loading user profile after successful login...');
+    this.userProfileService.loadAndSaveUserProfile().subscribe({
+      next: (userProfile) => {
+        console.log('✅ User profile loaded and saved after login:', userProfile);
+      },
+      error: (error) => {
+        console.error('❌ Error loading user profile after login:', error);
+        // No bloquear el login si falla la carga del perfil
+        // El usuario puede seguir usando la aplicación con los datos básicos del token
+      }
+    });
 
     if (navigate) {
       // Redirigir según el rol del usuario
