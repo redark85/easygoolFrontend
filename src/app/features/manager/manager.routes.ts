@@ -35,5 +35,15 @@ export const managerRoutes: Routes = [
     path: 'matches-history',
     loadComponent: () => import('./components/matches/matches-history/matches-history.component').then(c => c.MatchesHistoryComponent),
     title: 'Historial de Partidos - Manager'
+  },
+  {
+    path: 'team-stats',
+    loadComponent: () => import('./components/statistics/team-stats/team-stats.component').then(c => c.TeamStatsComponent),
+    title: 'Estadísticas del Equipo - Manager'
+  },
+  {
+    path: 'player-analysis',
+    loadComponent: () => import('./components/statistics/player-analysis/player-analysis.component').then(c => c.PlayerAnalysisComponent),
+    title: 'Análisis de Jugadores - Manager'
   }
 ];

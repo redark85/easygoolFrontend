@@ -1,0 +1,362 @@
+<div class="player-analysis-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>person_search</mat-icon>
+        Análisis de Jugadores
+      </h1>
+      <p class="page-subtitle">Rankings internos y comparativas de rendimiento</p>
+    </div>
+  </div>
+
+  <mat-tab-group class="analysis-tabs">
+    <!-- Tab: Rankings Internos -->
+    <mat-tab label="Rankings Internos">
+      <div class="tab-content">
+        <!-- Top Scorers -->
+        <mat-card class="ranking-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>sports_soccer</mat-icon>
+              Top Goleadores
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="ranking-list">
+              <div *ngFor="let player of topScorers; let i = index" class="ranking-item">
+                <div class="position-badge" [class]="getPositionBadge(i + 1)">
+                  <mat-icon>{{ getPositionIcon(i + 1) }}</mat-icon>
+                  <span class="position-number">{{ i + 1 }}</span>
+                </div>
+                <img [src]="player.photo" [alt]="player.name" class="player-photo">
+                <div class="player-info">
+                  <h4>{{ player.name }}</h4>
+                  <span class="player-position">{{ player.position }} • #{{ player.jerseyNumber }}</span>
+                </div>
+                <div class="player-stats">
+                  <div class="stat-value">{{ player.value }}</div>
+                  <div class="stat-label">Goles</div>
+                  <div class="stat-additional">{{ player.additionalInfo }}</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Top Assisters -->
+        <mat-card class="ranking-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>sports_score</mat-icon>
+              Top Asistidores
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="ranking-list">
+              <div *ngFor="let player of topAssisters; let i = index" class="ranking-item">
+                <div class="position-badge" [class]="getPositionBadge(i + 1)">
+                  <mat-icon>{{ getPositionIcon(i + 1) }}</mat-icon>
+                  <span class="position-number">{{ i + 1 }}</span>
+                </div>
+                <img [src]="player.photo" [alt]="player.name" class="player-photo">
+                <div class="player-info">
+                  <h4>{{ player.name }}</h4>
+                  <span class="player-position">{{ player.position }} • #{{ player.jerseyNumber }}</span>
+                </div>
+                <div class="player-stats">
+                  <div class="stat-value">{{ player.value }}</div>
+                  <div class="stat-label">Asistencias</div>
+                  <div class="stat-additional">{{ player.additionalInfo }}</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Most Disciplined -->
+        <mat-card class="ranking-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>verified</mat-icon>
+              Más Disciplinados
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="ranking-list">
+              <div *ngFor="let player of mostDisciplined; let i = index" class="ranking-item">
+                <div class="position-badge" [class]="getPositionBadge(i + 1)">
+                  <mat-icon>{{ getPositionIcon(i + 1) }}</mat-icon>
+                  <span class="position-number">{{ i + 1 }}</span>
+                </div>
+                <img [src]="player.photo" [alt]="player.name" class="player-photo">
+                <div class="player-info">
+                  <h4>{{ player.name }}</h4>
+                  <span class="player-position">{{ player.position }} • #{{ player.jerseyNumber }}</span>
+                </div>
+                <div class="player-stats">
+                  <div class="stat-value">{{ player.value }}</div>
+                  <div class="stat-label">Tarjetas</div>
+                  <div class="stat-additional">{{ player.additionalInfo }}</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Most Minutes -->
+        <mat-card class="ranking-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>schedule</mat-icon>
+              Más Minutos Jugados
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="ranking-list">
+              <div *ngFor="let player of mostMinutes; let i = index" class="ranking-item">
+                <div class="position-badge" [class]="getPositionBadge(i + 1)">
+                  <mat-icon>{{ getPositionIcon(i + 1) }}</mat-icon>
+                  <span class="position-number">{{ i + 1 }}</span>
+                </div>
+                <img [src]="player.photo" [alt]="player.name" class="player-photo">
+                <div class="player-info">
+                  <h4>{{ player.name }}</h4>
+                  <span class="player-position">{{ player.position }} • #{{ player.jerseyNumber }}</span>
+                </div>
+                <div class="player-stats">
+                  <div class="stat-value">{{ player.value }}</div>
+                  <div class="stat-label">Minutos</div>
+                  <div class="stat-additional">{{ player.additionalInfo }}</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: MVP del Equipo -->
+    <mat-tab label="MVP del Equipo">
+      <div class="tab-content">
+        <mat-card class="mvp-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>emoji_events</mat-icon>
+              Jugador Más Valioso
+            </mat-card-title>
+            <mat-card-subtitle>Basado en múltiples métricas de rendimiento</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="mvp-content">
+              <div class="mvp-header">
+                <div class="mvp-photo-container">
+                  <img [src]="teamMVP.photo" [alt]="teamMVP.name" class="mvp-photo">
+                  <div class="mvp-badge">
+                    <mat-icon>emoji_events</mat-icon>
+                  </div>
+                </div>
+                <div class="mvp-info">
+                  <h2>{{ teamMVP.name }}</h2>
+                  <div class="mvp-details">
+                    <mat-chip-set>
+                      <mat-chip>{{ teamMVP.position }}</mat-chip>
+                      <mat-chip>#{{ teamMVP.jerseyNumber }}</mat-chip>
+                    </mat-chip-set>
+                  </div>
+                  <div class="mvp-rating">
+                    <mat-icon>star</mat-icon>
+                    <span class="rating-value">{{ teamMVP.rating }}</span>
+                    <span class="rating-label">Calificación Promedio</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mvp-stats-grid">
+                <div class="mvp-stat">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.goals }}</span>
+                    <span class="stat-label">Goles</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>sports_score</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.assists }}</span>
+                    <span class="stat-label">Asistencias</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>event</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.matches }}</span>
+                    <span class="stat-label">Partidos</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>schedule</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.minutes }}</span>
+                    <span class="stat-label">Minutos</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>key</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.keyPasses }}</span>
+                    <span class="stat-label">Pases Clave</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>directions_run</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.successfulDribbles }}</span>
+                    <span class="stat-label">Regates</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>sports_kabaddi</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.tackles }}</span>
+                    <span class="stat-label">Tackles</span>
+                  </div>
+                </div>
+                <div class="mvp-stat">
+                  <mat-icon>block</mat-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ teamMVP.interceptions }}</span>
+                    <span class="stat-label">Intercepciones</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Comparativas -->
+    <mat-tab label="Comparativas">
+      <div class="tab-content">
+        <mat-card class="comparison-card">
+          <mat-card-header>
+            <mat-card-title>Rendimiento vs Promedios</mat-card-title>
+            <mat-card-subtitle>Comparación con promedio del equipo y del torneo</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="comparison-list">
+              <div *ngFor="let player of playerComparisons" class="comparison-item">
+                <div class="player-header">
+                  <img [src]="player.photo" [alt]="player.name" class="player-photo-small">
+                  <div class="player-basic-info">
+                    <h4>{{ player.name }}</h4>
+                    <span class="position">{{ player.position }}</span>
+                  </div>
+                </div>
+
+                <div class="comparison-stats">
+                  <div class="stat-row">
+                    <span class="stat-label">Calificación</span>
+                    <div class="stat-bars">
+                      <div class="stat-bar-item">
+                        <span class="bar-label">Jugador</span>
+                        <div class="bar-container">
+                          <div class="bar player" [style.width.%]="(player.rating / 10) * 100"></div>
+                        </div>
+                        <span class="bar-value">{{ player.rating }}</span>
+                      </div>
+                      <div class="stat-bar-item">
+                        <span class="bar-label">Equipo</span>
+                        <div class="bar-container">
+                          <div class="bar team" [style.width.%]="(player.teamAverage / 10) * 100"></div>
+                        </div>
+                        <span class="bar-value">{{ player.teamAverage }}</span>
+                      </div>
+                      <div class="stat-bar-item">
+                        <span class="bar-label">Torneo</span>
+                        <div class="bar-container">
+                          <div class="bar tournament" [style.width.%]="(player.tournamentAverage / 10) * 100"></div>
+                        </div>
+                        <span class="bar-value">{{ player.tournamentAverage }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="comparison-differences">
+                    <div class="difference-item">
+                      <span class="diff-label">vs Equipo:</span>
+                      <span class="diff-value" [style.color]="getDifferenceColor(getTeamDifference(player.rating, player.teamAverage))">
+                        {{ formatDifference(getTeamDifference(player.rating, player.teamAverage)) }}
+                      </span>
+                    </div>
+                    <div class="difference-item">
+                      <span class="diff-label">vs Torneo:</span>
+                      <span class="diff-value" [style.color]="getDifferenceColor(getTournamentDifference(player.rating, player.tournamentAverage))">
+                        {{ formatDifference(getTournamentDifference(player.rating, player.tournamentAverage)) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="quick-stats">
+                    <div class="quick-stat">
+                      <mat-icon>sports_soccer</mat-icon>
+                      <span>{{ player.goals }} goles</span>
+                    </div>
+                    <div class="quick-stat">
+                      <mat-icon>sports_score</mat-icon>
+                      <span>{{ player.assists }} asistencias</span>
+                    </div>
+                    <div class="quick-stat">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ player.minutes }} min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Evolución Individual -->
+    <mat-tab label="Evolución Individual">
+      <div class="tab-content">
+        <mat-card class="evolution-card">
+          <mat-card-header>
+            <mat-card-title>Evolución a lo Largo del Torneo</mat-card-title>
+            <mat-card-subtitle>Ejemplo: Pedro Martínez (#10)</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="evolution-chart">
+              <div class="chart-placeholder">
+                <mat-icon>show_chart</mat-icon>
+                <p>Gráfico de evolución de rendimiento</p>
+              </div>
+              <div class="evolution-data">
+                <div *ngFor="let data of playerEvolution" class="evolution-item">
+                  <span class="matchday">J{{ data.matchday }}</span>
+                  <div class="evolution-stats">
+                    <div class="evo-stat">
+                      <mat-icon>sports_soccer</mat-icon>
+                      <span>{{ data.goals }}</span>
+                    </div>
+                    <div class="evo-stat">
+                      <mat-icon>sports_score</mat-icon>
+                      <span>{{ data.assists }}</span>
+                    </div>
+                    <div class="evo-stat rating">
+                      <mat-icon>star</mat-icon>
+                      <span>{{ data.rating }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

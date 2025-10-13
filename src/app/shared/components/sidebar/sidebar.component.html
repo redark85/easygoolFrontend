@@ -118,6 +118,24 @@
           </mat-list-item>
           <mat-list-item
             class="nav-item"
+            routerLink="/manager/team-stats"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Estadísticas del Equipo' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">analytics</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Estadísticas</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
+            routerLink="/manager/player-analysis"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Análisis de Jugadores' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">person_search</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Análisis</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
             routerLink="/settings"
             routerLinkActive="active"
             [matTooltip]="isCollapsed && !isMobile ? 'Configuración' : ''"

@@ -1,0 +1,432 @@
+<div class="team-stats-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>analytics</mat-icon>
+        Estadísticas del Equipo
+      </h1>
+      <p class="page-subtitle">Análisis detallado del rendimiento del equipo</p>
+    </div>
+  </div>
+
+  <mat-tab-group class="stats-tabs">
+    <!-- Tab: Rendimiento General -->
+    <mat-tab label="Rendimiento General">
+      <div class="tab-content">
+        <!-- Main Stats Grid -->
+        <div class="main-stats-grid">
+          <mat-card class="stat-card large">
+            <mat-card-content>
+              <div class="stat-header">
+                <mat-icon>sports_soccer</mat-icon>
+                <span class="stat-title">Partidos Jugados</span>
+              </div>
+              <div class="stat-value">{{ performance.totalMatches }}</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card wins">
+            <mat-card-content>
+              <div class="stat-header">
+                <mat-icon>check_circle</mat-icon>
+                <span class="stat-title">Victorias</span>
+              </div>
+              <div class="stat-value">{{ performance.wins }}</div>
+              <div class="stat-percentage">{{ winPercentage | number:'1.1-1' }}%</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card draws">
+            <mat-card-content>
+              <div class="stat-header">
+                <mat-icon>remove_circle</mat-icon>
+                <span class="stat-title">Empates</span>
+              </div>
+              <div class="stat-value">{{ performance.draws }}</div>
+              <div class="stat-percentage">{{ drawPercentage | number:'1.1-1' }}%</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stat-card losses">
+            <mat-card-content>
+              <div class="stat-header">
+                <mat-icon>cancel</mat-icon>
+                <span class="stat-title">Derrotas</span>
+              </div>
+              <div class="stat-value">{{ performance.losses }}</div>
+              <div class="stat-percentage">{{ lossPercentage | number:'1.1-1' }}%</div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Results Distribution -->
+        <mat-card class="distribution-card">
+          <mat-card-header>
+            <mat-card-title>Distribución de Resultados</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="distribution-bars">
+              <div class="distribution-item">
+                <span class="label">Victorias</span>
+                <div class="bar-container">
+                  <mat-progress-bar mode="determinate" [value]="winPercentage" color="primary"></mat-progress-bar>
+                </div>
+                <span class="value">{{ winPercentage | number:'1.0-0' }}%</span>
+              </div>
+              <div class="distribution-item">
+                <span class="label">Empates</span>
+                <div class="bar-container">
+                  <mat-progress-bar mode="determinate" [value]="drawPercentage" color="accent"></mat-progress-bar>
+                </div>
+                <span class="value">{{ drawPercentage | number:'1.0-0' }}%</span>
+              </div>
+              <div class="distribution-item">
+                <span class="label">Derrotas</span>
+                <div class="bar-container">
+                  <mat-progress-bar mode="determinate" [value]="lossPercentage" color="warn"></mat-progress-bar>
+                </div>
+                <span class="value">{{ lossPercentage | number:'1.0-0' }}%</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Goals Stats -->
+        <div class="goals-stats-grid">
+          <mat-card class="goals-card">
+            <mat-card-content>
+              <div class="goals-header">
+                <mat-icon class="goals-for">sports_score</mat-icon>
+                <span class="goals-title">Goles a Favor</span>
+              </div>
+              <div class="goals-value">{{ performance.goalsFor }}</div>
+              <mat-divider></mat-divider>
+              <div class="goals-average">
+                <span class="average-label">Promedio por partido</span>
+                <span class="average-value">{{ performance.averageGoalsFor | number:'1.1-1' }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="goals-card">
+            <mat-card-content>
+              <div class="goals-header">
+                <mat-icon class="goals-against">sports_score</mat-icon>
+                <span class="goals-title">Goles en Contra</span>
+              </div>
+              <div class="goals-value">{{ performance.goalsAgainst }}</div>
+              <mat-divider></mat-divider>
+              <div class="goals-average">
+                <span class="average-label">Promedio por partido</span>
+                <span class="average-value">{{ performance.averageGoalsAgainst | number:'1.1-1' }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="goals-card">
+            <mat-card-content>
+              <div class="goals-header">
+                <mat-icon class="goal-diff">compare_arrows</mat-icon>
+                <span class="goals-title">Diferencia de Goles</span>
+              </div>
+              <div class="goals-value" [class.positive]="goalDifference > 0" [class.negative]="goalDifference < 0">
+                {{ goalDifference > 0 ? '+' : '' }}{{ goalDifference }}
+              </div>
+              <mat-divider></mat-divider>
+              <div class="goals-average">
+                <span class="average-label">Porterías a cero</span>
+                <span class="average-value">{{ performance.cleanSheets }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="goals-card">
+            <mat-card-content>
+              <div class="goals-header">
+                <mat-icon class="possession">timeline</mat-icon>
+                <span class="goals-title">Posesión Promedio</span>
+              </div>
+              <div class="goals-value">{{ performance.averagePossession }}%</div>
+              <mat-divider></mat-divider>
+              <div class="possession-bar">
+                <mat-progress-bar mode="determinate" [value]="performance.averagePossession" color="primary"></mat-progress-bar>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Análisis por Contexto -->
+    <mat-tab label="Análisis por Contexto">
+      <div class="tab-content">
+        <!-- Home vs Away -->
+        <mat-card class="context-card">
+          <mat-card-header>
+            <mat-card-title>Rendimiento Local vs Visitante</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="context-comparison">
+              <!-- Home Stats -->
+              <div class="context-section home">
+                <div class="context-header">
+                  <mat-icon>home</mat-icon>
+                  <h3>Local</h3>
+                </div>
+                <div class="context-stats">
+                  <div class="context-stat">
+                    <span class="stat-label">Partidos</span>
+                    <span class="stat-value">{{ contextPerformance.home.matches }}</span>
+                  </div>
+                  <div class="context-stat wins">
+                    <span class="stat-label">Victorias</span>
+                    <span class="stat-value">{{ contextPerformance.home.wins }}</span>
+                  </div>
+                  <div class="context-stat draws">
+                    <span class="stat-label">Empates</span>
+                    <span class="stat-value">{{ contextPerformance.home.draws }}</span>
+                  </div>
+                  <div class="context-stat losses">
+                    <span class="stat-label">Derrotas</span>
+                    <span class="stat-value">{{ contextPerformance.home.losses }}</span>
+                  </div>
+                  <div class="context-stat">
+                    <span class="stat-label">Goles a Favor</span>
+                    <span class="stat-value">{{ contextPerformance.home.goalsFor }}</span>
+                  </div>
+                  <div class="context-stat">
+                    <span class="stat-label">Goles en Contra</span>
+                    <span class="stat-value">{{ contextPerformance.home.goalsAgainst }}</span>
+                  </div>
+                </div>
+                <div class="win-rate">
+                  <span class="win-rate-label">Efectividad</span>
+                  <span class="win-rate-value">{{ getHomeWinRate() | number:'1.0-0' }}%</span>
+                  <mat-progress-bar mode="determinate" [value]="getHomeWinRate()" color="primary"></mat-progress-bar>
+                </div>
+              </div>
+
+              <mat-divider [vertical]="true"></mat-divider>
+
+              <!-- Away Stats -->
+              <div class="context-section away">
+                <div class="context-header">
+                  <mat-icon>flight_takeoff</mat-icon>
+                  <h3>Visitante</h3>
+                </div>
+                <div class="context-stats">
+                  <div class="context-stat">
+                    <span class="stat-label">Partidos</span>
+                    <span class="stat-value">{{ contextPerformance.away.matches }}</span>
+                  </div>
+                  <div class="context-stat wins">
+                    <span class="stat-label">Victorias</span>
+                    <span class="stat-value">{{ contextPerformance.away.wins }}</span>
+                  </div>
+                  <div class="context-stat draws">
+                    <span class="stat-label">Empates</span>
+                    <span class="stat-value">{{ contextPerformance.away.draws }}</span>
+                  </div>
+                  <div class="context-stat losses">
+                    <span class="stat-label">Derrotas</span>
+                    <span class="stat-value">{{ contextPerformance.away.losses }}</span>
+                  </div>
+                  <div class="context-stat">
+                    <span class="stat-label">Goles a Favor</span>
+                    <span class="stat-value">{{ contextPerformance.away.goalsFor }}</span>
+                  </div>
+                  <div class="context-stat">
+                    <span class="stat-label">Goles en Contra</span>
+                    <span class="stat-value">{{ contextPerformance.away.goalsAgainst }}</span>
+                  </div>
+                </div>
+                <div class="win-rate">
+                  <span class="win-rate-label">Efectividad</span>
+                  <span class="win-rate-value">{{ getAwayWinRate() | number:'1.0-0' }}%</span>
+                  <mat-progress-bar mode="determinate" [value]="getAwayWinRate()" color="accent"></mat-progress-bar>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Tournament Phases -->
+        <mat-card class="phases-card">
+          <mat-card-header>
+            <mat-card-title>Rendimiento por Fase del Torneo</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="phases-list">
+              <div *ngFor="let phase of tournamentPhases" class="phase-item">
+                <div class="phase-header">
+                  <h4>{{ phase.phase }}</h4>
+                  <mat-chip-set>
+                    <mat-chip>{{ phase.points }} pts</mat-chip>
+                  </mat-chip-set>
+                </div>
+                <div class="phase-stats">
+                  <div class="phase-stat">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>{{ phase.matches }} partidos</span>
+                  </div>
+                  <div class="phase-stat wins">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>{{ phase.wins }} V</span>
+                  </div>
+                  <div class="phase-stat draws">
+                    <mat-icon>remove_circle</mat-icon>
+                    <span>{{ phase.draws }} E</span>
+                  </div>
+                  <div class="phase-stat losses">
+                    <mat-icon>cancel</mat-icon>
+                    <span>{{ phase.losses }} D</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Opponent Levels -->
+        <mat-card class="opponents-card">
+          <mat-card-header>
+            <mat-card-title>Rendimiento vs Nivel de Oponentes</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="opponents-grid">
+              <div *ngFor="let opponent of opponentLevels" class="opponent-item">
+                <div class="opponent-header">
+                  <div class="opponent-badge" [style.background-color]="getOpponentLevelColor(opponent.level)">
+                    <mat-icon>shield</mat-icon>
+                  </div>
+                  <h4>{{ getOpponentLevelLabel(opponent.level) }}</h4>
+                </div>
+                <div class="opponent-stats">
+                  <div class="opponent-record">
+                    <span class="record-label">Récord</span>
+                    <span class="record-value">{{ opponent.wins }}-{{ opponent.draws }}-{{ opponent.losses }}</span>
+                  </div>
+                  <div class="opponent-winrate">
+                    <span class="winrate-value">{{ opponent.winRate | number:'1.0-0' }}%</span>
+                    <span class="winrate-label">Efectividad</span>
+                  </div>
+                </div>
+                <mat-progress-bar mode="determinate" [value]="opponent.winRate" [color]="opponent.winRate > 50 ? 'primary' : 'warn'"></mat-progress-bar>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Tendencias -->
+    <mat-tab label="Tendencias">
+      <div class="tab-content">
+        <!-- Position Evolution -->
+        <mat-card class="evolution-card">
+          <mat-card-header>
+            <mat-card-title>Evolución de Posición en Tabla</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="evolution-chart">
+              <div class="chart-placeholder">
+                <mat-icon>show_chart</mat-icon>
+                <p>Gráfico de evolución de posición</p>
+                <div class="position-list">
+                  <div *ngFor="let item of positionHistory" class="position-item">
+                    <span class="matchday">J{{ item.matchday }}</span>
+                    <div class="position-badge">
+                      <span class="position">{{ item.position }}°</span>
+                    </div>
+                    <span class="points">{{ item.points }} pts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Current Streak -->
+        <mat-card class="streak-card">
+          <mat-card-header>
+            <mat-card-title>Racha Actual</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="streak-content">
+              <div class="streak-icon" [style.background-color]="getStreakColor()">
+                <mat-icon>{{ getStreakIcon() }}</mat-icon>
+              </div>
+              <div class="streak-info">
+                <h3>{{ currentStreak.count }} {{ getStreakLabel() }} Consecutivas</h3>
+                <div class="streak-matches">
+                  <div *ngFor="let match of currentStreak.matches" class="streak-match">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>{{ match }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Best/Worst Moments -->
+        <div class="moments-grid">
+          <mat-card class="moment-card best">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>emoji_events</mat-icon>
+                Mejor Momento
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <h3>{{ bestMoment.period }}</h3>
+              <p class="moment-description">{{ bestMoment.description }}</p>
+              <div class="moment-stats">
+                <div class="moment-stat">
+                  <mat-icon>stars</mat-icon>
+                  <span>{{ bestMoment.points }} puntos</span>
+                </div>
+                <div class="moment-stat">
+                  <mat-icon>sports_score</mat-icon>
+                  <span>{{ bestMoment.goalsFor }} goles a favor</span>
+                </div>
+                <div class="moment-stat">
+                  <mat-icon>shield</mat-icon>
+                  <span>{{ bestMoment.goalsAgainst }} goles en contra</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="moment-card worst">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>warning</mat-icon>
+                Momento Difícil
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <h3>{{ worstMoment.period }}</h3>
+              <p class="moment-description">{{ worstMoment.description }}</p>
+              <div class="moment-stats">
+                <div class="moment-stat">
+                  <mat-icon>stars</mat-icon>
+                  <span>{{ worstMoment.points }} puntos</span>
+                </div>
+                <div class="moment-stat">
+                  <mat-icon>sports_score</mat-icon>
+                  <span>{{ worstMoment.goalsFor }} goles a favor</span>
+                </div>
+                <div class="moment-stat">
+                  <mat-icon>shield</mat-icon>
+                  <span>{{ worstMoment.goalsAgainst }} goles en contra</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
