@@ -8,11 +8,11 @@
               <mat-icon>groups</mat-icon>
               Equipos del Torneo
             </mat-card-title>
-            <mat-card-subtitle>
+            <mat-card-subtitle class="subtitle-team-management">
               Administra los equipos participantes en tu torneo
             </mat-card-subtitle>
           </div>
-          
+
           <div class="col-6">
             <div class="row justify-content-end">
               <div class="col-auto">
@@ -61,7 +61,8 @@
         <mat-expansion-panel *ngFor="let team of filteredTeams; trackBy: trackByTeamId" class="team-panel">
           <mat-expansion-panel-header>
             <mat-panel-title class="w-100">
-              <div class="row align-items-center w-100 g-3">
+              <!-- Layout para Web (Desktop) - Mantener intacto -->
+              <div class="row align-items-center w-100 g-3 desktop-layout">
                 <!-- Avatar e info principal -->
                 <div class="col-md-4 d-flex align-items-center">
                   <div class="team-avatar me-3 position-relative">
@@ -91,7 +92,7 @@
                   </div>
                   <div class="manager-info flex-grow-1">
                     <div class="manager-name-container" *ngIf="team.manager; else noManager">
-                      <small class="manager-link" 
+                      <small class="manager-link"
                              (click)="openManagerInfoModal(team); $event.stopPropagation()"
                              matTooltip="Click para ver información completa del manager"
                              matTooltipPosition="above">
@@ -175,6 +176,127 @@
                       <mat-icon>link</mat-icon>
                     </button>
                   </div>
+                </div>
+              </div>
+
+              <!-- Layout para Móvil - Solo visible en móvil -->
+              <div class="mobile-layout d-none">
+                <!-- Avatar -->
+                <div class="team-avatar me-3 position-relative">
+                  <img [src]="team.logoUrl || 'assets/default-team.png'"
+                       [alt]="team.name"
+                       class="team-logo"
+                       (error)="$event.target.src='assets/default-team.png'"
+                       width="40" height="40">
+                  <!-- Status Badge sobre la imagen -->
+                  <div [class]="getTeamStatusClass(team.status)"
+                       [matTooltip]="getTeamStatusText(team.status)"
+                       matTooltipPosition="above">
+                    <mat-icon class="status-icon">{{ getTeamStatusIcon(team.status) }}</mat-icon>
+                  </div>
+                </div>
+
+                <!-- Info del equipo y manager -->
+                <div class="team-mobile-info flex-grow-1">
+                  <h6 class="mb-1 fw-bold team-name-mobile">{{ team.name }}</h6>
+                  <div class="manager-mobile" *ngIf="team.manager; else noManagerMobile">
+                    <small class="manager-link-mobile"
+                           (click)="openManagerInfoModal(team); $event.stopPropagation()"
+                           matTooltip="Ver información del manager">
+                      Manager: {{ team.manager.managerName }}
+                    </small>
+                  </div>
+                  <ng-template #noManagerMobile>
+                    <small class="text-muted">Sin manager</small>
+                  </ng-template>
+                </div>
+
+                <!-- Menú de 3 puntos para móvil -->
+                <div class="mobile-actions-menu">
+                  <button mat-icon-button
+                          class="mobile-menu-trigger"
+                          [matMenuTriggerFor]="teamMobileMenu"
+                          (click)="$event.stopPropagation()"
+                          matTooltip="Más opciones">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #teamMobileMenu="matMenu" class="team-mobile-menu" xPosition="before" yPosition="below">
+                    <div class="mobile-menu-content" (click)="$event.stopPropagation()">
+                      <!-- Estadísticas -->
+                      <div class="mobile-menu-item">
+                        <mat-icon>people</mat-icon>
+                        <span class="menu-label">Jugadores:</span>
+                        <span class="menu-value">{{ team.totalPlayers }}</span>
+                      </div>
+
+                      <!-- Switch de registro -->
+                      <div class="mobile-menu-item">
+                        <mat-icon>settings</mat-icon>
+                        <span class="menu-label">Registro:</span>
+                        <div class="mobile-toggle-container">
+                          <mat-slide-toggle
+                            [checked]="team.allowPlayerRegistration || false"
+                            (change)="onTogglePlayerRegistration(team, $event)"
+                            [disabled]="isUpdatingTeamRegistration(team)"
+                            class="mobile-registration-toggle">
+                            <span class="toggle-label-mobile">
+                              <mat-spinner *ngIf="isUpdatingTeamRegistration(team)" diameter="14" class="inline-spinner"></mat-spinner>
+                              {{ (team.allowPlayerRegistration || false) ? 'Habilitado' : 'Deshabilitado' }}
+                            </span>
+                          </mat-slide-toggle>
+                        </div>
+                      </div>
+
+                      <div class="mobile-menu-divider"></div>
+
+                      <!-- Acciones principales -->
+                      <div class="mobile-menu-item action-item" (click)="createPlayer(team)">
+                        <mat-icon class="text-success">person_add</mat-icon>
+                        <span class="action-label">Agregar jugador</span>
+                      </div>
+
+                      <div class="mobile-menu-item action-item" (click)="editTeam(team)">
+                        <mat-icon class="text-primary">edit</mat-icon>
+                        <span class="action-label">Editar equipo</span>
+                      </div>
+
+                      <div class="mobile-menu-item action-item"
+                           *ngIf="!team.hasExcelUploaded"
+                           (click)="uploadExcelDocument(team)">
+                        <mat-icon class="text-info">upload_file</mat-icon>
+                        <span class="action-label">Subir Excel</span>
+                      </div>
+
+                      <div class="mobile-menu-item action-item"
+                           *ngIf="canDisqualifyTeam(team)"
+                           (click)="disqualifyTeam(team)">
+                        <mat-icon class="text-warning">gavel</mat-icon>
+                        <span class="action-label">Descalificar</span>
+                      </div>
+
+                      <div class="mobile-menu-item action-item"
+                           *ngIf="canReactivateTeam(team)"
+                           (click)="reactivateTeam(team)">
+                        <mat-icon style="color: #4caf50;">verified</mat-icon>
+                        <span class="action-label">Reactivar</span>
+                      </div>
+
+                      <div class="mobile-menu-item action-item"
+                           *ngIf="!team.hasUsedLink"
+                           (click)="copyRegistrationUrl(team.urlRegistration)">
+                        <mat-icon class="text-info">link</mat-icon>
+                        <span class="action-label">Copiar enlace</span>
+                      </div>
+
+                      <div class="mobile-menu-divider"></div>
+
+                      <div class="mobile-menu-item action-item danger-action" (click)="deleteTeam(team)">
+                        <mat-icon class="text-danger">delete</mat-icon>
+                        <span class="action-label">Eliminar equipo</span>
+                      </div>
+                    </div>
+                  </mat-menu>
                 </div>
               </div>
             </mat-panel-title>

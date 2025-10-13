@@ -48,7 +48,7 @@ export interface ManagerInfoData {
             <mat-icon class="section-icon">contact_phone</mat-icon>
             Información de Contacto
           </h3>
-          
+
           <div class="contact-info">
             <!-- Teléfono -->
             <div class="info-item">
@@ -57,14 +57,14 @@ export interface ManagerInfoData {
                 <span>Teléfono</span>
               </div>
               <div class="info-value">
-                <a [href]="getPhoneLink(data.phoneNumber)" 
-                   target="_blank" 
-                   class="whatsapp-link" 
+                <a [href]="getPhoneLink(data.phoneNumber)"
+                   target="_blank"
+                   class="whatsapp-link"
                    matTooltip="Abrir WhatsApp"
                    matTooltipPosition="above">
                   {{ data.phoneNumber }}
                 </a>
-                <button mat-icon-button 
+                <button mat-icon-button
                         class="copy-btn"
                         (click)="copyToClipboard(data.phoneNumber, 'phone')"
                         [matTooltip]="getTooltipText('phone')"
@@ -83,13 +83,13 @@ export interface ManagerInfoData {
               </div>
               <div class="info-value">
                 <span *ngIf="data.email; else noEmail" class="email-value">
-                  <a [href]="'mailto:' + data.email" 
+                  <a [href]="'mailto:' + data.email"
                      class="email-link"
                      matTooltip="Enviar email"
                      matTooltipPosition="above">
                     {{ data.email }}
                   </a>
-                  <button mat-icon-button 
+                  <button mat-icon-button
                           class="copy-btn"
                           (click)="copyToClipboard(data.email!, 'email')"
                           [matTooltip]="getTooltipText('email')"
@@ -110,8 +110,8 @@ export interface ManagerInfoData {
       <mat-divider></mat-divider>
 
       <div mat-dialog-actions class="modal-actions">
-        <button mat-raised-button 
-                color="primary" 
+        <button mat-raised-button
+                color="primary"
                 (click)="close()"
                 class="close-btn">
           <mat-icon>close</mat-icon>
@@ -129,7 +129,7 @@ export interface ManagerInfoData {
     .modal-header {
       padding: 24px 24px 16px 24px;
       margin: 0;
-      
+
       .header-content {
         display: flex;
         align-items: center;
@@ -147,7 +147,7 @@ export interface ManagerInfoData {
 
       .header-text {
         flex: 1;
-        
+
         .manager-name {
           margin: 0 0 4px 0;
           font-size: 1.5rem;
@@ -228,7 +228,7 @@ export interface ManagerInfoData {
             color: #1976d2;
             text-decoration: none;
             font-weight: 500;
-            
+
             &:hover {
               text-decoration: underline;
             }
@@ -254,7 +254,7 @@ export interface ManagerInfoData {
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            
+
             &:hover {
               color: #1976d2;
               background: rgba(25, 118, 210, 0.1);
@@ -276,10 +276,10 @@ export interface ManagerInfoData {
     .modal-actions {
       padding: 16px 24px 24px 24px;
       justify-content: center;
-      
+
       .close-btn {
         min-width: 120px;
-        
+
         mat-icon {
           margin-right: 8px;
         }
@@ -293,7 +293,7 @@ export interface ManagerInfoData {
       font-size: 12px !important;
       border-radius: 4px !important;
       padding: 6px 8px !important;
-      
+
       &.copied-tooltip {
         background-color: #4caf50 !important;
       }
@@ -303,6 +303,7 @@ export interface ManagerInfoData {
     @media (max-width: 480px) {
       .manager-info-modal {
         max-width: 100%;
+        padding: 15px;
       }
 
       .modal-header .header-content {
@@ -344,13 +345,13 @@ export class ManagerInfoModalComponent {
         // Fallback para navegadores sin soporte de clipboard API
         this.fallbackCopyTextToClipboard(text);
       }
-      
+
       // Marcar como copiado temporalmente
       this.copiedStates[type] = true;
       setTimeout(() => {
         this.copiedStates[type] = false;
       }, 2000);
-      
+
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       this.fallbackCopyTextToClipboard(text);

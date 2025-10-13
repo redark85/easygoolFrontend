@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -60,7 +61,8 @@ export interface TeamModalResult {
     MatInputModule,
     MatFormFieldModule,
     MatSlideToggleModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatMenuModule
   ],
   templateUrl: './teams-management.component.html',
   styleUrls: ['./teams-management.component.scss'],
