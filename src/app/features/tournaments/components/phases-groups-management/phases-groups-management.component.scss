@@ -641,22 +641,25 @@
     .team-card-content {
       padding: 16px;
       display: flex;
-      flex-direction: column;
-      height: 100%;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      height: auto;
     }
 
     .team-info-knockout {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex: 1;
 
       .team-avatar-knockout {
         position: relative;
+        flex-shrink: 0;
 
         .team-logo-knockout {
-          width: 48px;
-          height: 48px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           object-fit: cover;
           border: 2px solid var(--border-color);
@@ -665,19 +668,26 @@
 
       .team-details-knockout {
         flex: 1;
+        min-width: 0;
 
         .team-name-knockout {
-          margin: 0 0 4px 0;
-          font-size: 1rem;
+          margin: 0 0 2px 0;
+          font-size: 0.9rem;
           font-weight: 600;
           color: var(--text-primary);
           line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .team-short-name-knockout {
-          font-size: 0.85rem;
+          font-size: 0.75rem;
           color: var(--text-secondary);
           font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }
@@ -685,23 +695,41 @@
     .team-actions-knockout {
       display: flex;
       justify-content: flex-end;
-      margin-top: 12px;
+      margin-top: 0;
+      gap: 6px;
+      flex-shrink: 0;
+
+      button {
+        transition: all 0.2s ease;
+        padding: 6px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+
+        mat-icon {
+          font-size: 1rem;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
 
       .remove-team-knockout-btn {
-        transition: all 0.2s ease;
-        padding: 8px;
-        width: 36px;
-        height: 36px;
-
         &:hover {
           background: rgba(244, 67, 54, 0.1);
           color: #f44336;
         }
-
-        mat-icon {
-          font-size: 1.1rem;
-          width: 1.1rem;
-          height: 1.1rem;
+      }
+      
+      .disqualify-team-btn {
+        &:hover {
+          background: rgba(255, 152, 0, 0.1);
+        }
+      }
+      
+      .reactivate-team-btn {
+        &:hover {
+          background: rgba(76, 175, 80, 0.1);
         }
       }
     }
@@ -765,6 +793,106 @@
           .team-short-name-knockout {
             font-size: 0.8rem;
           }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .no-phases {
+    padding: 40px 16px;
+
+    .no-phases-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .phase-card {
+    .phase-card-header {
+      .phase-info {
+        .phase-icon {
+          font-size: 1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+
+        .phase-details {
+          .phase-name {
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .knockout-teams-grid {
+    .team-card {
+      .team-card-content {
+        padding: 12px;
+        // Solo en móvil: cambiar a layout horizontal
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+      }
+
+      .team-info-knockout {
+        gap: 10px;
+        // Solo en móvil: ocupar espacio disponible y sin margen inferior
+        flex: 1 !important;
+        margin-bottom: 0 !important;
+
+        .team-avatar-knockout {
+          .team-logo-knockout {
+            width: 40px;
+            height: 40px;
+          }
+        }
+
+        .team-details-knockout {
+          .team-name-knockout {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+          }
+
+          .team-short-name-knockout {
+            font-size: 0.75rem;
+          }
+        }
+      }
+
+      .team-actions-knockout {
+        // Solo en móvil: sin margen superior y con gap específico
+        margin-top: 0 !important;
+        gap: 4px !important;
+
+        button {
+          width: 32px !important;
+          height: 32px !important;
+          min-width: 32px !important;
+          min-height: 32px !important;
+          padding: 0 !important;
+
+          mat-icon {
+            font-size: 16px !important;
+            width: 16px !important;
+            height: 16px !important;
+          }
+        }
+
+        .disqualify-team-btn,
+        .reactivate-team-btn,
+        .remove-team-knockout-btn {
+          width: 32px !important;
+          height: 32px !important;
+          min-width: 32px !important;
+          min-height: 32px !important;
         }
       }
     }
