@@ -519,10 +519,27 @@
   }
 }
 
+.phases-subtitle {
+  display: block;
+}
+
 // Responsive Design
 @media (max-width: 768px) {
   .phases-groups-container {
     padding: 0 8px;
+  }
+
+  .phases-groups-container {
+    padding: 0 !important;
+  }
+
+  .phases-subtitle {
+    display: none !important;
+  }
+
+  // También ocultar cualquier mat-card-subtitle
+  .mat-card-subtitle.phases-subtitle {
+    display: none !important;
   }
 
   .fab-create-phase {
@@ -751,5 +768,13 @@
         }
       }
     }
+  }
+}
+
+// Estilos globales para móvil
+@media (max-width: 768px) {
+  // Remover padding de mat-card-content en móvil
+  ::ng-deep .mat-mdc-card-content {
+    padding: 0 !important;
   }
 }
