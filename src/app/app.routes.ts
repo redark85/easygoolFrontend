@@ -124,6 +124,27 @@ export const routes: Routes = [
     title: 'Fixture Completo - Torneo'
   },
   
+  // Public Match Detail (public access, no layout)
+  {
+    path: 'public-match-detail/:matchId',
+    loadComponent: () => import('./features/public-match-detail/public-match-detail.component').then(c => c.PublicMatchDetailComponent),
+    title: 'Detalle del Partido'
+  },
+  
+  // Public Top Scorers (public access, no layout)
+  {
+    path: 'public-top-scorers/:tournamentId',
+    loadComponent: () => import('./features/public-top-scorers/public-top-scorers.component').then(c => c.PublicTopScorersComponent),
+    title: 'Estadísticas de Jugadores'
+  },
+  
+  // Public Teams (public access, no layout)
+  {
+    path: 'public-teams/:tournamentId',
+    loadComponent: () => import('./features/public-teams/public-teams.component').then(c => c.PublicTeamsComponent),
+    title: 'Equipos Participantes'
+  },
+  
   // Not Found page
   {
     path: 'not-found',

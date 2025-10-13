@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -100,6 +100,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -300,7 +301,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
    */
   onViewMatchDetails(match: Match): void {
     console.log('Ver detalles del partido:', match);
-    // TODO: Navegar a página de detalles del partido
+    this.router.navigate(['/public-match-detail', match.id]);
   }
 
   /**

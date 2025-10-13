@@ -1,0 +1,166 @@
+.football-field {
+  position: relative;
+  width: 100%;
+  padding-bottom: 140%; // Ratio de campo de fútbol (70m x 100m aprox)
+  background: linear-gradient(180deg, #2d5016 0%, #1a3d0a 50%, #2d5016 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+
+  // Field markings
+  .field-markings {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    .center-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20%;
+      height: 14.3%; // Mantener proporción circular
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+    }
+
+    .center-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .penalty-area {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 18%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+
+      &.top {
+        top: 0;
+        border-top: none;
+      }
+
+      &.bottom {
+        bottom: 0;
+        border-bottom: none;
+      }
+    }
+
+    .goal-area {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30%;
+      height: 8%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+
+      &.top {
+        top: 0;
+        border-top: none;
+      }
+
+      &.bottom {
+        bottom: 0;
+        border-bottom: none;
+      }
+    }
+  }
+
+  // Players
+  .players {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    .player {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translate(-50%, -50%) scale(1.2);
+        z-index: 10;
+
+        .player-marker {
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .player-name {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .player-marker {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+        border: 3px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+
+        .jersey-number {
+          font-size: 16px;
+          font-weight: 700;
+          color: white;
+        }
+      }
+
+      .player-name {
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 4px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .football-field {
+    .players {
+      .player {
+        .player-marker {
+          width: 32px;
+          height: 32px;
+
+          .jersey-number {
+            font-size: 14px;
+          }
+        }
+
+        .player-name {
+          font-size: 10px;
+          padding: 3px 6px;
+        }
+      }
+    }
+  }
+}
