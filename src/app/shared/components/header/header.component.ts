@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { AuthService } from '@core/services';
 import { User } from '@core/models';
-import { Observable, map, switchMap, of, combineLatest, BehaviorSubject } from 'rxjs';
+import { Observable, map, switchMap, of, combineLatest, BehaviorSubject, takeUntil, Subject } from 'rxjs';
 import { UserProfileService } from '@core/services/user-profile.service';
 import { UserProfileEventsService } from '@core/services/user-profile-events.service';
 import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
@@ -46,7 +46,7 @@ interface HeaderUser {
   styleUrls: ['./header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   @Input() isMobile = false;
   @Input() sidebarCollapsed = false;
   @Output() toggleSidebar = new EventEmitter<void>();
@@ -54,6 +54,7 @@ export class HeaderComponent implements OnInit {
 
   currentUser$: Observable<HeaderUser | null>;
   private refreshTrigger$ = new BehaviorSubject<void>(undefined);
+  private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
@@ -79,7 +80,12 @@ export class HeaderComponent implements OnInit {
         
         if (userProfile) {
           // Si hay datos del perfil, usarlos para crear el HeaderUser
-          console.log('📱 Using user profile data from localStorage for header');
+          console.log('📱 Header - Using user profile data from localStorage:', {
+            name: userProfile.name,
+            email: userProfile.email,
+            hasImage: !!userProfile.profileImagePath,
+            imagePath: userProfile.profileImagePath
+          });
           return {
             firstName: userProfile.name,
             lastName: `${userProfile.secondName ? userProfile.secondName + ' ' : ''}${userProfile.lastName}${userProfile.secondLastName ? ' ' + userProfile.secondLastName : ''}`.trim(),
@@ -88,7 +94,7 @@ export class HeaderComponent implements OnInit {
           } as HeaderUser;
         } else {
           // Fallback a datos del token si no hay perfil en localStorage
-          console.log('🔄 Using token data as fallback for header (no profile in localStorage)');
+          console.log('🔄 Header - Using token data as fallback (no profile in localStorage)');
           return {
             firstName: state.user.firstName,
             lastName: state.user.lastName,
@@ -100,7 +106,20 @@ export class HeaderComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Suscribirse a las notificaciones de actualización del perfil
+    this.userProfileEventsService.profileUpdated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        console.log('📱 Header - Received profile update notification');
+        this.refreshUserData();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   onToggleSidebar(): void {
     if (this.isMobile) {

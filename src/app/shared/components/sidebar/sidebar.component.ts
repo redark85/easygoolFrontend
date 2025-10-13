@@ -122,7 +122,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
         
         if (userProfile) {
           // Si hay datos del perfil, usarlos para crear el SidebarUser
-          console.log('📱 Sidebar - Using user profile data from localStorage');
+          console.log('📱 Sidebar - Using user profile data from localStorage:', {
+            name: userProfile.name,
+            email: userProfile.email,
+            hasImage: !!userProfile.profileImagePath,
+            imagePath: userProfile.profileImagePath
+          });
           return {
             firstName: userProfile.name,
             lastName: `${userProfile.secondName ? userProfile.secondName + ' ' : ''}${userProfile.lastName}${userProfile.secondLastName ? ' ' + userProfile.secondLastName : ''}`.trim(),

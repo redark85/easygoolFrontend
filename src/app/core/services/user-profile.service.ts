@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, map, catchError, throwError, tap, switchMap, of } from 'rxjs';
+import { UserProfileEventsService } from './user-profile-events.service';
 import {
   UserProfileData,
   UserProfileApiResponse,
@@ -25,7 +26,8 @@ export class UserProfileService {
   constructor(
     private apiService: ApiService,
     private toastService: ToastService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private userProfileEventsService: UserProfileEventsService
   ) {}
 
   /**
@@ -43,9 +45,16 @@ export class UserProfileService {
         throw new Error(response.message || 'Error al obtener el perfil de usuario');
       }),
       tap(userProfile => {
-        // Guardar el perfil en localStorage para uso posterior
+        // Guardar automáticamente en localStorage después de obtener desde API
         this.saveUserProfileToStorage(userProfile);
-        console.log('💾 User profile saved to localStorage');
+        console.log('💾 User profile saved to localStorage after API fetch');
+        
+        // Notificar a todos los componentes que el perfil se ha cargado/actualizado
+        // Usar setTimeout para asegurar que los componentes estén listos para recibir la notificación
+        setTimeout(() => {
+          this.userProfileEventsService.notifyProfileUpdated();
+          console.log('🔔 Profile update notification sent after API fetch');
+        }, 100);
       }),
       catchError(error => {
         console.error('❌ Error getting user profile:', {
