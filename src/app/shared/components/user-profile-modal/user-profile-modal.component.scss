@@ -29,7 +29,7 @@
     top: 8px;
     right: 8px;
     color: #666;
-    z-index: 10;
+    z-index: 1000; // Z-index más alto para evitar que quede detrás
     
     &:hover {
       background-color: rgba(244, 67, 54, 0.1);
@@ -37,11 +37,12 @@
     }
   }
 
-  // Contenido del modal
+  // Contenido del modal - CORREGIR DOBLE SCROLL
   mat-dialog-content {
     padding: 0;
-    max-height: 70vh;
-    overflow-y: auto;
+    max-height: none !important; // Eliminar max-height para evitar doble scroll
+    overflow-y: visible !important; // Eliminar overflow del mat-dialog-content
+    overflow-x: visible !important;
   }
 
   // Label para imagen
@@ -135,6 +136,8 @@
   // Formulario con Bootstrap Grid
   .container-fluid {
     padding: 0;
+    position: relative;
+    z-index: 1; // Asegurar que el contenido esté accesible
     
     .row {
       margin: 0;
@@ -155,6 +158,18 @@
     
     .w-100 {
       width: 100%;
+    }
+    
+    // Asegurar que los campos sean interactivos
+    mat-form-field {
+      position: relative;
+      z-index: 2;
+      
+      input, mat-select, textarea {
+        pointer-events: auto;
+        position: relative;
+        z-index: 3;
+      }
     }
   }
 
@@ -252,8 +267,19 @@
 
 // Estilos globales para el modal
 ::ng-deep {
-  .mat-mdc-dialog-container .mdc-dialog__surface {
-    padding: 24px;
+  // Específico para este modal - evitar doble scroll
+  .user-profile-modal {
+    .mat-mdc-dialog-container .mdc-dialog__surface {
+      padding: 24px;
+      max-height: 90vh; // Altura máxima del modal
+      overflow-y: auto; // Solo el contenedor principal tiene scroll
+    }
+    
+    // Asegurar que mat-dialog-content no tenga scroll propio
+    mat-dialog-content {
+      overflow: visible !important;
+      max-height: none !important;
+    }
   }
   
   .mat-mdc-form-field {
@@ -268,6 +294,23 @@
       
       .mat-mdc-form-field-outline {
         color: #ccc;
+      }
+    }
+  }
+  
+  // Asegurar que los campos de formulario sean interactivos
+  .modal-container {
+    .container-fluid {
+      position: relative;
+      z-index: 1; // Asegurar que esté por encima de otros elementos
+    }
+    
+    mat-form-field {
+      position: relative;
+      z-index: 2; // Z-index para campos de formulario
+      
+      input, mat-select {
+        pointer-events: auto; // Asegurar que sean clickeables
       }
     }
   }

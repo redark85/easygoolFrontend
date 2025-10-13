@@ -40,7 +40,10 @@ import { UppercaseDirective } from '../../directives/uppercase.directive';
   ],
   templateUrl: './user-profile-modal.component.html',
   styleUrls: ['./user-profile-modal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    'class': 'user-profile-modal' // Agregar clase específica para estilos
+  }
 })
 export class UserProfileModalComponent implements OnInit, OnDestroy {
   profileForm!: FormGroup; // Usando definite assignment assertion
