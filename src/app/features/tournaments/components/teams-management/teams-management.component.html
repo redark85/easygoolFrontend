@@ -338,55 +338,122 @@
               <p class="mb-0">No hay jugadores registrados en este equipo</p>
             </div>
 
-            <div *ngFor="let player of getPlayersForTeam(team); trackBy: trackByPlayerId" class="player-item d-flex align-items-center py-2 border-bottom">
-              <!-- Foto -->
-              <div class="player-avatar me-3 flex-shrink-0">
-                <img [src]="player.photoUrl || 'assets/person.jpg'"
-                     [alt]="getPlayerFullName(player)"
-                     class="player-photo"
-                     width="40" height="40"
-                     (error)="$event.target.src='assets/person.jpg'">
-              </div>
+            <div *ngFor="let player of getPlayersForTeam(team); trackBy: trackByPlayerId" class="player-item border-bottom">
+              <!-- Layout Desktop - Información completa -->
+              <div class="d-none d-md-flex align-items-center py-2 player-desktop-layout">
+                <!-- Foto -->
+                <div class="player-avatar me-3 flex-shrink-0">
+                  <img [src]="player.photoUrl || 'assets/person.jpg'"
+                       [alt]="getPlayerFullName(player)"
+                       class="player-photo"
+                       width="40" height="40"
+                       (error)="$event.target.src='assets/person.jpg'">
+                </div>
 
-              <!-- Número de camiseta -->
-              <div class="player-jersey me-3 flex-shrink-0">
-                <span class="badge bg-secondary">#{{ player.jerseyNumber }}</span>
-              </div>
+                <!-- Número de camiseta -->
+                <div class="player-jersey me-3 flex-shrink-0">
+                  <span class="badge bg-secondary">#{{ player.jerseyNumber }}</span>
+                </div>
 
-              <!-- Nombre completo e identificación -->
-              <div class="player-info flex-grow-1 me-3 text-start">
-                <div class="player-name-container">
-                  <strong class="d-block text-start">{{ getPlayerFullName(player) }}</strong>
-                  <small class="text-muted d-block text-start">C.I: {{ player.identification }}</small>
+                <!-- Nombre completo e identificación -->
+                <div class="player-info flex-grow-1 me-3 text-start">
+                  <div class="player-name-container">
+                    <strong class="d-block text-start">{{ getPlayerFullName(player) }}</strong>
+                    <small class="text-muted d-block text-start">C.I: {{ player.identification }}</small>
+                  </div>
+                </div>
+
+                <!-- Posición -->
+                <div class="player-position me-3 flex-shrink-0 text-start">
+                  <div class="d-flex align-items-center justify-content-start">
+                    <mat-icon class="me-1 text-muted">sports_soccer</mat-icon>
+                    <small class="text-muted">{{ player.position }}</small>
+                  </div>
+                </div>
+
+                <!-- Acciones del jugador -->
+                <div class="player-actions flex-shrink-0">
+                  <div class="d-flex align-items-center gap-1">
+                    <button mat-icon-button
+                            (click)="editPlayer(player, team)"
+                            [disabled]="isDeletingPlayer(player)"
+                            matTooltip="Editar jugador"
+                            class="text-primary">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button
+                            (click)="deletePlayer(player, team)"
+                            [disabled]="isDeletingPlayer(player)"
+                            [matTooltip]="isDeletingPlayer(player) ? 'Eliminando jugador...' : 'Eliminar jugador'"
+                            class="text-danger">
+                      <mat-spinner *ngIf="isDeletingPlayer(player)" diameter="16" class="inline-spinner"></mat-spinner>
+                      <mat-icon *ngIf="!isDeletingPlayer(player)">delete</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <!-- Posición -->
-              <div class="player-position me-3 flex-shrink-0 text-start">
-                <div class="d-flex align-items-center justify-content-start">
-                  <mat-icon class="me-1 text-muted">sports_soccer</mat-icon>
-                  <small class="text-muted">{{ player.position }}</small>
-                </div>
-              </div>
+              <!-- Layout Móvil - Solo avatar, nombre y cédula -->
+              <div class="d-block d-md-none player-mobile-layout">
+                <div class="d-flex align-items-center py-2">
+                  <!-- Avatar -->
+                  <div class="player-avatar me-3 flex-shrink-0">
+                    <img [src]="player.photoUrl || 'assets/person.jpg'"
+                         [alt]="getPlayerFullName(player)"
+                         class="player-photo"
+                         width="40" height="40"
+                         (error)="$event.target.src='assets/person.jpg'">
+                  </div>
 
-              <!-- Acciones del jugador -->
-              <div class="player-actions flex-shrink-0">
-                <div class="d-flex align-items-center gap-1">
-                  <button mat-icon-button
-                          (click)="editPlayer(player, team)"
-                          [disabled]="isDeletingPlayer(player)"
-                          matTooltip="Editar jugador"
-                          class="text-primary">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button
-                          (click)="deletePlayer(player, team)"
-                          [disabled]="isDeletingPlayer(player)"
-                          [matTooltip]="isDeletingPlayer(player) ? 'Eliminando jugador...' : 'Eliminar jugador'"
-                          class="text-danger">
-                    <mat-spinner *ngIf="isDeletingPlayer(player)" diameter="16" class="inline-spinner"></mat-spinner>
-                    <mat-icon *ngIf="!isDeletingPlayer(player)">delete</mat-icon>
-                  </button>
+                  <!-- Nombre y cédula -->
+                  <div class="player-mobile-info flex-grow-1">
+                    <strong class="d-block">{{ getPlayerFullName(player) }}</strong>
+                    <small class="text-muted d-block">C.I: {{ player.identification }}</small>
+                  </div>
+
+                  <!-- Botón de 3 puntos -->
+                  <div class="player-mobile-actions">
+                    <button mat-icon-button
+                            class="player-mobile-menu-trigger"
+                            [matMenuTriggerFor]="playerMobileMenu"
+                            matTooltip="Más opciones">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+
+                    <mat-menu #playerMobileMenu="matMenu" class="player-mobile-menu" xPosition="before" yPosition="below">
+                      <div class="player-mobile-menu-content" (click)="$event.stopPropagation()">
+                        <!-- Número de camiseta -->
+                        <div class="mobile-menu-item">
+                          <mat-icon>tag</mat-icon>
+                          <span class="menu-label">Número:</span>
+                          <span class="menu-value">#{{ player.jerseyNumber }}</span>
+                        </div>
+
+                        <!-- Posición -->
+                        <div class="mobile-menu-item">
+                          <mat-icon>sports_soccer</mat-icon>
+                          <span class="menu-label">Posición:</span>
+                          <span class="menu-value">{{ player.position }}</span>
+                        </div>
+
+                        <div class="mobile-menu-divider"></div>
+
+                        <!-- Acciones -->
+                        <div class="mobile-menu-item action-item" (click)="editPlayer(player, team)">
+                          <mat-icon class="text-primary">edit</mat-icon>
+                          <span class="action-label">Editar jugador</span>
+                        </div>
+
+                        <div class="mobile-menu-item action-item danger-action" 
+                             (click)="deletePlayer(player, team)"
+                             [class.disabled]="isDeletingPlayer(player)">
+                          <mat-spinner *ngIf="isDeletingPlayer(player)" diameter="16" class="inline-spinner me-2"></mat-spinner>
+                          <mat-icon *ngIf="!isDeletingPlayer(player)" class="text-danger">delete</mat-icon>
+                          <span class="action-label">{{ isDeletingPlayer(player) ? 'Eliminando...' : 'Eliminar jugador' }}</span>
+                        </div>
+                      </div>
+                    </mat-menu>
+                  </div>
                 </div>
               </div>
             </div>
