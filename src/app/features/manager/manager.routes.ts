@@ -22,11 +22,6 @@ export const managerRoutes: Routes = [
     title: 'Gestión de Jugadores - Manager'
   },
   {
-    path: 'team-lineup',
-    loadComponent: () => import('./components/my-team/team-lineup/team-lineup.component').then(c => c.TeamLineupComponent),
-    title: 'Plantilla y Alineaciones - Manager'
-  },
-  {
     path: 'matches-calendar',
     loadComponent: () => import('./components/matches/matches-calendar/matches-calendar.component').then(c => c.MatchesCalendarComponent),
     title: 'Calendario de Partidos - Manager'

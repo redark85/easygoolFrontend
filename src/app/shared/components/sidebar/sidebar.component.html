@@ -88,16 +88,7 @@
             matTooltipPosition="right">
             <mat-icon matListItemIcon class="nav-icon">people</mat-icon>
             <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Jugadores</span>
-          </mat-list-item>
-          <mat-list-item
-            class="nav-item"
-            routerLink="/manager/team-lineup"
-            routerLinkActive="active"
-            [matTooltip]="isCollapsed && !isMobile ? 'Plantilla y Alineaciones' : ''"
-            matTooltipPosition="right">
-            <mat-icon matListItemIcon class="nav-icon">sports</mat-icon>
-            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Alineaciones</span>
-          </mat-list-item>
+          </mat-list-item>          
           <mat-list-item
             class="nav-item"
             routerLink="/manager/matches-calendar"
