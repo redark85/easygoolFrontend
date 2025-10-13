@@ -524,7 +524,7 @@ html, body {
   right: 0 !important;
   bottom: 0 !important;
   pointer-events: none !important;
-  
+
   // Centrado perfecto en móviles
   @media (max-width: 768px) {
     display: flex !important;
@@ -687,6 +687,7 @@ html, body {
       max-height: calc(100vh - 20px) !important;
       width: calc(100vw - 20px) !important;
       max-width: calc(100vw - 20px) !important;
+      padding: 0 !important;
 
       .mat-mdc-dialog-content {
         max-height: calc(100vh - 140px) !important;
@@ -743,3 +744,4 @@ html, body {
   width: auto !important;
   height: auto !important;
 }
+

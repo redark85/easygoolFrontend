@@ -229,17 +229,38 @@
     }
   }
 
-  // Estilos específicos responsive para OTP
+  // Estilos específicos responsive para OTP - Solo optimización de inputs
   @media (max-width: 768px) {
     .modal-content {
       .otp-form {
         .otp-inputs {
-          gap: 0.5rem;
+          gap: 0.25rem; // Gap reducido para evitar desbordamiento
 
           .otp-input {
-            width: 42px;
-            height: 52px;
-            font-size: 1.25rem;
+            width: calc((100% - (5 * 0.25rem)) / 6); // Cálculo dinámico del ancho
+            min-width: 32px; // Ancho mínimo usable
+            max-width: 45px; // Ancho máximo
+            height: 48px;
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+  
+  // Para pantallas muy pequeñas - Solo ajuste adicional de inputs
+  @media (max-width: 375px) {
+    .modal-content {
+      .otp-form {
+        .otp-inputs {
+          gap: 0.125rem; // Gap mínimo
+          
+          .otp-input {
+            width: calc((100% - (5 * 0.125rem)) / 6);
+            min-width: 28px;
+            max-width: 40px;
+            height: 44px;
+            font-size: 1rem;
           }
         }
       }
