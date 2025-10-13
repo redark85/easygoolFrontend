@@ -117,6 +117,13 @@ export const routes: Routes = [
     title: 'Inicio - Torneo'
   },
   
+  // Public Fixture (public access, no layout)
+  {
+    path: 'public-fixture/:tournamentId',
+    loadComponent: () => import('./features/public-fixture/public-fixture.component').then(c => c.PublicFixtureComponent),
+    title: 'Fixture Completo - Torneo'
+  },
+  
   // Not Found page
   {
     path: 'not-found',
