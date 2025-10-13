@@ -1,233 +1,220 @@
-<div class="user-profile-modal">
+<div class="modal-container">
   <!-- Header del Modal -->
-  <div class="modal-header">
-    <div class="header-content">
-      <mat-icon class="header-icon">person</mat-icon>
-      <h2 mat-dialog-title>Mi Perfil</h2>
-    </div>
-    <button mat-icon-button 
-            mat-dialog-close 
-            class="close-btn"
-            matTooltip="Cerrar"
-            matTooltipPosition="below">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
+  <h2 mat-dialog-title>
+    <mat-icon>person</mat-icon>
+    Mi Perfil
+  </h2>
+  
+  <!-- Botón de cerrar en esquina superior derecha -->
+  <button mat-icon-button 
+          mat-dialog-close 
+          class="close-btn"
+          matTooltip="Cerrar"
+          matTooltipPosition="below">
+    <mat-icon>close</mat-icon>
+  </button>
 
-  <!-- Contenido del Modal -->
-  <div mat-dialog-content class="modal-content">
-    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
-      
-      <!-- Sección de Imagen de Perfil -->
-      <div class="profile-image-section">
-        <div class="image-container">
-          <app-image-uploader
-            formControlName="profileImage"
-            [maxFileSizeMB]="1"
-            viewUploadText="Foto de perfil"
-            (imageUploaded)="onImageUploaded($event)">
-          </app-image-uploader>
+  <mat-dialog-content>
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="container-fluid">
+        <!-- Foto del Perfil -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <label class="image-label">Foto de Perfil</label>
+            <app-image-uploader
+              formControlName="profileImage"
+              [maxFileSizeMB]="1"
+              [viewUploadText]="'Subir imagen de perfil'"
+              (imageUploaded)="onImageUploaded($event)">
+            </app-image-uploader>
+          </div>
         </div>
         
         <!-- Información de Estado y Rol -->
-        <div class="user-badges">
-          <mat-chip-set>
-            <mat-chip [class]="getUserStatusClass()" 
-                      [matTooltip]="'Estado: ' + getUserStatusText()">
-              <mat-icon>{{ userProfile.status === 1 ? 'check_circle' : 'cancel' }}</mat-icon>
-              {{ getUserStatusText() }}
-            </mat-chip>
-            <mat-chip [class]="getUserRoleClass()" 
-                      [matTooltip]="'Rol: ' + getUserRoleText()">
-              <mat-icon>{{ userProfile.role === 1 ? 'admin_panel_settings' : 'person' }}</mat-icon>
-              {{ getUserRoleText() }}
-            </mat-chip>
-          </mat-chip-set>
-        </div>
-      </div>
-
-      <!-- Formulario de Datos Personales -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <mat-icon>badge</mat-icon>
-          Información Personal
-        </h3>
-
-        <div class="form-row">
-          <!-- Primer Nombre -->
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Primer Nombre *</mat-label>
-            <input matInput 
-                   formControlName="name"
-                   appUppercase
-                   placeholder="Ingrese su primer nombre"
-                   maxlength="50">
-            <mat-icon matSuffix>person</mat-icon>
-            <mat-error *ngIf="nameControl?.hasError('required')">
-              El primer nombre es obligatorio
-            </mat-error>
-            <mat-error *ngIf="nameControl?.hasError('minlength')">
-              Debe tener al menos 2 caracteres
-            </mat-error>
-            <mat-error *ngIf="nameControl?.hasError('maxlength')">
-              No puede exceder 50 caracteres
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Segundo Nombre -->
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Segundo Nombre</mat-label>
-            <input matInput 
-                   formControlName="secondName"
-                   appUppercase
-                   placeholder="Ingrese su segundo nombre"
-                   maxlength="50">
-            <mat-icon matSuffix>person_outline</mat-icon>
-            <mat-error *ngIf="secondNameControl?.hasError('maxlength')">
-              No puede exceder 50 caracteres
-            </mat-error>
-          </mat-form-field>
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="user-badges">
+              <mat-chip-set>
+                <mat-chip [class]="getUserStatusClass()" 
+                          [matTooltip]="'Estado: ' + getUserStatusText()">
+                  <mat-icon>{{ userProfile.status === 1 ? 'check_circle' : 'cancel' }}</mat-icon>
+                  {{ getUserStatusText() }}
+                </mat-chip>
+                <mat-chip [class]="getUserRoleClass()" 
+                          [matTooltip]="'Rol: ' + getUserRoleText()">
+                  <mat-icon>{{ userProfile.role === 1 ? 'admin_panel_settings' : 'person' }}</mat-icon>
+                  {{ getUserRoleText() }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
         </div>
 
-        <div class="form-row">
-          <!-- Primer Apellido -->
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Primer Apellido *</mat-label>
-            <input matInput 
-                   formControlName="lastName"
-                   appUppercase
-                   placeholder="Ingrese su primer apellido"
-                   maxlength="50">
-            <mat-icon matSuffix>family_restroom</mat-icon>
-            <mat-error *ngIf="lastNameControl?.hasError('required')">
-              El primer apellido es obligatorio
-            </mat-error>
-            <mat-error *ngIf="lastNameControl?.hasError('minlength')">
-              Debe tener al menos 2 caracteres
-            </mat-error>
-            <mat-error *ngIf="lastNameControl?.hasError('maxlength')">
-              No puede exceder 50 caracteres
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Segundo Apellido -->
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Segundo Apellido</mat-label>
-            <input matInput 
-                   formControlName="secondLastName"
-                   appUppercase
-                   placeholder="Ingrese su segundo apellido"
-                   maxlength="50">
-            <mat-icon matSuffix>family_restroom</mat-icon>
-            <mat-error *ngIf="secondLastNameControl?.hasError('maxlength')">
-              No puede exceder 50 caracteres
-            </mat-error>
-          </mat-form-field>
+        <!-- Nombres -->
+        <div class="row mb-3">
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Primer Nombre *</mat-label>
+              <input matInput 
+                     formControlName="name"
+                     appUppercase
+                     placeholder="Ej: Juan"
+                     maxlength="50">
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error *ngIf="nameControl?.hasError('required')">
+                El primer nombre es obligatorio
+              </mat-error>
+              <mat-error *ngIf="nameControl?.hasError('minlength')">
+                Debe tener al menos 2 caracteres
+              </mat-error>
+              <mat-error *ngIf="nameControl?.hasError('maxlength')">
+                No puede exceder 50 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Segundo Nombre</mat-label>
+              <input matInput 
+                     formControlName="secondName"
+                     appUppercase
+                     placeholder="Ej: Carlos"
+                     maxlength="50">
+              <mat-icon matSuffix>person_outline</mat-icon>
+              <mat-error *ngIf="secondNameControl?.hasError('maxlength')">
+                No puede exceder 50 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
         </div>
-      </div>
 
-      <!-- Información de Contacto -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <mat-icon>contact_mail</mat-icon>
-          Información de Contacto
-        </h3>
+        <!-- Apellidos -->
+        <div class="row mb-3">
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Primer Apellido *</mat-label>
+              <input matInput 
+                     formControlName="lastName"
+                     appUppercase
+                     placeholder="Ej: García"
+                     maxlength="50">
+              <mat-icon matSuffix>badge</mat-icon>
+              <mat-error *ngIf="lastNameControl?.hasError('required')">
+                El primer apellido es obligatorio
+              </mat-error>
+              <mat-error *ngIf="lastNameControl?.hasError('minlength')">
+                Debe tener al menos 2 caracteres
+              </mat-error>
+              <mat-error *ngIf="lastNameControl?.hasError('maxlength')">
+                No puede exceder 50 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Segundo Apellido</mat-label>
+              <input matInput 
+                     formControlName="secondLastName"
+                     appUppercase
+                     placeholder="Ej: López"
+                     maxlength="50">
+              <mat-icon matSuffix>badge</mat-icon>
+              <mat-error *ngIf="secondLastNameControl?.hasError('maxlength')">
+                No puede exceder 50 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
 
-        <div class="form-row">
-          <!-- Email -->
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Correo Electrónico *</mat-label>
-            <input matInput 
-                   formControlName="email"
-                   type="email"
-                   placeholder="ejemplo@correo.com"
-                   maxlength="100">
-            <mat-icon matSuffix>email</mat-icon>
-            <mat-error *ngIf="emailControl?.hasError('required')">
-              El correo electrónico es obligatorio
-            </mat-error>
-            <mat-error *ngIf="emailControl?.hasError('email')">
-              Ingrese un correo electrónico válido
-            </mat-error>
-            <mat-error *ngIf="emailControl?.hasError('maxlength')">
-              No puede exceder 100 caracteres
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Teléfono -->
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Número de Teléfono *</mat-label>
-            <input matInput 
-                   formControlName="phoneNUmber"
-                   type="tel"
-                   placeholder="+57 300 123 4567"
-                   maxlength="20">
-            <mat-icon matSuffix>phone</mat-icon>
-            <mat-error *ngIf="phoneControl?.hasError('required')">
-              El número de teléfono es obligatorio
-            </mat-error>
-            <mat-error *ngIf="phoneControl?.hasError('pattern')">
-              Ingrese un número de teléfono válido
-            </mat-error>
-            <mat-error *ngIf="phoneControl?.hasError('maxlength')">
-              No puede exceder 20 caracteres
-            </mat-error>
-          </mat-form-field>
+        <!-- Información de Contacto -->
+        <div class="row mb-3">
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Correo Electrónico *</mat-label>
+              <input matInput 
+                     formControlName="email"
+                     type="email"
+                     placeholder="ejemplo@correo.com"
+                     maxlength="100">
+              <mat-icon matSuffix>email</mat-icon>
+              <mat-error *ngIf="emailControl?.hasError('required')">
+                El correo electrónico es obligatorio
+              </mat-error>
+              <mat-error *ngIf="emailControl?.hasError('email')">
+                Ingrese un correo electrónico válido
+              </mat-error>
+              <mat-error *ngIf="emailControl?.hasError('maxlength')">
+                No puede exceder 100 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6 col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Número de Teléfono *</mat-label>
+              <input matInput 
+                     formControlName="phoneNUmber"
+                     type="tel"
+                     placeholder="+57 300 123 4567"
+                     maxlength="20">
+              <mat-icon matSuffix>phone</mat-icon>
+              <mat-error *ngIf="phoneControl?.hasError('required')">
+                El número de teléfono es obligatorio
+              </mat-error>
+              <mat-error *ngIf="phoneControl?.hasError('pattern')">
+                Ingrese un número de teléfono válido
+              </mat-error>
+              <mat-error *ngIf="phoneControl?.hasError('maxlength')">
+                No puede exceder 20 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
         </div>
       </div>
     </form>
-  </div>
+  </mat-dialog-content>
 
-  <!-- Footer del Modal -->
-  <div mat-dialog-actions class="modal-actions">
-    <div class="actions-left">
-      <button mat-stroked-button 
-              type="button"
-              (click)="onCancel()"
-              class="cancel-btn">
-        <mat-icon>close</mat-icon>
-        Salir
-      </button>
-    </div>
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button 
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting">
+      Salir
+    </button>
+    
+    <!-- Botón Editar/Cancelar Edición -->
+    <button *ngIf="!isEditing" 
+            mat-flat-button 
+            color="primary"
+            type="button"
+            (click)="toggleEditMode()">
+      <mat-icon>edit</mat-icon>
+      Editar Perfil
+    </button>
 
-    <div class="actions-right">
-      <!-- Botón Editar/Cancelar Edición -->
-      <button *ngIf="!isEditing" 
-              mat-raised-button 
-              color="primary"
-              type="button"
-              (click)="toggleEditMode()"
-              class="edit-btn">
-        <mat-icon>edit</mat-icon>
-        Editar Perfil
-      </button>
+    <button *ngIf="isEditing" 
+            mat-stroked-button 
+            color="warn"
+            type="button"
+            (click)="toggleEditMode()"
+            [disabled]="isSubmitting">
+      <mat-icon>cancel</mat-icon>
+      Cancelar
+    </button>
 
-      <button *ngIf="isEditing" 
-              mat-stroked-button 
-              color="warn"
-              type="button"
-              (click)="toggleEditMode()"
-              class="cancel-edit-btn">
-        <mat-icon>cancel</mat-icon>
-        Cancelar
-      </button>
-
-      <!-- Botón Actualizar -->
-      <button *ngIf="isEditing" 
-              mat-raised-button 
-              color="primary"
-              type="submit"
-              [disabled]="!profileForm.valid || isSubmitting"
-              (click)="onSubmit()"
-              class="update-btn">
-        <mat-progress-spinner *ngIf="isSubmitting" 
-                              mode="indeterminate" 
-                              diameter="20" 
-                              class="spinner-inline">
-        </mat-progress-spinner>
-        <mat-icon *ngIf="!isSubmitting">save</mat-icon>
-        {{ isSubmitting ? 'Actualizando...' : 'Actualizar' }}
-      </button>
-    </div>
-  </div>
+    <!-- Botón Actualizar -->
+    <button *ngIf="isEditing" 
+            mat-flat-button 
+            color="primary"
+            type="submit"
+            [disabled]="!profileForm.valid || isSubmitting"
+            (click)="onSubmit()">
+      <span *ngIf="!isSubmitting">
+        <mat-icon>save</mat-icon>
+        Actualizar
+      </span>
+      <span *ngIf="isSubmitting" class="loading-content">
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+      </span>
+    </button>
+  </mat-dialog-actions>
 </div>
