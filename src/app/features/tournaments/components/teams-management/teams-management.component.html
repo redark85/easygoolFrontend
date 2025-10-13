@@ -2,7 +2,8 @@
   <mat-card class="teams-management-card">
     <mat-card-header>
       <div class="container-fluid">
-        <div class="row align-items-center">
+        <!-- Layout Desktop - Título y buscador en la misma fila -->
+        <div class="row align-items-center desktop-header-layout d-none d-md-flex">
           <div class="col-6">
             <mat-card-title>
               <mat-icon>groups</mat-icon>
@@ -26,6 +27,34 @@
                   <mat-icon matSuffix>search</mat-icon>
                 </mat-form-field>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layout Móvil - Título arriba, buscador abajo -->
+        <div class="mobile-header-layout d-block d-md-none">
+          <!-- Título en la primera fila -->
+          <div class="row">
+            <div class="col-12">
+              <mat-card-title>
+                <mat-icon>groups</mat-icon>
+                Equipos del Torneo
+              </mat-card-title>
+            </div>
+          </div>
+          
+          <!-- Buscador en la segunda fila -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <mat-form-field appearance="outline" class="search-field w-100">
+                <mat-label>Buscar equipos</mat-label>
+                <input matInput
+                       [(ngModel)]="searchTerm"
+                       (input)="onSearchChange()"
+                       placeholder="Nombre o nombre corto"
+                       autocomplete="off">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
             </div>
           </div>
         </div>

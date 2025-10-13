@@ -660,6 +660,7 @@
 
 // Responsive Design
 @media (max-width: 768px) {
+
   .subtitle-team-management {
     display: none !important;
   }
@@ -669,8 +670,17 @@
   }
 
   .search-field {
-    width: 250px;
     margin-bottom: 0;
+
+    // En móvil, si tiene clase w-100, usar ancho completo
+    &.w-100 {
+      width: 100% !important;
+    }
+
+    // Si no tiene w-100, usar ancho fijo (desktop en móvil)
+    &:not(.w-100) {
+      width: 250px;
+    }
 
     .mat-mdc-form-field-wrapper {
       padding-bottom: 0;
