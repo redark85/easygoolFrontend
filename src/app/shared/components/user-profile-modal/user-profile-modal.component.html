@@ -4,10 +4,10 @@
     <mat-icon>person</mat-icon>
     Mi Perfil
   </h2>
-  
+
   <!-- Botón de cerrar en esquina superior derecha -->
-  <button mat-icon-button 
-          mat-dialog-close 
+  <button mat-icon-button
+          mat-dialog-close
           class="close-btn"
           matTooltip="Cerrar"
           matTooltipPosition="below">
@@ -29,33 +29,13 @@
             </app-image-uploader>
           </div>
         </div>
-        
-        <!-- Información de Estado y Rol -->
-        <div class="row mb-3">
-          <div class="col-12">
-            <div class="user-badges">
-              <mat-chip-set>
-                <mat-chip [class]="getUserStatusClass()" 
-                          [matTooltip]="'Estado: ' + getUserStatusText()">
-                  <mat-icon>{{ userProfile.status === 1 ? 'check_circle' : 'cancel' }}</mat-icon>
-                  {{ getUserStatusText() }}
-                </mat-chip>
-                <mat-chip [class]="getUserRoleClass()" 
-                          [matTooltip]="'Rol: ' + getUserRoleText()">
-                  <mat-icon>{{ userProfile.role === 1 ? 'admin_panel_settings' : 'person' }}</mat-icon>
-                  {{ getUserRoleText() }}
-                </mat-chip>
-              </mat-chip-set>
-            </div>
-          </div>
-        </div>
 
         <!-- Nombres -->
         <div class="row mb-3">
           <div class="col-md-6 col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Primer Nombre *</mat-label>
-              <input matInput 
+              <input matInput
                      formControlName="name"
                      appUppercase
                      placeholder="Ej: Juan"
@@ -75,7 +55,7 @@
           <div class="col-md-6 col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Segundo Nombre</mat-label>
-              <input matInput 
+              <input matInput
                      formControlName="secondName"
                      appUppercase
                      placeholder="Ej: Carlos"
@@ -93,7 +73,7 @@
           <div class="col-md-6 col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Primer Apellido *</mat-label>
-              <input matInput 
+              <input matInput
                      formControlName="lastName"
                      appUppercase
                      placeholder="Ej: García"
@@ -113,7 +93,7 @@
           <div class="col-md-6 col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Segundo Apellido</mat-label>
-              <input matInput 
+              <input matInput
                      formControlName="secondLastName"
                      appUppercase
                      placeholder="Ej: López"
@@ -131,7 +111,7 @@
           <div class="col-md-6 col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Correo Electrónico *</mat-label>
-              <input matInput 
+              <input matInput
                      formControlName="email"
                      type="email"
                      placeholder="ejemplo@correo.com"
@@ -151,7 +131,7 @@
           <div class="col-md-6 col-12">
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Número de Teléfono *</mat-label>
-              <input matInput 
+              <input matInput
                      formControlName="phoneNUmber"
                      type="tel"
                      placeholder="+57 300 123 4567"
@@ -174,36 +154,15 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-stroked-button 
+    <button mat-stroked-button
             type="button"
             (click)="onCancel()"
             [disabled]="isSubmitting">
       Salir
     </button>
-    
-    <!-- Botón Editar/Cancelar Edición -->
-    <button *ngIf="!isEditing" 
-            mat-flat-button 
-            color="primary"
-            type="button"
-            (click)="toggleEditMode()">
-      <mat-icon>edit</mat-icon>
-      Editar Perfil
-    </button>
-
-    <button *ngIf="isEditing" 
-            mat-stroked-button 
-            color="warn"
-            type="button"
-            (click)="toggleEditMode()"
-            [disabled]="isSubmitting">
-      <mat-icon>cancel</mat-icon>
-      Cancelar
-    </button>
 
     <!-- Botón Actualizar -->
-    <button *ngIf="isEditing" 
-            mat-flat-button 
+    <button mat-flat-button
             color="primary"
             type="submit"
             [disabled]="!profileForm.valid || isSubmitting"

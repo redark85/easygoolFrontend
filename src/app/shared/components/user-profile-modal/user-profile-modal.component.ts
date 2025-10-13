@@ -48,7 +48,6 @@ import { UppercaseDirective } from '../../directives/uppercase.directive';
 export class UserProfileModalComponent implements OnInit, OnDestroy {
   profileForm!: FormGroup; // Usando definite assignment assertion
   isSubmitting = false;
-  isEditing = false;
   userProfile: UserProfileData;
   
   private destroy$ = new Subject<void>();
@@ -64,7 +63,9 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
     console.log('🔍 UserProfileModal - User profile:', data.userProfile);
     
     this.userProfile = data.userProfile;
-    this.isEditing = data.isEditing || false;
+    
+    console.log('🔍 UserProfileModal - Modal always in edit mode');
+    
     this.createForm();
   }
 
@@ -78,6 +79,8 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
   }
 
   private createForm(): void {
+    console.log('🏗️ UserProfileModal - Creating form...');
+    
     this.profileForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       secondName: ['', [Validators.maxLength(50)]],
@@ -88,10 +91,8 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
       profileImage: [null]
     });
 
-    // Deshabilitar formulario si no está en modo edición
-    if (!this.isEditing) {
-      this.profileForm.disable();
-    }
+    console.log('✅ UserProfileModal - Form created and enabled (always in edit mode)');
+    console.log('🏗️ UserProfileModal - Form enabled status:', this.profileForm.enabled);
   }
 
   private loadProfileData(): void {
@@ -122,19 +123,6 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleEditMode(): void {
-    this.isEditing = !this.isEditing;
-    
-    if (this.isEditing) {
-      this.profileForm.enable();
-    } else {
-      this.profileForm.disable();
-      // Recargar datos originales al cancelar edición
-      this.loadProfileData();
-    }
-    
-    this.cdr.detectChanges();
-  }
 
   onSubmit(): void {
     if (this.profileForm.valid && !this.isSubmitting) {
@@ -165,12 +153,10 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
           next: (updatedProfile) => {
             console.log('Profile updated successfully:', updatedProfile);
             this.isSubmitting = false;
-            this.isEditing = false;
             this.userProfile = updatedProfile;
             
             // Actualizar formulario con datos actualizados
             this.loadProfileData();
-            this.profileForm.disable();
             
             this.cdr.detectChanges();
 
@@ -219,20 +205,4 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
   get emailControl() { return this.profileForm.get('email'); }
   get phoneControl() { return this.profileForm.get('phoneNUmber'); }
 
-  // Métodos utilitarios
-  getUserStatusText(): string {
-    return this.userProfileService.getUserStatusText(this.userProfile.status);
-  }
-
-  getUserRoleText(): string {
-    return this.userProfileService.getUserRoleText(this.userProfile.role);
-  }
-
-  getUserStatusClass(): string {
-    return this.userProfileService.getUserStatusClass(this.userProfile.status);
-  }
-
-  getUserRoleClass(): string {
-    return this.userProfileService.getUserRoleClass(this.userProfile.role);
-  }
 }

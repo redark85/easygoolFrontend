@@ -139,7 +139,7 @@ export class HeaderComponent implements OnInit {
     // Configurar datos del modal
     const modalData: UserProfileModalData = {
       userProfile: userProfile,
-      isEditing: false // Inicialmente en modo solo lectura
+      isEditing: true // Siempre en modo edición desde el inicio
     };
 
     // Abrir modal
