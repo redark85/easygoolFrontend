@@ -152,10 +152,9 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
       });
   }
 
-  viewTeamDetails(tournamentId: number): void {
-    console.log('Ver detalles del torneo:', tournamentId);
+  viewTeamDetails(): void {
     // Navegar a la tabla de posiciones enviando el tournamentId
-    this.router.navigate(['/teams/standings', tournamentId]);
+    this.router.navigate(['/manager/dashboard']);
   }
 
   getTeamLogo(logoUrl: string): string {
@@ -178,5 +177,11 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
         this.loadTeams();
       }
     });
+  }
+
+  
+  viewTeamInformation(): void {
+    // Navegar a la tabla de posiciones enviando el tournamentId
+    this.router.navigate(['/manager/team-info']);
   }
 }

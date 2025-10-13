@@ -45,7 +45,7 @@
         
         <div class="tournaments-list" *ngIf="team.tournaments.length > 0; else noTournaments">
           <div *ngFor="let tournament of team.tournaments" class="tournament-item">
-            <div class="tournament-info" (click)="viewTeamDetails(tournament.tournamentId)">
+            <div class="tournament-info" (click)="viewTeamDetails()">
               <mat-icon class="tournament-icon">sports_soccer</mat-icon>
               <div class="tournament-details">
                 <span class="tournament-name">{{ tournament.tournamentName }}</span>
@@ -68,14 +68,10 @@
 
       <!-- Card Actions -->
       <div class="card-actions">
-        <button mat-button color="primary">
+        <button mat-button color="primary" (click)="viewTeamInformation()">
           <mat-icon>visibility</mat-icon>
           Ver Detalles
-        </button>
-        <button mat-button>
-          <mat-icon>edit</mat-icon>
-          Editar
-        </button>
+        </button>       
       </div>
     </mat-card>
   </div>
