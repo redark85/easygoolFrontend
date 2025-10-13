@@ -81,6 +81,10 @@ export const MANAGER_GET_ALL_TEAMS_ENDPOINT = '/api/Manager/GetAllTeams';
 export const MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT = '/api/Manager/RegisterTournamentTeam';
 export const MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT = '/api/Manager/GetTournamentPhases';
 
+// User Profile Endpoints
+export const USER_PROFILE_GET_ENDPOINT = '/api/User/GetUserProfile';
+export const USER_PROFILE_UPDATE_ENDPOINT = '/api/User/UpdateProfile';
+
 // Configuración de endpoints
 export const EndpointsConfig = {
   // Auth
@@ -147,5 +151,9 @@ export const EndpointsConfig = {
   VOCALIA_FINISH_MATCH_ENDPOINT,
 
   // Manager
-  MANAGER_GET_TEAMS_ENDPOINT
+  MANAGER_GET_TEAMS_ENDPOINT,
+
+  // User Profile
+  USER_PROFILE_GET_ENDPOINT,
+  USER_PROFILE_UPDATE_ENDPOINT
 };

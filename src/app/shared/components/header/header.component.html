@@ -1,7 +1,7 @@
 <mat-toolbar class="header-toolbar">
   <!-- Left Section: Breadcrumb only (mobile menu toggle removed) -->
   <div class="header-left">
-    <button mat-icon-button 
+    <button mat-icon-button
             *ngIf="isMobile"
             class="menu-toggle"
             (click)="toggleMobileSidebar.emit()"
@@ -9,7 +9,7 @@
             matTooltipPosition="below">
       <mat-icon>menu</mat-icon>
     </button>
-    
+
     <app-breadcrumb class="breadcrumb-container"></app-breadcrumb>
   </div>
 
@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <button mat-menu-item (click)="navigateToProfile()">
+      <button mat-menu-item (click)="getProfile()">
         <mat-icon>person</mat-icon>
         <span>Mi Perfil</span>
       </button>
