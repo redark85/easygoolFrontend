@@ -36,6 +36,89 @@
               <span>{{ getModalityText(tournament.modality) }}</span>
             </div>
           </div>
+          
+          <!-- Menú desplegable solo para móvil (fuera del header) -->
+          <div class="mobile-menu-container">
+            <button mat-icon-button 
+                    class="mobile-menu-trigger"
+                    [matMenuTriggerFor]="mobileInfoMenu"
+                    matTooltip="Ver más información"
+                    matTooltipPosition="below">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            
+            <mat-menu #mobileInfoMenu="matMenu" class="mobile-info-menu" xPosition="before" yPosition="below">
+              <div class="mobile-menu-content" (click)="$event.stopPropagation()">
+                <!-- Modalidad (igual que en web) -->
+                <div class="mobile-menu-item">
+                  <mat-icon class="modality-icon">{{ getModalityIcon(tournament.modality) }}</mat-icon>
+                  <span class="menu-label">Modalidad:</span>
+                  <span class="menu-value">{{ getModalityText(tournament.modality) }}</span>
+                </div>
+                
+                <!-- Descripción (igual que en web) -->
+                <div class="mobile-menu-item">
+                  <mat-icon>description</mat-icon>
+                  <span class="menu-label">Descripción:</span>
+                  <p class="menu-value">{{ tournament.description }}</p>
+                </div>
+                
+                <!-- Estadísticas (igual que en web) -->
+                <div class="mobile-menu-item">
+                  <mat-icon>groups</mat-icon>
+                  <span class="menu-label">Equipos:</span>
+                  <span class="menu-value">{{ tournament.totalTeams }} equipos</span>
+                </div>
+                
+                <div class="mobile-menu-item">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <span class="menu-label">Partidos:</span>
+                  <span class="menu-value">{{ tournament.totalMatches }} partidos</span>
+                </div>
+                
+                <div class="mobile-menu-item">
+                  <mat-icon>event</mat-icon>
+                  <span class="menu-label">Fechas:</span>
+                  <span class="menu-value">{{ getDateRange() }}</span>
+                </div>
+                
+                <!-- Controles de registro (exactamente igual que en web) -->
+                <div class="mobile-menu-divider"></div>
+                
+                <div class="mobile-menu-item">
+                  <mat-icon>settings</mat-icon>
+                  <span class="menu-label">Registro:</span>
+                  <div class="mobile-toggle-container">
+                    <mat-slide-toggle
+                      [checked]="!registrationClosed"
+                      (change)="onRegistrationToggleChange($event)"
+                      [disabled]="isUpdatingRegistration"
+                      [matTooltip]="registrationClosed ? 'Registro cerrado - Los equipos no pueden registrarse' : 'Registro abierto - Los equipos pueden registrarse'"
+                      matTooltipPosition="below"
+                      class="registration-toggle mobile-menu-toggle">
+                      <span class="toggle-label">
+                        <mat-spinner *ngIf="isUpdatingRegistration" diameter="16" class="inline-spinner"></mat-spinner>
+                        {{ registrationClosed ? 'Registro cerrado' : 'Registro abierto' }}
+                      </span>
+                    </mat-slide-toggle>
+                  </div>
+                </div>
+                
+                <!-- Botón copiar enlace (exactamente igual que en web) -->
+                <div class="mobile-menu-item" *ngIf="tournament.tournamentLink && !registrationClosed">
+                  <button type="button"
+                          class="mobile-registration-link"
+                          matTooltip="Enlace para registrarse al torneo"
+                          matTooltipPosition="above"
+                          (click)="copyRegistrationLink()">
+                    <mat-icon>content_copy</mat-icon>
+                    <span>Copiar enlace</span>
+                  </button>
+                </div>
+              </div>
+            </mat-menu>
+          </div>
+          
           <p class="tournament-description">{{ tournament.description }}</p>
         </div>
 
