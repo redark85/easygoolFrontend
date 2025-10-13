@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, map, catchError, throwError, tap } from 'rxjs';
+import { Observable, map, catchError, throwError, tap, switchMap, of } from 'rxjs';
 import {
   UserProfileData,
   UserProfileApiResponse,
   UpdateUserProfileRequest,
+  UpdateUserProfileApiRequest,
   UserStatus,
   UserRole
 } from '@core/models/user-profile.interface';
@@ -72,9 +73,27 @@ export class UserProfileService {
    */
   getUserProfileFromStorage(): UserProfileData | null {
     try {
+      // Limpiar datos corruptos antes de intentar cargar
+      this.cleanCorruptedProfileData();
+      
       const profile = this.storageService.getItem<UserProfileData>(AppConstants.STORAGE_KEYS.USER_PROFILE);
-      console.log('📱 User profile loaded from localStorage:', profile ? 'Found' : 'Not found');
-      return profile;
+      
+      // Validar que el perfil cargado sea un objeto válido
+      if (profile && typeof profile === 'object' && profile.name && profile.email) {
+        console.log('📱 Valid user profile loaded from localStorage:', {
+          name: profile.name,
+          email: profile.email,
+          hasImage: !!profile.profileImagePath
+        });
+        return profile;
+      } else if (profile) {
+        console.warn('⚠️ Invalid profile data detected, cleaning localStorage:', profile);
+        this.clearUserProfileFromStorage();
+        return null;
+      } else {
+        console.log('📱 No user profile found in localStorage');
+        return null;
+      }
     } catch (error) {
       console.error('❌ Error loading user profile from localStorage:', error);
       return null;
@@ -86,8 +105,22 @@ export class UserProfileService {
    */
   saveUserProfileToStorage(userProfile: UserProfileData): void {
     try {
+      // Validar que userProfile sea un objeto válido antes de guardar
+      if (!userProfile || typeof userProfile !== 'object') {
+        console.error('❌ Invalid user profile data, not saving to localStorage:', userProfile);
+        return;
+      }
+
+      // Limpiar cualquier dato corrupto previo
+      this.storageService.removeItem(AppConstants.STORAGE_KEYS.USER_PROFILE);
+      
+      // Guardar los nuevos datos
       this.storageService.setItem(AppConstants.STORAGE_KEYS.USER_PROFILE, userProfile);
-      console.log('✅ User profile saved to localStorage successfully');
+      console.log('✅ User profile saved to localStorage successfully:', {
+        name: userProfile.name,
+        email: userProfile.email,
+        hasImage: !!userProfile.profileImagePath
+      });
     } catch (error) {
       console.error('❌ Error saving user profile to localStorage:', error);
     }
@@ -106,24 +139,74 @@ export class UserProfileService {
   }
 
   /**
-   * Actualiza el perfil del usuario
+   * Limpia datos corruptos del localStorage y los reemplaza con datos válidos
+   */
+  cleanCorruptedProfileData(): void {
+    try {
+      const storedValue = localStorage.getItem(AppConstants.STORAGE_KEYS.USER_PROFILE);
+      if (storedValue === 'true' || storedValue === 'false' || storedValue === 'null') {
+        console.warn('🧹 Detected corrupted profile data in localStorage, cleaning...');
+        this.clearUserProfileFromStorage();
+      }
+    } catch (error) {
+      console.error('❌ Error cleaning corrupted profile data:', error);
+    }
+  }
+
+  /**
+   * Actualiza el perfil del usuario usando el endpoint /api/User/UpdateUser
    */
   updateUserProfile(updateRequest: UpdateUserProfileRequest): Observable<UserProfileData> {
-    return this.apiService.put<UserProfileApiResponse>(USER_PROFILE_UPDATE_ENDPOINT, updateRequest).pipe(
-      map(response => {
-        if (response.succeed && response.result) {
-          this.toastService.showSuccess('Perfil actualizado correctamente');
-          return response.result;
+    console.log('🔄 UserProfileService - Updating user profile with data:', updateRequest);
+
+    // Mapear desde la interface antigua a la nueva requerida por el API
+    const apiRequest: UpdateUserProfileApiRequest = {
+      firstName: updateRequest.name,
+      secondName: updateRequest.secondName || '',
+      lastName: updateRequest.lastName,
+      secondLastName: updateRequest.secondLastName || '',
+      igameBase64: updateRequest.profileImageBase64 || '',
+      photoContentType: updateRequest.profileImageContentType || '',
+      phoneNumber: updateRequest.phoneNUmber // Mapear phoneNUmber a phoneNumber
+    };
+
+    console.log('📡 UserProfileService - API request mapped:', apiRequest);
+
+    return this.apiService.put<UserProfileApiResponse>(USER_PROFILE_UPDATE_ENDPOINT, apiRequest).pipe(
+      switchMap(response => {
+        console.log('✅ UserProfile Update API Response:', response);
+        console.log('🔍 Response type:', typeof response);
+        console.log('🔍 Response result:', response.result);
+        console.log('🔍 Response result type:', typeof response.result);
+        
+        if (response.succeed) {
+          // Verificar si result es un objeto válido o solo un boolean
+          if (response.result && typeof response.result === 'object' && response.result !== null) {
+            console.log('✅ API returned complete profile data');
+            this.toastService.showSuccess('Perfil actualizado correctamente');
+            return of(response.result);
+          } else {
+            console.warn('⚠️ API returned success but result is boolean/null, fetching updated profile...');
+            this.toastService.showSuccess('Perfil actualizado correctamente');
+            // Si el API solo devuelve true, obtener el perfil actualizado
+            return this.getUserProfile();
+          }
         }
         throw new Error(response.message || 'Error al actualizar el perfil');
       }),
       tap(userProfile => {
         // Actualizar el perfil en localStorage después de la actualización exitosa
+        console.log('💾 Saving user profile to localStorage:', userProfile);
         this.saveUserProfileToStorage(userProfile);
-        console.log('💾 Updated user profile saved to localStorage');
+        console.log('✅ Updated user profile saved to localStorage');
       }),
       catchError(error => {
-        console.error('Error updating user profile:', error);
+        console.error('❌ Error updating user profile:', {
+          error,
+          status: error.status,
+          message: error.message,
+          url: error.url
+        });
         this.toastService.showError('Error al actualizar el perfil de usuario');
         return throwError(() => error);
       })
@@ -133,9 +216,9 @@ export class UserProfileService {
   /**
    * Procesa los datos de imagen para el perfil
    */
-  processImageData(photoData: any): { base64: string; extension: string } {
+  processImageData(photoData: any): { base64: string; contentType: string } {
     if (!photoData || !photoData.base64 || !photoData.contentType) {
-      return { base64: '', extension: '' };
+      return { base64: '', contentType: '' };
     }
 
     // Extraer base64 sin el prefijo data:image/...;base64,
@@ -144,20 +227,18 @@ export class UserProfileService {
       cleanBase64 = cleanBase64.split(',')[1];
     }
 
-    // Extraer solo la extensión del contentType
-    let extension = '';
-    if (photoData.contentType) {
-      // De "image/jpeg" extraer "jpeg"
-      // De "image/png" extraer "png"
-      const parts = photoData.contentType.split('/');
-      if (parts.length > 1) {
-        extension = parts[1];
-      }
-    }
+    // Mantener el contentType completo para el API
+    const contentType = photoData.contentType || '';
+
+    console.log('🖼️ UserProfileService - Processing image data:', {
+      originalBase64Length: photoData.base64?.length,
+      cleanBase64Length: cleanBase64.length,
+      contentType: contentType
+    });
 
     return {
       base64: cleanBase64,
-      extension: extension
+      contentType: contentType
     };
   }
 
@@ -211,5 +292,15 @@ export class UserProfileService {
       case UserRole.Referee: return 'role-referee';
       default: return 'role-unknown';
     }
+  }
+
+  /**
+   * Método de utilidad para limpiar datos corruptos manualmente
+   * Útil para debugging y limpieza manual
+   */
+  forceCleanLocalStorage(): void {
+    console.log('🧹 Force cleaning user profile localStorage...');
+    this.clearUserProfileFromStorage();
+    console.log('✅ LocalStorage cleaned successfully');
   }
 }

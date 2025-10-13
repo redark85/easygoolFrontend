@@ -70,11 +70,18 @@ export class ImageUploaderComponent implements ControlValueAccessor {
   }
 
   onFileSelected(event: Event): void {
+    // Prevenir que el evento se propague y cause submit del formulario padre
+    event.preventDefault();
+    event.stopPropagation();
+    
     const element = event.target as HTMLInputElement;
     if (element.files && element.files[0]) {
       const file = element.files[0];
       this.handleFile(file);
     }
+    
+    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+    element.value = '';
   }
 
   private handleFile(file: File): void {
@@ -173,6 +180,39 @@ export class ImageUploaderComponent implements ControlValueAccessor {
     this.onTouched();
     this.cdr.detectChanges();
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Maneja el click del botón "Cambiar imagen" previniendo propagación
+   */
+  onChangeImageClick(event: Event, fileInput: HTMLInputElement): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.isDisabled) {
+      fileInput.click();
+    }
+  }
+
+  /**
+   * Maneja el click del botón "Eliminar imagen" previniendo propagación
+   */
+  onRemoveImageClick(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.isDisabled) {
+      this.removeImage();
+    }
+  }
+
+  /**
+   * Maneja el click del botón "Seleccionar archivo" previniendo propagación
+   */
+  onSelectFileClick(event: Event, fileInput: HTMLInputElement): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.isDisabled) {
+      fileInput.click();
+    }
   }
 
   /**

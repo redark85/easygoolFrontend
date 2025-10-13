@@ -83,7 +83,7 @@ export const MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT = '/api/Manager/GetTournamen
 
 // User Profile Endpoints
 export const USER_PROFILE_GET_ENDPOINT = '/api/User/GetUserProfile';
-export const USER_PROFILE_UPDATE_ENDPOINT = '/api/User/UpdateProfile';
+export const USER_PROFILE_UPDATE_ENDPOINT = '/api/User/UpdateUser';
 
 // Configuración de endpoints
 export const EndpointsConfig = {

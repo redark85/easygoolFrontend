@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { AuthService } from '@core/services';
 import { User } from '@core/models';
-import { Observable, map, switchMap, of, combineLatest } from 'rxjs';
+import { Observable, map, switchMap, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { UserProfileService } from '@core/services/user-profile.service';
 import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
 import {
@@ -52,16 +52,22 @@ export class HeaderComponent implements OnInit {
   @Output() toggleMobileSidebar = new EventEmitter<void>();
 
   currentUser$: Observable<HeaderUser | null>;
+  private refreshTrigger$ = new BehaviorSubject<void>(undefined);
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private dialog: MatDialog,
-    private userProfileService: UserProfileService
+    private userProfileService: UserProfileService,
+    private cdr: ChangeDetectorRef
   ) {
     // Combinar datos del token con datos del perfil desde localStorage
-    this.currentUser$ = this.authService.authState$.pipe(
-      map(state => {
+    // y un trigger para forzar actualizaciones
+    this.currentUser$ = combineLatest([
+      this.authService.authState$,
+      this.refreshTrigger$
+    ]).pipe(
+      map(([state, _]) => {
         if (!state.user) {
           return null;
         }
@@ -192,7 +198,10 @@ export class HeaderComponent implements OnInit {
    */
   private refreshUserData(): void {
     console.log('🔄 Refreshing user data in header...');
-    // El observable se actualizará automáticamente ya que está basado en authState$
-    // y getUserProfileFromStorage() siempre obtiene los datos más recientes del localStorage
+    // Emitir un nuevo valor para forzar la actualización del observable
+    this.refreshTrigger$.next();
+    // Forzar detección de cambios
+    this.cdr.detectChanges();
+    console.log('✅ Header user data refreshed');
   }
 }

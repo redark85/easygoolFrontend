@@ -31,6 +31,17 @@ export interface UpdateUserProfileRequest {
   profileImageContentType?: string;
 }
 
+// Nueva interface para el endpoint /api/User/UpdateUser
+export interface UpdateUserProfileApiRequest {
+  firstName: string;
+  secondName: string;
+  lastName: string;
+  secondLastName: string;
+  igameBase64: string;
+  photoContentType: string;
+  phoneNumber: string;
+}
+
 export enum UserStatus {
   Inactive = 0,
   Active = 1,

@@ -129,7 +129,10 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
 
 
   onSubmit(): void {
+    console.log('🔄 onSubmit called, form valid:', this.profileForm.valid, 'isSubmitting:', this.isSubmitting);
+    
     if (this.profileForm.valid && !this.isSubmitting) {
+      console.log('✅ Starting form submission...');
       this.isSubmitting = true;
       this.cdr.detectChanges();
 
@@ -149,7 +152,11 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
       if (profileImageData && typeof profileImageData === 'object' && profileImageData.base64) {
         const processedImage = this.userProfileService.processImageData(profileImageData);
         updateRequest.profileImageBase64 = processedImage.base64;
-        updateRequest.profileImageContentType = processedImage.extension;
+        updateRequest.profileImageContentType = processedImage.contentType;
+        console.log('🖼️ UserProfileModal - Image processed for update:', {
+          hasBase64: !!processedImage.base64,
+          contentType: processedImage.contentType
+        });
       }
 
       this.userProfileService.updateUserProfile(updateRequest)
@@ -197,8 +204,16 @@ export class UserProfileModalComponent implements OnInit, OnDestroy {
   }
 
   onImageUploaded(imageData: ImageUploadData): void {
-    console.log('Image uploaded:', imageData);
+    console.log('🖼️ Image uploaded in modal:', imageData);
+    
+    // Asegurar que no se está en proceso de envío para evitar submit automático
+    if (this.isSubmitting) {
+      console.warn('⚠️ Form is submitting, ignoring image upload');
+      return;
+    }
+    
     this.profileForm.get('profileImage')?.setValue(imageData);
+    console.log('✅ Image data set in form control');
     this.cdr.detectChanges();
   }
 

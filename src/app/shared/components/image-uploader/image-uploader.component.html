@@ -18,7 +18,7 @@
           <h4 class="upload-title">{{ viewUploadText }}</h4>
           <p class="upload-description">
             Arrastra y suelta una imagen aquí o
-            <button type="button" class="upload-link" (click)="fileInput.click()" [disabled]="isDisabled">
+            <button type="button" class="upload-link" (click)="onSelectFileClick($event, fileInput)" [disabled]="isDisabled">
               Selecciona un archivo
             </button>
           </p>
@@ -44,12 +44,12 @@
              (error)="onImageError($event)"
              (load)="onImageLoad($event)">
         <div class="preview-overlay">
-          <button mat-icon-button class="change-btn" (click)="fileInput.click()"
+          <button type="button" mat-icon-button class="change-btn" (click)="onChangeImageClick($event, fileInput)"
                   [disabled]="isDisabled"
                   matTooltip="Cambiar imagen">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button class="remove-btn" (click)="removeImage()"
+          <button type="button" mat-icon-button class="remove-btn" (click)="onRemoveImageClick($event)"
                   [disabled]="isDisabled"
                   matTooltip="Eliminar imagen">
             <mat-icon>delete</mat-icon>
