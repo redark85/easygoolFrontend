@@ -136,6 +136,24 @@
           </mat-list-item>
           <mat-list-item
             class="nav-item"
+            routerLink="/manager/match-predictions"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Pronósticos de Partidos' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">psychology</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Pronósticos</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
+            routerLink="/manager/scenario-simulator"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Simulador de Escenarios' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">science</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Simulador</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
             routerLink="/settings"
             routerLinkActive="active"
             [matTooltip]="isCollapsed && !isMobile ? 'Configuración' : ''"

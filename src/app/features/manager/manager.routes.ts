@@ -45,5 +45,15 @@ export const managerRoutes: Routes = [
     path: 'player-analysis',
     loadComponent: () => import('./components/statistics/player-analysis/player-analysis.component').then(c => c.PlayerAnalysisComponent),
     title: 'Análisis de Jugadores - Manager'
+  },
+  {
+    path: 'match-predictions',
+    loadComponent: () => import('./components/predictions/match-predictions/match-predictions.component').then(c => c.MatchPredictionsComponent),
+    title: 'Pronósticos de Partidos - Manager'
+  },
+  {
+    path: 'scenario-simulator',
+    loadComponent: () => import('./components/predictions/scenario-simulator/scenario-simulator.component').then(c => c.ScenarioSimulatorComponent),
+    title: 'Simulador de Escenarios - Manager'
   }
 ];

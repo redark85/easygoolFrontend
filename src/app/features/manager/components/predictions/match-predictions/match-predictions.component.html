@@ -1,0 +1,409 @@
+<div class="match-predictions-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>psychology</mat-icon>
+        Pronósticos y Predicciones
+      </h1>
+      <p class="page-subtitle">Análisis predictivo basado en datos históricos</p>
+    </div>
+  </div>
+
+  <!-- Match Selector -->
+  <mat-card class="match-selector-card">
+    <mat-card-header>
+      <mat-card-title>Selecciona un Partido</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="matches-list">
+        <div *ngFor="let match of upcomingMatches" 
+             class="match-item"
+             [class.selected]="selectedMatch.id === match.id"
+             (click)="selectMatch(match)">
+          <div class="match-date">
+            <span class="date">{{ match.date | date:'dd/MM' }}</span>
+            <span class="time">{{ match.date | date:'HH:mm' }}</span>
+          </div>
+          <div class="match-teams">
+            <span class="team">{{ match.isHome ? 'Mi Equipo' : match.opponent.name }}</span>
+            <span class="vs">VS</span>
+            <span class="team">{{ match.isHome ? match.opponent.name : 'Mi Equipo' }}</span>
+          </div>
+          <mat-chip-set>
+            <mat-chip>J{{ match.matchday }}</mat-chip>
+            <mat-chip>{{ match.isHome ? 'Local' : 'Visitante' }}</mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-tab-group class="predictions-tabs">
+    <!-- Tab: Predicción del Partido -->
+    <mat-tab label="Predicción">
+      <div class="tab-content">
+        <!-- Main Prediction -->
+        <mat-card class="prediction-card">
+          <mat-card-header>
+            <mat-card-title>Probabilidades de Resultado</mat-card-title>
+            <mat-chip [style.background-color]="getConfidenceColor(prediction.confidence)">
+              Confianza: {{ getConfidenceLabel(prediction.confidence) }}
+            </mat-chip>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="probabilities-grid">
+              <div class="probability-item win">
+                <mat-icon>emoji_events</mat-icon>
+                <span class="probability-label">Victoria</span>
+                <span class="probability-value">{{ prediction.winProbability }}%</span>
+                <mat-progress-bar mode="determinate" [value]="prediction.winProbability" color="primary"></mat-progress-bar>
+              </div>
+              <div class="probability-item draw">
+                <mat-icon>handshake</mat-icon>
+                <span class="probability-label">Empate</span>
+                <span class="probability-value">{{ prediction.drawProbability }}%</span>
+                <mat-progress-bar mode="determinate" [value]="prediction.drawProbability" color="accent"></mat-progress-bar>
+              </div>
+              <div class="probability-item loss">
+                <mat-icon>trending_down</mat-icon>
+                <span class="probability-label">Derrota</span>
+                <span class="probability-value">{{ prediction.lossProbability }}%</span>
+                <mat-progress-bar mode="determinate" [value]="prediction.lossProbability" color="warn"></mat-progress-bar>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="predicted-score">
+              <h3>Marcador Predicho</h3>
+              <div class="score-display">
+                <div class="team-score">
+                  <span class="team-name">{{ selectedMatch.isHome ? 'Mi Equipo' : selectedMatch.opponent.name }}</span>
+                  <span class="score">{{ selectedMatch.isHome ? prediction.predictedScore.home : prediction.predictedScore.away }}</span>
+                </div>
+                <span class="separator">-</span>
+                <div class="team-score">
+                  <span class="score">{{ selectedMatch.isHome ? prediction.predictedScore.away : prediction.predictedScore.home }}</span>
+                  <span class="team-name">{{ selectedMatch.isHome ? selectedMatch.opponent.name : 'Mi Equipo' }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Algorithm Factors -->
+        <mat-card class="factors-card">
+          <mat-card-header>
+            <mat-card-title>Factores del Algoritmo</mat-card-title>
+            <mat-card-subtitle>Basado en datos históricos y estadísticas actuales</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="factors-grid">
+              <!-- Position in Table -->
+              <div class="factor-item">
+                <div class="factor-header">
+                  <mat-icon>leaderboard</mat-icon>
+                  <h4>Posición en Tabla</h4>
+                </div>
+                <div class="factor-comparison">
+                  <div class="team-factor">
+                    <span class="label">Mi Equipo</span>
+                    <span class="value">3° (27 pts)</span>
+                  </div>
+                  <div class="team-factor">
+                    <span class="label">{{ selectedMatch.opponent.name }}</span>
+                    <span class="value">{{ selectedMatch.opponent.position }}° ({{ selectedMatch.opponent.points }} pts)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Form -->
+              <div class="factor-item">
+                <div class="factor-header">
+                  <mat-icon>trending_up</mat-icon>
+                  <h4>Racha Reciente (Últimos 5)</h4>
+                </div>
+                <div class="factor-comparison">
+                  <div class="team-factor">
+                    <span class="label">Mi Equipo</span>
+                    <div class="form-badges">
+                      <span *ngFor="let result of myTeamForm.last5Matches" 
+                            class="form-badge"
+                            [style.background-color]="getResultColor(result)">
+                        {{ result }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="team-factor">
+                    <span class="label">{{ selectedMatch.opponent.name }}</span>
+                    <div class="form-badges">
+                      <span *ngFor="let result of opponentForm.last5Matches" 
+                            class="form-badge"
+                            [style.background-color]="getResultColor(result)">
+                        {{ result }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goals Stats -->
+              <div class="factor-item">
+                <div class="factor-header">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <h4>Goles (Últimos 5 partidos)</h4>
+                </div>
+                <div class="factor-comparison">
+                  <div class="team-factor">
+                    <span class="label">Mi Equipo</span>
+                    <span class="value">{{ myTeamForm.goalsFor }} GF / {{ myTeamForm.goalsAgainst }} GC</span>
+                  </div>
+                  <div class="team-factor">
+                    <span class="label">{{ selectedMatch.opponent.name }}</span>
+                    <span class="value">{{ opponentForm.goalsFor }} GF / {{ opponentForm.goalsAgainst }} GC</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Head to Head -->
+              <div class="factor-item">
+                <div class="factor-header">
+                  <mat-icon>history</mat-icon>
+                  <h4>Historial de Enfrentamientos</h4>
+                </div>
+                <div class="h2h-stats">
+                  <div class="h2h-record">
+                    <span class="record-item wins">{{ headToHead.wins }} V</span>
+                    <span class="record-item draws">{{ headToHead.draws }} E</span>
+                    <span class="record-item losses">{{ headToHead.losses }} D</span>
+                  </div>
+                  <div class="h2h-percentage">
+                    <span class="percentage-label">% Victorias:</span>
+                    <span class="percentage-value">{{ headToHeadWinRate | number:'1.0-0' }}%</span>
+                  </div>
+                  <div class="last-meetings">
+                    <span class="meetings-label">Últimos encuentros:</span>
+                    <div class="meetings-list">
+                      <div *ngFor="let meeting of headToHead.lastMeetings" class="meeting-item">
+                        <mat-icon [style.color]="getResultColor(meeting.result)">
+                          {{ getResultIcon(meeting.result) }}
+                        </mat-icon>
+                        <span class="meeting-score">{{ meeting.score }}</span>
+                        <span class="meeting-date">{{ meeting.date | date:'dd/MM/yy' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Análisis del Rival -->
+    <mat-tab label="Análisis del Rival">
+      <div class="tab-content">
+        <!-- Strengths & Weaknesses -->
+        <div class="analysis-grid">
+          <mat-card class="strengths-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>shield</mat-icon>
+                Fortalezas
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <ul class="analysis-list">
+                <li *ngFor="let strength of opponentAnalysis.strengths">
+                  <mat-icon>check_circle</mat-icon>
+                  {{ strength }}
+                </li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="weaknesses-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>warning</mat-icon>
+                Debilidades
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <ul class="analysis-list">
+                <li *ngFor="let weakness of opponentAnalysis.weaknesses">
+                  <mat-icon>cancel</mat-icon>
+                  {{ weakness }}
+                </li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Best Formation -->
+        <mat-card class="formation-card">
+          <mat-card-header>
+            <mat-card-title>Mejor Alineación del Rival</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="formation-display">
+              <mat-icon>sports</mat-icon>
+              <span class="formation-text">{{ opponentAnalysis.bestFormation }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Dangerous Players -->
+        <mat-card class="dangerous-players-card">
+          <mat-card-header>
+            <mat-card-title>Jugadores Peligrosos</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="players-list">
+              <div *ngFor="let player of opponentAnalysis.dangerousPlayers" class="player-item">
+                <div class="player-info">
+                  <h4>{{ player.name }}</h4>
+                  <span class="position">{{ player.position }}</span>
+                </div>
+                <div class="player-stats">
+                  <div class="stat">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>{{ player.goals }} goles</span>
+                  </div>
+                  <div class="stat">
+                    <mat-icon>sports_score</mat-icon>
+                    <span>{{ player.assists }} asistencias</span>
+                  </div>
+                  <div class="stat rating">
+                    <mat-icon>star</mat-icon>
+                    <span>{{ player.rating }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Stats Comparison -->
+        <div class="stats-grid">
+          <mat-card class="stats-card defensive">
+            <mat-card-header>
+              <mat-card-title>Estadísticas Defensivas</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-item">
+                <span class="stat-label">Goles en Contra</span>
+                <span class="stat-value">{{ opponentAnalysis.defensiveStats.goalsAgainst }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Porterías a Cero</span>
+                <span class="stat-value">{{ opponentAnalysis.defensiveStats.cleanSheets }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Promedio GC/Partido</span>
+                <span class="stat-value">{{ opponentAnalysis.defensiveStats.averageGoalsAgainst }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats-card offensive">
+            <mat-card-header>
+              <mat-card-title>Estadísticas Ofensivas</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="stat-item">
+                <span class="stat-label">Goles a Favor</span>
+                <span class="stat-value">{{ opponentAnalysis.offensiveStats.goalsFor }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Promedio GF/Partido</span>
+                <span class="stat-value">{{ opponentAnalysis.offensiveStats.averageGoalsFor }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Tiros/Partido</span>
+                <span class="stat-value">{{ opponentAnalysis.offensiveStats.shotsPerGame }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Recomendaciones Tácticas -->
+    <mat-tab label="Recomendaciones">
+      <div class="tab-content">
+        <mat-card class="recommendations-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>lightbulb</mat-icon>
+              Plan Táctico Sugerido
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- Suggested Formation -->
+            <div class="recommendation-section">
+              <h3>
+                <mat-icon>sports</mat-icon>
+                Formación Sugerida
+              </h3>
+              <div class="formation-recommendation">
+                <span class="formation-badge">{{ tacticalRecommendation.suggestedFormation }}</span>
+                <p class="formation-reason">{{ tacticalRecommendation.formationReason }}</p>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Key Players to Mark -->
+            <div class="recommendation-section">
+              <h3>
+                <mat-icon>person_pin</mat-icon>
+                Jugadores Clave a Marcar
+              </h3>
+              <mat-chip-set>
+                <mat-chip *ngFor="let player of tacticalRecommendation.keyPlayersToMark" color="warn" highlighted>
+                  {{ player }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Offensive Strategy -->
+            <div class="recommendation-section">
+              <h3>
+                <mat-icon>arrow_upward</mat-icon>
+                Estrategia Ofensiva
+              </h3>
+              <p class="strategy-text">{{ tacticalRecommendation.offensiveStrategy }}</p>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Defensive Strategy -->
+            <div class="recommendation-section">
+              <h3>
+                <mat-icon>shield</mat-icon>
+                Estrategia Defensiva
+              </h3>
+              <p class="strategy-text">{{ tacticalRecommendation.defensiveStrategy }}</p>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Set Pieces -->
+            <div class="recommendation-section">
+              <h3>
+                <mat-icon>flag</mat-icon>
+                Balones Parados
+              </h3>
+              <p class="strategy-text alert">{{ tacticalRecommendation.setPiecesFocus }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
