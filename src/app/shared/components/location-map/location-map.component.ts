@@ -144,6 +144,12 @@ export interface LocationMapData {
         height: 24px;
       }
     }
+
+    @media (max-width: 768px) {
+      .location-map-container {
+        max-height: 600px !important;
+      }
+    }
   `]
 })
 export class LocationMapComponent implements OnInit, AfterViewInit, OnDestroy {

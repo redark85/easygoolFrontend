@@ -378,6 +378,10 @@ html, body {
 // Asegurar visibilidad completa en móviles
 @media (max-width: 768px) {
 
+  .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+    max-height: 600px !important;
+  }
+
   .matchday-center {
     display: none !important;
   }
