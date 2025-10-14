@@ -1,0 +1,191 @@
+<div class="fixture-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <mat-icon class="header-icon">calendar_month</mat-icon>
+      <div class="header-text">
+        <h1 class="page-title">Fixture Completo</h1>
+        <p class="page-subtitle">Calendario de todos los partidos del torneo</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon class="stat-icon total">sports_soccer</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total }}</span>
+          <span class="stat-label">Total Partidos</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon class="stat-icon upcoming">schedule</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.upcoming }}</span>
+          <span class="stat-label">Próximos</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon class="stat-icon live">fiber_manual_record</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.live }}</span>
+          <span class="stat-label">En Vivo</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon class="stat-icon finished">check_circle</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.finished }}</span>
+          <span class="stat-label">Finalizados</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Filters Card -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-container">
+        <!-- Phase Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Fase del Torneo</mat-label>
+          <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
+            <mat-option *ngFor="let phase of phases" [value]="phase.id">
+              <mat-icon class="option-icon">emoji_events</mat-icon>
+              {{ phase.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Group Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Grupo</mat-label>
+          <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+            <mat-option *ngFor="let group of groups" [value]="group.id">
+              <mat-icon class="option-icon">flag</mat-icon>
+              {{ group.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Status Filter -->
+        <div class="status-filter">
+          <span class="filter-label">Estado:</span>
+          <mat-button-toggle-group [(ngModel)]="selectedStatus" (change)="onStatusChange(selectedStatus)">
+            <mat-button-toggle value="all">
+              <mat-icon>list</mat-icon>
+              Todos
+            </mat-button-toggle>
+            <mat-button-toggle value="upcoming">
+              <mat-icon>schedule</mat-icon>
+              Próximos
+            </mat-button-toggle>
+            <mat-button-toggle value="live">
+              <mat-icon>fiber_manual_record</mat-icon>
+              En Vivo
+            </mat-button-toggle>
+            <mat-button-toggle value="finished">
+              <mat-icon>check_circle</mat-icon>
+              Finalizados
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando fixture...</p>
+  </div>
+
+  <!-- Matchdays -->
+  <div class="matchdays-container" *ngIf="!isLoading">
+    <div class="matchday" *ngFor="let matchday of filteredMatchdays">
+      <!-- Matchday Header -->
+      <div class="matchday-header">
+        <div class="matchday-info">
+          <mat-icon class="matchday-icon">calendar_today</mat-icon>
+          <h2 class="matchday-title">Jornada {{ matchday.number }}</h2>
+          <mat-chip class="matchday-date">
+            {{ matchday.date | date:'dd MMM yyyy' }}
+          </mat-chip>
+        </div>
+        <div class="matchday-stats">
+          <span class="matches-count">{{ matchday.matches.length }} partido(s)</span>
+        </div>
+      </div>
+
+      <!-- Matches Grid -->
+      <div class="matches-grid">
+        <app-match-card 
+          *ngFor="let match of matchday.matches" 
+          [match]="match"
+          (viewDetails)="onViewMatchDetails($event)">
+        </app-match-card>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredMatchdays.length === 0">
+      <mat-icon class="empty-icon">event_busy</mat-icon>
+      <h2>No hay partidos</h2>
+      <p>No se encontraron partidos con los filtros seleccionados</p>
+      <button mat-raised-button color="primary" (click)="selectedStatus = 'all'; onStatusChange('all')">
+        Ver Todos los Partidos
+      </button>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <mat-card class="legend-card" *ngIf="!isLoading && filteredMatchdays.length > 0">
+    <mat-card-content>
+      <h3 class="legend-title">Leyenda de Estados</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <div class="legend-badge live">
+            <mat-icon>fiber_manual_record</mat-icon>
+            EN VIVO
+          </div>
+          <span class="legend-description">Partido en curso</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-badge upcoming">
+            <mat-icon>schedule</mat-icon>
+            PRÓXIMO
+          </div>
+          <span class="legend-description">Partido programado</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-badge finished">
+            <mat-icon>check_circle</mat-icon>
+            FINALIZADO
+          </div>
+          <span class="legend-description">Partido terminado</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-badge suspended">
+            <mat-icon>pause_circle</mat-icon>
+            SUSPENDIDO
+          </div>
+          <span class="legend-description">Partido suspendido</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -43,6 +43,11 @@ export const dashboardRoutes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('./components/home/home.component').then(c => c.HomeComponent) // Placeholder
+      },
+      {
+        path: 'manager',
+        loadChildren: () => import('../manager/manager.routes').then(r => r.managerRoutes),
+        title: 'Manager - EasyGool'
       }
     ]
   }

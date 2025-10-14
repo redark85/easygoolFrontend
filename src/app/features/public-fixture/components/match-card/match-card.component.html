@@ -1,0 +1,68 @@
+<mat-card class="match-card" [class.live]="match.isLive" [class.finished]="match.isFinished">
+  <!-- Status Badge -->
+  <div class="match-status" [ngClass]="getStatusClass()">
+    <span class="status-badge" *ngIf="match.isLive">
+      <mat-icon class="live-icon">fiber_manual_record</mat-icon>
+      {{ getStatusLabel() }}
+    </span>
+    <span class="status-badge" *ngIf="match.isFinished">
+      {{ getStatusLabel() }}
+    </span>
+    <span class="status-badge" *ngIf="match.status === 'suspended'">
+      <mat-icon>pause_circle</mat-icon>
+      {{ getStatusLabel() }}
+    </span>
+    <span class="date-time" *ngIf="!match.isLive && !match.isFinished && match.status !== 'suspended'">
+      {{ getDateTimeText() }}
+    </span>
+  </div>
+
+  <!-- Match Content -->
+  <mat-card-content class="match-content">
+    <!-- Home Team -->
+    <div class="team home-team">
+      <img [src]="match.homeTeam.logoUrl" 
+           [alt]="match.homeTeam.name" 
+           class="team-logo"
+           [matTooltip]="match.homeTeam.name">
+      <span class="team-name">{{ match.homeTeam.shortName }}</span>
+    </div>
+
+    <!-- Score or VS -->
+    <div class="score-container">
+      <div class="score" *ngIf="shouldShowScore()">
+        <span class="home-score" [class.winner]="match.homeScore! > match.awayScore!">
+          {{ match.homeScore }}
+        </span>
+        <span class="separator">-</span>
+        <span class="away-score" [class.winner]="match.awayScore! > match.homeScore!">
+          {{ match.awayScore }}
+        </span>
+      </div>
+      <div class="vs" *ngIf="!shouldShowScore()">
+        <span>VS</span>
+      </div>
+    </div>
+
+    <!-- Away Team -->
+    <div class="team away-team">
+      <span class="team-name">{{ match.awayTeam.shortName }}</span>
+      <img [src]="match.awayTeam.logoUrl" 
+           [alt]="match.awayTeam.name" 
+           class="team-logo"
+           [matTooltip]="match.awayTeam.name">
+    </div>
+  </mat-card-content>
+
+  <!-- Match Footer -->
+  <mat-card-actions class="match-footer">
+    <div class="venue-info">
+      <mat-icon class="venue-icon">location_on</mat-icon>
+      <span class="venue-name">{{ match.venue }}</span>
+    </div>
+    <button mat-button color="primary" (click)="onViewDetails()">
+      <mat-icon>info</mat-icon>
+      Ver Detalles
+    </button>
+  </mat-card-actions>
+</mat-card>

@@ -64,30 +64,49 @@
           </div>
           <mat-list-item
             class="nav-item"
-            routerLink="/teams"
+            routerLink="/teams/my-teams"
             routerLinkActive="active"
-            [matTooltip]="isCollapsed && !isMobile ? 'Mis Equipos' : ''"
+            [matTooltip]="isCollapsed && !isMobile ? 'Mis equipos' : ''"
             matTooltipPosition="right">
-            <mat-icon matListItemIcon class="nav-icon">groups</mat-icon>
-            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Mis Equipos</span>
+            <mat-icon matListItemIcon class="nav-icon">sports_soccer</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Mis equipos</span>
           </mat-list-item>
           <mat-list-item
             class="nav-item"
-            routerLink="/players"
+            routerLink="/manager/matches-history"
             routerLinkActive="active"
-            [matTooltip]="isCollapsed && !isMobile ? 'Jugadores' : ''"
+            [matTooltip]="isCollapsed && !isMobile ? 'Historial de Partidos' : ''"
             matTooltipPosition="right">
-            <mat-icon matListItemIcon class="nav-icon">person</mat-icon>
-            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Jugadores</span>
+            <mat-icon matListItemIcon class="nav-icon">history</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Historial</span>
+          </mat-list-item>
+          
+          <mat-list-item
+            class="nav-item"
+            routerLink="/manager/player-analysis"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Análisis de Jugadores' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">person_search</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Análisis</span>
           </mat-list-item>
           <mat-list-item
             class="nav-item"
-            routerLink="/settings"
+            routerLink="/manager/match-predictions"
             routerLinkActive="active"
-            [matTooltip]="isCollapsed && !isMobile ? 'Configuración' : ''"
+            [matTooltip]="isCollapsed && !isMobile ? 'Pronósticos de Partidos' : ''"
             matTooltipPosition="right">
-            <mat-icon matListItemIcon class="nav-icon">settings</mat-icon>
-            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Configuración</span>
+            <mat-icon matListItemIcon class="nav-icon">psychology</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Pronósticos</span>
+          </mat-list-item>
+          <mat-list-item
+            class="nav-item"
+            routerLink="/manager/scenario-simulator"
+            routerLinkActive="active"
+            [matTooltip]="isCollapsed && !isMobile ? 'Simulador de Escenarios' : ''"
+            matTooltipPosition="right">
+            <mat-icon matListItemIcon class="nav-icon">science</mat-icon>
+            <span matListItemTitle class="nav-label" [class.hidden]="isCollapsed && !isMobile">Simulador</span>
           </mat-list-item>
         </ng-container>
       </ng-container>

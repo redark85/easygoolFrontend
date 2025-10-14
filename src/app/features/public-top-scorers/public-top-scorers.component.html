@@ -1,0 +1,344 @@
+<div class="top-scorers-container">
+
+
+  <!-- Page Header -->
+  <div class="page-header">
+      <!-- Back Button -->
+  <button mat-icon-button class="back-button" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+   <div class="header-content">
+    <mat-icon class="header-icon">emoji_events</mat-icon>
+    <div class="header-text">
+      <h1 class="page-title">Estadísticas de Jugadores</h1>
+      <p class="page-subtitle">Goleadores, MVP y Tarjetas del Torneo</p>
+    </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando estadísticas...</p>
+  </div>
+
+  <!-- Tabs Content -->
+  <mat-card class="stats-card" *ngIf="!isLoading">
+    <mat-tab-group class="stats-tabs" animationDuration="300ms">
+      
+      <!-- Tab 1: Goleadores -->
+      <mat-tab label="Goleadores">
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">sports_soccer</mat-icon>
+          Goleadores
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="table-header">
+            <h2>
+              <mat-icon>sports_soccer</mat-icon>
+              Tabla de Goleadores
+            </h2>
+            <p class="subtitle">Los máximos artilleros del torneo</p>
+          </div>
+
+          <div class="table-container">
+            <table mat-table [dataSource]="topScorers" class="scorers-table">
+              
+              <!-- Position Column -->
+              <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef>Pos</th>
+                <td mat-cell *matCellDef="let scorer">
+                  <span class="position-badge" [ngClass]="getPositionClass(scorer.position)">
+                    <mat-icon *ngIf="isTop3(scorer.position)" class="medal-icon">
+                      {{ scorer.position === 1 ? 'emoji_events' : 'military_tech' }}
+                    </mat-icon>
+                    {{ scorer.position }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Player Column -->
+              <ng-container matColumnDef="player">
+                <th mat-header-cell *matHeaderCellDef>Jugador</th>
+                <td mat-cell *matCellDef="let scorer" class="player-cell">
+                  <div class="player-info" (click)="viewPlayerDetail(scorer.player.id)">
+                    <img [src]="scorer.player.photoUrl" 
+                         [alt]="scorer.player.name" 
+                         class="player-photo">
+                    <div class="player-details">
+                      <div class="player-name">{{ scorer.player.name }}</div>
+                      <div class="team-info">
+                        <img [src]="scorer.player.team.logoUrl" 
+                             [alt]="scorer.player.team.name" 
+                             class="team-logo">
+                        <span class="team-name">{{ scorer.player.team.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Goals Column -->
+              <ng-container matColumnDef="goals">
+                <th mat-header-cell *matHeaderCellDef>Goles</th>
+                <td mat-cell *matCellDef="let scorer">
+                  <span class="goals-badge">
+                    <mat-icon>sports_soccer</mat-icon>
+                    {{ scorer.goals }}
+                  </span>
+                  <span class="penalty-info" *ngIf="scorer.penaltyGoals > 0" 
+                        [matTooltip]="scorer.penaltyGoals + ' penaltis'">
+                    ({{ scorer.penaltyGoals }})
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Assists Column -->
+              <ng-container matColumnDef="assists">
+                <th mat-header-cell *matHeaderCellDef>Asist.</th>
+                <td mat-cell *matCellDef="let scorer" class="assists-col">
+                  {{ scorer.assists }}
+                </td>
+              </ng-container>
+
+              <!-- Matches Column -->
+              <ng-container matColumnDef="matches">
+                <th mat-header-cell *matHeaderCellDef>PJ</th>
+                <td mat-cell *matCellDef="let scorer" class="matches-col">
+                  {{ scorer.matchesPlayed }}
+                </td>
+              </ng-container>
+
+              <!-- Average Column -->
+              <ng-container matColumnDef="average">
+                <th mat-header-cell *matHeaderCellDef>Prom.</th>
+                <td mat-cell *matCellDef="let scorer" class="average-col">
+                  <mat-chip class="average-chip">
+                    {{ scorer.goalsPerMatch | number:'1.2-2' }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="scorersColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: scorersColumns;" class="scorer-row"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: MVP -->
+      <mat-tab label="MVP">
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">emoji_events</mat-icon>
+          MVP
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="table-header">
+            <h2>
+              <mat-icon>emoji_events</mat-icon>
+              Jugadores MVP
+            </h2>
+            <p class="subtitle">Los jugadores más valiosos del torneo</p>
+          </div>
+
+          <div class="table-container">
+            <table mat-table [dataSource]="mvpPlayers" class="mvp-table">
+              
+              <!-- Position Column -->
+              <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef>Pos</th>
+                <td mat-cell *matCellDef="let mvp">
+                  <span class="position-badge" [ngClass]="getPositionClass(mvp.position)">
+                    <mat-icon *ngIf="isTop3(mvp.position)" class="medal-icon">
+                      {{ mvp.position === 1 ? 'emoji_events' : 'military_tech' }}
+                    </mat-icon>
+                    {{ mvp.position }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Player Column -->
+              <ng-container matColumnDef="player">
+                <th mat-header-cell *matHeaderCellDef>Jugador</th>
+                <td mat-cell *matCellDef="let mvp" class="player-cell">
+                  <div class="player-info" (click)="viewPlayerDetail(mvp.player.id)">
+                    <img [src]="mvp.player.photoUrl" 
+                         [alt]="mvp.player.name" 
+                         class="player-photo">
+                    <div class="player-details">
+                      <div class="player-name">{{ mvp.player.name }}</div>
+                      <div class="team-info">
+                        <img [src]="mvp.player.team.logoUrl" 
+                             [alt]="mvp.player.team.name" 
+                             class="team-logo">
+                        <span class="team-name">{{ mvp.player.team.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Goals Column -->
+              <ng-container matColumnDef="goals">
+                <th mat-header-cell *matHeaderCellDef>Goles</th>
+                <td mat-cell *matCellDef="let mvp" class="stat-col">
+                  {{ mvp.goals }}
+                </td>
+              </ng-container>
+
+              <!-- Assists Column -->
+              <ng-container matColumnDef="assists">
+                <th mat-header-cell *matHeaderCellDef>Asist.</th>
+                <td mat-cell *matCellDef="let mvp" class="stat-col">
+                  {{ mvp.assists }}
+                </td>
+              </ng-container>
+
+              <!-- Rating Column -->
+              <ng-container matColumnDef="rating">
+                <th mat-header-cell *matHeaderCellDef>Rating</th>
+                <td mat-cell *matCellDef="let mvp" class="rating-col">
+                  <mat-chip class="rating-chip" [style.background-color]="getRatingColor(mvp.rating)">
+                    <mat-icon>star</mat-icon>
+                    {{ mvp.rating | number:'1.1-1' }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- MOTM Column -->
+              <ng-container matColumnDef="motm">
+                <th mat-header-cell *matHeaderCellDef>MOTM</th>
+                <td mat-cell *matCellDef="let mvp" class="motm-col">
+                  <span class="motm-badge" [matTooltip]="'Man of the Match'">
+                    <mat-icon>workspace_premium</mat-icon>
+                    {{ mvp.motmAwards }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="mvpColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: mvpColumns;" class="mvp-row"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 3: Tarjetas -->
+      <mat-tab label="Tarjetas">
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">square</mat-icon>
+          Tarjetas
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="table-header">
+            <h2>
+              <mat-icon>square</mat-icon>
+              Tabla de Tarjetas
+            </h2>
+            <p class="subtitle">Jugadores más amonestados del torneo</p>
+          </div>
+
+          <div class="table-container">
+            <table mat-table [dataSource]="cardPlayers" class="cards-table">
+              
+              <!-- Position Column -->
+              <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef>Pos</th>
+                <td mat-cell *matCellDef="let card">
+                  <span class="position-badge warning">
+                    {{ card.position }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Player Column -->
+              <ng-container matColumnDef="player">
+                <th mat-header-cell *matHeaderCellDef>Jugador</th>
+                <td mat-cell *matCellDef="let card" class="player-cell">
+                  <div class="player-info" (click)="viewPlayerDetail(card.player.id)">
+                    <img [src]="card.player.photoUrl" 
+                         [alt]="card.player.name" 
+                         class="player-photo">
+                    <div class="player-details">
+                      <div class="player-name">{{ card.player.name }}</div>
+                      <div class="team-info">
+                        <img [src]="card.player.team.logoUrl" 
+                             [alt]="card.player.team.name" 
+                             class="team-logo">
+                        <span class="team-name">{{ card.player.team.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Yellow Cards Column -->
+              <ng-container matColumnDef="yellow">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-icon class="yellow-icon">square</mat-icon>
+                </th>
+                <td mat-cell *matCellDef="let card" class="yellow-col">
+                  <span class="card-count yellow">{{ card.yellowCards }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Red Cards Column -->
+              <ng-container matColumnDef="red">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-icon class="red-icon">square</mat-icon>
+                </th>
+                <td mat-cell *matCellDef="let card" class="red-col">
+                  <span class="card-count red">{{ card.redCards }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Total Cards Column -->
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let card" class="total-col">
+                  <strong>{{ card.totalCards }}</strong>
+                </td>
+              </ng-container>
+
+              <!-- Matches Column -->
+              <ng-container matColumnDef="matches">
+                <th mat-header-cell *matHeaderCellDef>PJ</th>
+                <td mat-cell *matCellDef="let card" class="matches-col">
+                  {{ card.matchesPlayed }}
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="cardsColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: cardsColumns;" class="card-row"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+
+  <!-- Legend -->
+  <mat-card class="legend-card" *ngIf="!isLoading">
+    <mat-card-content>
+      <h3 class="legend-title">Leyenda</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <strong>PJ:</strong> Partidos Jugados
+        </div>
+        <div class="legend-item">
+          <strong>Asist.:</strong> Asistencias
+        </div>
+        <div class="legend-item">
+          <strong>Prom.:</strong> Promedio de goles por partido
+        </div>
+        <div class="legend-item">
+          <strong>MOTM:</strong> Man of the Match (Mejor jugador del partido)
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

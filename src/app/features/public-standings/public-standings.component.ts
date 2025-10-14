@@ -272,7 +272,7 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/fixture-viewer']);
+    this.router.navigate(['/tournament-home', this.tournamentId]);
   }
 
   getPositionClass(position: number): string {

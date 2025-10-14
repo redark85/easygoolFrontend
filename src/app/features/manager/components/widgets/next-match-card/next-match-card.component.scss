@@ -1,0 +1,209 @@
+.next-match-card {
+  height: 100%;
+
+  mat-card-header {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 600;
+
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+  }
+
+  mat-card-content {
+    .match-info {
+      .matchday-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        background-color: #1976d2;
+        color: white;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+      }
+
+      .teams-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+
+        .team {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+
+          .team-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid #f5f5f5;
+          }
+
+          .team-name {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            color: #1a1a1a;
+          }
+        }
+
+        .vs-separator {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 50px;
+          height: 50px;
+          background-color: #f5f5f5;
+          border-radius: 50%;
+          font-weight: 700;
+          font-size: 16px;
+          color: #666;
+        }
+      }
+
+      .match-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        margin-bottom: 20px;
+
+        .detail-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 14px;
+          color: #666;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: #1976d2;
+          }
+        }
+      }
+    }
+
+    .countdown-container {
+      text-align: center;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      color: white;
+
+      .countdown-label {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0.9;
+      }
+
+      .countdown-grid {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        .countdown-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 50px;
+
+          .countdown-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+          }
+
+          .countdown-unit {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 4px;
+            text-transform: uppercase;
+          }
+        }
+
+        .countdown-separator {
+          font-size: 24px;
+          font-weight: 700;
+          opacity: 0.6;
+          padding: 0 4px;
+        }
+      }
+    }
+  }
+
+  mat-card-actions {
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .next-match-card {
+    mat-card-content {
+      .match-info {
+        .teams-container {
+          .team {
+            .team-logo {
+              width: 50px;
+              height: 50px;
+            }
+
+            .team-name {
+              font-size: 12px;
+            }
+          }
+
+          .vs-separator {
+            width: 40px;
+            height: 40px;
+            font-size: 14px;
+          }
+        }
+      }
+
+      .countdown-container {
+        .countdown-grid {
+          .countdown-item {
+            min-width: 40px;
+
+            .countdown-value {
+              font-size: 22px;
+            }
+
+            .countdown-unit {
+              font-size: 10px;
+            }
+          }
+
+          .countdown-separator {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+}

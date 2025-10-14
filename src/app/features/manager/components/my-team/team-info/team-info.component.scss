@@ -1,0 +1,330 @@
+.team-info-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .header-content {
+      .page-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 8px 0;
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+
+        mat-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+          color: #1976d2;
+        }
+      }
+
+      .page-subtitle {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+
+    .team-basic-card {
+      grid-column: 1;
+      grid-row: 1 / 3;
+    }
+
+    .team-stats-card {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .registration-card {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    mat-card {
+      mat-card-header {
+        mat-card-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1a1a1a;
+        }
+      }
+
+      mat-card-content {
+        padding-top: 16px;
+      }
+    }
+
+    .team-basic-card {
+      .logo-section {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 32px;
+
+        .logo-container {
+          position: relative;
+          width: 150px;
+          height: 150px;
+
+          .team-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 3px solid #f5f5f5;
+          }
+
+          .change-logo-btn {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+          }
+        }
+      }
+
+      .team-form {
+        .full-width {
+          width: 100%;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        mat-form-field {
+          margin-bottom: 8px;
+        }
+      }
+    }
+
+    .team-stats-card {
+      .stats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 12px;
+          background-color: #f5f5f5;
+          border-radius: 8px;
+
+          mat-icon {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+            color: #1976d2;
+          }
+
+          .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .stat-label {
+              font-size: 12px;
+              color: #666;
+              font-weight: 500;
+            }
+
+            .stat-value {
+              font-size: 20px;
+              font-weight: 700;
+              color: #1a1a1a;
+            }
+          }
+        }
+
+        mat-divider {
+          margin: 0;
+        }
+      }
+    }
+
+    .registration-card {
+      .registration-description {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+
+      .registration-status {
+        margin-bottom: 20px;
+
+        mat-chip {
+          &.enabled {
+            background-color: #e8f5e9;
+            color: #4caf50;
+
+            mat-icon {
+              color: #4caf50;
+            }
+          }
+
+          &.disabled {
+            background-color: #ffebee;
+            color: #f44336;
+
+            mat-icon {
+              color: #f44336;
+            }
+          }
+
+          mat-icon {
+            margin-right: 8px;
+          }
+        }
+      }
+
+      .code-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        margin-bottom: 16px;
+
+        .code-display {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          mat-icon {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+            color: #1976d2;
+          }
+
+          .code-text {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+          }
+        }
+      }
+
+      .url-section {
+        margin-bottom: 20px;
+
+        .full-width {
+          width: 100%;
+        }
+      }
+
+      .registration-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        button {
+          mat-icon {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .team-info-container {
+    padding: 16px;
+
+    .content-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+
+      .team-basic-card,
+      .team-stats-card,
+      .registration-card {
+        grid-column: 1;
+        grid-row: auto;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .team-info-container {
+    padding: 12px;
+
+    .page-header {
+      .header-content {
+        .page-title {
+          font-size: 24px;
+
+          mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+          }
+        }
+      }
+
+      .header-actions {
+        width: 100%;
+        
+        button {
+          flex: 1;
+        }
+      }
+    }
+
+    .content-grid {
+      .team-basic-card {
+        .team-form {
+          .form-row {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+
+      .registration-card {
+        .code-section {
+          .code-display {
+            .code-text {
+              font-size: 18px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

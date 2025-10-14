@@ -1,0 +1,324 @@
+<div class="scenario-simulator-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon>science</mat-icon>
+        Simulador de Escenarios
+      </h1>
+      <p class="page-subtitle">Proyecta resultados y analiza posibles posiciones finales</p>
+    </div>
+    <button mat-raised-button color="warn" (click)="clearResults()">
+      <mat-icon>refresh</mat-icon>
+      Limpiar Simulación
+    </button>
+  </div>
+
+  <mat-tab-group class="simulator-tabs">
+    <!-- Tab: Proyección de Tabla -->
+    <mat-tab label="Proyección de Tabla">
+      <div class="tab-content">
+        <!-- Match Results Selector -->
+        <mat-card class="matches-selector-card">
+          <mat-card-header>
+            <mat-card-title>Simular Resultados de Jornadas Restantes</mat-card-title>
+            <mat-card-subtitle>Selecciona el resultado esperado para cada partido</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="matches-grid">
+              <div *ngFor="let match of remainingMatches" class="match-selector">
+                <div class="match-info">
+                  <span class="matchday">J{{ match.matchday }}</span>
+                  <div class="match-teams">
+                    <span class="team">{{ match.isHome ? 'Mi Equipo' : match.opponent }}</span>
+                    <span class="vs">vs</span>
+                    <span class="team">{{ match.isHome ? match.opponent : 'Mi Equipo' }}</span>
+                  </div>
+                  <mat-chip>{{ match.isHome ? 'Local' : 'Visitante' }}</mat-chip>
+                </div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Resultado</mat-label>
+                  <mat-select [formControl]="matchResultControls[match.matchday]">
+                    <mat-option value="">Sin definir</mat-option>
+                    <mat-option value="W">Victoria</mat-option>
+                    <mat-option value="D">Empate</mat-option>
+                    <mat-option value="L">Derrota</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Projection Summary -->
+        <mat-card class="projection-summary-card">
+          <mat-card-header>
+            <mat-card-title>Proyección de Mi Equipo</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <mat-icon>leaderboard</mat-icon>
+                <div class="summary-content">
+                  <span class="summary-label">Posición Proyectada</span>
+                  <span class="summary-value">{{ myTeamProjectedPosition }}°</span>
+                  <span class="summary-change" 
+                        [class.positive]="positionChange > 0"
+                        [class.negative]="positionChange < 0"
+                        *ngIf="positionChange !== 0">
+                    <mat-icon>{{ positionChange > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    {{ positionChange > 0 ? positionChange : -positionChange }} posiciones
+                  </span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>stars</mat-icon>
+                <div class="summary-content">
+                  <span class="summary-label">Puntos Proyectados</span>
+                  <span class="summary-value">{{ myTeamProjectedPoints }}</span>
+                  <span class="summary-additional">+{{ myTeamProjectedPoints - 23 }} puntos</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Projected Table -->
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Tabla Proyectada</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="projectedStandings" class="standings-table">
+              <!-- Position Column -->
+              <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef>#</th>
+                <td mat-cell *matCellDef="let team">
+                  <span class="position-badge" [class.top]="team.position <= 4">{{ team.position }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Team Column -->
+              <ng-container matColumnDef="team">
+                <th mat-header-cell *matHeaderCellDef>Equipo</th>
+                <td mat-cell *matCellDef="let team">
+                  <div class="team-cell" [class.my-team]="team.isMyTeam">
+                    <img [src]="team.logo" [alt]="team.team" class="team-logo">
+                    <span class="team-name">{{ team.team }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Matches Column -->
+              <ng-container matColumnDef="matches">
+                <th mat-header-cell *matHeaderCellDef>PJ</th>
+                <td mat-cell *matCellDef="let team">{{ team.matches }}</td>
+              </ng-container>
+
+              <!-- Wins Column -->
+              <ng-container matColumnDef="wins">
+                <th mat-header-cell *matHeaderCellDef>G</th>
+                <td mat-cell *matCellDef="let team">{{ team.wins }}</td>
+              </ng-container>
+
+              <!-- Draws Column -->
+              <ng-container matColumnDef="draws">
+                <th mat-header-cell *matHeaderCellDef>E</th>
+                <td mat-cell *matCellDef="let team">{{ team.draws }}</td>
+              </ng-container>
+
+              <!-- Losses Column -->
+              <ng-container matColumnDef="losses">
+                <th mat-header-cell *matHeaderCellDef>P</th>
+                <td mat-cell *matCellDef="let team">{{ team.losses }}</td>
+              </ng-container>
+
+              <!-- Goal Difference Column -->
+              <ng-container matColumnDef="goalDifference">
+                <th mat-header-cell *matHeaderCellDef>DG</th>
+                <td mat-cell *matCellDef="let team">
+                  <span [class.positive]="team.goalDifference > 0" [class.negative]="team.goalDifference < 0">
+                    {{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Points Column -->
+              <ng-container matColumnDef="points">
+                <th mat-header-cell *matHeaderCellDef>Pts</th>
+                <td mat-cell *matCellDef="let team">
+                  <span class="points-value">{{ team.points }}</span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.my-team-row]="row.isMyTeam"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Escenarios Predefinidos -->
+    <mat-tab label="Escenarios Predefinidos">
+      <div class="tab-content">
+        <div class="scenarios-grid">
+          <mat-card *ngFor="let scenario of predefinedScenarios" class="scenario-card">
+            <mat-card-header>
+              <mat-card-title>{{ scenario.name }}</mat-card-title>
+              <mat-card-subtitle>{{ scenario.description }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="scenario-results">
+                <h4>Resultados:</h4>
+                <div class="results-list">
+                  <ng-container *ngFor="let item of scenario.results | keyvalue">
+                    <span class="result-badge">
+                      J{{ item.key }}: {{ getResultLabel(item.value) }}
+                    </span>
+                  </ng-container>
+                </div>
+              </div>
+
+              <div class="scenario-projection">
+                <div class="projection-item">
+                  <mat-icon>leaderboard</mat-icon>
+                  <div class="projection-info">
+                    <span class="label">Posición Final</span>
+                    <span class="value">{{ scenario.projectedPosition }}°</span>
+                  </div>
+                </div>
+                <div class="projection-item">
+                  <mat-icon>stars</mat-icon>
+                  <div class="projection-info">
+                    <span class="label">Puntos Totales</span>
+                    <span class="value">{{ scenario.projectedPoints }}</span>
+                  </div>
+                </div>
+                <div class="projection-item">
+                  <mat-icon>percent</mat-icon>
+                  <div class="projection-info">
+                    <span class="label">Probabilidad</span>
+                    <span class="value">{{ scenario.probability }}%</span>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="primary" (click)="applyScenario(scenario)">
+                <mat-icon>play_arrow</mat-icon>
+                Aplicar Escenario
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Probabilidad de Clasificación -->
+    <mat-tab label="Probabilidad de Clasificación">
+      <div class="tab-content">
+        <mat-card class="qualification-card">
+          <mat-card-header>
+            <mat-card-title>Escenarios de Clasificación</mat-card-title>
+            <mat-card-subtitle>Análisis de probabilidades según objetivos</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="qualification-list">
+              <div *ngFor="let chance of qualificationChances" class="qualification-item">
+                <div class="qualification-header">
+                  <h3>{{ chance.scenario }}</h3>
+                  <div class="probability-badge" [style.background-color]="chance.probability > 70 ? '#4caf50' : chance.probability > 40 ? '#ff9800' : '#f44336'">
+                    {{ chance.probability }}%
+                  </div>
+                </div>
+                <div class="qualification-stats">
+                  <div class="stat-row">
+                    <span class="stat-label">Puntos Requeridos:</span>
+                    <span class="stat-value">{{ chance.requiredPoints }}</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">Puntos Actuales:</span>
+                    <span class="stat-value">{{ chance.currentPoints }}</span>
+                  </div>
+                  <div class="stat-row highlight">
+                    <span class="stat-label">Puntos Necesarios:</span>
+                    <span class="stat-value">{{ chance.pointsNeeded }}</span>
+                  </div>
+                </div>
+                <div class="qualification-progress">
+                  <mat-progress-bar mode="determinate" 
+                                    [value]="(chance.currentPoints / chance.requiredPoints) * 100"
+                                    [class.high-probability]="chance.probability > 70"
+                                    [class.medium-probability]="chance.probability > 40 && chance.probability <= 70"
+                                    [class.low-probability]="chance.probability <= 40">
+                  </mat-progress-bar>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Escenarios "What-if" -->
+    <mat-tab label='Escenarios "What-if"'>
+      <div class="tab-content">
+        <mat-card class="whatif-card">
+          <mat-card-header>
+            <mat-card-title>Preguntas Clave</mat-card-title>
+            <mat-card-subtitle>Análisis de escenarios hipotéticos</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-accordion>
+              <mat-expansion-panel *ngFor="let scenario of whatIfScenarios">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon [style.color]="getImpactColor(scenario.impact)">{{ scenario.icon }}</mat-icon>
+                    {{ scenario.question }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="whatif-answer">
+                  <p class="answer-text">{{ scenario.answer }}</p>
+                  <mat-chip [style.background-color]="getImpactColor(scenario.impact)">
+                    Impacto: {{ scenario.impact === 'high' ? 'Alto' : scenario.impact === 'medium' ? 'Medio' : 'Bajo' }}
+                  </mat-chip>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Additional Insights -->
+        <mat-card class="insights-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>lightbulb</mat-icon>
+              Insights Clave
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ul class="insights-list">
+              <li>
+                <mat-icon>check_circle</mat-icon>
+                <span>Con 3 victorias consecutivas, prácticamente aseguramos la clasificación</span>
+              </li>
+              <li>
+                <mat-icon>warning</mat-icon>
+                <span>Perder contra equipos directos (posiciones 2-5) reduce drásticamente nuestras opciones</span>
+              </li>
+              <li>
+                <mat-icon>trending_up</mat-icon>
+                <span>El partido contra el líder en J15 puede definir el campeonato</span>
+              </li>
+              <li>
+                <mat-icon>sports_soccer</mat-icon>
+                <span>La diferencia de goles puede ser crucial en caso de empate en puntos</span>
+              </li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

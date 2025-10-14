@@ -1,0 +1,429 @@
+<div class="public-tournament-stats-container">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Cargando estadísticas del torneo...</p>
+  </div>
+
+  <!-- Tournament Stats Content -->
+  <div class="tournament-stats-content" *ngIf="!isLoading && records && stats">
+    <!-- Back Button -->
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-icon">
+        <mat-icon>analytics</mat-icon>
+      </div>
+      <div class="header-content">
+        <h1>Estadísticas del Torneo</h1>
+        <p>Récords, datos y análisis completo de la competición</p>
+      </div>
+    </div>
+
+    <!-- General Stats Overview -->
+    <div class="stats-overview">
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon">sports_soccer</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalMatches }}</span>
+          <span class="stat-label">Partidos Jugados</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon goals">sports</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalGoals }}</span>
+          <span class="stat-label">Goles Totales</span>
+          <span class="stat-detail">{{ stats.averageGoalsPerMatch | number:'1.2-2' }} por partido</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon yellow">style</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalYellowCards }}</span>
+          <span class="stat-label">Tarjetas Amarillas</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon red">cancel</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalRedCards }}</span>
+          <span class="stat-label">Tarjetas Rojas</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon penalty">gps_fixed</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalPenalties }}</span>
+          <span class="stat-label">Penales</span>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Tabs Section -->
+    <mat-card class="tabs-card">
+      <mat-tab-group animationDuration="300ms">
+        <!-- Tab: Récords -->
+        <mat-tab label="Récords y Destacados">
+          <div class="records-section">
+            <h2 class="section-title">
+              <mat-icon>emoji_events</mat-icon>
+              Récords del Torneo
+            </h2>
+
+            <div class="tournament-records">
+              <!-- Biggest Win -->
+              <mat-card class="record-card highlight">
+                <div class="record-icon">
+                  <mat-icon>sports_soccer</mat-icon>
+                </div>
+                <h3>Mayor Goleada</h3>
+                <p class="record-value">{{ records.biggestWin.score }}</p>
+                <p class="record-detail">
+                  {{ records.biggestWin.winner }} vs {{ records.biggestWin.loser }}
+                </p>
+                <p class="record-date">{{ formatDate(records.biggestWin.date) }}</p>
+              </mat-card>
+
+              <!-- Highest Scoring -->
+              <mat-card class="record-card highlight">
+                <div class="record-icon">
+                  <mat-icon>whatshot</mat-icon>
+                </div>
+                <h3>Partido con Más Goles</h3>
+                <p class="record-value">{{ records.highestScoring.totalGoals }} goles</p>
+                <p class="record-detail">{{ records.highestScoring.match }}</p>
+                <p class="record-score">{{ records.highestScoring.score }}</p>
+                <p class="record-date">{{ formatDate(records.highestScoring.date) }}</p>
+              </mat-card>
+
+              <!-- Best Streak -->
+              <mat-card class="record-card">
+                <div class="record-icon">
+                  <mat-icon>trending_up</mat-icon>
+                </div>
+                <h3>Mejor Racha</h3>
+                <p class="record-value">{{ records.bestStreak.wins }} victorias</p>
+                <p class="record-detail">{{ records.bestStreak.team }}</p>
+                <p class="record-period">{{ records.bestStreak.period }}</p>
+              </mat-card>
+
+              <!-- Best Defense -->
+              <mat-card class="record-card">
+                <div class="record-icon">
+                  <mat-icon>shield</mat-icon>
+                </div>
+                <h3>Mejor Defensa</h3>
+                <p class="record-value">{{ records.bestDefense.goalsAgainst }} goles</p>
+                <p class="record-detail">{{ records.bestDefense.team }}</p>
+                <p class="record-average">
+                  {{ (records.bestDefense.goalsAgainst / records.bestDefense.matchesPlayed) | number:'1.2-2' }} por partido
+                </p>
+              </mat-card>
+
+              <!-- Best Attack -->
+              <mat-card class="record-card">
+                <div class="record-icon">
+                  <mat-icon>flash_on</mat-icon>
+                </div>
+                <h3>Mejor Ataque</h3>
+                <p class="record-value">{{ records.bestAttack.goalsFor }} goles</p>
+                <p class="record-detail">{{ records.bestAttack.team }}</p>
+                <p class="record-average">
+                  {{ (records.bestAttack.goalsFor / records.bestAttack.matchesPlayed) | number:'1.2-2' }} por partido
+                </p>
+              </mat-card>
+
+              <!-- Most Clean Sheets -->
+              <mat-card class="record-card">
+                <div class="record-icon">
+                  <mat-icon>sports_handball</mat-icon>
+                </div>
+                <h3>Más Vallas Invictas</h3>
+                <p class="record-value">{{ records.mostCleanSheets.count }}</p>
+                <p class="record-detail">{{ records.mostCleanSheets.team }}</p>
+                <p class="record-goalkeeper">Portero: {{ records.mostCleanSheets.goalkeeper }}</p>
+              </mat-card>
+
+              <!-- Fair Play Leader -->
+              <mat-card class="record-card">
+                <div class="record-icon">
+                  <mat-icon>handshake</mat-icon>
+                </div>
+                <h3>Líder Fair Play</h3>
+                <p class="record-detail">{{ records.fairPlayLeader.team }}</p>
+                <div class="fair-play-stats">
+                  <span class="yellow-stat">🟨 {{ records.fairPlayLeader.yellowCards }}</span>
+                  <span class="red-stat">🟥 {{ records.fairPlayLeader.redCards }}</span>
+                </div>
+              </mat-card>
+
+              <!-- Longest Winning Streak -->
+              <mat-card class="record-card">
+                <div class="record-icon">
+                  <mat-icon>military_tech</mat-icon>
+                </div>
+                <h3>Racha Ganadora Más Larga</h3>
+                <p class="record-value">{{ records.longestWinningStreak.matches }}</p>
+                <p class="record-detail">{{ records.longestWinningStreak.team }}</p>
+              </mat-card>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Gráficos -->
+        <mat-tab label="Visualizaciones">
+          <div class="charts-section">
+            <!-- Goals per Matchday Chart -->
+            <div class="chart-container">
+              <h3 class="chart-title">
+                <mat-icon>show_chart</mat-icon>
+                Goles por Jornada
+              </h3>
+              <div class="chart-stats">
+                <span class="chart-stat">
+                  <strong>Promedio:</strong> {{ getAverageGoalsPerMatchday() | number:'1.1-1' }} goles
+                </span>
+                <span class="chart-stat">
+                  <strong>Máximo:</strong> {{ getMaxGoalsInMatchday() }} goles
+                </span>
+              </div>
+              <div class="bar-chart">
+                <div *ngFor="let data of goalsPerMatchday" class="bar-item">
+                  <div class="bar-wrapper">
+                    <div class="bar" 
+                         [style.height]="getBarWidth(data.goals, getMaxGoalsInMatchday())"
+                         [style.background-color]="getBarColor(data.goals, getMaxGoalsInMatchday())"
+                         [matTooltip]="data.goals + ' goles'">
+                      <span class="bar-value">{{ data.goals }}</span>
+                    </div>
+                  </div>
+                  <span class="bar-label">J{{ data.matchday }}</span>
+                </div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Result Distribution -->
+            <div class="chart-container" *ngIf="resultDistribution">
+              <h3 class="chart-title">
+                <mat-icon>pie_chart</mat-icon>
+                Distribución de Resultados
+              </h3>
+              <div class="result-distribution">
+                <div class="result-item home">
+                  <div class="result-bar" 
+                       [style.width]="(resultDistribution.homeWins / stats.totalMatches * 100) + '%'">
+                    <span class="result-label">Victorias Local</span>
+                    <span class="result-value">{{ resultDistribution.homeWins }}</span>
+                  </div>
+                  <span class="result-percentage">
+                    {{ (resultDistribution.homeWins / stats.totalMatches * 100) | number:'1.1-1' }}%
+                  </span>
+                </div>
+                <div class="result-item draw">
+                  <div class="result-bar" 
+                       [style.width]="(resultDistribution.draws / stats.totalMatches * 100) + '%'">
+                    <span class="result-label">Empates</span>
+                    <span class="result-value">{{ resultDistribution.draws }}</span>
+                  </div>
+                  <span class="result-percentage">
+                    {{ (resultDistribution.draws / stats.totalMatches * 100) | number:'1.1-1' }}%
+                  </span>
+                </div>
+                <div class="result-item away">
+                  <div class="result-bar" 
+                       [style.width]="(resultDistribution.awayWins / stats.totalMatches * 100) + '%'">
+                    <span class="result-label">Victorias Visitante</span>
+                    <span class="result-value">{{ resultDistribution.awayWins }}</span>
+                  </div>
+                  <span class="result-percentage">
+                    {{ (resultDistribution.awayWins / stats.totalMatches * 100) | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Attendance Chart -->
+            <div class="chart-container">
+              <h3 class="chart-title">
+                <mat-icon>people</mat-icon>
+                Asistencia por Jornada
+              </h3>
+              <div class="chart-stats">
+                <span class="chart-stat">
+                  <strong>Total:</strong> {{ getTotalAttendance() | number }} espectadores
+                </span>
+                <span class="chart-stat">
+                  <strong>Ocupación Promedio:</strong> {{ getAverageAttendancePercentage() | number:'1.1-1' }}%
+                </span>
+              </div>
+              <div class="attendance-chart">
+                <div *ngFor="let data of attendanceData" class="attendance-item">
+                  <div class="attendance-bar-wrapper">
+                    <div class="attendance-bar capacity"></div>
+                    <div class="attendance-bar filled" 
+                         [style.height]="(data.attendance / data.capacity * 100) + '%'"
+                         [matTooltip]="(data.attendance | number) + ' / ' + (data.capacity | number)">
+                    </div>
+                  </div>
+                  <span class="attendance-label">J{{ data.matchday }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Top Scorers -->
+        <mat-tab label="Goleadores">
+          <div class="scorers-section">
+            <h3 class="section-title">
+              <mat-icon>emoji_events</mat-icon>
+              Tabla de Goleadores
+            </h3>
+            <div class="scorers-list">
+              <div *ngFor="let scorer of topScorers; let i = index" 
+                   class="scorer-item"
+                   [class.top1]="i === 0"
+                   [class.top2]="i === 1"
+                   [class.top3]="i === 2">
+                <div class="scorer-position">
+                  <span class="position-number">{{ i + 1 }}</span>
+                  <mat-icon *ngIf="i === 0" class="trophy gold">emoji_events</mat-icon>
+                  <mat-icon *ngIf="i === 1" class="trophy silver">emoji_events</mat-icon>
+                  <mat-icon *ngIf="i === 2" class="trophy bronze">emoji_events</mat-icon>
+                </div>
+                <div class="scorer-info">
+                  <span class="scorer-name">{{ scorer.name }}</span>
+                  <span class="scorer-team">{{ scorer.team }}</span>
+                </div>
+                <div class="scorer-stats">
+                  <div class="stat-item">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span class="stat-value">{{ scorer.goals }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <mat-icon>sports</mat-icon>
+                    <span class="stat-value">{{ scorer.matches }} PJ</span>
+                  </div>
+                  <div class="stat-item average">
+                    <span class="stat-label">Promedio:</span>
+                    <span class="stat-value">{{ (scorer.goals / scorer.matches) | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Análisis -->
+        <mat-tab label="Análisis">
+          <div class="analysis-section">
+            <h3 class="section-title">
+              <mat-icon>insights</mat-icon>
+              Análisis del Torneo
+            </h3>
+
+            <!-- Performance by Venue -->
+            <div class="analysis-card">
+              <h4>Rendimiento por Localía</h4>
+              <div class="venue-stats">
+                <div class="venue-stat home">
+                  <mat-icon>home</mat-icon>
+                  <div class="venue-content">
+                    <span class="venue-label">Victorias Local</span>
+                    <span class="venue-value">{{ stats.homeWinPercentage | number:'1.1-1' }}%</span>
+                  </div>
+                </div>
+                <div class="venue-stat draw">
+                  <mat-icon>drag_handle</mat-icon>
+                  <div class="venue-content">
+                    <span class="venue-label">Empates</span>
+                    <span class="venue-value">{{ stats.drawPercentage | number:'1.1-1' }}%</span>
+                  </div>
+                </div>
+                <div class="venue-stat away">
+                  <mat-icon>flight_takeoff</mat-icon>
+                  <div class="venue-content">
+                    <span class="venue-label">Victorias Visitante</span>
+                    <span class="venue-value">{{ stats.awayWinPercentage | number:'1.1-1' }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Key Insights -->
+            <div class="analysis-card">
+              <h4>Datos Clave</h4>
+              <div class="insights-grid">
+                <div class="insight-item">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <div class="insight-content">
+                    <span class="insight-label">Promedio de Goles</span>
+                    <span class="insight-value">{{ stats.averageGoalsPerMatch | number:'1.2-2' }}</span>
+                    <span class="insight-description">por partido</span>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <mat-icon>style</mat-icon>
+                  <div class="insight-content">
+                    <span class="insight-label">Tarjetas por Partido</span>
+                    <span class="insight-value">
+                      {{ ((stats.totalYellowCards + stats.totalRedCards) / stats.totalMatches) | number:'1.1-1' }}
+                    </span>
+                    <span class="insight-description">amarillas y rojas</span>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <mat-icon>gps_fixed</mat-icon>
+                  <div class="insight-content">
+                    <span class="insight-label">Penales por Partido</span>
+                    <span class="insight-value">{{ (stats.totalPenalties / stats.totalMatches) | number:'1.2-2' }}</span>
+                    <span class="insight-description">en promedio</span>
+                  </div>
+                </div>
+                <div class="insight-item">
+                  <mat-icon>trending_up</mat-icon>
+                  <div class="insight-content">
+                    <span class="insight-label">Factor Cancha</span>
+                    <span class="insight-value">{{ stats.homeWinPercentage | number:'1.0-0' }}%</span>
+                    <span class="insight-description">victorias locales</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tournament Summary -->
+            <div class="analysis-card summary">
+              <h4>Resumen del Torneo</h4>
+              <p class="summary-text">
+                El torneo ha sido altamente competitivo con un promedio de 
+                <strong>{{ stats.averageGoalsPerMatch | number:'1.2-2' }} goles por partido</strong>.
+                La localía ha jugado un papel importante, con 
+                <strong>{{ stats.homeWinPercentage | number:'1.1-1' }}%</strong> de victorias para los equipos locales.
+                Se han registrado <strong>{{ stats.totalGoals }} goles</strong> en 
+                <strong>{{ stats.totalMatches }} partidos</strong>, demostrando un torneo ofensivo y emocionante.
+              </p>
+              <p class="summary-text">
+                En términos de disciplina, se han mostrado 
+                <strong>{{ stats.totalYellowCards }} tarjetas amarillas</strong> y 
+                <strong>{{ stats.totalRedCards }} tarjetas rojas</strong>, con un promedio de 
+                <strong>{{ ((stats.totalYellowCards + stats.totalRedCards) / stats.totalMatches) | number:'1.1-1' }} tarjetas por partido</strong>.
+              </p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </div>
+</div>

@@ -82,6 +82,12 @@ export const routes: Routes = [
       {
         path: 'leagues',
         loadComponent: () => import('./features/dashboard/components/home/home.component').then(c => c.HomeComponent)
+      },
+      
+      // Manager routes (Dashboard del Manager)
+      {
+        path: 'manager',
+        loadChildren: () => import('./features/manager/manager.routes').then(r => r.managerRoutes)
       }
     ]
   },
@@ -102,6 +108,55 @@ export const routes: Routes = [
   {
     path: 'public-standings/:tournamentId',
     loadComponent: () => import('./features/public-standings/public-standings.component').then(c => c.PublicStandingsComponent)
+  },
+  
+  // Tournament Home (public access, no layout)
+  {
+    path: 'tournament-home/:tournamentId',
+    loadComponent: () => import('./features/tournament-home/tournament-home.component').then(c => c.TournamentHomeComponent),
+    title: 'Inicio - Torneo'
+  },
+  
+  // Public Fixture (public access, no layout)
+  {
+    path: 'public-fixture/:tournamentId',
+    loadComponent: () => import('./features/public-fixture/public-fixture.component').then(c => c.PublicFixtureComponent),
+    title: 'Fixture Completo - Torneo'
+  },
+  
+  // Public Match Detail (public access, no layout)
+  {
+    path: 'public-match-detail/:matchId',
+    loadComponent: () => import('./features/public-match-detail/public-match-detail.component').then(c => c.PublicMatchDetailComponent),
+    title: 'Detalle del Partido'
+  },
+  
+  // Public Top Scorers (public access, no layout)
+  {
+    path: 'public-top-scorers/:tournamentId',
+    loadComponent: () => import('./features/public-top-scorers/public-top-scorers.component').then(c => c.PublicTopScorersComponent),
+    title: 'Estadísticas de Jugadores'
+  },
+  
+  // Public Teams (public access, no layout)
+  {
+    path: 'public-teams/:tournamentId',
+    loadComponent: () => import('./features/public-teams/public-teams.component').then(c => c.PublicTeamsComponent),
+    title: 'Equipos Participantes'
+  },
+  
+  // Public Team Detail (public access, no layout)
+  {
+    path: 'public-team-detail/:teamId',
+    loadComponent: () => import('./features/public-team-detail/public-team-detail.component').then(c => c.PublicTeamDetailComponent),
+    title: 'Detalle del Equipo'
+  },
+  
+  // Public Tournament Stats (public access, no layout)
+  {
+    path: 'public-tournament-stats/:tournamentId',
+    loadComponent: () => import('./features/public-tournament-stats/public-tournament-stats.component').then(c => c.PublicTournamentStatsComponent),
+    title: 'Estadísticas del Torneo'
   },
   
   // Not Found page
