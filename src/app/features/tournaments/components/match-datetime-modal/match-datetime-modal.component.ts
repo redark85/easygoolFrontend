@@ -9,6 +9,7 @@ import { MatDatepickerModule, MatDatepicker } from '@angular/material/datepicker
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatchService } from '@core/services/match.service';
 import { ToastService } from '@core/services/toast.service';
 
@@ -40,7 +41,8 @@ export interface MatchDateTimeResult {
     MatDatepickerModule,
     MatTimepickerModule,
     MatNativeDateModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './match-datetime-modal.component.html',

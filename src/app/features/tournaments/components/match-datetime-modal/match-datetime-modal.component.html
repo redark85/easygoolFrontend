@@ -4,6 +4,12 @@
       <mat-icon>schedule</mat-icon>
       Actualizar Fecha y Hora
     </h2>
+    <button mat-icon-button 
+            class="close-button d-none d-md-inline-flex"
+            (click)="onCancel()"
+            matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
   <div class="modal-content" mat-dialog-content>

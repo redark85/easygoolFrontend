@@ -7,6 +7,30 @@
 .modal-container {
   // Estilos específicos del componente
 
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+
+    .close-button {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+
+      // Asegurar que se oculte en móviles
+      @media (max-width: 767.98px) {
+        display: none !important;
+      }
+    }
+  }
+
   .match-info {
     text-align: center;
     padding: 1rem;

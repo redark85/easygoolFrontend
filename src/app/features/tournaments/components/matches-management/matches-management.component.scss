@@ -174,7 +174,7 @@
     &:hover {
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
       transform: translateY(-2px);
-      
+
       .panel-header {
         background: linear-gradient(135deg, #f0f0f0 0%, #d8d8d8 100%);
       }
@@ -260,7 +260,7 @@
 
               &.create-btn {
                 color: #1976d2;
-                
+
                 &:hover {
                   color: #1565c0;
                   background: transparent !important;
@@ -269,7 +269,7 @@
 
               &.random-btn {
                 color: #4caf50;
-                
+
                 &:hover {
                   color: #388e3c;
                   background: transparent !important;
@@ -278,7 +278,7 @@
 
               &.delete-btn {
                 color: #f44336;
-                
+
                 &:hover {
                   color: #d32f2f;
                   background: transparent !important;
@@ -377,7 +377,7 @@
 
           &.update-date {
             color: #1976d2;
-            
+
             &:hover {
               color: #1565c0;
             }
@@ -385,7 +385,7 @@
 
           &.change-status {
             color: #4caf50;
-            
+
             &:hover {
               color: #388e3c;
             }
@@ -393,7 +393,7 @@
 
           &.delete {
             color: #f44336;
-            
+
             &:hover {
               color: #d32f2f;
             }
@@ -779,8 +779,22 @@
   }
 }
 
+.min-width-input {
+  min-width: 300px !important;
+}
+
 // Responsive Design
 @media (max-width: 768px) {
+  .min-width-input {
+    min-width: auto !important;
+    width: 100%;
+  }
+
+  .matches-grid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
   .matches-management-container {
     padding: 0 8px;
   }
@@ -792,7 +806,7 @@
 
     .d-flex {
       flex-direction: column;
-      gap: 1rem !important;
+      gap: 0.0rem !important;
 
       .phase-selection, .group-selection {
         .phase-select, .group-select {

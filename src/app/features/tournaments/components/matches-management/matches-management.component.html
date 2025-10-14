@@ -18,8 +18,8 @@
               [matTooltip]="getFabButtonText()"
               [disabled]="!selectedPhaseId || loading || isCreatingMatchDay">
         <mat-icon *ngIf="!loading && !isCreatingMatchDay">add</mat-icon>
-        <mat-progress-spinner *ngIf="loading || isCreatingMatchDay" 
-                              diameter="24" 
+        <mat-progress-spinner *ngIf="loading || isCreatingMatchDay"
+                              diameter="24"
                               mode="indeterminate">
         </mat-progress-spinner>
       </button>
@@ -28,7 +28,7 @@
       <div class="selection-container-centered" *ngIf="phases.length > 0">
         <div class="d-flex justify-content-center align-items-center gap-4">
           <!-- Phase Selection -->
-          <div class="phase-selection" style="min-width: 300px;">
+          <div class="phase-selection min-width-input">
             <mat-form-field appearance="outline" class="phase-select" style="width: 100%;">
               <mat-label>Fase</mat-label>
               <mat-select [(value)]="selectedPhaseId" (selectionChange)="onPhaseSelectionChange($event.value)">
@@ -44,7 +44,7 @@
           <div class="vertical-separator" *ngIf="getGroupsForSelectedPhase().length > 0"></div>
 
           <!-- Group Selection -->
-          <div class="group-selection" style="min-width: 300px;" *ngIf="getGroupsForSelectedPhase().length > 0">
+          <div class="group-selection min-width-input" *ngIf="getGroupsForSelectedPhase().length > 0">
             <mat-form-field appearance="outline" class="group-select" style="width: 100%;">
               <mat-label>Grupo</mat-label>
               <mat-select [(value)]="selectedGroupId" (selectionChange)="onGroupChange($event.value)">
@@ -96,7 +96,7 @@
                           <mat-icon class="matchday-icon">event</mat-icon>
                           <span class="matchday-name">{{ matchDay.matchDayName }}</span>
                         </div>
-                        
+
                         <div class="matchday-center">
                           <mat-chip class="matches-count-chip">
                             {{ matchDay.matches.length }} {{ matchDay.matches.length === 1 ? 'partido' : 'partidos' }}
@@ -161,7 +161,7 @@
                                   </button>
                                 </ng-container>
                               </div>
-                              
+
                               <!-- Status Badge Right -->
                               <div class="match-status-top">
                                 <div

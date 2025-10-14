@@ -377,6 +377,11 @@ html, body {
 
 // Asegurar visibilidad completa en móviles
 @media (max-width: 768px) {
+
+  .matchday-center {
+    display: none !important;
+  }
+
   ::ng-deep .mat-sidenav {
     box-shadow: 0 8px 32px var(--overlay-medium) !important;
     border-right: none !important;
@@ -676,6 +681,12 @@ html, body {
 
 // Configuración específica para viewport pequeños
 @media (max-width: 768px) {
+
+  .mat-expansion-panel-body {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
   .mat-mdc-dialog-container {
     margin: 10px auto !important;
     // Centrado perfecto en móviles
