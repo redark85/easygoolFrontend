@@ -205,35 +205,35 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
       title: 'Tabla de Posiciones',
       description: 'Consulta la clasificación actual',
       icon: 'leaderboard',
-      route: '/standings',
+      route: '/public-standings/1',
       color: '#1976d2'
     },
     {
       title: 'Fixture Completo',
       description: 'Todos los partidos del torneo',
       icon: 'calendar_month',
-      route: '/fixture',
+      route: '/public-fixture/1',
       color: '#ff9800'
     },
     {
       title: 'Goleadores',
       description: 'Tabla de máximos goleadores',
       icon: 'sports_soccer',
-      route: '/scorers',
+      route: '/public-top-scorers/1',
       color: '#4caf50'
     },
     {
       title: 'Equipos',
       description: 'Información de todos los equipos',
       icon: 'groups',
-      route: '/teams',
+      route: '/public-teams/1',
       color: '#9c27b0'
     },
     {
       title: 'Estadísticas',
       description: 'Números y récords del torneo',
       icon: 'analytics',
-      route: '/statistics',
+      route: '/public-tournament-stats/1',
       color: '#f44336'
     },
     {

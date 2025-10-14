@@ -112,7 +112,7 @@ export const routes: Routes = [
   
   // Tournament Home (public access, no layout)
   {
-    path: 'tournament-home',
+    path: 'tournament-home/:tournamentId',
     loadComponent: () => import('./features/tournament-home/tournament-home.component').then(c => c.TournamentHomeComponent),
     title: 'Inicio - Torneo'
   },

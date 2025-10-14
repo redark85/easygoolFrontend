@@ -104,6 +104,9 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
+    goBack(): void {
+    this.router.navigate(['/tournament-home', this.tournamentId]);
+  }
   ngOnInit(): void {
     // Obtener tournamentId de la ruta
     this.route.paramMap

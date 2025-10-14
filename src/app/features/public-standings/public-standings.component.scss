@@ -1,7 +1,10 @@
 .standings-container {
   padding: 2rem;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  position: relative;
 
   .page-header {
     display: flex;

@@ -310,7 +310,7 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
    * Navega hacia atrás
    */
   goBack(): void {
-    this.router.navigate(['/tournament-home']);
+    this.router.navigate(['/tournament-home', this.tournamentId]);
   }
 
   /**

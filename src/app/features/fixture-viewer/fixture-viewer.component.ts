@@ -89,7 +89,7 @@ export class FixtureViewerComponent implements OnInit, OnDestroy {
 
   viewFixture(tournamentId: number): void {
     console.log('Ver fixture del torneo:', tournamentId);
-    this.router.navigate(['/public-standings', tournamentId]);
+    this.router.navigate(['/tournament-home', tournamentId]);
   }
 
   goBack(): void {

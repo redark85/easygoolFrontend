@@ -314,7 +314,7 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
    * Navega hacia atrás
    */
   goBack(): void {
-    this.router.navigate(['/public-standings', this.tournamentId]);
+        this.router.navigate(['/tournament-home', this.tournamentId]);
   }
 
   /**
