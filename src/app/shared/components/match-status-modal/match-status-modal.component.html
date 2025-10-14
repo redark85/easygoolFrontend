@@ -23,11 +23,11 @@
     </div>
 
     <!-- Formulario de cambio de estado -->
-    <form [formGroup]="statusForm" (ngSubmit)="onSubmit()" class="status-form">
+    <form [formGroup]="statusForm" (ngSubmit)="onSubmit()" class="status-form margin-left">
       <div class="form-field">
         <mat-form-field appearance="outline" class="status-select">
           <mat-label>Nuevo Estado</mat-label>
-          <mat-select formControlName="newStatus" 
+          <mat-select formControlName="newStatus"
                       [compareWith]="compareStatusValues">
             <mat-option *ngFor="let status of availableStatuses" [value]="status.value">
               <div class="status-option">

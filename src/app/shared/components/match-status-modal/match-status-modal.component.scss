@@ -258,3 +258,13 @@
     }
   }
 }
+
+.margin-left {
+  margin-left: 0;
+}
+
+@media (max-width: 768px) {
+  .margin-left {
+    margin-left: 15px;
+  }
+}
