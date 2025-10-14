@@ -3,6 +3,15 @@
 .teams-management-container {
   padding: 0;
   position: relative;
+
+  // Asegurar que el contenedor sea scrollable para el CDK
+  overflow-y: auto;
+  max-height: 100vh;
+
+  // Configuración para el scroll strategy
+  &[cdkScrollable] {
+    overflow-y: auto;
+  }
 }
 
 // Reusar estilos clave dentro de .team-panel
@@ -1011,6 +1020,30 @@
   }
 }
 
+// Animación de entrada para menús
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Animación de entrada para modal en móvil
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 // Estilos adicionales para botón de reactivación
 .reactivate-team-btn {
   transition: all 0.3s ease;
@@ -1105,6 +1138,166 @@
   }
 }
 
+// Backdrop personalizado para menús
+::ng-deep .menu-backdrop {
+  background-color: rgba(0, 0, 0, 0.32) !important;
+  backdrop-filter: blur(2px);
+}
+
+// Estilos para menú modal en móvil
+@media (max-width: 768px) {
+  ::ng-deep .mobile-menu-modal {
+    // Posicionamiento centrado como modal
+    top: 50% !important;
+    left: calc(50% - 16px) !important;
+    transform: translate(-50%, -50%) !important;
+
+    // Dimensiones del modal
+    width: calc(100vw - 32px) !important;
+    max-width: 400px !important;
+    max-height: calc(100vh - 64px) !important;
+
+    // Z-index alto para estar sobre todo
+    z-index: 1001 !important;
+
+    // Sombra y bordes del modal
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25) !important;
+    border-radius: 16px !important;
+
+    // Animación de entrada mejorada
+    animation: modalSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+
+    .mat-mdc-menu-panel {
+      // Resetear posicionamiento del panel interno
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      transform: none !important;
+
+      // Estilos del modal
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      border-radius: 16px !important;
+
+      // Sombra interna
+      box-shadow: none !important;
+
+      // Mejorar padding y espaciado en modal
+      .mobile-menu-content,
+      .player-mobile-menu-content {
+        padding: 20px !important;
+
+        .mobile-menu-item {
+          padding: 12px 0 !important;
+
+          &:first-child {
+            padding-top: 0 !important;
+          }
+
+          &:last-child {
+            padding-bottom: 0 !important;
+            border-bottom: none !important;
+          }
+
+          // Iconos más grandes en modal
+          mat-icon {
+            font-size: 20px !important;
+            width: 20px !important;
+            height: 20px !important;
+          }
+
+          // Texto más legible
+          .menu-label {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+          }
+
+          .menu-value {
+            font-size: 15px !important;
+          }
+
+          .action-label {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Backdrop más oscuro para el modal
+  ::ng-deep .menu-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+  }
+}
+
+// Configuración global para mejorar posicionamiento de menús
+::ng-deep .cdk-overlay-container {
+  .cdk-overlay-pane {
+    // Asegurar que los menús no se salgan del viewport
+    max-width: calc(100vw - 32px) !important;
+    max-height: calc(100vh - 64px) !important;
+  }
+}
+
+// Solución específica para menús móviles de equipos y jugadores
+::ng-deep .teams-management-container {
+  // Interceptar todos los overlays de menús móviles
+  .cdk-overlay-pane {
+    // Detectar menús que están mal posicionados (muy arriba o fuera del viewport)
+    &[style*="top: 0px"],
+    &[style*="top: 1px"],
+    &[style*="top: 2px"],
+    &[style*="top: 3px"],
+    &[style*="top: 4px"],
+    &[style*="top: 5px"],
+    &[style*="top: 6px"],
+    &[style*="top: 7px"],
+    &[style*="top: 8px"],
+    &[style*="top: 9px"],
+    &[style*="top: 10px"],
+    &[style*="top: -"] {
+      // Forzar posicionamiento debajo del área de header
+      top: 120px !important;
+      transform: translateY(0) !important;
+
+      // Asegurar que se vea completamente
+      z-index: 1000 !important;
+
+    }
+
+    // Posicionamiento horizontal seguro
+    &[style*="left: 0px"],
+    &[style*="left: 1px"],
+    &[style*="left: 2px"] {
+      left: 16px !important;
+    }
+
+    // Limitar ancho para evitar desbordamiento
+    max-width: calc(100vw - 32px) !important;
+
+    // Asegurar que no se salga por abajo
+    max-height: calc(100vh - 160px) !important;
+  }
+}
+
+// Forzar posicionamiento correcto para menús específicos
+::ng-deep .team-mobile-menu .mat-mdc-menu-panel,
+::ng-deep .player-mobile-menu .mat-mdc-menu-panel {
+  // Asegurar que el menú aparezca en una posición visible
+  position: fixed !important;
+  top: auto !important;
+  bottom: auto !important;
+
+  // Forzar que aparezca debajo del trigger
+  margin-top: 8px !important;
+
+  // Asegurar visibilidad completa
+  z-index: 1001 !important;
+}
+
 // Estilos para el menú móvil de equipos
 ::ng-deep .team-mobile-menu {
   .mat-mdc-menu-panel {
@@ -1113,10 +1306,30 @@
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     margin-top: 8px;
+
+    // Posicionamiento mejorado
+    position: relative;
+
+    // Asegurar que no se salga del viewport
+    max-height: min(400px, calc(100vh - 100px));
+    overflow-y: auto;
+
+    // Animación suave de entrada
+    animation: menuSlideIn 0.2s ease-out;
+
+    // Posicionamiento inteligente
+    transform-origin: top right;
+
+    // Forzar posicionamiento visible para menú de equipos
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .mobile-menu-content {
     padding: 16px;
+    min-height: fit-content;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 
     .mobile-menu-item {
       display: flex;
@@ -1207,10 +1420,30 @@
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     margin-top: 8px;
+
+    // Posicionamiento mejorado
+    position: relative;
+
+    // Asegurar que no se salga del viewport
+    max-height: min(350px, calc(100vh - 100px));
+    overflow-y: auto;
+
+    // Animación suave de entrada
+    animation: menuSlideIn 0.2s ease-out;
+
+    // Posicionamiento inteligente
+    transform-origin: top right;
+
+    // Forzar posicionamiento visible para menú de jugadores
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .player-mobile-menu-content {
     padding: 16px;
+    min-height: fit-content;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 
     .mobile-menu-item {
       display: flex;

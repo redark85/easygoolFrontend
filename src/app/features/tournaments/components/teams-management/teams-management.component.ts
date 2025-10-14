@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -13,7 +13,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { Overlay, ScrollStrategy } from '@angular/cdk/overlay';
+import { ViewportRuler, CdkScrollableModule } from '@angular/cdk/scrolling';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -62,13 +64,14 @@ export interface TeamModalResult {
     MatFormFieldModule,
     MatSlideToggleModule,
     MatExpansionModule,
-    MatMenuModule
+    MatMenuModule,
+    CdkScrollableModule
   ],
   templateUrl: './teams-management.component.html',
   styleUrls: ['./teams-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TeamsManagementComponent implements OnInit, OnDestroy {
+export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() tournamentId!: number;
   @Input() teams: Team[] = [];
   @Output() teamsUpdated = new EventEmitter<Team[]>();
@@ -78,17 +81,141 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private updatingTeamRegistration = new Set<number>(); // Track loading state per team
   private deletingPlayers = new Set<number>(); // Track loading state per player
+  
   constructor(
     private teamService: TeamService,
     private playerService: PlayerService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private errorHandler: DeletionErrorHandlerHook,
-    private documentUploadService: DocumentUploadService
+    private documentUploadService: DocumentUploadService,
+    private overlay: Overlay,
+    private viewportRuler: ViewportRuler
   ) {}
 
   ngOnInit(): void {
     this.loadTeams();
+  }
+
+  ngAfterViewInit(): void {
+    // Configurar interceptores para menús móviles
+    this.setupMenuPositionFix();
+    
+    // Escuchar cambios de tamaño de ventana para reposicionar menús
+    window.addEventListener('resize', () => {
+      this.repositionOpenMenus();
+    });
+  }
+
+  /**
+   * Configura la corrección de posicionamiento para menús móviles
+   */
+  private setupMenuPositionFix(): void {
+    // Observar cambios en el DOM para detectar menús mal posicionados
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              // Buscar overlays de menús
+              if (element.classList.contains('cdk-overlay-pane')) {
+                this.fixMenuPosition(element as HTMLElement);
+              }
+              // Buscar dentro del elemento agregado
+              const overlays = element.querySelectorAll('.cdk-overlay-pane');
+              overlays.forEach(overlay => this.fixMenuPosition(overlay as HTMLElement));
+            }
+          });
+        }
+      });
+    });
+
+    // Observar el documento completo
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Limpiar el observer cuando se destruya el componente
+    this.destroy$.subscribe(() => observer.disconnect());
+  }
+
+  /**
+   * Corrige la posición de un menú para que aparezca centrado como modal en móvil
+   */
+  private fixMenuPosition(overlay: HTMLElement): void {
+    // Verificar si contiene un menú móvil
+    const hasTeamMenu = overlay.querySelector('.team-mobile-menu');
+    const hasPlayerMenu = overlay.querySelector('.player-mobile-menu');
+    
+    if (hasTeamMenu || hasPlayerMenu) {
+      // Verificar si estamos en móvil (ancho menor a 768px)
+      const isMobile = window.innerWidth <= 768;
+      
+      if (isMobile) {
+        // Centrar el menú como modal en móvil
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Posicionar en el centro de la pantalla
+        overlay.style.position = 'fixed';
+        overlay.style.top = '50%';
+        overlay.style.left = '50%';
+        overlay.style.transform = 'translate(-50%, -50%)';
+        overlay.style.zIndex = '1001';
+        
+        // Asegurar que el menú no sea más grande que la pantalla
+        overlay.style.maxWidth = `${viewportWidth - 32}px`;
+        overlay.style.maxHeight = `${viewportHeight - 64}px`;
+        
+        // Agregar clase para estilos adicionales
+        overlay.classList.add('mobile-menu-modal');
+      } else {
+        // Comportamiento normal en desktop
+        const rect = overlay.getBoundingClientRect();
+        
+        // Si el menú está muy arriba (menos de 50px del top)
+        if (rect.top < 50) {
+          overlay.style.top = '120px';
+          overlay.style.transform = 'translateY(0)';
+        }
+        
+        // Si el menú está muy a la izquierda
+        if (rect.left < 16) {
+          overlay.style.left = '16px';
+        }
+        
+        // Asegurar que no se salga por la derecha
+        const viewportWidth = window.innerWidth;
+        if (rect.right > viewportWidth - 16) {
+          overlay.style.left = `${viewportWidth - rect.width - 16}px`;
+        }
+        
+        // Asegurar z-index alto
+        overlay.style.zIndex = '1000';
+      }
+    }
+  }
+
+  /**
+   * Maneja la apertura de menús móviles para corregir posicionamiento
+   */
+  onMenuOpened(): void {
+    // Usar setTimeout para asegurar que el menú esté renderizado
+    setTimeout(() => {
+      this.repositionOpenMenus();
+    }, 10);
+  }
+
+  /**
+   * Reposiciona todos los menús abiertos
+   */
+  private repositionOpenMenus(): void {
+    const overlays = document.querySelectorAll('.cdk-overlay-pane');
+    overlays.forEach(overlay => {
+      this.fixMenuPosition(overlay as HTMLElement);
+    });
   }
 
   /**
@@ -813,6 +940,27 @@ export class TeamsManagementComponent implements OnInit, OnDestroy {
       data: dialogData,
       panelClass: 'manager-info-dialog'
     });
+  }
+
+  /**
+   * Configura el posicionamiento óptimo del menú basado en la posición del trigger
+   */
+  getMenuPositionStrategy(triggerElement: HTMLElement): { xPosition: 'before' | 'after', yPosition: 'above' | 'below' } {
+    const rect = triggerElement.getBoundingClientRect();
+    const viewportHeight = this.viewportRuler.getViewportSize().height;
+    const viewportWidth = this.viewportRuler.getViewportSize().width;
+    
+    // Determinar posición vertical
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const yPosition = spaceBelow > 300 || spaceBelow > spaceAbove ? 'below' : 'above';
+    
+    // Determinar posición horizontal
+    const spaceRight = viewportWidth - rect.right;
+    const spaceLeft = rect.left;
+    const xPosition = spaceLeft > 280 || spaceLeft > spaceRight ? 'before' : 'after';
+    
+    return { xPosition, yPosition };
   }
 
   /**

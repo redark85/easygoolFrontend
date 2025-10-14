@@ -1,4 +1,4 @@
-<div class="teams-management-container">
+<div class="teams-management-container" cdkScrollable>
   <mat-card class="teams-management-card">
     <mat-card-header>
       <div class="container-fluid">
@@ -250,7 +250,14 @@
                     <mat-icon>more_vert</mat-icon>
                   </button>
 
-                  <mat-menu #teamMobileMenu="matMenu" class="team-mobile-menu" xPosition="before" yPosition="below">
+                  <mat-menu #teamMobileMenu="matMenu" 
+                            class="team-mobile-menu" 
+                            xPosition="before" 
+                            yPosition="below"
+                            [overlapTrigger]="false"
+                            [hasBackdrop]="true"
+                            backdropClass="menu-backdrop"
+                            (opened)="onMenuOpened()">
                     <div class="mobile-menu-content" (click)="$event.stopPropagation()">
                       <!-- Estadísticas -->
                       <div class="mobile-menu-item">
@@ -420,7 +427,14 @@
                       <mat-icon>more_vert</mat-icon>
                     </button>
 
-                    <mat-menu #playerMobileMenu="matMenu" class="player-mobile-menu" xPosition="before" yPosition="below">
+                    <mat-menu #playerMobileMenu="matMenu" 
+                              class="player-mobile-menu" 
+                              xPosition="before" 
+                              yPosition="below"
+                              [overlapTrigger]="false"
+                              [hasBackdrop]="true"
+                              backdropClass="menu-backdrop"
+                              (opened)="onMenuOpened()">
                       <div class="player-mobile-menu-content" (click)="$event.stopPropagation()">
                         <!-- Número de camiseta -->
                         <div class="mobile-menu-item">
