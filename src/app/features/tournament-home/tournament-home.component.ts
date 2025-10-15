@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { Subject, takeUntil, interval } from 'rxjs';
 
 interface Tournament {
@@ -89,7 +91,9 @@ interface QuickLink {
     MatButtonModule,
     MatChipsModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   templateUrl: './tournament-home.component.html',
   styleUrls: ['./tournament-home.component.scss'],

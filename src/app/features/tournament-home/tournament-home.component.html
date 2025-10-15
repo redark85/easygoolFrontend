@@ -1,58 +1,156 @@
 <div class="tournament-home-container">
   <!-- Hero Section -->
   <section class="hero-section">
-    <div class="hero-background" [style.background-image]="'url(' + tournament.bannerUrl + ')'">
+    <div class="hero-background">
+      <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
       <div class="hero-overlay"></div>
     </div>
     
     <div class="container-fluid">
-      <div class="row align-items-center">
-        <!-- Tournament Logo -->
-        <div class="col-auto">
-          <div class="tournament-logo">
-            <img [src]="tournament.logoUrl" [alt]="tournament.name" class="tournament-image">
+      <div class="row align-items-start">
+        <!-- Left Column: Tournament Info (8 columns) -->
+        <div class="col-lg-8">
+          <div class="row align-items-center">
+            <!-- Tournament Logo -->
+            <div class="col-auto">
+              <div class="tournament-logo">
+                <img [src]="tournament.logoUrl" [alt]="tournament.name" class="tournament-image">
+                
+                <!-- Status Badge sobre la imagen -->
+                <div class="status-badge"
+                     [class]="'status-' + tournament.status"
+                     [matTooltip]="getStatusBadge().label + ' - ' + tournament.season"
+                     matTooltipPosition="above">
+                  <mat-icon class="status-icon">{{ getStatusIcon(tournament.status) }}</mat-icon>
+                </div>
+              </div>
+            </div>
             
-            <!-- Status Badge sobre la imagen -->
-            <div class="status-badge"
-                 [class]="'status-' + tournament.status"
-                 [matTooltip]="getStatusBadge().label + ' - ' + tournament.season"
-                 matTooltipPosition="above">
-              <mat-icon class="status-icon">{{ getStatusIcon(tournament.status) }}</mat-icon>
+            <!-- Tournament Info -->
+            <div class="col">
+              <div class="tournament-info">
+                <div class="tournament-header">
+                  <h1 class="tournament-title">{{ tournament.name }}</h1>
+                </div>
+                
+                <div class="tournament-meta">
+                  <div class="tournament-season">{{ tournament.season }}</div>
+                  <div class="current-phase">
+                    <mat-icon class="phase-icon">flag</mat-icon>
+                    {{ tournament.currentPhase }}
+                  </div>
+                </div>
+                
+                <div class="tournament-stats">
+                  <div class="stat-item">
+                    <mat-icon>groups</mat-icon>
+                    <span class="stat-number">{{ tournament.totalTeams }}</span>
+                    <span class="stat-label">Equipos</span>
+                  </div>
+                  <div class="stat-item">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span class="stat-number">{{ tournament.totalMatches }}</span>
+                    <span class="stat-label">Partidos</span>
+                  </div>
+                  <div class="stat-item">
+                    <mat-icon>emoji_events</mat-icon>
+                    <span class="stat-number">{{ tournament.totalGoals }}</span>
+                    <span class="stat-label">Goles</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         
-        <!-- Tournament Info -->
-        <div class="col">
-          <div class="tournament-info">
-            <div class="tournament-header">
-              <h1 class="tournament-title">{{ tournament.name }}</h1>
-            </div>
-            
-            <div class="tournament-meta">
-              <div class="tournament-season">{{ tournament.season }}</div>
-              <div class="current-phase">
-                <mat-icon class="phase-icon">flag</mat-icon>
-                {{ tournament.currentPhase }}
+        <!-- Right Column: Filters & Next Match (4 columns) -->
+        <div class="col-lg-4">
+          <div class="hero-right-content">
+            <!-- Filters Row -->
+            <div class="filters-row">
+              <div class="row g-2">
+                <div class="col-6">
+                  <mat-form-field appearance="outline" class="filter-select">
+                    <mat-label>Fase</mat-label>
+                    <mat-select value="categoria-hombres">
+                      <mat-option value="categoria-hombres">Categoría hombres</mat-option>
+                      <mat-option value="categoria-mujeres">Categoría mujeres</mat-option>
+                      <mat-option value="categoria-mixta">Categoría mixta</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field appearance="outline" class="filter-select">
+                    <mat-label>Grupo</mat-label>
+                    <mat-select value="grupo-1">
+                      <mat-option value="grupo-1">Grupo 1</mat-option>
+                      <mat-option value="grupo-2">Grupo 2</mat-option>
+                      <mat-option value="grupo-3">Grupo 3</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
               </div>
             </div>
             
-            <div class="tournament-stats">
-              <div class="stat-item">
-                <mat-icon>groups</mat-icon>
-                <span class="stat-number">{{ tournament.totalTeams }}</span>
-                <span class="stat-label">Equipos</span>
-              </div>
-              <div class="stat-item">
-                <mat-icon>sports_soccer</mat-icon>
-                <span class="stat-number">{{ tournament.totalMatches }}</span>
-                <span class="stat-label">Partidos</span>
-              </div>
-              <div class="stat-item">
-                <mat-icon>emoji_events</mat-icon>
-                <span class="stat-number">{{ tournament.totalGoals }}</span>
-                <span class="stat-label">Goles</span>
-              </div>
+            <!-- Next Match Card -->
+            <div class="hero-next-match">
+              <mat-card class="next-match-card-compact">
+                <mat-card-header>
+                  <mat-card-title>
+                    <mat-icon>schedule</mat-icon>
+                    Próximo Partido
+                  </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="match-info-compact">
+                    <div class="matchday-badge">
+                      <span>Jornada {{ nextMatch.matchday }}</span>
+                    </div>
+                    
+                    <div class="teams-container-compact">
+                      <div class="team-compact">
+                        <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo-compact">
+                        <span class="team-name-compact">{{ nextMatch.homeTeam.name }}</span>
+                      </div>
+                      
+                      <div class="vs-section-compact">
+                        <div class="vs-compact">VS</div>
+                        <div class="match-venue">
+                          <mat-icon>location_on</mat-icon>
+                          {{ nextMatch.venue }}
+                        </div>
+                      </div>
+                      
+                      <div class="team-compact">
+                        <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo-compact">
+                        <span class="team-name-compact">{{ nextMatch.awayTeam.name }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="match-details-compact">
+                      <!-- Countdown Compacto -->
+                      <div class="countdown-compact">
+                        <div class="countdown-timer-compact">
+                          <div class="time-unit-compact">
+                            <span class="time-value-compact">{{ countdown.days }}</span>
+                            <span class="time-label-compact">Días</span>
+                          </div>
+                          <div class="time-separator-compact">:</div>
+                          <div class="time-unit-compact">
+                            <span class="time-value-compact">{{ countdown.hours }}</span>
+                            <span class="time-label-compact">Hrs</span>
+                          </div>
+                          <div class="time-separator-compact">:</div>
+                          <div class="time-unit-compact">
+                            <span class="time-value-compact">{{ countdown.minutes }}</span>
+                            <span class="time-label-compact">Min</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
             </div>
           </div>
         </div>
@@ -61,72 +159,6 @@
   </section>
 
   <div class="content-wrapper">
-    <!-- Next Match Section -->
-    <section class="next-match-section">
-      <mat-card class="next-match-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>schedule</mat-icon>
-            Próximo Partido Destacado
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="match-info">
-            <div class="matchday-badge">
-              <span>Jornada {{ nextMatch.matchday }}</span>
-            </div>
-            
-            <div class="teams-container">
-              <div class="team home-team">
-                <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo">
-                <h3>{{ nextMatch.homeTeam.name }}</h3>
-                <span class="position">{{ nextMatch.homeTeam.position }}° Posición</span>
-              </div>
-
-              <div class="vs-section">
-                <span class="vs-text">VS</span>
-                <div class="match-details">
-                  <mat-icon>location_on</mat-icon>
-                  <span>{{ nextMatch.venue }}</span>
-                </div>
-              </div>
-
-              <div class="team away-team">
-                <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo">
-                <h3>{{ nextMatch.awayTeam.name }}</h3>
-                <span class="position">{{ nextMatch.awayTeam.position }}° Posición</span>
-              </div>
-            </div>
-
-            <!-- Countdown -->
-            <div class="countdown-section">
-              <h4>Faltan:</h4>
-              <div class="countdown-timer">
-                <div class="time-unit">
-                  <span class="time-value">{{ countdown.days }}</span>
-                  <span class="time-label">Días</span>
-                </div>
-                <div class="time-separator">:</div>
-                <div class="time-unit">
-                  <span class="time-value">{{ countdown.hours }}</span>
-                  <span class="time-label">Horas</span>
-                </div>
-                <div class="time-separator">:</div>
-                <div class="time-unit">
-                  <span class="time-value">{{ countdown.minutes }}</span>
-                  <span class="time-label">Minutos</span>
-                </div>
-                <div class="time-separator">:</div>
-                <div class="time-unit">
-                  <span class="time-value">{{ countdown.seconds }}</span>
-                  <span class="time-label">Segundos</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </section>
 
     <!-- Two Column Layout -->
     <div class="two-column-layout">
