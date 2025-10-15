@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, interval } from 'rxjs';
 import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, TournamentDetails, ToastService, TournamentHomeService } from '@core/services';
 import { TournamentHomeData, OutstandingMatch, LastMatch, BestScorer } from '@core/interfaces/tournament-home.interface';
+import { DefaultImageDirective } from '@shared/directives/default-image.directive';
 
 interface Tournament {
   id: number;
@@ -99,7 +100,8 @@ interface QuickLink {
     MatFormFieldModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    DefaultImageDirective
   ],
   templateUrl: './tournament-home.component.html',
   styleUrls: ['./tournament-home.component.scss'],
@@ -450,6 +452,7 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
             this.toastService.showError(response.message || 'Error al cargar los datos del torneo');
           }
           this.isLoadingTournamentData = false;
+          this.cdr.markForCheck();
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -465,15 +468,20 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
    * Actualiza los datos del torneo con la respuesta del API
    */
   private updateTournamentData(data: TournamentHomeData): void {
+    console.log('Updating tournament data:', data);
+    
     // Actualizar información general del torneo
-    this.tournament.name = data.name;
-    this.tournament.totalTeams = data.totalTeams;
-    this.tournament.totalMatches = data.totalMatches;
-    this.tournament.totalGoals = data.goals;
-    this.tournament.startDate = new Date(data.startDate);
-    this.tournament.endDate = new Date(data.endDate);
-    this.tournament.currentPhase = data.phaseName;
-    this.tournament.status = this.mapApiStatusToTournamentStatus(data.status);
+    this.tournament = {
+      ...this.tournament,
+      name: data.name,
+      totalTeams: data.totalTeams,
+      totalMatches: data.totalMatches,
+      totalGoals: data.goals,
+      startDate: new Date(data.startDate),
+      endDate: new Date(data.endDate),
+      currentPhase: data.phaseName,
+      status: this.mapApiStatusToTournamentStatus(data.status)
+    };
     
     // Mantener la imagen por defecto si no viene logoUrl del API
     // (el logoUrl del torneo se obtiene desde tournamentDetails, no desde este API)
@@ -481,17 +489,30 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     // Actualizar próximo partido destacado
     if (data.outstandingMatch) {
       this.updateNextMatch(data.outstandingMatch);
+    } else {
+      console.warn('No outstanding match data received');
     }
 
     // Actualizar últimos partidos
     if (data.lastMatches && data.lastMatches.length > 0) {
       this.updateRecentMatches(data.lastMatches);
+    } else {
+      console.warn('No recent matches data received');
+      this.recentMatches = []; // Limpiar si no hay datos
     }
 
     // Actualizar goleadores
     if (data.bestScorers && data.bestScorers.length > 0) {
       this.updateTopScorers(data.bestScorers);
+    } else {
+      console.warn('No top scorers data received');
+      this.topScorers = []; // Limpiar si no hay datos
     }
+    
+    // Forzar detección de cambios
+    console.log('Forcing change detection...');
+    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   /**
@@ -499,57 +520,68 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
    */
   private updateNextMatch(match: OutstandingMatch): void {
     this.nextMatch = {
+      ...this.nextMatch,
       id: 1,
       homeTeam: {
         name: match.homeTeamName,
-        logo: match.homeTeamLogoUrl || 'assets/team-placeholder.png',
+        logo: match.homeTeamLogoUrl,
         position: match.homeTeamPosition
       },
       awayTeam: {
         name: match.awayTeamName,
-        logo: match.awayTeamLogoUrl || 'assets/team-placeholder.png',
+        logo: match.awayTeamLogoUrl,
         position: match.awayTeamPosition
       },
       date: new Date(match.matchDate),
       venue: match.groupName || match.phaseName,
       matchday: parseInt(match.matchDayName.replace(/\D/g, '')) || 1
     };
+    
+    console.log('Next match updated:', this.nextMatch);
   }
 
   /**
    * Actualiza los últimos partidos con datos del API
    */
   private updateRecentMatches(matches: LastMatch[]): void {
-    this.recentMatches = matches.slice(0, 4).map((match, index) => ({
+    // Crear nuevo array para forzar detección de cambios
+    const newRecentMatches = matches.slice(0, 4).map((match, index) => ({
       id: index + 1,
       homeTeam: {
         name: match.homeTeamName,
-        logo: match.homeTeamLogoUrl || 'assets/team-placeholder.png'
+        logo: match.homeTeamLogoUrl
       },
       awayTeam: {
         name: match.awayTeamName,
-        logo: match.awayTeamLogoUrl || 'assets/team-placeholder.png'
+        logo: match.awayTeamLogoUrl
       },
       homeScore: match.homeScore || 0,
       awayScore: match.awayScore || 0,
       date: new Date(match.matchDate),
       matchday: parseInt(match.matchDayName.replace(/\D/g, '')) || 1
     }));
+    
+    this.recentMatches = [...newRecentMatches];
+    console.log('Recent matches updated:', this.recentMatches);
   }
 
   /**
    * Actualiza los goleadores con datos del API
    */
   private updateTopScorers(scorers: BestScorer[]): void {
-    this.topScorers = scorers.slice(0, 3).map((scorer, index) => ({
+    // Crear nuevo array para forzar detección de cambios
+    const newTopScorers = scorers.slice(0, 3).map((scorer, index) => ({
       id: index + 1,
       name: scorer.name,
-      photo: scorer.imageUrl || 'assets/person.jpg',
+      photo: scorer.imageUrl,
       team: scorer.teamName,
-      teamLogo: scorer.teamLogoUrl || 'assets/team-placeholder.png',
+      teamLogo: scorer.teamLogoUrl,
       goals: scorer.goals,
       matches: 10 // Este campo no viene del API, usar valor por defecto
     }));
+    
+    this.topScorers = [...newTopScorers];
+    console.log('Top scorers updated:', this.topScorers);
   }
 
   /**
@@ -564,11 +596,4 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Maneja el error de carga de la imagen del torneo
-   */
-  onTournamentImageError(event: any): void {
-    console.warn('Error loading tournament image, using default logo');
-    event.target.src = 'assets/logo.png';
-  }
 }

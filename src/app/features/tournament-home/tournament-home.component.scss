@@ -365,23 +365,36 @@
                   display: flex;
                   flex-direction: column;
                   align-items: center;
-                  gap: 6px;
+                  gap: 8px;
                   flex: 1;
 
-                  .team-logo-compact {
-                    width: 40px;
-                    height: 40px;
-                    object-fit: contain;
-                    border-radius: 50%;
-                    border: 2px solid #e0e0e0;
+                  .team-top-compact {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    width: 100%;
+                    justify-content: center;
+
+                    .team-info-compact {
+                      .team-name-compact {
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #333;
+                        text-align: center;
+                        line-height: 1.2;
+                      }
+                    }
                   }
 
-                  .team-name-compact {
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-align: center;
-                    color: #333;
-                    line-height: 1.2;
+                  .team-logo-container-compact {
+                    .team-logo-compact {
+                      width: 60px;
+                      height: 60px;
+                      border-radius: 12px;
+                      object-fit: cover;
+                      border: 2px solid #e0e0e0;
+                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    }
                   }
                 }
 
@@ -624,57 +637,79 @@
               }
 
               .match-result {
-                display: grid;
-                grid-template-columns: 1fr auto 1fr;
-                gap: 16px;
+                display: flex;
                 align-items: center;
+                justify-content: space-between;
+                gap: 8px;
 
                 .team {
                   display: flex;
+                  flex-direction: column;
                   align-items: center;
                   gap: 8px;
-                  font-size: 14px;
-                  color: #666;
+                  flex: 1;
 
-                  &.winner {
-                    font-weight: 700;
-                    color: #1a1a1a;
-                  }
+                  .team-top {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    width: 100%;
+                    justify-content: center;
 
-                  img {
-                    width: 32px;
-                    height: 32px;
-                    object-fit: contain;
-                  }
+                    .team-score {
+                      .score {
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #1976d2;
+                      }
+                    }
 
-                  .team-name {
-                    flex: 1;
-                  }
-
-                  &:last-child {
-                    flex-direction: row-reverse;
-                    text-align: right;
-                  }
-                }
-
-                .score {
-                  display: flex;
-                  align-items: center;
-                  gap: 8px;
-                  font-size: 20px;
-                  font-weight: 700;
-                  color: #666;
-
-                  .score-value {
-                    &.winner {
-                      color: #4caf50;
-                      font-size: 24px;
+                    .team-info {
+                      .team-name {
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #333;
+                        text-align: center;
+                        line-height: 1.2;
+                      }
                     }
                   }
 
-                  .separator {
-                    font-weight: 400;
-                    opacity: 0.5;
+                  .team-logo-container {
+                    .team-logo {
+                      width: 60px;
+                      height: 60px;
+                      border-radius: 12px;
+                      object-fit: cover;
+                      border: 2px solid #e0e0e0;
+                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    }
+                  }
+
+                  &.winner {
+                    .team-top .team-info .team-name {
+                      color: #4caf50;
+                      font-weight: 700;
+                    }
+                    
+                    .team-top .team-score .score {
+                      color: #4caf50;
+                    }
+                  }
+                }
+
+                .vs-section {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 4px;
+                  padding: 0 16px;
+
+                  .vs-text {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #666;
+                    margin-bottom: 4px;
                   }
                 }
               }
@@ -936,6 +971,31 @@
           }
         }
 
+        .hero-next-match {
+          .next-match-card-compact {
+            .match-info-compact {
+              .teams-container-compact {
+                .team-compact {
+                  .team-logo-container-compact {
+                    .team-logo-compact {
+                      width: 40px;
+                      height: 40px;
+                    }
+                  }
+
+                  .team-top-compact {
+                    .team-info-compact {
+                      .team-name-compact {
+                        font-size: 10px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
         .tournament-info {
           .tournament-header {
             flex-direction: column;
@@ -1063,6 +1123,47 @@
             
             &:last-child {
               margin-bottom: 0;
+            }
+          }
+        }
+
+        .recent-matches-section {
+          .recent-matches-card {
+            .matches-list {
+              .match-item {
+                .match-result {
+                  .team {
+                    .team-logo-container {
+                      .team-logo {
+                        width: 40px;
+                        height: 40px;
+                      }
+                    }
+
+                    .team-top {
+                      .team-score {
+                        .score {
+                          font-size: 18px;
+                        }
+                      }
+
+                      .team-info {
+                        .team-name {
+                          font-size: 10px;
+                        }
+                      }
+                    }
+                  }
+
+                  .vs-section {
+                    padding: 0 8px;
+
+                    .vs-text {
+                      font-size: 10px;
+                    }
+                  }
+                }
+              }
             }
           }
         }

@@ -30,10 +30,10 @@
             <!-- Tournament Logo -->
             <div class="col-auto">
               <div class="tournament-logo" [routerLink]="['/public-standings', tournamentId]" style="cursor: pointer;">
-                <img [src]="tournament.logoUrl || 'assets/logo.png'" 
+                <img [src]="tournament.logoUrl" 
                      [alt]="tournament.name" 
                      class="tournament-image"
-                     (error)="onTournamentImageError($event)">
+                     appDefaultImage="assets/logo.png">
 
                 <!-- Status Badge sobre la imagen -->
                 <div class="status-badge"
@@ -167,9 +167,16 @@
                     </div>
 
                     <div class="teams-container-compact">
+                      <!-- Home Team -->
                       <div class="team-compact">
-                        <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo-compact">
-                        <span class="team-name-compact">{{ nextMatch.homeTeam.name }}</span>
+                        <div class="team-top-compact">
+                          <div class="team-info-compact">
+                            <span class="team-name-compact">{{ nextMatch.homeTeam.name }}</span>
+                          </div>
+                        </div>
+                        <div class="team-logo-container-compact">
+                          <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo-compact" appDefaultImage="assets/logo.png">
+                        </div>
                       </div>
 
                       <div class="vs-section-compact">
@@ -180,9 +187,16 @@
                         </div>
                       </div>
 
+                      <!-- Away Team -->
                       <div class="team-compact">
-                        <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo-compact">
-                        <span class="team-name-compact">{{ nextMatch.awayTeam.name }}</span>
+                        <div class="team-top-compact">
+                          <div class="team-info-compact">
+                            <span class="team-name-compact">{{ nextMatch.awayTeam.name }}</span>
+                          </div>
+                        </div>
+                        <div class="team-logo-container-compact">
+                          <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo-compact" appDefaultImage="assets/logo.png">
+                        </div>
                       </div>
                     </div>
 
@@ -245,18 +259,39 @@
                           <span class="match-date">{{ formatMatchDate(match.date) }}</span>
                         </div>
                         <div class="match-result">
+                          <!-- Home Team -->
                           <div class="team" [class.winner]="getMatchResult(match) === 'home'">
-                            <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name">
-                            <span class="team-name">{{ match.homeTeam.name }}</span>
+                            <div class="team-top">
+                              <div class="team-score">
+                                <span class="score">{{ match.homeScore }}</span>
+                              </div>
+                              <div class="team-info">
+                                <span class="team-name">{{ match.homeTeam.name }}</span>
+                              </div>
+                            </div>
+                            <div class="team-logo-container">
+                              <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo" appDefaultImage="assets/logo.png">
+                            </div>
                           </div>
-                          <div class="score">
-                            <span class="score-value" [class.winner]="getMatchResult(match) === 'home'">{{ match.homeScore }}</span>
-                            <span class="separator">-</span>
-                            <span class="score-value" [class.winner]="getMatchResult(match) === 'away'">{{ match.awayScore }}</span>
+                          
+                          <!-- VS Section -->
+                          <div class="vs-section">
+                            <span class="vs-text">VS</span>
                           </div>
+                          
+                          <!-- Away Team -->
                           <div class="team" [class.winner]="getMatchResult(match) === 'away'">
-                            <span class="team-name">{{ match.awayTeam.name }}</span>
-                            <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name">
+                            <div class="team-top">
+                              <div class="team-score">
+                                <span class="score">{{ match.awayScore }}</span>
+                              </div>
+                              <div class="team-info">
+                                <span class="team-name">{{ match.awayTeam.name }}</span>
+                              </div>
+                            </div>
+                            <div class="team-logo-container">
+                              <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo" appDefaultImage="assets/logo.png">
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -285,11 +320,11 @@
                         <div class="position-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
                           {{ i + 1 }}
                         </div>
-                        <img [src]="scorer.photo" [alt]="scorer.name" class="player-photo">
+                        <img [src]="scorer.photo" [alt]="scorer.name" class="player-photo" appDefaultImage="assets/logo.png">
                         <div class="scorer-info">
                           <h4>{{ scorer.name }}</h4>
                           <div class="team-info">
-                            <img [src]="scorer.teamLogo" [alt]="scorer.team" class="team-logo-small">
+                            <img [src]="scorer.teamLogo" [alt]="scorer.team" class="team-logo-small" appDefaultImage="assets/logo.png">
                             <span>{{ scorer.team }}</span>
                           </div>
                         </div>
