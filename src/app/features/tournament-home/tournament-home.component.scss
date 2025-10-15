@@ -316,7 +316,7 @@
 
               .match-details-compact {
                 text-align: center;
-                
+
                 .countdown-compact {
                   margin-bottom: 8px;
 
@@ -366,6 +366,57 @@
           }
         }
       }
+
+      // Tournament Info Compact
+      .tournament-info-compact {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        background: transparent;
+        padding: 16px;
+
+        .info-item-compact {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1;
+          min-width: 0;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: white;
+            flex-shrink: 0;
+          }
+
+          .info-content-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+
+            .info-label-compact {
+              font-size: 11px;
+              color: rgba(255, 255, 255, 0.8);
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              line-height: 1;
+            }
+
+            .info-value-compact {
+              font-size: 13px;
+              font-weight: 600;
+              color: white;
+              line-height: 1.2;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -378,15 +429,34 @@
 
     // Two Column Layout
     .two-column-layout {
-      display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
       margin-bottom: 40px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+
+      .row {
+        display: flex;
+        align-items: stretch;
+        
+        .col-lg-6 {
+          display: flex;
+          flex-direction: column;
+        }
+      }
 
       // Recent Matches
       .recent-matches-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        
         .recent-matches-card {
           height: 100%;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
 
           mat-card-header {
             display: flex;
@@ -417,10 +487,17 @@
             }
           }
 
+          mat-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+          }
+
           .matches-list {
             display: flex;
             flex-direction: column;
             gap: 16px;
+            flex: 1;
 
             .match-item {
               padding: 16px;
@@ -509,8 +586,15 @@
 
       // Top Scorers
       .top-scorers-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        
         .top-scorers-card {
           height: 100%;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
 
           mat-card-header {
             display: flex;
@@ -541,10 +625,17 @@
             }
           }
 
+          mat-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+          }
+
           .scorers-list {
             display: flex;
             flex-direction: column;
             gap: 16px;
+            flex: 1;
 
             .scorer-item {
               display: flex;
@@ -648,143 +739,17 @@
       }
     }
 
-    // Quick Links Section
-    .quick-links-section {
-      margin-bottom: 40px;
 
-      .section-title {
-        text-align: center;
-        font-size: 32px;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin: 0 0 32px 0;
-      }
-
-      .quick-links-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-
-        .quick-link-card {
-          cursor: pointer;
-          transition: all 0.3s ease;
-          border-top: 4px solid;
-
-          &:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-          }
-
-          mat-card-content {
-            position: relative;
-            padding: 24px;
-
-            .link-icon {
-              width: 64px;
-              height: 64px;
-              border-radius: 16px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-bottom: 16px;
-
-              mat-icon {
-                font-size: 32px;
-                width: 32px;
-                height: 32px;
-              }
-            }
-
-            h3 {
-              margin: 0 0 8px 0;
-              font-size: 20px;
-              font-weight: 600;
-              color: #1a1a1a;
-            }
-
-            p {
-              margin: 0;
-              font-size: 14px;
-              color: #666;
-              line-height: 1.5;
-            }
-
-            .arrow-icon {
-              position: absolute;
-              bottom: 16px;
-              right: 16px;
-              color: #ccc;
-              transition: all 0.3s ease;
-            }
-
-            &:hover .arrow-icon {
-              color: #1976d2;
-              transform: translateX(4px);
-            }
-          }
-        }
-      }
-    }
-
-    // Tournament Info Footer
-    .tournament-info-footer {
-      mat-card {
-        background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-
-        .info-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 32px;
-
-          .info-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-
-            mat-icon {
-              font-size: 40px;
-              width: 40px;
-              height: 40px;
-              color: #1976d2;
-            }
-
-            .info-content {
-              display: flex;
-              flex-direction: column;
-              gap: 4px;
-
-              .info-label {
-                font-size: 12px;
-                color: #666;
-                font-weight: 600;
-                text-transform: uppercase;
-              }
-
-              .info-value {
-                font-size: 16px;
-                font-weight: 700;
-                color: #1a1a1a;
-              }
-            }
-          }
-        }
-      }
-    }
   }
+}
+
+.hero-right-section {
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
 }
 
 // Responsive Design
-@media (max-width: 1200px) {
-  .tournament-home-container {
-    .content-wrapper {
-      .quick-links-section {
-        .quick-links-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-    }
-  }
-}
 
 @media (max-width: 768px) {
   .tournament-home-container {
@@ -919,27 +884,210 @@
           }
         }
       }
+
+      // Tournament Info Compact Responsive
+      .tournament-info-compact {
+        flex-direction: column;
+        gap: 12px;
+
+        .info-item-compact {
+          justify-content: center;
+          text-align: center;
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            color: white;
+          }
+
+          .info-content-compact {
+            align-items: center;
+
+            .info-label-compact {
+              font-size: 10px;
+              color: rgba(255, 255, 255, 0.8);
+            }
+
+            .info-value-compact {
+              font-size: 12px;
+              color: white;
+            }
+          }
+        }
+      }
     }
 
     .content-wrapper {
       padding: 24px 12px;
 
-
       .two-column-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-links-section {
-        .quick-links-grid {
-          grid-template-columns: 1fr;
+        .row {
+          flex-direction: column;
+          
+          .col-lg-6 {
+            margin-bottom: 20px;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
         }
       }
 
-      .tournament-info-footer {
-        mat-card {
-          .info-grid {
-            grid-template-columns: 1fr;
-            gap: 24px;
+    }
+  }
+}
+
+// Navigation Sections (Sidebar)
+.navigation-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .nav-section-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-card-content {
+      padding: 16px !important;
+
+      .nav-section-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .nav-section-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        .nav-section-info {
+          flex: 1;
+          min-width: 0;
+
+          .nav-section-title {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.2;
+          }
+
+          .nav-section-description {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.3;
+          }
+        }
+
+        .nav-arrow-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: #ccc;
+          transition: all 0.3s ease;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    &:hover {
+      .nav-arrow-icon {
+        color: #1976d2;
+        transform: translateX(2px);
+      }
+    }
+  }
+}
+
+// Responsive para Navigation Sections
+@media (max-width: 991px) {
+  .navigation-sections {
+    .nav-section-card {
+      mat-card-content {
+        .nav-section-content {
+          .nav-section-info {
+            .nav-section-title {
+              font-size: 13px;
+            }
+
+            .nav-section-description {
+              font-size: 11px;
+            }
+          }
+
+          .nav-section-icon {
+            width: 36px;
+            height: 36px;
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .navigation-sections {
+    margin-top: 20px;
+    
+    .nav-section-card {
+      mat-card-content {
+        padding: 12px !important;
+
+        .nav-section-content {
+          gap: 10px;
+
+          .nav-section-icon {
+            width: 32px;
+            height: 32px;
+
+            mat-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+
+          .nav-section-info {
+            .nav-section-title {
+              font-size: 12px;
+            }
+
+            .nav-section-description {
+              font-size: 10px;
+            }
+          }
+
+          .nav-arrow-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
           }
         }
       }
