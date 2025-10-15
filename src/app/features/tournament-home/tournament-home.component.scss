@@ -208,6 +208,18 @@
             ::ng-deep .mat-mdc-floating-label {
               color: rgba(0, 0, 0, 0.6);
             }
+
+            // Estilos para los íconos en las opciones
+            ::ng-deep .mat-mdc-option {
+              .option-icon {
+                margin-right: 8px;
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+                color: #1976d2;
+                vertical-align: middle;
+              }
+            }
           }
         }
 

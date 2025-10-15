@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, interval } from 'rxjs';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, TournamentDetails, ToastService } from '@core/services';
 
 interface Tournament {
   id: number;
@@ -93,7 +95,8 @@ interface QuickLink {
     MatDividerModule,
     MatTooltipModule,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    FormsModule
   ],
   templateUrl: './tournament-home.component.html',
   styleUrls: ['./tournament-home.component.scss'],
@@ -259,13 +262,43 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     seconds: 0
   };
 
+  // Selects de Fase y Grupo
+  phases: TournamentPhase[] = [];
+  groups: TournamentGroup[] = [];
+  selectedPhaseId: number | null = null;
+  selectedGroupId: number | null = null;
+  PhaseType = PhaseType; // Exponer el enum al template
+  tournamentId: number = 1; // Por defecto torneo 1
+  
+  // Información del torneo desde API
+  tournamentDetails: TournamentDetails | null = null;
+
   private destroy$ = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private managerService: ManagerService,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
     this.startCountdown();
-    // TODO: Cargar datos reales del torneo
+    
+    // Obtener el tournamentId de los parámetros de la ruta
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const id = params.get('tournamentId');
+        if (id) {
+          this.tournamentId = +id;
+          console.log('Tournament ID recibido:', this.tournamentId);
+          this.loadPhases();
+        } else {
+          // Si no hay ID en la ruta, usar el ID por defecto
+          this.loadPhases();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -345,5 +378,107 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
       minute: '2-digit'
     };
     return date.toLocaleDateString('es-ES', options);
+  }
+
+  /**
+   * Carga las fases del torneo
+   */
+  private loadPhases(): void {
+    this.managerService.getTournamentPhases(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentDetails) => {
+          console.log('Detalles del torneo recibidos:', tournamentDetails);
+          
+          // Guardar detalles del torneo
+          this.tournamentDetails = tournamentDetails;
+          
+          // Actualizar información del torneo existente
+          this.tournament.name = tournamentDetails.name;
+          this.tournament.startDate = new Date(tournamentDetails.startDate);
+          this.tournament.endDate = new Date(tournamentDetails.endDate);
+          
+          // Cargar fases
+          this.phases = tournamentDetails.phases || [];
+          console.log('Fases cargadas:', this.phases);
+          
+          // Seleccionar la primera fase por defecto
+          if (this.phases.length > 0) {
+            this.selectedPhaseId = this.phases[0].id;
+            this.onPhaseChange();
+          }
+          
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fases:', error);
+          this.toastService.showError('Error al cargar las fases del torneo');
+        }
+      });
+  }
+
+  /**
+   * Maneja el cambio de fase seleccionada
+   */
+  onPhaseChange(): void {
+    const selectedPhase = this.selectedPhase;
+    
+    if (selectedPhase) {
+      console.log('Fase seleccionada:', selectedPhase);
+      
+      // Si es fase de grupos, cargar los grupos
+      if (selectedPhase.phaseType === PhaseType.Groups) {
+        this.loadGroups(selectedPhase);
+      } else {
+        // Si es knockout, limpiar grupos
+        this.groups = [];
+        this.selectedGroupId = null;
+      }
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Carga los grupos de la fase seleccionada
+   */
+  private loadGroups(selectedPhase: TournamentPhase): void {
+    // Cargar los grupos desde la fase seleccionada
+    this.groups = selectedPhase.groups || [];
+    
+    console.log('Grupos cargados:', this.groups);
+
+    // Seleccionar el primer grupo por defecto
+    if (this.groups.length > 0) {
+      this.selectedGroupId = this.groups[0].id;
+    }
+    
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja el cambio de grupo seleccionado
+   */
+  onGroupChange(): void {
+    const selectedGroup = this.groups.find(g => g.id === this.selectedGroupId);
+    
+    if (selectedGroup) {
+      console.log('Grupo seleccionado:', selectedGroup);
+      // Aquí se puede agregar lógica adicional si es necesario
+    }
+  }
+
+  /**
+   * Obtiene la fase seleccionada
+   */
+  get selectedPhase(): TournamentPhase | undefined {
+    return this.phases.find(p => p.id === this.selectedPhaseId);
+  }
+
+  /**
+   * Verifica si debe mostrar el select de grupos
+   */
+  get shouldShowGroupSelect(): boolean {
+    return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 }
