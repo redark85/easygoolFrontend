@@ -87,6 +87,43 @@
       z-index: 1;
     }
 
+    // Back Button
+    .back-button-container {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+
+      .back-button {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        width: 48px;
+        height: 48px;
+
+        &:hover {
+          background: white;
+          transform: translateX(-2px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+          border-color: rgba(25, 118, 210, 0.3);
+        }
+
+        mat-icon {
+          color: #1976d2;
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+          transition: color 0.3s ease;
+        }
+
+        &:hover mat-icon {
+          color: #1565c0;
+        }
+      }
+    }
+
     .container-fluid {
       position: relative;
       z-index: 2;
@@ -943,6 +980,23 @@
                 font-size: 12px;
               }
             }
+          }
+        }
+      }
+
+      // Back Button Responsive
+      .back-button-container {
+        top: 12px;
+        left: 12px;
+
+        .back-button {
+          width: 40px;
+          height: 40px;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
           }
         }
       }

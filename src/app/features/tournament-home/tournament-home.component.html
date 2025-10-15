@@ -15,6 +15,13 @@
       <div class="hero-overlay"></div>
     </div>
 
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <button mat-icon-button class="back-button" routerLink="/" matTooltip="Volver al inicio" matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+
     <div class="container-fluid">
       <div class="row align-items-start">
         <!-- Left Column: Tournament Info (8 columns) -->
@@ -22,7 +29,7 @@
           <div class="row align-items-center">
             <!-- Tournament Logo -->
             <div class="col-auto">
-              <div class="tournament-logo">
+              <div class="tournament-logo" [routerLink]="['/public-standings', tournamentId]" style="cursor: pointer;">
                 <img [src]="tournament.logoUrl || 'assets/logo.png'" 
                      [alt]="tournament.name" 
                      class="tournament-image"
@@ -42,7 +49,7 @@
             <div class="col">
               <div class="tournament-info">
                 <div class="tournament-header">
-                  <h1 class="tournament-title">{{ tournament.name }}</h1>
+                  <h1 class="tournament-title" [routerLink]="['/public-standings', tournamentId]" style="cursor: pointer;">{{ tournament.name }}</h1>
                 </div>
 
                 <div class="tournament-meta">
@@ -146,7 +153,7 @@
 
             <!-- Next Match Card -->
             <div class="hero-next-match">
-              <mat-card class="next-match-card-compact">
+              <mat-card class="next-match-card-compact" [routerLink]="['/public-fixture', tournamentId]" style="cursor: pointer;">
                 <mat-card-header>
                   <mat-card-title>
                     <mat-icon>schedule</mat-icon>
@@ -225,14 +232,14 @@
                       <mat-icon>history</mat-icon>
                       Últimos Resultados
                     </mat-card-title>
-                    <button mat-button routerLink="/public-fixture/1" class="view-all-btn">
+                    <button mat-button [routerLink]="['/public-fixture', tournamentId]" class="view-all-btn">
                       Ver todos
                       <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </mat-card-header>
                   <mat-card-content>
                     <div class="matches-list">
-                      <div *ngFor="let match of recentMatches" class="match-item">
+                      <div *ngFor="let match of recentMatches" class="match-item" [routerLink]="['/public-fixture', tournamentId]" style="cursor: pointer;">
                         <div class="match-header">
                           <span class="matchday">J{{ match.matchday }}</span>
                           <span class="match-date">{{ formatMatchDate(match.date) }}</span>
@@ -267,14 +274,14 @@
                       <mat-icon>sports_soccer</mat-icon>
                       Máximos Goleadores
                     </mat-card-title>
-                    <button mat-button routerLink="/public-top-scorers/1" class="view-all-btn">
+                    <button mat-button [routerLink]="['/public-top-scorers', tournamentId]" class="view-all-btn">
                       Ver tabla completa
                       <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </mat-card-header>
                   <mat-card-content>
                     <div class="scorers-list">
-                      <div *ngFor="let scorer of topScorers; let i = index" class="scorer-item">
+                      <div *ngFor="let scorer of topScorers; let i = index" class="scorer-item" [routerLink]="['/public-top-scorers', tournamentId]" style="cursor: pointer;">
                         <div class="position-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
                           {{ i + 1 }}
                         </div>
@@ -302,7 +309,7 @@
           <!-- Secciones de navegación -->
           <div class="navigation-sections">
             <!-- Tabla de Posiciones -->
-            <mat-card class="nav-section-card" routerLink="/public-standings/1">
+            <mat-card class="nav-section-card" [routerLink]="['/public-standings', tournamentId]">
               <mat-card-content>
                 <div class="nav-section-content">
                   <div class="nav-section-icon" style="background-color: #1976d220;">
@@ -318,7 +325,7 @@
             </mat-card>
 
             <!-- Fixture Completo -->
-            <mat-card class="nav-section-card" routerLink="/public-fixture/1">
+            <mat-card class="nav-section-card" [routerLink]="['/public-fixture', tournamentId]">
               <mat-card-content>
                 <div class="nav-section-content">
                   <div class="nav-section-icon" style="background-color: #ff980020;">
@@ -334,7 +341,7 @@
             </mat-card>
 
             <!-- Goleadores -->
-            <mat-card class="nav-section-card" routerLink="/public-top-scorers/1">
+            <mat-card class="nav-section-card" [routerLink]="['/public-top-scorers', tournamentId]">
               <mat-card-content>
                 <div class="nav-section-content">
                   <div class="nav-section-icon" style="background-color: #4caf5020;">
@@ -350,7 +357,7 @@
             </mat-card>
 
             <!-- Equipos -->
-            <mat-card class="nav-section-card" routerLink="/public-teams/1">
+            <mat-card class="nav-section-card" [routerLink]="['/public-teams', tournamentId]">
               <mat-card-content>
                 <div class="nav-section-content">
                   <div class="nav-section-icon" style="background-color: #9c27b020;">
@@ -366,7 +373,7 @@
             </mat-card>
 
             <!-- Estadísticas -->
-            <mat-card class="nav-section-card" routerLink="/public-tournament-stats/1">
+            <mat-card class="nav-section-card" [routerLink]="['/public-tournament-stats', tournamentId]">
               <mat-card-content>
                 <div class="nav-section-content">
                   <div class="nav-section-icon" style="background-color: #f4433620;">
