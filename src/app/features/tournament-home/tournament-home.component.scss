@@ -5,10 +5,11 @@
   // Hero Section - Minimalista
   .hero-section {
     position: relative;
-    height: 200px;
+    min-height: 200px;
     display: flex;
     align-items: center;
     overflow: hidden;
+    padding: 20px 0;
 
     .hero-background {
       position: absolute;
@@ -35,7 +36,9 @@
       position: relative;
       z-index: 1;
       color: white;
-      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 10px 24px;
 
       .tournament-logo {
         position: relative;
@@ -116,19 +119,14 @@
 
         .tournament-meta {
           display: flex;
-          align-items: center;
-          gap: 12px;
+          flex-direction: column;
+          gap: 8px;
           font-size: 16px;
           opacity: 0.95;
           margin-bottom: 16px;
 
           .tournament-season {
             font-weight: 500;
-          }
-
-          .separator {
-            font-weight: 700;
-            opacity: 0.7;
           }
 
           .current-phase {
@@ -757,12 +755,11 @@
 @media (max-width: 768px) {
   .tournament-home-container {
     .hero-section {
-      height: auto;
       min-height: 160px;
       padding: 16px 0;
 
       .container-fluid {
-        padding: 16px;
+        padding: 24px 12px;
 
         .row {
           flex-direction: column;
@@ -802,9 +799,9 @@
           }
 
           .tournament-meta {
-            justify-content: center;
+            align-items: center;
             font-size: 14px;
-            flex-wrap: wrap;
+            gap: 6px;
 
             .phase-icon {
               font-size: 16px;
