@@ -73,6 +73,7 @@ export const VOCALIA_FINISH_MATCH_ENDPOINT = '/api/Vocalia/FinishMatch';
 // Fixture Endpoints
 export const FIXTURE_GET_ENDPOINT = '/api/Fixture/GetFixture';
 export const FIXTURE_GET_TOURNAMENT_LIST_ENDPOINT = '/api/Fixture/GetTournamentList';
+export const FIXTURE_GET_TOURNAMENT_HOME_ENDPOINT = '/api/Fixture/GetTournamentHome';
 
 // Manager Endpoints
 export const MANAGER_GET_TEAMS_ENDPOINT = '/api/Manager/ManagerTeams';

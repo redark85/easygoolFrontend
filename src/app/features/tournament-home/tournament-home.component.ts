@@ -9,9 +9,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, interval } from 'rxjs';
-import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, TournamentDetails, ToastService } from '@core/services';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, TournamentDetails, ToastService, TournamentHomeService } from '@core/services';
+import { TournamentHomeData, OutstandingMatch, LastMatch, BestScorer } from '@core/interfaces/tournament-home.interface';
 
 interface Tournament {
   id: number;
@@ -96,6 +98,7 @@ interface QuickLink {
     MatTooltipModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatProgressSpinnerModule,
     FormsModule
   ],
   templateUrl: './tournament-home.component.html',
@@ -106,107 +109,42 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
   // Tournament Info
   tournament: Tournament = {
     id: 1,
-    name: 'Liga Amateur 2025',
+    name: 'Cargando...',
     season: 'Temporada 2025',
     bannerUrl: 'assets/tournament-banner.jpg',
-    logoUrl: 'assets/tournament-logo.png',
-    totalTeams: 12,
-    totalMatches: 66,
-    totalGoals: 156,
-    currentPhase: 'Fase de Grupos',
-    status: 'ongoing',
-    startDate: new Date(2025, 0, 15),
-    endDate: new Date(2025, 5, 30)
+    logoUrl: 'assets/logo.png',
+    totalTeams: 0,
+    totalMatches: 0,
+    totalGoals: 0,
+    currentPhase: 'Cargando...',
+    status: 'upcoming',
+    startDate: new Date(),
+    endDate: new Date()
   };
 
   // Next Featured Match
   nextMatch: NextMatch = {
     id: 1,
     homeTeam: {
-      name: 'Deportivo FC',
+      name: 'Cargando...',
       logo: 'assets/team-placeholder.png',
-      position: 3
+      position: 0
     },
     awayTeam: {
-      name: 'Atlético United',
+      name: 'Cargando...',
       logo: 'assets/team-placeholder.png',
-      position: 5
+      position: 0
     },
-    date: new Date(2025, 9, 15, 18, 0),
-    venue: 'Estadio Municipal',
-    matchday: 11
+    date: new Date(),
+    venue: 'Cargando...',
+    matchday: 0
   };
 
   // Recent Matches
-  recentMatches: RecentMatch[] = [
-    {
-      id: 1,
-      homeTeam: { name: 'Real FC', logo: 'assets/team-placeholder.png' },
-      awayTeam: { name: 'Sporting Club', logo: 'assets/team-placeholder.png' },
-      homeScore: 3,
-      awayScore: 1,
-      date: new Date(2025, 9, 10),
-      matchday: 10
-    },
-    {
-      id: 2,
-      homeTeam: { name: 'Unidos FC', logo: 'assets/team-placeholder.png' },
-      awayTeam: { name: 'Victoria United', logo: 'assets/team-placeholder.png' },
-      homeScore: 2,
-      awayScore: 2,
-      date: new Date(2025, 9, 10),
-      matchday: 10
-    },
-    {
-      id: 3,
-      homeTeam: { name: 'Campeones SC', logo: 'assets/team-placeholder.png' },
-      awayTeam: { name: 'Estrella FC', logo: 'assets/team-placeholder.png' },
-      homeScore: 1,
-      awayScore: 0,
-      date: new Date(2025, 9, 9),
-      matchday: 10
-    },
-    {
-      id: 4,
-      homeTeam: { name: 'Tigres FC', logo: 'assets/team-placeholder.png' },
-      awayTeam: { name: 'Leones United', logo: 'assets/team-placeholder.png' },
-      homeScore: 4,
-      awayScore: 2,
-      date: new Date(2025, 9, 9),
-      matchday: 10
-    }
-  ];
+  recentMatches: RecentMatch[] = [];
 
   // Top Scorers Preview
-  topScorers: TopScorer[] = [
-    {
-      id: 1,
-      name: 'Carlos Gómez',
-      photo: 'assets/person.jpg',
-      team: 'Real FC',
-      teamLogo: 'assets/team-placeholder.png',
-      goals: 12,
-      matches: 10
-    },
-    {
-      id: 2,
-      name: 'Juan Martínez',
-      photo: 'assets/person.jpg',
-      team: 'Deportivo FC',
-      teamLogo: 'assets/team-placeholder.png',
-      goals: 10,
-      matches: 10
-    },
-    {
-      id: 3,
-      name: 'Pedro López',
-      photo: 'assets/person.jpg',
-      team: 'Atlético United',
-      teamLogo: 'assets/team-placeholder.png',
-      goals: 9,
-      matches: 9
-    }
-  ];
+  topScorers: TopScorer[] = [];
 
   // Quick Links
   quickLinks: QuickLink[] = [
@@ -272,6 +210,7 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
   
   // Información del torneo desde API
   tournamentDetails: TournamentDetails | null = null;
+  isLoadingTournamentData = false;
 
   private destroy$ = new Subject<void>();
 
@@ -279,7 +218,8 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private managerService: ManagerService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private tournamentHomeService: TournamentHomeService
   ) {}
 
   ngOnInit(): void {
@@ -397,6 +337,8 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
           this.tournament.name = tournamentDetails.name;
           this.tournament.startDate = new Date(tournamentDetails.startDate);
           this.tournament.endDate = new Date(tournamentDetails.endDate);
+          // Usar la imagen del torneo si está disponible, sino mantener la por defecto
+          this.tournament.logoUrl = tournamentDetails.imageUrl || 'assets/logo.png';
           
           // Cargar fases
           this.phases = tournamentDetails.phases || [];
@@ -430,9 +372,10 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
       if (selectedPhase.phaseType === PhaseType.Groups) {
         this.loadGroups(selectedPhase);
       } else {
-        // Si es knockout, limpiar grupos
+        // Si es knockout, limpiar grupos y cargar datos
         this.groups = [];
         this.selectedGroupId = null;
+        this.loadTournamentHomeData();
       }
       
       this.cdr.detectChanges();
@@ -451,6 +394,7 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     // Seleccionar el primer grupo por defecto
     if (this.groups.length > 0) {
       this.selectedGroupId = this.groups[0].id;
+      this.loadTournamentHomeData();
     }
     
     this.cdr.detectChanges();
@@ -464,7 +408,7 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     
     if (selectedGroup) {
       console.log('Grupo seleccionado:', selectedGroup);
-      // Aquí se puede agregar lógica adicional si es necesario
+      this.loadTournamentHomeData();
     }
   }
 
@@ -480,5 +424,151 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
    */
   get shouldShowGroupSelect(): boolean {
     return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
+  }
+
+  /**
+   * Carga los datos del home del torneo desde el API
+   */
+  private loadTournamentHomeData(): void {
+    if (!this.selectedPhaseId) {
+      console.warn('No hay fase seleccionada');
+      return;
+    }
+
+    this.isLoadingTournamentData = true;
+    const groupId = this.selectedGroupId || 0; // 0 si no hay grupo seleccionado
+
+    this.tournamentHomeService.getTournamentHome(this.tournamentId, this.selectedPhaseId, groupId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeed && response.result) {
+            console.log('Datos del torneo recibidos:', response.result);
+            this.updateTournamentData(response.result);
+          } else {
+            console.error('Error en la respuesta:', response.message);
+            this.toastService.showError(response.message || 'Error al cargar los datos del torneo');
+          }
+          this.isLoadingTournamentData = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar datos del torneo:', error);
+          this.toastService.showError('Error al cargar los datos del torneo');
+          this.isLoadingTournamentData = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Actualiza los datos del torneo con la respuesta del API
+   */
+  private updateTournamentData(data: TournamentHomeData): void {
+    // Actualizar información general del torneo
+    this.tournament.name = data.name;
+    this.tournament.totalTeams = data.totalTeams;
+    this.tournament.totalMatches = data.totalMatches;
+    this.tournament.totalGoals = data.goals;
+    this.tournament.startDate = new Date(data.startDate);
+    this.tournament.endDate = new Date(data.endDate);
+    this.tournament.currentPhase = data.phaseName;
+    this.tournament.status = this.mapApiStatusToTournamentStatus(data.status);
+    
+    // Mantener la imagen por defecto si no viene logoUrl del API
+    // (el logoUrl del torneo se obtiene desde tournamentDetails, no desde este API)
+
+    // Actualizar próximo partido destacado
+    if (data.outstandingMatch) {
+      this.updateNextMatch(data.outstandingMatch);
+    }
+
+    // Actualizar últimos partidos
+    if (data.lastMatches && data.lastMatches.length > 0) {
+      this.updateRecentMatches(data.lastMatches);
+    }
+
+    // Actualizar goleadores
+    if (data.bestScorers && data.bestScorers.length > 0) {
+      this.updateTopScorers(data.bestScorers);
+    }
+  }
+
+  /**
+   * Actualiza el próximo partido con datos del API
+   */
+  private updateNextMatch(match: OutstandingMatch): void {
+    this.nextMatch = {
+      id: 1,
+      homeTeam: {
+        name: match.homeTeamName,
+        logo: match.homeTeamLogoUrl || 'assets/team-placeholder.png',
+        position: match.homeTeamPosition
+      },
+      awayTeam: {
+        name: match.awayTeamName,
+        logo: match.awayTeamLogoUrl || 'assets/team-placeholder.png',
+        position: match.awayTeamPosition
+      },
+      date: new Date(match.matchDate),
+      venue: match.groupName || match.phaseName,
+      matchday: parseInt(match.matchDayName.replace(/\D/g, '')) || 1
+    };
+  }
+
+  /**
+   * Actualiza los últimos partidos con datos del API
+   */
+  private updateRecentMatches(matches: LastMatch[]): void {
+    this.recentMatches = matches.slice(0, 4).map((match, index) => ({
+      id: index + 1,
+      homeTeam: {
+        name: match.homeTeamName,
+        logo: match.homeTeamLogoUrl || 'assets/team-placeholder.png'
+      },
+      awayTeam: {
+        name: match.awayTeamName,
+        logo: match.awayTeamLogoUrl || 'assets/team-placeholder.png'
+      },
+      homeScore: match.homeScore || 0,
+      awayScore: match.awayScore || 0,
+      date: new Date(match.matchDate),
+      matchday: parseInt(match.matchDayName.replace(/\D/g, '')) || 1
+    }));
+  }
+
+  /**
+   * Actualiza los goleadores con datos del API
+   */
+  private updateTopScorers(scorers: BestScorer[]): void {
+    this.topScorers = scorers.slice(0, 3).map((scorer, index) => ({
+      id: index + 1,
+      name: scorer.name,
+      photo: scorer.imageUrl || 'assets/person.jpg',
+      team: scorer.teamName,
+      teamLogo: scorer.teamLogoUrl || 'assets/team-placeholder.png',
+      goals: scorer.goals,
+      matches: 10 // Este campo no viene del API, usar valor por defecto
+    }));
+  }
+
+  /**
+   * Mapea el status del API al status del componente
+   */
+  private mapApiStatusToTournamentStatus(apiStatus: number): 'upcoming' | 'ongoing' | 'finished' {
+    switch (apiStatus) {
+      case 0: return 'upcoming';
+      case 1: return 'ongoing';
+      case 2: return 'finished';
+      default: return 'ongoing';
+    }
+  }
+
+  /**
+   * Maneja el error de carga de la imagen del torneo
+   */
+  onTournamentImageError(event: any): void {
+    console.warn('Error loading tournament image, using default logo');
+    event.target.src = 'assets/logo.png';
   }
 }

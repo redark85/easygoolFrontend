@@ -1,4 +1,13 @@
 <div class="tournament-home-container">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoadingTournamentData">
+    <div class="loading-content">
+      <mat-spinner diameter="60" strokeWidth="4"></mat-spinner>
+      <p class="loading-text">Cargando datos del torneo...</p>
+      <p class="loading-subtext">Por favor espere</p>
+    </div>
+  </div>
+
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-background">
@@ -14,7 +23,10 @@
             <!-- Tournament Logo -->
             <div class="col-auto">
               <div class="tournament-logo">
-                <img [src]="tournament.logoUrl" [alt]="tournament.name" class="tournament-image">
+                <img [src]="tournament.logoUrl || 'assets/logo.png'" 
+                     [alt]="tournament.name" 
+                     class="tournament-image"
+                     (error)="onTournamentImageError($event)">
 
                 <!-- Status Badge sobre la imagen -->
                 <div class="status-badge"
