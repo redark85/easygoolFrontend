@@ -2,13 +2,12 @@
   min-height: 100vh;
   background-color: #f5f5f5;
 
-  // Hero Section
+  // Hero Section - Minimalista
   .hero-section {
     position: relative;
-    height: 600px;
+    height: 200px;
     display: flex;
     align-items: center;
-    justify-content: center;
     overflow: hidden;
 
     .hero-background {
@@ -19,8 +18,8 @@
       bottom: 0;
       background-size: cover;
       background-position: center;
-      filter: blur(3px);
-      transform: scale(1.1);
+      filter: blur(2px);
+      transform: scale(1.05);
     }
 
     .hero-overlay {
@@ -29,102 +28,152 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(135deg, rgba(25, 118, 210, 0.9) 0%, rgba(156, 39, 176, 0.9) 100%);
+      background: linear-gradient(135deg, rgba(25, 118, 210, 0.85) 0%, rgba(156, 39, 176, 0.85) 100%);
     }
 
-    .hero-content {
+    .container-fluid {
       position: relative;
       z-index: 1;
-      text-align: center;
       color: white;
-      max-width: 1200px;
-      padding: 0 24px;
+      padding: 24px;
 
       .tournament-logo {
-        margin-bottom: 24px;
+        position: relative;
 
-        img {
-          width: 120px;
-          height: 120px;
+        .tournament-image {
+          width: 80px;
+          height: 80px;
           object-fit: contain;
-          border-radius: 50%;
-          border: 4px solid white;
+          border-radius: 12px;
+          border: 3px solid white;
           background-color: white;
-          padding: 8px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+          padding: 6px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          width: 28px;
+          height: 28px;
+          background-color: #4caf50;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          border: 2px solid white;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          }
+
+          .status-icon {
+            color: white;
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            margin: 0;
+          }
+
+          &.status-upcoming {
+            background-color: #ff9800; // Naranja para próximamente
+          }
+
+          &.status-ongoing {
+            background-color: #4caf50; // Verde para en curso
+          }
+
+          &.status-finished {
+            background-color: #2196f3; // Azul para finalizado
+          }
         }
       }
 
-      .tournament-title {
-        font-size: 56px;
-        font-weight: 700;
-        margin: 0 0 12px 0;
-        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        line-height: 1.2;
-      }
+      .tournament-info {
+        .tournament-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 12px;
 
-      .tournament-season {
-        font-size: 24px;
-        margin: 0 0 16px 0;
-        opacity: 0.95;
-        font-weight: 300;
-      }
+          .tournament-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
+          }
+        }
 
-      .status-chip {
-        color: white;
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 32px;
-      }
+        .tournament-meta {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 16px;
+          opacity: 0.95;
+          margin-bottom: 16px;
 
-      .quick-stats {
-        display: flex;
-        justify-content: center;
-        gap: 48px;
-        margin: 40px 0 32px 0;
+          .tournament-season {
+            font-weight: 500;
+          }
 
-        .stat-item {
+          .separator {
+            font-weight: 700;
+            opacity: 0.7;
+          }
+
+          .current-phase {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+
+            .phase-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+
+        .tournament-stats {
           display: flex;
           flex-direction: column;
-          align-items: center;
           gap: 8px;
 
-          mat-icon {
-            font-size: 48px;
-            width: 48px;
-            height: 48px;
-            opacity: 0.9;
+          .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+              opacity: 0.9;
+            }
+
+            .stat-number {
+              font-size: 18px;
+              font-weight: 700;
+              line-height: 1;
+            }
+
+            .stat-label {
+              font-size: 13px;
+              opacity: 0.9;
+              font-weight: 500;
+            }
           }
-
-          .stat-number {
-            font-size: 48px;
-            font-weight: 700;
-            line-height: 1;
-          }
-
-          .stat-label {
-            font-size: 16px;
-            opacity: 0.9;
-            font-weight: 300;
-          }
-        }
-      }
-
-      .current-phase {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 24px;
-        backdrop-filter: blur(10px);
-        font-size: 16px;
-        font-weight: 600;
-
-        mat-icon {
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
         }
       }
     }
@@ -709,21 +758,83 @@
   .tournament-home-container {
     .hero-section {
       height: auto;
-      min-height: 500px;
-      padding: 40px 0;
+      min-height: 160px;
+      padding: 16px 0;
 
-      .hero-content {
-        .tournament-title {
-          font-size: 36px;
-        }
+      .container-fluid {
+        padding: 16px;
 
-        .tournament-season {
-          font-size: 18px;
-        }
-
-        .quick-stats {
+        .row {
           flex-direction: column;
-          gap: 24px;
+          text-align: center;
+          gap: 16px;
+        }
+
+        .tournament-logo {
+          .tournament-image {
+            width: 60px;
+            height: 60px;
+          }
+
+          .status-badge {
+            width: 24px;
+            height: 24px;
+            top: -3px;
+            right: -3px;
+
+            .status-icon {
+              font-size: 12px;
+              width: 12px;
+              height: 12px;
+            }
+          }
+        }
+
+        .tournament-info {
+          .tournament-header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+
+            .tournament-title {
+              font-size: 24px;
+            }
+          }
+
+          .tournament-meta {
+            justify-content: center;
+            font-size: 14px;
+            flex-wrap: wrap;
+
+            .phase-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+
+          .tournament-stats {
+            align-items: center;
+            gap: 6px;
+
+            .stat-item {
+              gap: 6px;
+
+              mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+              }
+
+              .stat-number {
+                font-size: 16px;
+              }
+
+              .stat-label {
+                font-size: 12px;
+              }
+            }
+          }
         }
       }
     }

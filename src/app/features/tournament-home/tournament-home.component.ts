@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil, interval } from 'rxjs';
 
 interface Tournament {
@@ -87,7 +88,8 @@ interface QuickLink {
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
   ],
   templateUrl: './tournament-home.component.html',
   styleUrls: ['./tournament-home.component.scss'],
@@ -305,6 +307,18 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
       finished: { label: 'Finalizado', color: '#607d8b' }
     };
     return badges[this.tournament.status] || badges['ongoing'];
+  }
+
+  /**
+   * Obtiene el ícono de estado del torneo
+   */
+  getStatusIcon(status: string): string {
+    const icons: { [key: string]: string } = {
+      upcoming: 'schedule',
+      ongoing: 'play_circle',
+      finished: 'check_circle'
+    };
+    return icons[status] || icons['ongoing'];
   }
 
   /**

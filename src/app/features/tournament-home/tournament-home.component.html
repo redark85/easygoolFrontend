@@ -4,37 +4,59 @@
     <div class="hero-background" [style.background-image]="'url(' + tournament.bannerUrl + ')'">
       <div class="hero-overlay"></div>
     </div>
-    <div class="hero-content">
-      <div class="tournament-logo">
-        <img [src]="tournament.logoUrl" [alt]="tournament.name">
-      </div>
-      <h1 class="tournament-title">{{ tournament.name }}</h1>
-      <p class="tournament-season">{{ tournament.season }}</p>
-      <mat-chip [style.background-color]="getStatusBadge().color" class="status-chip">
-        {{ getStatusBadge().label }}
-      </mat-chip>
-      
-      <div class="quick-stats">
-        <div class="stat-item">
-          <mat-icon>groups</mat-icon>
-          <span class="stat-number">{{ tournament.totalTeams }}</span>
-          <span class="stat-label">Equipos</span>
+    
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <!-- Tournament Logo -->
+        <div class="col-auto">
+          <div class="tournament-logo">
+            <img [src]="tournament.logoUrl" [alt]="tournament.name" class="tournament-image">
+            
+            <!-- Status Badge sobre la imagen -->
+            <div class="status-badge"
+                 [class]="'status-' + tournament.status"
+                 [matTooltip]="getStatusBadge().label + ' - ' + tournament.season"
+                 matTooltipPosition="above">
+              <mat-icon class="status-icon">{{ getStatusIcon(tournament.status) }}</mat-icon>
+            </div>
+          </div>
         </div>
-        <div class="stat-item">
-          <mat-icon>sports_soccer</mat-icon>
-          <span class="stat-number">{{ tournament.totalMatches }}</span>
-          <span class="stat-label">Partidos</span>
+        
+        <!-- Tournament Info -->
+        <div class="col">
+          <div class="tournament-info">
+            <div class="tournament-header">
+              <h1 class="tournament-title">{{ tournament.name }}</h1>
+            </div>
+            
+            <div class="tournament-meta">
+              <span class="tournament-season">{{ tournament.season }}</span>
+              <span class="separator">•</span>
+              <span class="current-phase">
+                <mat-icon class="phase-icon">flag</mat-icon>
+                {{ tournament.currentPhase }}
+              </span>
+            </div>
+            
+            <div class="tournament-stats">
+              <div class="stat-item">
+                <mat-icon>groups</mat-icon>
+                <span class="stat-number">{{ tournament.totalTeams }}</span>
+                <span class="stat-label">Equipos</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>sports_soccer</mat-icon>
+                <span class="stat-number">{{ tournament.totalMatches }}</span>
+                <span class="stat-label">Partidos</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>emoji_events</mat-icon>
+                <span class="stat-number">{{ tournament.totalGoals }}</span>
+                <span class="stat-label">Goles</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="stat-item">
-          <mat-icon>emoji_events</mat-icon>
-          <span class="stat-number">{{ tournament.totalGoals }}</span>
-          <span class="stat-label">Goles</span>
-        </div>
-      </div>
-
-      <div class="current-phase">
-        <mat-icon>flag</mat-icon>
-        <span>{{ tournament.currentPhase }}</span>
       </div>
     </div>
   </section>
