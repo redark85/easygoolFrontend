@@ -54,6 +54,7 @@ interface MatchStats {
   yellowCards: { home: number; away: number };
   redCards: { home: number; away: number };
   offsides: { home: number; away: number };
+  substitutions: { home: number; away: number };
 }
 
 interface StatRow {
@@ -183,7 +184,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
         fouls: { home: 0, away: 0 },
         yellowCards: { home: 0, away: 0 },
         redCards: { home: 0, away: 0 },
-        offsides: { home: 0, away: 0 }
+        offsides: { home: 0, away: 0 },
+        substitutions: { home: 0, away: 0 }
       }
     };
 
@@ -403,7 +405,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       fouls: { home: 0, away: 0 }, // No viene en el API
       yellowCards: { home: apiStats.homeTeamYellowCards, away: apiStats.awayTeamYellowCards },
       redCards: { home: apiStats.homeTeamRedCards, away: apiStats.awayTeamRedCards },
-      offsides: { home: 0, away: 0 } // No viene en el API
+      offsides: { home: 0, away: 0 }, // No viene en el API
+      substitutions: { home: apiStats.homeTeamSubstitution || 0, away: apiStats.awayTeamSubstitution || 0 }
     };
   }
 
@@ -566,7 +569,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       fouls: { home: 12, away: 14 },
       yellowCards: { home: 2, away: 3 },
       redCards: { home: 0, away: 0 },
-      offsides: { home: 3, away: 2 }
+      offsides: { home: 3, away: 2 },
+      substitutions: { home: 3, away: 2 }
     };
   }
 
@@ -595,11 +599,11 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Calcula solo las estadísticas de tarjetas (amarillas y rojas)
+   * Calcula las estadísticas del header (tarjetas y sustituciones)
    */
   private calculateCardStatsRows(stats: MatchStats): StatRow[] {
     const rows: StatRow[] = [];
-    const cardKeys = ['yellowCards', 'redCards'];
+    const cardKeys = ['yellowCards', 'redCards', 'substitutions'];
 
     cardKeys.forEach(key => {
       const stat = stats[key as keyof MatchStats];
@@ -631,9 +635,41 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       fouls: 'Faltas',
       yellowCards: 'Tarjetas Amarillas',
       redCards: 'Tarjetas Rojas',
-      offsides: 'Fuera de Juego'
+      offsides: 'Fuera de Juego',
+      substitutions: 'Cambios'
     };
     return labels[key] || key;
+  }
+
+  /**
+   * Formatea la fecha en español
+   */
+  getFormattedDate(date: Date): string {
+    if (!date) return 'Fecha por definir';
+    
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    
+    return new Intl.DateTimeFormat('es-ES', options).format(new Date(date));
+  }
+
+  /**
+   * Formatea la hora en español
+   */
+  getFormattedTime(date: Date): string {
+    if (!date) return 'Hora por definir';
+    
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    };
+    
+    return new Intl.DateTimeFormat('es-ES', options).format(new Date(date));
   }
 
   /**

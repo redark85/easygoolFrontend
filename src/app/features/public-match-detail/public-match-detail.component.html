@@ -42,11 +42,11 @@
               <div class="match-info">
                 <div class="info-item">
                   <mat-icon>event</mat-icon>
-                  <span>{{ (match.date | date:'fullDate') || 'Fecha por definir' }}</span>
+                  <span>{{ getFormattedDate(match.date) || 'Fecha por definir' }}</span>
                 </div>
                 <div class="info-item">
                   <mat-icon>schedule</mat-icon>
-                  <span>{{ (match.date | date:'shortTime') || 'Hora por definir' }}</span>
+                  <span>{{ getFormattedTime(match.date) || 'Hora por definir' }}</span>
                 </div>
                 <div class="info-item">
                   <mat-icon>location_on</mat-icon>
