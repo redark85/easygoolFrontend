@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { MatchCardComponent } from './components/match-card/match-card.component';
 import { PublicLoadingComponent } from '@shared/components';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService } from '@core/services';
 
 interface Team {
   id: number;
@@ -41,15 +42,6 @@ interface Matchday {
   matches: Match[];
 }
 
-interface Phase {
-  id: number;
-  name: string;
-}
-
-interface Group {
-  id: number;
-  name: string;
-}
 
 /**
  * Componente para mostrar el fixture completo del torneo
@@ -77,12 +69,13 @@ interface Group {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicFixtureComponent implements OnInit, OnDestroy {
-  // Filtros
-  phases: Phase[] = [];
-  groups: Group[] = [];
+  // Filtros - Usando los mismos tipos que tournament-home
+  phases: TournamentPhase[] = [];
+  groups: TournamentGroup[] = [];
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
   selectedStatus: string = 'all';
+  PhaseType = PhaseType; // Exponer el enum al template
 
   // Datos
   matchdays: Matchday[] = [];
@@ -103,7 +96,9 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private managerService: ManagerService,
+    private toastService: ToastService
   ) {}
 
     goBack(): void {
@@ -117,7 +112,11 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
         const id = params.get('tournamentId');
         if (id) {
           this.tournamentId = +id;
-          this.loadData();
+          console.log('Tournament ID recibido:', this.tournamentId);
+          this.loadPhases();
+        } else {
+          // Si no hay ID en la ruta, usar el ID por defecto
+          this.loadPhases();
         }
       });
   }
@@ -128,45 +127,69 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos del fixture
+   * Carga las fases del torneo
    */
-  private loadData(): void {
-    this.isLoading = true;
+  private loadPhases(): void {
+    this.managerService.getTournamentPhases(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentDetails) => {
+          console.log('Detalles del torneo recibidos:', tournamentDetails);
+          
+          // Cargar fases
+          this.phases = tournamentDetails.phases || [];
+          console.log('Fases cargadas:', this.phases);
+          
+          // Seleccionar la primera fase por defecto
+          if (this.phases.length > 0) {
+            this.selectedPhaseId = this.phases[0].id;
+            this.onPhaseChange();
+          }
+          
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fases:', error);
+          this.toastService.showError('Error al cargar las fases del torneo');
+        }
+      });
+  }
+
+  /**
+   * Carga los grupos de la fase seleccionada
+   */
+  private loadGroups(selectedPhase: TournamentPhase): void {
+    // Cargar los grupos desde la fase seleccionada
+    this.groups = selectedPhase.groups || [];
     
-    // TODO: Cargar desde API
-    // Por ahora usar datos dummy
-    this.loadDummyData();
+    console.log('Grupos cargados:', this.groups);
+
+    // Seleccionar el primer grupo por defecto
+    if (this.groups.length > 0) {
+      this.selectedGroupId = this.groups[0].id;
+      this.loadFixtureData();
+    } else {
+      this.loadFixtureData();
+    }
     
-    this.isLoading = false;
     this.cdr.detectChanges();
   }
 
   /**
-   * Carga datos dummy para demostración
+   * Carga los datos del fixture desde el API
    */
-  private loadDummyData(): void {
-    // Fases
-    this.phases = [
-      { id: 1, name: 'Fase de Grupos' },
-      { id: 2, name: 'Octavos de Final' },
-      { id: 3, name: 'Cuartos de Final' }
-    ];
-
-    // Grupos
-    this.groups = [
-      { id: 1, name: 'Grupo A' },
-      { id: 2, name: 'Grupo B' },
-      { id: 3, name: 'Grupo C' }
-    ];
-
-    // Seleccionar primera fase y grupo
-    this.selectedPhaseId = this.phases[0].id;
-    this.selectedGroupId = this.groups[0].id;
-
-    // Generar jornadas con partidos
-    this.matchdays = this.generateDummyMatchdays();
-    this.filteredMatchdays = [...this.matchdays];
-    this.calculateStats();
+  private loadFixtureData(): void {
+    this.isLoading = true;
+    
+    // TODO: Implementar llamada al API del fixture
+    // Por ahora usar datos dummy
+    setTimeout(() => {
+      this.matchdays = this.generateDummyMatchdays();
+      this.filteredMatchdays = [...this.matchdays];
+      this.calculateStats();
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }, 1000);
   }
 
   /**
@@ -263,19 +286,52 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja el cambio de fase
+   * Maneja el cambio de fase seleccionada
    */
   onPhaseChange(): void {
-    console.log('Fase seleccionada:', this.selectedPhaseId);
-    this.applyFilters();
+    const selectedPhase = this.selectedPhase;
+    
+    if (selectedPhase) {
+      console.log('Fase seleccionada:', selectedPhase);
+      
+      // Si es fase de grupos, cargar los grupos
+      if (selectedPhase.phaseType === PhaseType.Groups) {
+        this.loadGroups(selectedPhase);
+      } else {
+        // Si es knockout, limpiar grupos y cargar datos
+        this.groups = [];
+        this.selectedGroupId = null;
+        this.loadFixtureData();
+      }
+      
+      this.cdr.detectChanges();
+    }
   }
 
   /**
-   * Maneja el cambio de grupo
+   * Maneja el cambio de grupo seleccionado
    */
   onGroupChange(): void {
-    console.log('Grupo seleccionado:', this.selectedGroupId);
-    this.applyFilters();
+    const selectedGroup = this.groups.find(g => g.id === this.selectedGroupId);
+    
+    if (selectedGroup) {
+      console.log('Grupo seleccionado:', selectedGroup);
+      this.loadFixtureData();
+    }
+  }
+
+  /**
+   * Obtiene la fase seleccionada
+   */
+  get selectedPhase(): TournamentPhase | undefined {
+    return this.phases.find(p => p.id === this.selectedPhaseId);
+  }
+
+  /**
+   * Verifica si debe mostrar el select de grupos
+   */
+  get shouldShowGroupSelect(): boolean {
+    return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 
   /**
