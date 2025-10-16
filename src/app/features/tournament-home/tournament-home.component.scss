@@ -3,54 +3,6 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
 
-  // Loading Overlay
-  .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-
-    .loading-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      min-width: 280px;
-
-      mat-spinner {
-        ::ng-deep .mat-mdc-progress-spinner circle {
-          stroke: #1976d2;
-        }
-      }
-
-      .loading-text {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-        color: #1a1a1a;
-        line-height: 1.3;
-      }
-
-      .loading-subtext {
-        margin: 0;
-        font-size: 14px;
-        color: #666;
-        line-height: 1.2;
-      }
-    }
-  }
 
   // Hero Section - Minimalista
   .hero-section {

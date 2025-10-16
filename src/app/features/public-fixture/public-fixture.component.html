@@ -35,7 +35,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Stats Row -->
           <div class="row mt-3">
             <div class="col-12">
@@ -148,29 +148,29 @@
                   <span class="filter-label-chips">Estado:</span>
                   <div class="status-chips-container">
                     <mat-chip-set>
-                      <mat-chip-option 
-                        [selected]="selectedStatus === 'all'" 
+                      <mat-chip-option
+                        [selected]="selectedStatus === 'all'"
                         (click)="onStatusChange('all')"
                         class="status-chip">
                         <mat-icon>list</mat-icon>
                         Todos
                       </mat-chip-option>
-                      <mat-chip-option 
-                        [selected]="selectedStatus === 'upcoming'" 
+                      <mat-chip-option
+                        [selected]="selectedStatus === 'upcoming'"
                         (click)="onStatusChange('upcoming')"
                         class="status-chip">
                         <mat-icon>schedule</mat-icon>
                         Próximos
                       </mat-chip-option>
-                      <mat-chip-option 
-                        [selected]="selectedStatus === 'live'" 
+                      <mat-chip-option
+                        [selected]="selectedStatus === 'live'"
                         (click)="onStatusChange('live')"
                         class="status-chip live-chip">
                         <mat-icon class="live-icon">fiber_manual_record</mat-icon>
                         En Vivo
                       </mat-chip-option>
-                      <mat-chip-option 
-                        [selected]="selectedStatus === 'finished'" 
+                      <mat-chip-option
+                        [selected]="selectedStatus === 'finished'"
                         (click)="onStatusChange('finished')"
                         class="status-chip">
                         <mat-icon>check_circle</mat-icon>
@@ -188,10 +188,13 @@
   </section>
 
   <!-- Loading Spinner -->
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p class="loading-text">Cargando fixture...</p>
-  </div>
+  <app-public-loading 
+    [isVisible]="isLoading"
+    text="Cargando fixture..."
+    subtext="Organizando los partidos del torneo"
+    [diameter]="50"
+    [strokeWidth]="3">
+  </app-public-loading>
 
   <!-- Matchdays -->
   <div class="matchdays-container" *ngIf="!isLoading">
@@ -212,8 +215,8 @@
 
       <!-- Matches Grid -->
       <div class="matches-grid">
-        <app-match-card 
-          *ngFor="let match of matchday.matches" 
+        <app-match-card
+          *ngFor="let match of matchday.matches"
           [match]="match"
           (viewDetails)="onViewMatchDetails($event)">
         </app-match-card>
@@ -230,41 +233,4 @@
       </button>
     </div>
   </div>
-
-  <!-- Legend -->
-  <mat-card class="legend-card" *ngIf="!isLoading && filteredMatchdays.length > 0">
-    <mat-card-content>
-      <h3 class="legend-title">Leyenda de Estados</h3>
-      <div class="legend-items">
-        <div class="legend-item">
-          <div class="legend-badge live">
-            <mat-icon>fiber_manual_record</mat-icon>
-            EN VIVO
-          </div>
-          <span class="legend-description">Partido en curso</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-badge upcoming">
-            <mat-icon>schedule</mat-icon>
-            PRÓXIMO
-          </div>
-          <span class="legend-description">Partido programado</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-badge finished">
-            <mat-icon>check_circle</mat-icon>
-            FINALIZADO
-          </div>
-          <span class="legend-description">Partido terminado</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-badge suspended">
-            <mat-icon>pause_circle</mat-icon>
-            SUSPENDIDO
-          </div>
-          <span class="legend-description">Partido suspendido</span>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
 </div>

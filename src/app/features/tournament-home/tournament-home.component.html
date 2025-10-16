@@ -1,12 +1,12 @@
 <div class="tournament-home-container">
   <!-- Loading Overlay -->
-  <div class="loading-overlay" *ngIf="isLoadingTournamentData">
-    <div class="loading-content">
-      <mat-spinner diameter="60" strokeWidth="4"></mat-spinner>
-      <p class="loading-text">Cargando datos del torneo...</p>
-      <p class="loading-subtext">Por favor espere</p>
-    </div>
-  </div>
+  <app-public-loading 
+    [isVisible]="isLoadingTournamentData"
+    text="Cargando datos del torneo..."
+    subtext="Por favor espere"
+    [diameter]="60"
+    [strokeWidth]="4">
+  </app-public-loading>
 
   <!-- Hero Section -->
   <section class="hero-section">

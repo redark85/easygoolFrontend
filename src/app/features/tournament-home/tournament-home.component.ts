@@ -15,6 +15,7 @@ import { Subject, takeUntil, interval } from 'rxjs';
 import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, TournamentDetails, ToastService, TournamentHomeService } from '@core/services';
 import { TournamentHomeData, OutstandingMatch, LastMatch, BestScorer } from '@core/interfaces/tournament-home.interface';
 import { DefaultImageDirective } from '@shared/directives/default-image.directive';
+import { PublicLoadingComponent } from '@shared/components';
 
 interface Tournament {
   id: number;
@@ -101,7 +102,8 @@ interface QuickLink {
     MatSelectModule,
     MatProgressSpinnerModule,
     FormsModule,
-    DefaultImageDirective
+    DefaultImageDirective,
+    PublicLoadingComponent
   ],
   templateUrl: './tournament-home.component.html',
   styleUrls: ['./tournament-home.component.scss'],

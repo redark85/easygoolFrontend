@@ -346,22 +346,6 @@
     background-color: #f5f5f5;
   }
 
-  // Loading
-  .loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    gap: 1rem;
-    background-color: #f5f5f5;
-
-    .loading-text {
-      font-size: 1rem;
-      color: #666;
-      margin: 0;
-    }
-  }
 
   // Matchdays Container
   .matchdays-container {

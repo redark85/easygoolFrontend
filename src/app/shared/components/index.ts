@@ -8,3 +8,4 @@ export * from './document-uploader/document-uploader.component';
 export * from './document-upload-modal/document-upload-modal.component';
 export * from './location-map/location-map.component';
 export * from './global-loading/global-loading.component';
+export * from './public-loading/public-loading.component';

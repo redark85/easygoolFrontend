@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { MatchCardComponent } from './components/match-card/match-card.component';
+import { PublicLoadingComponent } from '@shared/components';
 
 interface Team {
   id: number;
@@ -68,7 +69,8 @@ interface Group {
     MatProgressSpinnerModule,
     MatChipsModule,
     FormsModule,
-    MatchCardComponent
+    MatchCardComponent,
+    PublicLoadingComponent
   ],
   templateUrl: './public-fixture.component.html',
   styleUrls: ['./public-fixture.component.scss'],
