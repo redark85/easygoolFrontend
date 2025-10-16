@@ -1,112 +1,191 @@
 <div class="fixture-container">
-  <!-- Header -->
-  <div class="page-header">
-    <button mat-icon-button class="back-button" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div class="header-content">
-      <mat-icon class="header-icon">calendar_month</mat-icon>
-      <div class="header-text">
-        <h1 class="page-title">Fixture Completo</h1>
-        <p class="page-subtitle">Calendario de todos los partidos del torneo</p>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+      <div class="hero-overlay"></div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row align-items-start">
+        <!-- Left Column: Fixture Info (8 columns) -->
+        <div class="col-lg-8">
+          <div class="row align-items-center">
+            <!-- Fixture Icon -->
+            <div class="col-auto">
+              <div class="fixture-icon-container">
+                <mat-icon class="fixture-main-icon">calendar_month</mat-icon>
+              </div>
+            </div>
+
+            <!-- Fixture Info -->
+            <div class="col">
+              <div class="fixture-info">
+                <div class="fixture-header">
+                  <h1 class="fixture-title">Fixture Completo</h1>
+                  <p class="fixture-subtitle">Calendario de todos los partidos del torneo</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Stats Row -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="fixture-stats-compact">
+                <div class="stat-item-compact">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Total Partidos</span>
+                    <span class="stat-value-compact">{{ stats.total }}</span>
+                  </div>
+                </div>
+                <div class="stat-item-compact">
+                  <mat-icon>schedule</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Próximos</span>
+                    <span class="stat-value-compact">{{ stats.upcoming }}</span>
+                  </div>
+                </div>
+                <div class="stat-item-compact live-stat">
+                  <mat-icon class="live-icon">fiber_manual_record</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">En Vivo</span>
+                    <span class="stat-value-compact">{{ stats.live }}</span>
+                  </div>
+                </div>
+                <div class="stat-item-compact">
+                  <mat-icon>check_circle</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Finalizados</span>
+                    <span class="stat-value-compact">{{ stats.finished }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legend Row -->
+          <div class="row mt-2">
+            <div class="col-12">
+              <div class="legend-items-hero">
+                <div class="legend-item-hero">
+                  <div class="legend-badge upcoming">
+                    <mat-icon>schedule</mat-icon>
+                    PRÓXIMO
+                  </div>
+                  <span class="legend-description">Partido programado</span>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge live">
+                    <mat-icon>fiber_manual_record</mat-icon>
+                    EN VIVO
+                  </div>
+                  <span class="legend-description">Partido en curso</span>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge finished">
+                    <mat-icon>check_circle</mat-icon>
+                    FINALIZADO
+                  </div>
+                  <span class="legend-description">Partido terminado</span>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge suspended">
+                    <mat-icon>pause_circle</mat-icon>
+                    SUSPENDIDO
+                  </div>
+                  <span class="legend-description">Partido suspendido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Filters (4 columns) -->
+        <div class="col-lg-4 hero-right-section">
+          <div class="hero-right-content">
+            <!-- Filters Card -->
+            <mat-card class="filters-card-hero">
+              <mat-card-content>
+                <!-- Filters Row -->
+                <div class="filters-row">
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Fase del Torneo</mat-label>
+                        <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
+                          <mat-option *ngFor="let phase of phases" [value]="phase.id">
+                            <mat-icon class="option-icon">emoji_events</mat-icon>
+                            {{ phase.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+                          <mat-option *ngFor="let group of groups" [value]="group.id">
+                            <mat-icon class="option-icon">flag</mat-icon>
+                            {{ group.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status Filter Chips -->
+                <div class="status-filter-chips">
+                  <span class="filter-label-chips">Estado:</span>
+                  <div class="status-chips-container">
+                    <mat-chip-set>
+                      <mat-chip-option 
+                        [selected]="selectedStatus === 'all'" 
+                        (click)="onStatusChange('all')"
+                        class="status-chip">
+                        <mat-icon>list</mat-icon>
+                        Todos
+                      </mat-chip-option>
+                      <mat-chip-option 
+                        [selected]="selectedStatus === 'upcoming'" 
+                        (click)="onStatusChange('upcoming')"
+                        class="status-chip">
+                        <mat-icon>schedule</mat-icon>
+                        Próximos
+                      </mat-chip-option>
+                      <mat-chip-option 
+                        [selected]="selectedStatus === 'live'" 
+                        (click)="onStatusChange('live')"
+                        class="status-chip live-chip">
+                        <mat-icon class="live-icon">fiber_manual_record</mat-icon>
+                        En Vivo
+                      </mat-chip-option>
+                      <mat-chip-option 
+                        [selected]="selectedStatus === 'finished'" 
+                        (click)="onStatusChange('finished')"
+                        class="status-chip">
+                        <mat-icon>check_circle</mat-icon>
+                        Finalizados
+                      </mat-chip-option>
+                    </mat-chip-set>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon total">sports_soccer</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.total }}</span>
-          <span class="stat-label">Total Partidos</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon upcoming">schedule</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.upcoming }}</span>
-          <span class="stat-label">Próximos</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon live">fiber_manual_record</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.live }}</span>
-          <span class="stat-label">En Vivo</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon finished">check_circle</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.finished }}</span>
-          <span class="stat-label">Finalizados</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <!-- Filters Card -->
-  <mat-card class="filters-card">
-    <mat-card-content>
-      <div class="filters-container">
-        <!-- Phase Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Fase del Torneo</mat-label>
-          <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
-            <mat-option *ngFor="let phase of phases" [value]="phase.id">
-              <mat-icon class="option-icon">emoji_events</mat-icon>
-              {{ phase.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Group Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Grupo</mat-label>
-          <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
-            <mat-option *ngFor="let group of groups" [value]="group.id">
-              <mat-icon class="option-icon">flag</mat-icon>
-              {{ group.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Status Filter -->
-        <div class="status-filter">
-          <span class="filter-label">Estado:</span>
-          <mat-button-toggle-group [(ngModel)]="selectedStatus" (change)="onStatusChange(selectedStatus)">
-            <mat-button-toggle value="all">
-              <mat-icon>list</mat-icon>
-              Todos
-            </mat-button-toggle>
-            <mat-button-toggle value="upcoming">
-              <mat-icon>schedule</mat-icon>
-              Próximos
-            </mat-button-toggle>
-            <mat-button-toggle value="live">
-              <mat-icon>fiber_manual_record</mat-icon>
-              En Vivo
-            </mat-button-toggle>
-            <mat-button-toggle value="finished">
-              <mat-icon>check_circle</mat-icon>
-              Finalizados
-            </mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+  </section>
 
   <!-- Loading Spinner -->
   <div class="loading-container" *ngIf="isLoading">

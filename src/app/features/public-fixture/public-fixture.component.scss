@@ -1,104 +1,332 @@
 .fixture-container {
-  padding: 2rem;
-  max-width: 1600px;
-  margin: 0 auto;
-  background-color: #f5f5f5;
   min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
-  // Page Header
-  .page-header {
+
+  // Hero Section - Similar to tournament-home
+  .hero-section {
+    position: relative;
+    min-height: 200px;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e0e0e0;
-    
+    overflow: hidden;
+    padding: 20px 0;
+
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+
+      .wallpaper-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(25, 118, 210, 0.7) 0%, rgba(156, 39, 176, 0.7) 100%);
+      z-index: 1;
+    }
+
+    // Back Button
+    .back-button-container {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+
       .back-button {
-      color: #1976d2;
-    }
-    
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        width: 48px;
+        height: 48px;
 
-      .header-icon {
-        font-size: 3rem;
-        width: 3rem;
-        height: 3rem;
-        color: #1976d2;
-      }
-
-      .header-text {
-        .page-title {
-          margin: 0;
-          font-size: 2rem;
-          font-weight: 700;
-          color: #212121;
+        &:hover {
+          background: white;
+          transform: translateX(-2px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+          border-color: rgba(25, 118, 210, 0.3);
         }
 
-        .page-subtitle {
-          margin: 0.25rem 0 0 0;
-          font-size: 1rem;
-          color: #757575;
+        mat-icon {
+          color: #1976d2;
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+          transition: color 0.3s ease;
+        }
+
+        &:hover mat-icon {
+          color: #1565c0;
         }
       }
     }
-  }
 
-  // Stats Grid
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    .container-fluid {
+      position: relative;
+      z-index: 2;
+      color: white;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 10px 24px;
 
-    .stat-card {
-      mat-card-content {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.5rem !important;
+      .fixture-icon-container {
+        position: relative;
 
-        .stat-icon {
-          font-size: 3rem;
-          width: 3rem;
-          height: 3rem;
-
-          &.total {
-            color: #1976d2;
-          }
-
-          &.upcoming {
-            color: #2196f3;
-          }
-
-          &.live {
-            color: #f44336;
-            animation: blink 1.5s infinite;
-          }
-
-          &.finished {
-            color: #4caf50;
-          }
+        .fixture-main-icon {
+          font-size: 120px;
+          width: 120px;
+          height: 120px;
+          color: white;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
+      }
 
-        .stat-info {
+      .fixture-info {
+        .fixture-header {
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
+          gap: 8px;
+          margin-bottom: 12px;
 
-          .stat-value {
-            font-size: 2rem;
+          .fixture-title {
+            font-size: 32px;
             font-weight: 700;
-            color: #212121;
-            line-height: 1;
+            margin: 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
           }
 
-          .stat-label {
-            font-size: 0.875rem;
-            color: #757575;
+          .fixture-subtitle {
+            font-size: 16px;
+            margin: 0;
+            opacity: 0.9;
+            font-weight: 500;
+          }
+        }
+      }
+
+      // Right Column Content
+      .hero-right-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        height: 100%;
+
+        .filters-card-hero {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+          .filters-row {
+            .filter-select {
+              width: 100%;
+
+              ::ng-deep .mat-mdc-form-field {
+                font-size: 14px;
+                background-color: white;
+                border-radius: 8px;
+              }
+
+              ::ng-deep .mat-mdc-select {
+                color: #333;
+              }
+
+              ::ng-deep .mat-mdc-form-field-outline {
+                color: rgba(0, 0, 0, 0.3);
+              }
+
+              ::ng-deep .mat-mdc-floating-label {
+                color: rgba(0, 0, 0, 0.6);
+              }
+
+              // Estilos para los íconos en las opciones
+              ::ng-deep .mat-mdc-option {
+                .option-icon {
+                  margin-right: 8px;
+                  font-size: 18px;
+                  width: 18px;
+                  height: 18px;
+                  color: #1976d2;
+                  vertical-align: middle;
+                }
+              }
+            }
+          }
+
+          .status-filter-chips {
+            margin-top: 16px;
+
+            .filter-label-chips {
+              display: block;
+              font-size: 14px;
+              font-weight: 600;
+              color: #333;
+              margin-bottom: 8px;
+            }
+
+            .status-chips-container {
+              mat-chip-set {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+
+                .status-chip {
+                  border-radius: 16px;
+                  font-size: 12px;
+                  font-weight: 500;
+
+                  mat-icon {
+                    font-size: 14px;
+                    width: 14px;
+                    height: 14px;
+                    margin-right: 4px;
+                  }
+
+                  &.live-chip {
+                    .live-icon {
+                      animation: blink 1.5s infinite;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Fixture Stats Compact
+      .fixture-stats-compact {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        background: transparent;
+        padding: 16px;
+
+        .stat-item-compact {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1;
+          min-width: 0;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: white;
+            flex-shrink: 0;
+          }
+
+          &.live-stat {
+            .live-icon {
+              color: #f44336;
+              animation: blink 1.5s infinite;
+            }
+          }
+
+          .stat-content-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+
+            .stat-label-compact {
+              font-size: 11px;
+              color: rgba(255, 255, 255, 0.8);
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              line-height: 1;
+            }
+
+            .stat-value-compact {
+              font-size: 18px;
+              font-weight: 700;
+              color: white;
+              line-height: 1.2;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
+
+      // Legend Items Hero
+      .legend-items-hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+
+        .legend-item-hero {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: start;
+          text-align: center;
+          flex: 1;
+
+          .legend-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+
+            mat-icon {
+              font-size: 12px;
+              width: 12px;
+              height: 12px;
+            }
+
+            &.live {
+              background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+              color: white;
+
+              mat-icon {
+                animation: blink 1.5s infinite;
+              }
+            }
+
+            &.upcoming {
+              background-color: #e3f2fd;
+              color: #1976d2;
+            }
+
+            &.finished {
+              background-color: #e8f5e9;
+              color: #2e7d32;
+            }
+
+            &.suspended {
+              background-color: #fff3e0;
+              color: #f57c00;
+            }
+          }
+
+          .legend-description {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
           }
         }
@@ -106,50 +334,16 @@
     }
   }
 
-  // Filters Card
-  .filters-card {
-    margin-bottom: 2rem;
+  .hero-right-section {
+    background: transparent;
+  }
 
-    .filters-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      align-items: center;
-
-      .filter-field {
-        min-width: 200px;
-        flex: 1;
-
-        .option-icon {
-          margin-right: 8px;
-          vertical-align: middle;
-        }
-      }
-
-      .status-filter {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        flex: 2;
-
-        .filter-label {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #666;
-        }
-
-        mat-button-toggle-group {
-          mat-button-toggle {
-            mat-icon {
-              font-size: 18px;
-              width: 18px;
-              height: 18px;
-              margin-right: 6px;
-            }
-          }
-        }
-      }
-    }
+  // Content Wrapper
+  .content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    background-color: #f5f5f5;
   }
 
   // Loading
@@ -160,6 +354,7 @@
     justify-content: center;
     padding: 4rem 2rem;
     gap: 1rem;
+    background-color: #f5f5f5;
 
     .loading-text {
       font-size: 1rem;
@@ -173,6 +368,10 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    background-color: transparent;
+    padding: 40px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
 
     .matchday {
       // Matchday Header
@@ -351,10 +550,6 @@
 // Responsive Design
 @media (max-width: 1200px) {
   .fixture-container {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
     .matchdays-container {
       .matchday {
         .matches-grid {
@@ -373,77 +568,135 @@
 
 @media (max-width: 768px) {
   .fixture-container {
-    padding: 1rem;
+    .hero-section {
+      min-height: 160px;
+      padding: 16px 0;
 
-    .page-header {
-      .header-content {
-        .header-icon {
-          font-size: 2rem;
-          width: 2rem;
-          height: 2rem;
+      .container-fluid {
+        padding: 24px 12px;
+
+        .row {
+          flex-direction: column;
+          text-align: center;
+          gap: 16px;
         }
 
-        .header-text {
-          .page-title {
-            font-size: 1.5rem;
-          }
+        .col-lg-4 {
+          margin-top: 20px;
+        }
 
-          .page-subtitle {
-            font-size: 0.875rem;
+        .hero-right-content {
+          gap: 12px;
+
+          .filters-card-hero {
+            .filters-row {
+              .row {
+                flex-direction: column;
+              }
+
+              .col-6 {
+                width: 100%;
+              }
+            }
+
+            .status-filter-chips {
+              .status-chips-container {
+                mat-chip-set {
+                  .status-chip {
+                    flex: 1 1 45%;
+                    margin-bottom: 8px;
+                  }
+                }
+              }
+            }
           }
         }
-      }
-    }
 
-    .stats-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-
-      .stat-card {
-        mat-card-content {
-          padding: 1rem !important;
-
-          .stat-icon {
-            font-size: 2rem;
-            width: 2rem;
-            height: 2rem;
+        .fixture-icon-container {
+          .fixture-main-icon {
+            font-size: 80px;
+            width: 80px;
+            height: 80px;
           }
+        }
 
-          .stat-info {
-            .stat-value {
-              font-size: 1.5rem;
+        .fixture-info {
+          .fixture-header {
+            .fixture-title {
+              font-size: 24px;
+            }
+
+            .fixture-subtitle {
+              font-size: 14px;
+            }
+          }
+        }
+
+        .fixture-stats-compact {
+          flex-direction: column;
+          gap: 12px;
+
+          .stat-item-compact {
+            justify-content: center;
+            text-align: center;
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+
+            .stat-content-compact {
+              align-items: center;
+
+              .stat-label-compact {
+                font-size: 10px;
+              }
+
+              .stat-value-compact {
+                font-size: 16px;
+              }
+            }
+          }
+        }
+
+        .legend-items-hero {
+          flex-direction: column;
+          gap: 8px;
+
+          .legend-item-hero {
+            flex-direction: row;
+            justify-content: flex-start;
+            text-align: left;
+
+            .legend-badge {
+              margin-right: 8px;
             }
           }
         }
       }
-    }
 
-    .filters-card {
-      .filters-container {
-        flex-direction: column;
-        align-items: stretch;
+      // Back Button Responsive
+      .back-button-container {
+        top: 12px;
+        left: 12px;
 
-        .filter-field {
-          width: 100%;
-        }
+        .back-button {
+          width: 40px;
+          height: 40px;
 
-        .status-filter {
-          width: 100%;
-
-          mat-button-toggle-group {
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-
-            mat-button-toggle {
-              flex: 1 1 45%;
-            }
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
           }
         }
       }
     }
 
     .matchdays-container {
+      padding: 24px 12px;
+
       .matchday {
         .matchday-header {
           flex-direction: column;
@@ -477,6 +730,10 @@
       .legend-items {
         grid-template-columns: 1fr;
       }
+    }
+
+    .loading-container {
+      padding: 2rem 1rem;
     }
   }
 }
