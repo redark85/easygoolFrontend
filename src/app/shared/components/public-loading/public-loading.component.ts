@@ -23,18 +23,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   `,
   styles: [`
     .public-loading-overlay {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
       display: flex;
-      justify-content: center;
       align-items: center;
-      z-index: 1000;
-      border-radius: 12px;
+      justify-content: center;
+      z-index: 9999;
     }
 
     .loading-content {
@@ -42,8 +41,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       flex-direction: column;
       align-items: center;
       gap: 16px;
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       text-align: center;
-      padding: 32px;
+      min-width: 280px;
+      animation: fadeInUp 0.4s ease-out;
     }
 
     .loading-text {
@@ -52,6 +56,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       font-weight: 600;
       color: #1976d2;
       letter-spacing: 0.5px;
+      line-height: 1.3;
     }
 
     .loading-subtext {
@@ -59,14 +64,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       font-size: 14px;
       color: #666;
       font-weight: 400;
-      opacity: 0.8;
+      line-height: 1.2;
     }
 
-    /* Animation for spinner container */
-    .loading-content {
-      animation: fadeInUp 0.4s ease-out;
+    /* Spinner styling */
+    ::ng-deep .mat-mdc-progress-spinner circle {
+      stroke: #1976d2;
     }
 
+    /* Animation for card */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -81,7 +87,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .loading-content {
-        padding: 24px;
+        padding: 32px 24px;
+        min-width: 240px;
+        margin: 20px;
       }
 
       .loading-text {

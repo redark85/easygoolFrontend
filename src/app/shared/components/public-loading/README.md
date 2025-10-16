@@ -7,8 +7,8 @@ Componente de loading compartido para las vistas públicas del torneo.
 - **Standalone Component**: No requiere módulo adicional
 - **Personalizable**: Texto, subtexto, tamaño del spinner configurable
 - **Responsive**: Se adapta a diferentes tamaños de pantalla
-- **Animaciones**: Efectos suaves de entrada y backdrop blur
-- **Glassmorphism**: Fondo translúcido con efecto blur
+- **Animaciones**: Efectos suaves de entrada con fadeInUp
+- **Modal Overlay**: Card pequeño centrado con fondo difuminado que cubre toda la pantalla
 
 ## Uso
 
@@ -84,7 +84,9 @@ import { PublicLoadingComponent } from '@shared/components';
 ## Estilos
 
 El componente incluye:
-- Overlay con backdrop-filter blur
+- Overlay fijo que cubre toda la pantalla con `backdrop-filter: blur(5px)`
+- Fondo semi-transparente oscuro `rgba(0, 0, 0, 0.7)`
+- Card blanco pequeño centrado con sombra elegante
 - Animación fadeInUp para suavidad
 - Responsive design para móvil
-- Colores consistentes con el tema de la aplicación
+- Z-index alto (9999) para aparecer sobre todo el contenido
