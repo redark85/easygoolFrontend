@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
-import { FIXTURE_GET_ENDPOINT, FIXTURE_GET_TOURNAMENT_LIST_ENDPOINT } from '../config/endpoints';
+import { FIXTURE_GET_ENDPOINT, FIXTURE_GET_TOURNAMENT_LIST_ENDPOINT, FIXTURE_GET_COMPLETE_FIXTURE_ENDPOINT } from '../config/endpoints';
 import { ApiResponse } from '../models/api.interface';
+import { CompleteFixtureResponse } from '../interfaces/fixture.interface';
 
 export interface FixtureTeam {
   position: number;
@@ -79,6 +80,28 @@ export class FixtureService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener la lista de torneos');
+      })
+    );
+  }
+
+  /**
+   * Obtiene el fixture completo con todos los partidos
+   * @param phaseId ID de la fase
+   * @param groupId ID del grupo (opcional)
+   * @returns Observable con el fixture completo
+   */
+  getCompleteFixture(phaseId: number, groupId?: number): Observable<CompleteFixtureResponse> {
+    let url = `${FIXTURE_GET_COMPLETE_FIXTURE_ENDPOINT}?PhaseId=${phaseId}`;
+    if (groupId) {
+      url += `&GroupId=${groupId}`;
+    }
+    
+    return this.apiService.get<CompleteFixtureResponse>(url).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al obtener el fixture completo');
       })
     );
   }

@@ -13,33 +13,30 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { MatchCardComponent } from './components/match-card/match-card.component';
 import { PublicLoadingComponent } from '@shared/components';
-import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService } from '@core/services';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService, FixtureService } from '@core/services';
+import { CompleteFixtureResponse, FixtureMatchDay, FixtureMatch, MatchStatus, MatchStatusMap } from '@core/interfaces/fixture.interface';
 
-interface Team {
+// Interfaces adaptadas para la UI
+interface UIMatch {
   id: number;
-  name: string;
-  shortName: string;
-  logoUrl: string;
-}
-
-interface Match {
-  id: number;
-  homeTeam: Team;
-  awayTeam: Team;
+  homeTeam: string;
+  awayTeam: string;
+  homeTeamLogoUrl: string;
+  awayTeamLogoUrl: string;
   homeScore: number | null;
   awayScore: number | null;
   date: Date;
-  venue: string;
   status: 'upcoming' | 'live' | 'finished' | 'suspended';
   isLive: boolean;
   isFinished: boolean;
   matchday: number;
 }
 
-interface Matchday {
-  number: number;
+interface UIMatchday {
+  id: number;
+  name: string;
   date: Date;
-  matches: Match[];
+  matches: UIMatch[];
 }
 
 
@@ -78,8 +75,8 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   PhaseType = PhaseType; // Exponer el enum al template
 
   // Datos
-  matchdays: Matchday[] = [];
-  filteredMatchdays: Matchday[] = [];
+  matchdays: UIMatchday[] = [];
+  filteredMatchdays: UIMatchday[] = [];
   isLoading = false;
   tournamentId: number = 0;
 
@@ -98,7 +95,8 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private managerService: ManagerService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private fixtureService: FixtureService
   ) {}
 
     goBack(): void {
@@ -179,111 +177,77 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
    * Carga los datos del fixture desde el API
    */
   private loadFixtureData(): void {
-    this.isLoading = true;
-    
-    // TODO: Implementar llamada al API del fixture
-    // Por ahora usar datos dummy
-    setTimeout(() => {
-      this.matchdays = this.generateDummyMatchdays();
-      this.filteredMatchdays = [...this.matchdays];
-      this.calculateStats();
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }, 1000);
-  }
-
-  /**
-   * Genera jornadas dummy
-   */
-  private generateDummyMatchdays(): Matchday[] {
-    const teams: Team[] = [
-      { id: 1, name: 'Real Madrid', shortName: 'RMA', logoUrl: 'assets/team-placeholder.png' },
-      { id: 2, name: 'Barcelona', shortName: 'BAR', logoUrl: 'assets/team-placeholder.png' },
-      { id: 3, name: 'Atlético Madrid', shortName: 'ATM', logoUrl: 'assets/team-placeholder.png' },
-      { id: 4, name: 'Sevilla FC', shortName: 'SEV', logoUrl: 'assets/team-placeholder.png' },
-      { id: 5, name: 'Valencia CF', shortName: 'VAL', logoUrl: 'assets/team-placeholder.png' },
-      { id: 6, name: 'Real Betis', shortName: 'BET', logoUrl: 'assets/team-placeholder.png' }
-    ];
-
-    const matchdays: Matchday[] = [];
-    const now = new Date();
-
-    for (let i = 1; i <= 5; i++) {
-      const matchdayDate = new Date(now);
-      matchdayDate.setDate(now.getDate() + (i - 3) * 7); // -2 semanas a +2 semanas
-
-      const matches: Match[] = [];
-      
-      // Generar 3 partidos por jornada
-      for (let j = 0; j < 3; j++) {
-        const matchDate = new Date(matchdayDate);
-        matchDate.setHours(18 + j * 2, 0, 0, 0);
-
-        const homeTeamIndex = j * 2;
-        const awayTeamIndex = j * 2 + 1;
-
-        let status: 'upcoming' | 'live' | 'finished' | 'suspended';
-        let homeScore: number | null = null;
-        let awayScore: number | null = null;
-
-        // Determinar estado según la fecha
-        if (matchDate < now) {
-          status = 'finished';
-          homeScore = Math.floor(Math.random() * 4);
-          awayScore = Math.floor(Math.random() * 4);
-        } else if (Math.abs(matchDate.getTime() - now.getTime()) < 2 * 60 * 60 * 1000) {
-          status = 'live';
-          homeScore = Math.floor(Math.random() * 3);
-          awayScore = Math.floor(Math.random() * 3);
-        } else {
-          status = 'upcoming';
-        }
-
-        matches.push({
-          id: (i - 1) * 3 + j + 1,
-          homeTeam: teams[homeTeamIndex],
-          awayTeam: teams[awayTeamIndex],
-          homeScore,
-          awayScore,
-          date: matchDate,
-          venue: `Estadio ${teams[homeTeamIndex].name}`,
-          status,
-          isLive: status === 'live',
-          isFinished: status === 'finished',
-          matchday: i
-        });
-      }
-
-      matchdays.push({
-        number: i,
-        date: matchdayDate,
-        matches
-      });
+    if (!this.selectedPhaseId) {
+      console.warn('No hay fase seleccionada');
+      return;
     }
 
-    return matchdays;
+    this.isLoading = true;
+    
+    this.fixtureService.getCompleteFixture(this.selectedPhaseId, this.selectedGroupId || undefined)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeed && response.result) {
+            console.log('Datos del fixture recibidos:', response.result);
+            this.processFixtureData(response.result);
+            this.updateStats(response.result);
+          } else {
+            console.error('Error en la respuesta:', response.message);
+            this.toastService.showError(response.message || 'Error al cargar el fixture');
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fixture:', error);
+          this.toastService.showError('Error al cargar los datos del fixture');
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   /**
-   * Calcula estadísticas de partidos
+   * Procesa los datos del fixture del API y los convierte al formato de la UI
    */
-  private calculateStats(): void {
-    this.stats = {
-      total: 0,
-      upcoming: 0,
-      live: 0,
-      finished: 0
-    };
+  private processFixtureData(fixtureResult: any): void {
+    this.matchdays = fixtureResult.matches.map((matchday: FixtureMatchDay) => ({
+      id: matchday.matchDayId,
+      name: matchday.matchDayName,
+      date: new Date(), // Se puede obtener de la primera fecha de partido si es necesario
+      matches: matchday.matches.map((match: FixtureMatch) => ({
+        id: match.id,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeTeamLogoUrl: match.homeTeamLogoUrl,
+        awayTeamLogoUrl: match.awayTeamLogoUrl,
+        homeScore: match.homeScore,
+        awayScore: match.awayScore,
+        date: new Date(match.matchDate),
+        status: MatchStatusMap[match.status] || 'upcoming',
+        isLive: match.status === MatchStatus.Live,
+        isFinished: match.status === MatchStatus.Finished,
+        matchday: matchday.matchDayId
+      }))
+    }));
 
-    this.matchdays.forEach(matchday => {
-      matchday.matches.forEach(match => {
-        this.stats.total++;
-        if (match.status === 'upcoming') this.stats.upcoming++;
-        if (match.status === 'live') this.stats.live++;
-        if (match.status === 'finished') this.stats.finished++;
-      });
-    });
+    this.filteredMatchdays = [...this.matchdays];
+    this.applyFilters();
   }
+
+  /**
+   * Actualiza las estadísticas con los datos del API
+   */
+  private updateStats(fixtureResult: any): void {
+    this.stats = {
+      total: fixtureResult.totalMatches,
+      upcoming: fixtureResult.nextMatches,
+      live: fixtureResult.liveMatches,
+      finished: fixtureResult.finishedMatches
+    };
+  }
+
 
   /**
    * Maneja el cambio de fase seleccionada
@@ -360,7 +324,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   /**
    * Maneja el evento de ver detalles de un partido
    */
-  onViewMatchDetails(match: Match): void {
+  onViewMatchDetails(match: UIMatch): void {
     console.log('Ver detalles del partido:', match);
     this.router.navigate(['/public-match-detail', match.id]);
   }

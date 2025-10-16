@@ -21,7 +21,7 @@
   // Status Section
   .match-status {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     padding: 8px 16px;
     min-height: 40px;
@@ -46,19 +46,52 @@
       color: #f57c00;
     }
 
-    .status-badge {
+    .status-content {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.5px;
+      flex: 1;
 
-      .live-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-        animation: blink 1.5s infinite;
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+
+        .live-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          animation: blink 1.5s infinite;
+        }
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .date-time {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1976d2;
+      }
+    }
+
+    .view-details-btn {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      color: inherit;
+      opacity: 0.8;
+      transition: all 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+        transform: scale(1.1);
+        background-color: rgba(255, 255, 255, 0.1);
       }
 
       mat-icon {
@@ -66,144 +99,86 @@
         width: 18px;
         height: 18px;
       }
-    }
-
-    .date-time {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1976d2;
     }
   }
 
   // Match Content
   .match-content {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 16px;
-    align-items: center;
-    padding: 24px 16px !important;
+    padding: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
-    .team {
+    .match-main {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      flex: 1;
 
-      &.home-team {
-        justify-content: flex-end;
-      }
-
-      &.away-team {
-        justify-content: flex-start;
-      }
-
-      .team-logo {
-        width: 48px;
-        height: 48px;
-        object-fit: contain;
-        border-radius: 8px;
-        transition: transform 0.3s ease;
-
-        &:hover {
-          transform: scale(1.1);
-        }
-      }
-
-      .team-name {
-        font-size: 16px;
-        font-weight: 600;
-        color: #1a1a1a;
-        text-align: center;
-        min-width: 60px;
-      }
-    }
-
-    .score-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-width: 80px;
-
-      .score {
+      .team {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
+        flex: 1;
 
-        .home-score,
-        .away-score {
-          font-size: 32px;
-          font-weight: 700;
-          color: #666;
-          min-width: 30px;
-          text-align: center;
-          transition: all 0.3s ease;
+        .team-top {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          justify-content: center;
 
-          &.winner {
-            color: #4caf50;
-            font-size: 36px;
+          .team-score {
+            .score {
+              font-size: 24px;
+              font-weight: 700;
+              color: #1976d2;
+            }
+          }
+
+          .team-info {
+            .team-name {
+              font-size: 12px;
+              font-weight: 600;
+              color: #333;
+              text-align: center;
+              line-height: 1.2;
+            }
           }
         }
 
-        .separator {
-          font-size: 24px;
-          color: #ccc;
-          font-weight: 400;
+        .team-logo-container {
+          .team-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
         }
       }
 
-      .vs {
-        span {
-          font-size: 24px;
+      .vs-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+
+        .vs-text {
+          font-size: 14px;
           font-weight: 700;
-          color: #999;
+          color: #666;
           padding: 8px 16px;
           background-color: #f5f5f5;
-          border-radius: 8px;
+          border-radius: 20px;
+          border: 2px solid #e0e0e0;
         }
       }
     }
   }
 
-  // Match Footer
-  .match-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px !important;
-    background-color: #fafafa;
-    border-top: 1px solid #e0e0e0;
-
-    .venue-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex: 1;
-
-      .venue-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        color: #666;
-      }
-
-      .venue-name {
-        font-size: 13px;
-        color: #666;
-        font-weight: 500;
-      }
-    }
-
-    button {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-    }
-  }
 }
 
 // Animations
@@ -229,54 +204,40 @@
 @media (max-width: 768px) {
   .match-card {
     .match-content {
-      gap: 8px;
-      padding: 16px 8px !important;
+      padding: 12px;
 
-      .team {
-        .team-logo {
-          width: 36px;
-          height: 36px;
-        }
-
-        .team-name {
-          font-size: 14px;
-          min-width: 50px;
-        }
-      }
-
-      .score-container {
-        .score {
-          gap: 8px;
-
-          .home-score,
-          .away-score {
-            font-size: 24px;
-
-            &.winner {
-              font-size: 28px;
+      .match-main {
+        .team {
+          .team-logo-container {
+            .team-logo {
+              width: 50px;
+              height: 50px;
             }
           }
 
-          .separator {
-            font-size: 18px;
+          .team-top {
+            .team-info {
+              .team-name {
+                font-size: 11px;
+              }
+            }
+
+            .team-score {
+              .score {
+                font-size: 20px;
+              }
+            }
           }
         }
 
-        .vs span {
-          font-size: 18px;
-          padding: 6px 12px;
+        .vs-section {
+          padding: 0 8px;
+
+          .vs-text {
+            font-size: 12px;
+            padding: 6px 12px;
+          }
         }
-      }
-    }
-
-    .match-footer {
-      flex-direction: column;
-      gap: 8px;
-      align-items: flex-start;
-
-      button {
-        width: 100%;
-        justify-content: center;
       }
     }
   }

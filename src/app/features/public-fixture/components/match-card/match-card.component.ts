@@ -5,21 +5,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-interface Team {
-  id: number;
-  name: string;
-  shortName: string;
-  logoUrl: string;
-}
-
 interface Match {
   id: number;
-  homeTeam: Team;
-  awayTeam: Team;
+  homeTeam: string;
+  awayTeam: string;
+  homeTeamLogoUrl: string;
+  awayTeamLogoUrl: string;
   homeScore: number | null;
   awayScore: number | null;
   date: Date;
-  venue: string;
   status: 'upcoming' | 'live' | 'finished' | 'suspended';
   isLive: boolean;
   isFinished: boolean;

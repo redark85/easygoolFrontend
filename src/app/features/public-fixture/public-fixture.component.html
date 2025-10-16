@@ -205,7 +205,7 @@
       <div class="matchday-header">
         <div class="matchday-info">
           <mat-icon class="matchday-icon">calendar_today</mat-icon>
-          <h2 class="matchday-title">Jornada {{ matchday.number }}</h2>
+          <h2 class="matchday-title">{{ matchday.name }}</h2>
           <mat-chip class="matchday-date">
             {{ matchday.date | date:'dd MMM yyyy' }}
           </mat-chip>
@@ -216,12 +216,16 @@
       </div>
 
       <!-- Matches Grid -->
-      <div class="matches-grid">
-        <app-match-card
-          *ngFor="let match of matchday.matches"
-          [match]="match"
-          (viewDetails)="onViewMatchDetails($event)">
-        </app-match-card>
+      <div class="container-fluid">
+        <div class="matches-grid">
+          <div *ngFor="let match of matchday.matches" class="col">
+            <app-match-card
+              [match]="match"
+              (viewDetails)="onViewMatchDetails($event)"
+              class="h-100">
+            </app-match-card>
+          </div>
+        </div>
       </div>
     </div>
 
