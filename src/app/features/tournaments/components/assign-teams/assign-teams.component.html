@@ -48,9 +48,9 @@
           
           <div class="team-checkbox">
             <mat-checkbox 
-              [checked]="isTeamSelected(team.id)"
+              [checked]="isTeamSelected(team.tournamentTeamId)"
               [disabled]="!canSelectTeam(team)"
-              (change)="onTeamSelectionChange(team.id, $event.checked)">
+              (change)="onTeamSelectionChange(team.tournamentTeamId, $event.checked)">
             </mat-checkbox>
           </div>
 

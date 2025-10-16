@@ -129,7 +129,7 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
       // Seleccionar todos los equipos activos
       this.availableTeams
         .filter(team => team.status === TeamStatus.Active)
-        .forEach(team => this.selectedTeams.add(team.id));
+        .forEach(team => this.selectedTeams.add(team.tournamentTeamId));
     } else {
       // Deseleccionar todos
       this.selectedTeams.clear();
@@ -141,7 +141,7 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
    */
   private updateSelectAllState(): void {
     const activeTeams = this.availableTeams.filter(team => team.status === TeamStatus.Active);
-    const selectedActiveTeams = activeTeams.filter(team => this.selectedTeams.has(team.id));
+    const selectedActiveTeams = activeTeams.filter(team => this.selectedTeams.has(team.tournamentTeamId));
     
     this.selectAll = activeTeams.length > 0 && selectedActiveTeams.length === activeTeams.length;
   }
@@ -265,7 +265,7 @@ export class AssignTeamsComponent implements OnInit, OnDestroy {
         // Cerrar modal con éxito
         this.dialogRef.close({ 
           success: true, 
-          selectedTeams: this.availableTeams.filter(team => this.selectedTeams.has(team.id))
+          selectedTeams: this.availableTeams.filter(team => this.selectedTeams.has(team.tournamentTeamId))
         });
       },
       error: (error) => {

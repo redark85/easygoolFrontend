@@ -75,6 +75,7 @@ export interface TeamWithoutPhase {
   };
   hasUsedLink: boolean;
   players: Player[];
+  tournamentTeamId: number;
 }
 
 export interface TeamsWithoutPhaseResponse {
