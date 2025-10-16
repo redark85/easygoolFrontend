@@ -169,11 +169,6 @@
               min-width: 80px;
               text-align: center;
               text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-
-              &.winner {
-                color: #4caf50;
-                text-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-              }
             }
 
             .separator {
@@ -216,41 +211,175 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 40px 24px;
-    background: white;
+    background: transparent;
     border-radius: 10px 10px 0 0;
     margin-top: -20px;
     position: relative;
     z-index: 3;
   }
 
-  // Tabs
-  .match-tabs {
-    .tab-icon {
-      margin-right: 8px;
-    }
+  // Main Content Card
+  .main-content-card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
 
-    .tab-content {
-      padding: 2rem 0;
+    .row {
+      margin: 0;
+
+      .col-lg-8, .col-lg-4 {
+        padding: 12px;
+      }
     }
   }
 
-  // Events Card
-  .events-card {
+  // Lineups Section
+  .lineups-section-card {
+    height: 100%;
+    background: transparent !important;
+    box-shadow: none !important;
+
     mat-card-header {
+      background: transparent;
+      
       mat-card-title {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 1.5rem;
         font-weight: 600;
+        color: white !important;
 
         mat-icon {
-          color: #1976d2;
+          color: white !important;
         }
       }
     }
 
-    .match-events {
+    mat-card-content {
+      background: transparent;
+    }
+  }
+
+  // Events Card
+  .events-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    
+    mat-card-header {
+      background: transparent;
+      
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white !important;
+
+        mat-icon {
+          color: white !important;
+        }
+      }
+    }
+
+    mat-card-content {
+      background: transparent;
+    }
+  }
+
+  // Stats Card in Header
+  .stats-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    
+    mat-card-header {
+      background: transparent;
+      
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white !important;
+
+        mat-icon {
+          color: white !important;
+        }
+      }
+    }
+
+    mat-card-content {
+      background: transparent;
+    }
+  }
+
+  // Stats Section (without card)
+  .stats-section {
+    .stats-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: white !important;
+      margin-bottom: 1rem;
+
+      mat-icon {
+        color: white !important;
+      }
+    }
+
+    .match-stats {
+      .stat-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding: 0.5rem 0;
+
+        .home-value,
+        .away-value {
+          font-weight: 600;
+          color: white;
+          min-width: 30px;
+          text-align: center;
+        }
+
+        .stat-bar-container {
+          flex: 1;
+          margin: 0 1rem;
+
+          .stat-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+
+            .home-bar {
+              height: 100%;
+              background-color: #1976d2;
+              float: left;
+            }
+
+            .away-bar {
+              height: 100%;
+              background-color: #f44336;
+              float: right;
+            }
+          }
+
+          .stat-label {
+            display: block;
+            text-align: center;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 0.25rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Match Events
+  .match-events {
       .timeline {
         display: flex;
         flex-direction: column;
@@ -454,70 +583,7 @@
         }
       }
     }
-
-    .match-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      padding: 1rem 0;
-
-      .stat-row {
-        display: grid;
-        grid-template-columns: 80px 1fr 80px;
-        gap: 1rem;
-        align-items: center;
-
-        .home-value,
-        .away-value {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #212121;
-        }
-
-        .home-value {
-          text-align: right;
-          color: #1976d2;
-        }
-
-        .away-value {
-          text-align: left;
-          color: #f44336;
-        }
-
-        .stat-bar-container {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-
-          .stat-bar {
-            display: flex;
-            height: 24px;
-            background-color: #e0e0e0;
-            border-radius: 12px;
-            overflow: hidden;
-
-            .home-bar {
-              background: linear-gradient(90deg, #1976d2 0%, #2196f3 100%);
-              transition: width 0.5s ease;
-            }
-
-            .away-bar {
-              background: linear-gradient(90deg, #f44336 0%, #ff5252 100%);
-              transition: width 0.5s ease;
-            }
-          }
-
-          .stat-label {
-            text-align: center;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #666;
-          }
-        }
-      }
-    }
   }
-}
 
 // Loading & Empty States
 .loading-container,
@@ -642,6 +708,23 @@
     .content-wrapper {
       padding: 24px 12px;
       margin-top: -15px;
+    }
+
+    .main-content-card {
+      .row {
+        .col-lg-8, .col-lg-4 {
+          padding: 8px;
+          margin-bottom: 16px;
+        }
+      }
+    }
+
+    .lineups-section-card {
+      .row {
+        .col-md-6 {
+          margin-bottom: 16px;
+        }
+      }
     }
 
     .events-card {

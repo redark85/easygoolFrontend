@@ -14,9 +14,9 @@
     </div>
 
     <div class="container-fluid">
-      <div class="row align-items-center justify-content-center">
-        <!-- Match Content -->
-        <div class="col-12">
+      <div class="row align-items-center">
+        <!-- Match Content - 8 columns -->
+        <div class="col-lg-8">
           <div class="match-header">
             <!-- Home Team -->
             <div class="team-section home">
@@ -29,15 +29,11 @@
               <mat-chip [ngClass]="getStatusClass()" class="status-chip">
                 {{ getMatchStatus() }}
               </mat-chip>
-              
+
               <div class="score">
-                <span class="home-score" [class.winner]="match.homeScore > match.awayScore">
-                  {{ match.homeScore }}
-                </span>
+                <span class="home-score">{{ match.homeScore }}</span>
                 <span class="separator">-</span>
-                <span class="away-score" [class.winner]="match.awayScore > match.homeScore">
-                  {{ match.awayScore }}
-                </span>
+                <span class="away-score">{{ match.awayScore }}</span>
               </div>
 
               <div class="match-info">
@@ -67,23 +63,131 @@
             </div>
           </div>
         </div>
+
+        <!-- Statistics - 4 columns -->
+        <div class="col-lg-4">
+          <div class="stats-section">
+            <h3 class="stats-title">
+              <mat-icon>bar_chart</mat-icon>
+              Estadísticas del Partido
+            </h3>
+            <div class="match-stats">
+              <div class="stat-row" *ngFor="let stat of cardStatsRows">
+                <span class="home-value">{{ stat.homeValue }}</span>
+
+                <div class="stat-bar-container">
+                  <div class="stat-bar">
+                    <div class="home-bar" [style.width.%]="stat.homePercentage"></div>
+                    <div class="away-bar" [style.width.%]="stat.awayPercentage"></div>
+                  </div>
+                  <span class="stat-label">{{ stat.label }}</span>
+                </div>
+
+                <span class="away-value">{{ stat.awayValue }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Content Wrapper -->
   <div class="content-wrapper">
-    <!-- Tabs -->
-    <mat-tab-group class="match-tabs" animationDuration="300ms">
-    
-    <!-- Tab 1: Eventos -->
-    <mat-tab label="Eventos">
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">timeline</mat-icon>
-        Eventos
-      </ng-template>
+    <div class="row">
+      <!-- Lineups Section - 8 columns -->
+      <div class="col-lg-8">
+        <mat-card class="lineups-section-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>groups</mat-icon>
+              Alineaciones
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="row" *ngIf="lineups; else noLineups">
+              <!-- Home Team Lineup - 6 columns -->
+              <div class="col-md-6">
+                <mat-card class="lineup-card">
+                  <mat-card-header>
+                    <mat-card-title>
+                      <img [src]="match.homeTeam.logoUrl" [alt]="match.homeTeam.name" class="team-logo-small">
+                      {{ match.homeTeam.name }}
+                    </mat-card-title>
+                    <mat-chip class="formation-chip">{{ lineups.home.formation }}</mat-chip>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="field-container">
+                      <!-- Campo de fútbol visual aquí -->
+                    </div>
 
-      <div class="tab-content">
+                    <div class="players-list">
+                      <h4 class="list-title">Titulares</h4>
+                      <div class="player-item" *ngFor="let player of lineups.home.startingXI">
+                        <span class="number">{{ player.number }}</span>
+                        <span class="name">{{ player.name }}</span>
+                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
+                      </div>
+
+                      <h4 class="list-title">Suplentes</h4>
+                      <div class="player-item" *ngFor="let player of lineups.home.substitutes">
+                        <span class="number">{{ player.number }}</span>
+                        <span class="name">{{ player.name }}</span>
+                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <!-- Away Team Lineup - 6 columns -->
+              <div class="col-md-6">
+                <mat-card class="lineup-card">
+                  <mat-card-header>
+                    <mat-card-title>
+                      <img [src]="match.awayTeam.logoUrl" [alt]="match.awayTeam.name" class="team-logo-small">
+                      {{ match.awayTeam.name }}
+                    </mat-card-title>
+                    <mat-chip class="formation-chip">{{ lineups.away.formation }}</mat-chip>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="field-container">
+                      <!-- Campo de fútbol visual aquí -->
+                    </div>
+
+                    <div class="players-list">
+                      <h4 class="list-title">Titulares</h4>
+                      <div class="player-item" *ngFor="let player of lineups.away.startingXI">
+                        <span class="number">{{ player.number }}</span>
+                        <span class="name">{{ player.name }}</span>
+                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
+                      </div>
+
+                      <h4 class="list-title">Suplentes</h4>
+                      <div class="player-item" *ngFor="let player of lineups.away.substitutes">
+                        <span class="number">{{ player.number }}</span>
+                        <span class="name">{{ player.name }}</span>
+                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+
+            <ng-template #noLineups>
+              <div class="empty-state">
+                <mat-icon class="empty-icon">groups</mat-icon>
+                <h3>Alineaciones no disponibles</h3>
+                <p>Las alineaciones para este partido no están disponibles.</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Events Section - 4 columns -->
+      <div class="col-lg-4">
         <mat-card class="events-card">
           <mat-card-header>
             <mat-card-title>
@@ -92,134 +196,44 @@
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <div class="match-events">
+            <div class="match-events" *ngIf="events && events.length > 0; else noEvents">
               <div class="timeline">
-                <div *ngFor="let event of match.events" 
-                     class="event" 
-                     [ngClass]="[getEventClass(event.type), event.team]">
-                  
-                  <div class="event-content" [class.home]="event.team === 'home'" [class.away]="event.team === 'away'">
+                <div class="event" *ngFor="let event of events">
+                  <div class="event-content" [ngClass]="event.team === 'home' ? 'home' : 'away'">
                     <span class="minute">{{ event.minute }}'</span>
-                    
+
                     <div class="event-icon-wrapper">
-                      <mat-icon class="event-icon" [ngClass]="getEventClass(event.type)">
+                      <mat-icon class="event-icon" [ngClass]="'event-' + event.type">
                         {{ getEventIcon(event.type) }}
                       </mat-icon>
                     </div>
 
                     <div class="event-details">
                       <span class="player">{{ event.player }}</span>
-                      <span *ngIf="event.assistedBy" class="assist">
-                        <mat-icon class="assist-icon">person</mat-icon>
-                        {{ event.assistedBy }}
-                      </span>
-                      <span *ngIf="event.playerOut" class="substitution">
-                        <mat-icon class="sub-icon">arrow_forward</mat-icon>
-                        {{ event.playerOut }}
-                      </span>
+                      <div class="assist" *ngIf="event.assistedBy">
+                        <mat-icon>trending_up</mat-icon>
+                        Asistencia: {{ event.assistedBy }}
+                      </div>
+                      <div class="substitution" *ngIf="event.playerOut">
+                        <mat-icon>swap_horiz</mat-icon>
+                        Sale: {{ event.playerOut }}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            <ng-template #noEvents>
+              <div class="empty-state">
+                <mat-icon class="empty-icon">timeline</mat-icon>
+                <h3>Sin eventos registrados</h3>
+                <p>No hay eventos disponibles para este partido.</p>
+              </div>
+            </ng-template>
           </mat-card-content>
         </mat-card>
       </div>
-    </mat-tab>
-
-    <!-- Tab 2: Alineaciones -->
-    <mat-tab label="Alineaciones">
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">groups</mat-icon>
-        Alineaciones
-      </ng-template>
-
-      <div class="tab-content">
-        <div class="lineups-container">
-          <!-- Home Team Lineup -->
-          <mat-card class="lineup-card home">
-            <mat-card-header>
-              <mat-card-title>
-                <img [src]="match.homeTeam.logoUrl" class="team-logo-small">
-                {{ match.homeTeam.name }}
-              </mat-card-title>
-              <mat-chip class="formation-chip">{{ match.homeFormation }}</mat-chip>
-            </mat-card-header>
-            <mat-card-content>
-              <!-- Players List -->
-              <div class="players-list">
-                <h4 class="list-title">Jugadores en cancha</h4>
-                <div *ngFor="let player of match.homeLineup" class="player-item">
-                  <span class="number">{{ player.jerseyNumber }}</span>
-                  <span class="name">{{ player.name }}</span>
-                  <mat-chip class="position-chip">{{ player.position }}</mat-chip>
-                </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
-
-          <!-- Away Team Lineup -->
-          <mat-card class="lineup-card away">
-            <mat-card-header>
-              <mat-card-title>
-                <img [src]="match.awayTeam.logoUrl" class="team-logo-small">
-                {{ match.awayTeam.name }}
-              </mat-card-title>
-              <mat-chip class="formation-chip">{{ match.awayFormation }}</mat-chip>
-            </mat-card-header>
-            <mat-card-content>
-              <!-- Players List -->
-              <div class="players-list">
-                <h4 class="list-title">Jugadores en cancha</h4>
-                <div *ngFor="let player of match.awayLineup" class="player-item">
-                  <span class="number">{{ player.jerseyNumber }}</span>
-                  <span class="name">{{ player.name }}</span>
-                  <mat-chip class="position-chip">{{ player.position }}</mat-chip>
-                </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </div>
-    </mat-tab>
-
-    <!-- Tab 3: Estadísticas -->
-    <mat-tab label="Estadísticas">
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">bar_chart</mat-icon>
-        Estadísticas
-      </ng-template>
-
-      <div class="tab-content">
-        <mat-card class="stats-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>bar_chart</mat-icon>
-              Estadísticas del Partido
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="match-stats">
-              <div class="stat-row" *ngFor="let stat of statsRows">
-                <span class="home-value">{{ stat.homeValue }}{{ stat.label === 'Posesión' ? '%' : '' }}</span>
-                
-                <div class="stat-bar-container">
-                  <div class="stat-bar">
-                    <div class="home-bar" [style.width.%]="stat.homePercentage"></div>
-                    <div class="away-bar" [style.width.%]="stat.awayPercentage"></div>
-                  </div>
-                  <span class="stat-label">{{ stat.label }}</span>
-                </div>
-                
-                <span class="away-value">{{ stat.awayValue }}{{ stat.label === 'Posesión' ? '%' : '' }}</span>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
-
-    </mat-tab-group>
+    </div>
   </div>
 </div>
 

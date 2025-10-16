@@ -98,6 +98,11 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   matchId: number = 0;
   isLoading = false;
   statsRows: StatRow[] = [];
+  cardStatsRows: StatRow[] = [];
+  
+  // Propiedades para la nueva estructura
+  lineups: any = null;
+  events: MatchEvent[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -172,6 +177,38 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
     };
 
     this.statsRows = this.calculateStatsRows(this.match.stats);
+    this.cardStatsRows = this.calculateCardStatsRows(this.match.stats);
+    
+    // Inicializar propiedades para la nueva estructura
+    this.events = this.match.events;
+    this.lineups = {
+      home: {
+        formation: this.match.homeFormation,
+        startingXI: this.match.homeLineup.slice(0, 11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        })),
+        substitutes: this.match.homeLineup.slice(11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        }))
+      },
+      away: {
+        formation: this.match.awayFormation,
+        startingXI: this.match.awayLineup.slice(0, 11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        })),
+        substitutes: this.match.awayLineup.slice(11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        }))
+      }
+    };
   }
 
   /**
@@ -179,18 +216,37 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
    */
   private generateLineup(team: 'home' | 'away', formation: string): Player[] {
     const positions = this.getFormationPositions(formation);
-    const names = team === 'home' 
-      ? ['Courtois', 'Carvajal', 'Militao', 'Alaba', 'Mendy', 'Modric', 'Casemiro', 'Kroos', 'Rodrygo', 'Benzema', 'Vinicius']
-      : ['Ter Stegen', 'Dest', 'Piqué', 'Araujo', 'Alba', 'Busquets', 'De Jong', 'Pedri', 'Gavi', 'Lewandowski', 'Raphinha'];
+    const allNames = team === 'home' 
+      ? ['Courtois', 'Carvajal', 'Militao', 'Alaba', 'Mendy', 'Modric', 'Casemiro', 'Kroos', 'Rodrygo', 'Benzema', 'Vinicius', 'Lunin', 'Nacho', 'Camavinga', 'Valverde', 'Asensio', 'Hazard', 'Mariano']
+      : ['Ter Stegen', 'Dest', 'Piqué', 'Araujo', 'Alba', 'Busquets', 'De Jong', 'Pedri', 'Gavi', 'Lewandowski', 'Raphinha', 'Neto', 'García', 'Kessie', 'Torre', 'Ferran', 'Ansu Fati', 'Aubameyang'];
 
-    return positions.map((pos, index) => ({
-      id: index + 1,
-      name: names[index],
-      jerseyNumber: index + 1,
-      position: pos.position,
-      x: pos.x,
-      y: pos.y
-    }));
+    const lineup: Player[] = [];
+    
+    // Titulares (primeros 11)
+    positions.forEach((pos, index) => {
+      lineup.push({
+        id: index + 1,
+        name: allNames[index],
+        jerseyNumber: index + 1,
+        position: pos.position,
+        x: pos.x,
+        y: pos.y
+      });
+    });
+    
+    // Suplentes (siguientes 7)
+    for (let i = 11; i < Math.min(18, allNames.length); i++) {
+      lineup.push({
+        id: i + 1,
+        name: allNames[i],
+        jerseyNumber: i + 1,
+        position: 'SUB',
+        x: 0,
+        y: 0
+      });
+    }
+
+    return lineup;
   }
 
   /**
@@ -255,6 +311,31 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
     const rows: StatRow[] = [];
 
     Object.keys(stats).forEach(key => {
+      const stat = stats[key as keyof MatchStats];
+      const total = stat.home + stat.away;
+      const homePercentage = total > 0 ? (stat.home / total) * 100 : 50;
+      const awayPercentage = total > 0 ? (stat.away / total) * 100 : 50;
+
+      rows.push({
+        label: this.getStatLabel(key),
+        homeValue: stat.home,
+        awayValue: stat.away,
+        homePercentage,
+        awayPercentage
+      });
+    });
+
+    return rows;
+  }
+
+  /**
+   * Calcula solo las estadísticas de tarjetas (amarillas y rojas)
+   */
+  private calculateCardStatsRows(stats: MatchStats): StatRow[] {
+    const rows: StatRow[] = [];
+    const cardKeys = ['yellowCards', 'redCards'];
+
+    cardKeys.forEach(key => {
       const stat = stats[key as keyof MatchStats];
       const total = stat.home + stat.away;
       const homePercentage = total > 0 ? (stat.home / total) * 100 : 50;
