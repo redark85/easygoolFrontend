@@ -1,20 +1,76 @@
 <div class="top-scorers-container">
-
-
-  <!-- Page Header -->
-  <div class="page-header">
-      <!-- Back Button -->
-  <button mat-icon-button class="back-button" (click)="goBack()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-   <div class="header-content">
-    <mat-icon class="header-icon">emoji_events</mat-icon>
-    <div class="header-text">
-      <h1 class="page-title">Estadísticas de Jugadores</h1>
-      <p class="page-subtitle">Goleadores, MVP y Tarjetas del Torneo</p>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+      <div class="hero-overlay"></div>
     </div>
+
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
     </div>
-  </div>
+
+    <div class="container-fluid">
+      <div class="row align-items-start">
+        <!-- Left Column: Top Scorers Info (8 columns) -->
+        <div class="col-lg-8">
+          <div class="row align-items-center">
+            <!-- Top Scorers Icon -->
+            <div class="col-auto">
+              <div class="fixture-icon-container">
+                <mat-icon class="fixture-main-icon">emoji_events</mat-icon>
+              </div>
+            </div>
+
+            <!-- Top Scorers Info -->
+            <div class="col">
+              <div class="fixture-info">
+                <div class="fixture-header">
+                  <h1 class="fixture-title">Estadísticas de Jugadores</h1>
+                  <p class="fixture-subtitle">Goleadores, MVP y Tarjetas del Torneo</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Legend (4 columns) -->
+        <div class="col-lg-4 hero-right-section">
+          <div class="hero-right-content">
+            <div class="legend-container">
+              <div class="legend-row">
+                <div class="legend-badge">
+                  <mat-icon>sports_soccer</mat-icon>
+                  PJ: Partidos Jugados
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-badge">
+                  <mat-icon>trending_up</mat-icon>
+                  Asist.: Asistencias
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-badge">
+                  <mat-icon>analytics</mat-icon>
+                  Prom.: Promedio de goles por partido
+                </div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-badge">
+                  <mat-icon>star</mat-icon>
+                  MOTM: Man of the Match
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading">
@@ -224,24 +280,4 @@
     </mat-tab-group>
   </mat-card>
 
-  <!-- Legend -->
-  <mat-card class="legend-card" *ngIf="!isLoading">
-    <mat-card-content>
-      <h3 class="legend-title">Leyenda</h3>
-      <div class="legend-items">
-        <div class="legend-item">
-          <strong>PJ:</strong> Partidos Jugados
-        </div>
-        <div class="legend-item">
-          <strong>Asist.:</strong> Asistencias
-        </div>
-        <div class="legend-item">
-          <strong>Prom.:</strong> Promedio de goles por partido
-        </div>
-        <div class="legend-item">
-          <strong>MOTM:</strong> Man of the Match (Mejor jugador del partido)
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
 </div>

@@ -1,58 +1,142 @@
 .top-scorers-container {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-
-  // Page Header
-  .page-header {
-     display: flex;
+  // Hero Section
+  .hero-section {
+    position: relative;
+    min-height: 300px;
+    display: flex;
     align-items: center;
-    gap: 1rem;
+    color: white;
+    overflow: hidden;
     margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e0e0e0;
 
-        .back-button {
-      color: #1976d2;
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+
+      .wallpaper-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg,
+          rgba(25, 118, 210, 0.8) 0%,
+          rgba(21, 101, 192, 0.9) 100%);
+      }
     }
-       .header-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex: 1;
 
-      .header-image {
-        width: 2.5rem;
-        height: 2.5rem;
-        object-fit: contain;
-        border-radius: 8px;
-      }
+    .back-button-container {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 10;
 
-      .header-icon {
-        font-size: 2.5rem;
-        width: 2.5rem;
-        height: 2.5rem;
-        color: #ffa726;
-      }
+      .back-button {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
 
-      .header-text {
-        .page-title {
-          margin: 0;
-          font-size: 1.75rem;
-          font-weight: 600;
-          color: #212121;
-        }
-
-        .page-subtitle {
-          margin: 0.25rem 0 0 0;
-          font-size: 0.95rem;
-          color: #757575;
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.3);
+          transform: translateX(-2px);
         }
       }
-    
+    }
+
+    .container-fluid {
+      position: relative;
+      z-index: 5;
+      padding: 2rem 3rem;
+      margin-left: 2rem;
+
+      .fixture-icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 120px;
+        background: transparent;
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        border: none;
+
+        .fixture-main-icon {
+          font-size: 4.5rem;
+          width: 4.5rem;
+          height: 4.5rem;
+          color: white;
+        }
+      }
+
+      .fixture-info {
+        .fixture-header {
+          .fixture-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+          }
+
+          .fixture-subtitle {
+            font-size: 1.3rem;
+            margin: 0.5rem 0 0 0;
+            color: white;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+          }
+        }
+      }
+
+      .hero-right-section {
+        .hero-right-content {
+          .legend-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding-top: 1rem;
+
+            .legend-row {
+              .legend-badge {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                background: transparent;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 0.95rem;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+                width: 100%;
+
+                mat-icon {
+                  font-size: 1.2rem;
+                  width: 1.2rem;
+                  height: 1.2rem;
+                  color: white;
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-    
+
 
   // Loading
   .loading-container {
@@ -375,41 +459,53 @@
     }
   }
 
-  // Legend Card
-  .legend-card {
-    margin-top: 2rem;
-
-    .legend-title {
-      margin: 0 0 1rem 0;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #212121;
-    }
-
-    .legend-items {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-
-      .legend-item {
-        font-size: 0.875rem;
-        color: #666;
-
-        strong {
-          color: #212121;
-          margin-right: 4px;
-        }
-      }
-    }
-  }
 }
 
 // Responsive Design
 @media (max-width: 1024px) {
   .top-scorers-container {
-    .legend-card {
-      .legend-items {
-        grid-template-columns: repeat(2, 1fr);
+    .hero-section {
+      .container-fluid {
+        padding: 2rem 2rem;
+        margin-left: 1.5rem;
+
+        .fixture-icon-container {
+          width: 100px;
+          height: 100px;
+
+          .fixture-main-icon {
+            font-size: 3.5rem;
+            width: 3.5rem;
+            height: 3.5rem;
+          }
+        }
+
+        .fixture-info {
+          .fixture-header {
+            .fixture-title {
+              font-size: 2.5rem;
+            }
+
+            .fixture-subtitle {
+              font-size: 1.2rem;
+            }
+          }
+        }
+
+        .hero-right-section {
+          .hero-right-content {
+            .legend-container {
+              gap: 0.75rem;
+
+              .legend-row {
+                .legend-badge {
+                  font-size: 0.85rem;
+                  padding: 0.6rem 0.8rem;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -417,27 +513,62 @@
 
 @media (max-width: 768px) {
   .top-scorers-container {
-    padding: 1rem;
+    .hero-section {
+      min-height: 250px;
 
-    .back-button {
-      top: 0.5rem;
-      left: 0.5rem;
-    }
-
-    .page-header {
-      .header-icon {
-        font-size: 2rem;
-        width: 2rem;
-        height: 2rem;
+      .back-button-container {
+        top: 0.5rem;
+        left: 0.5rem;
       }
 
-      .header-text {
-        .page-title {
-          font-size: 1.5rem;
+      .container-fluid {
+        padding: 1.5rem 1rem;
+        margin-left: 1rem;
+
+        .fixture-icon-container {
+          width: 80px;
+          height: 80px;
+
+          .fixture-main-icon {
+            font-size: 3rem;
+            width: 3rem;
+            height: 3rem;
+          }
         }
 
-        .page-subtitle {
-          font-size: 0.875rem;
+        .fixture-info {
+          .fixture-header {
+            .fixture-title {
+              font-size: 2rem;
+            }
+
+            .fixture-subtitle {
+              font-size: 1.1rem;
+            }
+          }
+        }
+
+        .hero-right-section {
+          margin-top: 1.5rem;
+
+          .hero-right-content {
+            .legend-container {
+              gap: 0.5rem;
+
+              .legend-row {
+                .legend-badge {
+                  font-size: 0.8rem;
+                  padding: 0.5rem 0.75rem;
+
+                  mat-icon {
+                    font-size: 1rem;
+                    width: 1rem;
+                    height: 1rem;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -530,13 +661,6 @@
             }
           }
         }
-      }
-    }
-
-    .legend-card {
-      .legend-items {
-        grid-template-columns: 1fr;
-        gap: 0.5rem;
       }
     }
   }
