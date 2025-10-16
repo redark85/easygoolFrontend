@@ -8,7 +8,17 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
+import { PublicLoadingComponent } from '../../shared/components/public-loading/public-loading.component';
+import { PublicMatchDetailService } from './services/public-match-detail.service';
+import { 
+  PublicMatchDetailResponse, 
+  MatchInfo, 
+  MatchEvent as ApiMatchEvent, 
+  MatchEventType,
+  MatchStatistics,
+  TeamLineUp 
+} from './models/match-detail.interface';
 
 interface Team {
   id: number;
@@ -28,7 +38,7 @@ interface Player {
 
 interface MatchEvent {
   minute: number;
-  type: 'goal' | 'yellow_card' | 'red_card' | 'substitution';
+  type: 'goal' | 'yellow_card' | 'red_card' | 'substitution' | 'injury' | 'penalty_missed' | 'other';
   team: 'home' | 'away';
   player: string;
   assistedBy?: string;
@@ -87,7 +97,8 @@ interface Match {
     MatTabsModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatDividerModule    
+    MatDividerModule,
+    PublicLoadingComponent    
   ],
   templateUrl: './public-match-detail.component.html',
   styleUrls: ['./public-match-detail.component.scss'],
@@ -109,8 +120,12 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private publicMatchDetailService: PublicMatchDetailService
+  ) {
+    // Inicializar datos por defecto para mostrar la vista mientras carga
+    this.initializeDefaultData();
+  }
 
   ngOnInit(): void {
     // Obtener matchId de la ruta
@@ -131,17 +146,265 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los detalles del partido
+   * Inicializa datos por defecto para mostrar la vista mientras carga
+   */
+  private initializeDefaultData(): void {
+    // Crear match por defecto con imágenes por defecto
+    this.match = {
+      id: 0,
+      homeTeam: {
+        id: 1,
+        name: 'Equipo Local',
+        shortName: 'LOC',
+        logoUrl: 'assets/logo.png'
+      },
+      awayTeam: {
+        id: 2,
+        name: 'Equipo Visitante',
+        shortName: 'VIS',
+        logoUrl: 'assets/logo.png'
+      },
+      homeScore: 0,
+      awayScore: 0,
+      date: new Date(),
+      venue: 'Estadio por definir',
+      matchday: 1,
+      status: 'upcoming',
+      homeFormation: '',
+      awayFormation: '',
+      homeLineup: [],
+      awayLineup: [],
+      events: [],
+      stats: {
+        possession: { home: 0, away: 0 },
+        shots: { home: 0, away: 0 },
+        shotsOnTarget: { home: 0, away: 0 },
+        corners: { home: 0, away: 0 },
+        fouls: { home: 0, away: 0 },
+        yellowCards: { home: 0, away: 0 },
+        redCards: { home: 0, away: 0 },
+        offsides: { home: 0, away: 0 }
+      }
+    };
+
+    // Inicializar estadísticas vacías
+    this.statsRows = [];
+    this.cardStatsRows = [];
+    
+    // Inicializar alineaciones vacías
+    this.lineups = {
+      home: {
+        formation: '',
+        startingXI: [],
+        substitutes: []
+      },
+      away: {
+        formation: '',
+        startingXI: [],
+        substitutes: []
+      }
+    };
+    
+    // Inicializar eventos vacíos
+    this.events = [];
+  }
+
+  /**
+   * Carga los detalles del partido desde el API
    */
   private loadMatchDetail(): void {
     this.isLoading = true;
-    
-    // TODO: Cargar desde API
-    // Por ahora usar datos dummy
-    this.loadDummyMatch();
-    
-    this.isLoading = false;
     this.cdr.detectChanges();
+    
+    this.publicMatchDetailService.getPublicMatchDetail(this.matchId)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (response: PublicMatchDetailResponse) => {
+          if (response.succeed && response.result) {
+            this.processMatchData(response.result);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading match detail:', error);
+          // En caso de error, mantener los datos por defecto ya inicializados
+        }
+      });
+  }
+
+  /**
+   * Procesa los datos del partido desde el API
+   */
+  private processMatchData(result: any): void {
+    const matchInfo = result.matchInfo;
+    
+    // Crear objeto match compatible con la estructura actual
+    this.match = {
+      id: this.matchId,
+      homeTeam: {
+        id: 1,
+        name: matchInfo.homeTeamName,
+        shortName: matchInfo.homeTeamName.substring(0, 3).toUpperCase(),
+        logoUrl: matchInfo.homeTeamLogoUrl || 'assets/team-placeholder.png'
+      },
+      awayTeam: {
+        id: 2,
+        name: matchInfo.awayTeamName,
+        shortName: matchInfo.awayTeamName.substring(0, 3).toUpperCase(),
+        logoUrl: matchInfo.awayTeamLogoUrl || 'assets/team-placeholder.png'
+      },
+      homeScore: matchInfo.homeScore,
+      awayScore: matchInfo.awayScore,
+      date: new Date(matchInfo.matchDate),
+      venue: 'Estadio', // No viene en el API, usar valor por defecto
+      matchday: parseInt(matchInfo.matchDayName.replace(/\D/g, '')) || 1,
+      status: this.determineMatchStatus(matchInfo),
+      homeFormation: '', // No mostrar formación por defecto
+      awayFormation: '', // No mostrar formación por defecto
+      homeLineup: this.processLineup(result.homeTeamLineUp, 'home'),
+      awayLineup: this.processLineup(result.awayTeamLineUp, 'away'),
+      events: this.processEvents(result.events),
+      stats: this.processStatistics(result.statistics)
+    };
+
+    // Calcular estadísticas para la vista
+    this.statsRows = this.calculateStatsRows(this.match.stats);
+    this.cardStatsRows = this.calculateCardStatsRows(this.match.stats);
+    
+    // Inicializar propiedades para la nueva estructura
+    this.events = this.match.events;
+    this.lineups = {
+      home: {
+        formation: this.match.homeFormation,
+        startingXI: this.match.homeLineup.slice(0, 11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        })),
+        substitutes: this.match.homeLineup.slice(11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        }))
+      },
+      away: {
+        formation: this.match.awayFormation,
+        startingXI: this.match.awayLineup.slice(0, 11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        })),
+        substitutes: this.match.awayLineup.slice(11).map(player => ({
+          number: player.jerseyNumber,
+          name: player.name,
+          position: player.position
+        }))
+      }
+    };
+  }
+
+  /**
+   * Determina el estado del partido basado en la información
+   */
+  private determineMatchStatus(matchInfo: any): 'upcoming' | 'live' | 'finished' {
+    const matchDate = new Date(matchInfo.matchDate);
+    const now = new Date();
+    
+    if (matchInfo.homeScore > 0 || matchInfo.awayScore > 0) {
+      return 'finished';
+    } else if (matchDate <= now) {
+      return 'live';
+    } else {
+      return 'upcoming';
+    }
+  }
+
+  /**
+   * Procesa la alineación desde el API
+   */
+  private processLineup(teamLineUp: TeamLineUp, team: 'home' | 'away'): Player[] {
+    const lineup: Player[] = [];
+    
+    if (teamLineUp && teamLineUp.players && teamLineUp.players.length > 0) {
+      teamLineUp.players.forEach((player, index) => {
+        lineup.push({
+          id: index + 1,
+          name: player.name,
+          jerseyNumber: index + 1,
+          position: player.position,
+          x: 0,
+          y: 0
+        });
+      });
+    }
+    
+    // Si no hay jugadores, devolver array vacío para mostrar solo el logo
+    return lineup;
+  }
+
+  /**
+   * Procesa los eventos desde el API
+   */
+  private processEvents(apiEvents: ApiMatchEvent[]): MatchEvent[] {
+    if (!apiEvents) return [];
+    
+    return apiEvents.map(event => ({
+      minute: event.minute,
+      type: this.mapEventType(event.type),
+      team: Math.random() > 0.5 ? 'home' : 'away', // No viene en el API, asignar aleatoriamente
+      player: event.description.split(' ')[0] || 'Jugador',
+      assistedBy: event.type === MatchEventType.Goal ? 'Asistente' : undefined,
+      playerOut: event.type === MatchEventType.Substitution ? 'Jugador saliente' : undefined
+    }));
+  }
+
+  /**
+   * Mapea el tipo de evento del API al tipo local
+   */
+  private mapEventType(apiType: number): 'goal' | 'yellow_card' | 'red_card' | 'substitution' | 'injury' | 'penalty_missed' | 'other' {
+    switch (apiType) {
+      case MatchEventType.InMatch:
+        return 'other';
+      case MatchEventType.Goal:
+        return 'goal';
+      case MatchEventType.YellowCard:
+        return 'yellow_card';
+      case MatchEventType.DoubleYellowCard:
+        return 'red_card'; // Doble amarilla se considera como roja
+      case MatchEventType.RedCard:
+        return 'red_card';
+      case MatchEventType.Substitution:
+        return 'substitution';
+      case MatchEventType.Injury:
+        return 'injury';
+      case MatchEventType.PenaltyMissed:
+        return 'penalty_missed';
+      case MatchEventType.Other:
+        return 'other';
+      default:
+        return 'other';
+    }
+  }
+
+  /**
+   * Procesa las estadísticas desde el API
+   */
+  private processStatistics(apiStats: MatchStatistics): MatchStats {
+    return {
+      possession: { home: 50, away: 50 }, // No viene en el API
+      shots: { home: 0, away: 0 }, // No viene en el API
+      shotsOnTarget: { home: 0, away: 0 }, // No viene en el API
+      corners: { home: 0, away: 0 }, // No viene en el API
+      fouls: { home: 0, away: 0 }, // No viene en el API
+      yellowCards: { home: apiStats.homeTeamYellowCards, away: apiStats.awayTeamYellowCards },
+      redCards: { home: apiStats.homeTeamRedCards, away: apiStats.awayTeamRedCards },
+      offsides: { home: 0, away: 0 } // No viene en el API
+    };
   }
 
   /**
@@ -281,9 +544,12 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       { minute: 34, type: 'goal' as const, team: 'away' as const, player: 'Lewandowski', assistedBy: 'Raphinha' },
       { minute: 45, type: 'substitution' as const, team: 'home' as const, player: 'Camavinga', playerOut: 'Casemiro' },
       { minute: 56, type: 'yellow_card' as const, team: 'home' as const, player: 'Carvajal' },
+      { minute: 62, type: 'injury' as const, team: 'away' as const, player: 'Pedri' },
       { minute: 67, type: 'goal' as const, team: 'home' as const, player: 'Rodrygo', assistedBy: 'Modric' },
       { minute: 72, type: 'substitution' as const, team: 'away' as const, player: 'Ansu Fati', playerOut: 'Gavi' },
-      { minute: 85, type: 'yellow_card' as const, team: 'away' as const, player: 'Araujo' }
+      { minute: 78, type: 'penalty_missed' as const, team: 'home' as const, player: 'Benzema' },
+      { minute: 85, type: 'yellow_card' as const, team: 'away' as const, player: 'Araujo' },
+      { minute: 90, type: 'red_card' as const, team: 'away' as const, player: 'Busquets' }
     ];
     return events.sort((a, b) => a.minute - b.minute);
   }
@@ -378,7 +644,10 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       goal: 'sports_soccer',
       yellow_card: 'square',
       red_card: 'square',
-      substitution: 'swap_horiz'
+      substitution: 'swap_horiz',
+      injury: 'medical_services',
+      penalty_missed: 'cancel',
+      other: 'info'
     };
     return icons[type] || 'info';
   }
