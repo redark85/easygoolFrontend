@@ -177,6 +177,8 @@
                         <div class="team-logo-container-compact">
                           <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo-compact" appDefaultImage="assets/logo.png">
                         </div>
+                        <span class="pmatch-venue" style="color: rgb(63, 62, 62);">{{ nextMatch.homeTeam.position }}° Posición</span>
+
                       </div>
 
                       <div class="vs-section-compact">
@@ -197,6 +199,8 @@
                         <div class="team-logo-container-compact">
                           <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo-compact" appDefaultImage="assets/logo.png">
                         </div>
+                        <span class="pmatch-venue" style="color: rgb(63, 62, 62);">{{ nextMatch.awayTeam.position }}° Posición</span>
+
                       </div>
                     </div>
 
