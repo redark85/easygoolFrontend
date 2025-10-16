@@ -130,19 +130,9 @@
               <mat-chip class="formation-chip">{{ match.homeFormation }}</mat-chip>
             </mat-card-header>
             <mat-card-content>
-              <!-- Visual Field -->
-              <div class="field-container">
-                <app-field-lineup 
-                  [players]="match.homeLineup" 
-                  [formation]="match.homeFormation">
-                </app-field-lineup>
-              </div>
-
-              <mat-divider></mat-divider>
-
               <!-- Players List -->
               <div class="players-list">
-                <h4 class="list-title">Jugadores</h4>
+                <h4 class="list-title">Jugadores en cancha</h4>
                 <div *ngFor="let player of match.homeLineup" class="player-item">
                   <span class="number">{{ player.jerseyNumber }}</span>
                   <span class="name">{{ player.name }}</span>
@@ -162,19 +152,9 @@
               <mat-chip class="formation-chip">{{ match.awayFormation }}</mat-chip>
             </mat-card-header>
             <mat-card-content>
-              <!-- Visual Field -->
-              <div class="field-container">
-                <app-field-lineup 
-                  [players]="match.awayLineup" 
-                  [formation]="match.awayFormation">
-                </app-field-lineup>
-              </div>
-
-              <mat-divider></mat-divider>
-
               <!-- Players List -->
               <div class="players-list">
-                <h4 class="list-title">Jugadores</h4>
+                <h4 class="list-title">Jugadores en cancha</h4>
                 <div *ngFor="let player of match.awayLineup" class="player-item">
                   <span class="number">{{ player.jerseyNumber }}</span>
                   <span class="name">{{ player.name }}</span>

@@ -9,7 +9,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { Subject, takeUntil } from 'rxjs';
-import { FieldLineupComponent } from './components/field-lineup/field-lineup.component';
 
 interface Team {
   id: number;
@@ -88,8 +87,7 @@ interface Match {
     MatTabsModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatDividerModule,
-    FieldLineupComponent
+    MatDividerModule    
   ],
   templateUrl: './public-match-detail.component.html',
   styleUrls: ['./public-match-detail.component.scss'],
