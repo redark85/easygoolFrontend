@@ -1,64 +1,80 @@
 <div class="match-detail-container" *ngIf="match">
-  <!-- Back Button -->
-  <button mat-icon-button class="back-button" (click)="goBack()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
+  <!-- Hero Section - Match Header -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+      <div class="hero-overlay"></div>
+    </div>
 
-  <!-- Match Header -->
-  <mat-card class="match-header-card">
-    <div class="match-header">
-      <!-- Home Team -->
-      <div class="team-section home">
-        <img [src]="match.homeTeam.logoUrl" [alt]="match.homeTeam.name" class="team-logo">
-        <h2 class="team-name">{{ match.homeTeam.name }}</h2>
-      </div>
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
 
-      <!-- Score Section -->
-      <div class="score-section">
-        <mat-chip [ngClass]="getStatusClass()" class="status-chip">
-          {{ getMatchStatus() }}
-        </mat-chip>
-        
-        <div class="score">
-          <span class="home-score" [class.winner]="match.homeScore > match.awayScore">
-            {{ match.homeScore }}
-          </span>
-          <span class="separator">-</span>
-          <span class="away-score" [class.winner]="match.awayScore > match.homeScore">
-            {{ match.awayScore }}
-          </span>
+    <div class="container-fluid">
+      <div class="row align-items-center justify-content-center">
+        <!-- Match Content -->
+        <div class="col-12">
+          <div class="match-header">
+            <!-- Home Team -->
+            <div class="team-section home">
+              <img [src]="match.homeTeam.logoUrl" [alt]="match.homeTeam.name" class="team-logo">
+              <h2 class="team-name">{{ match.homeTeam.name }}</h2>
+            </div>
+
+            <!-- Score Section -->
+            <div class="score-section">
+              <mat-chip [ngClass]="getStatusClass()" class="status-chip">
+                {{ getMatchStatus() }}
+              </mat-chip>
+              
+              <div class="score">
+                <span class="home-score" [class.winner]="match.homeScore > match.awayScore">
+                  {{ match.homeScore }}
+                </span>
+                <span class="separator">-</span>
+                <span class="away-score" [class.winner]="match.awayScore > match.homeScore">
+                  {{ match.awayScore }}
+                </span>
+              </div>
+
+              <div class="match-info">
+                <div class="info-item">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ match.date | date:'fullDate' }}</span>
+                </div>
+                <div class="info-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ match.date | date:'shortTime' }}</span>
+                </div>
+                <div class="info-item">
+                  <mat-icon>location_on</mat-icon>
+                  <span>{{ match.venue }}</span>
+                </div>
+                <div class="info-item">
+                  <mat-icon>calendar_today</mat-icon>
+                  <span>Jornada {{ match.matchday }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Away Team -->
+            <div class="team-section away">
+              <img [src]="match.awayTeam.logoUrl" [alt]="match.awayTeam.name" class="team-logo">
+              <h2 class="team-name">{{ match.awayTeam.name }}</h2>
+            </div>
+          </div>
         </div>
-
-        <div class="match-info">
-          <p class="info-item">
-            <mat-icon>event</mat-icon>
-            {{ match.date | date:'fullDate' }}
-          </p>
-          <p class="info-item">
-            <mat-icon>schedule</mat-icon>
-            {{ match.date | date:'shortTime' }}
-          </p>
-          <p class="info-item">
-            <mat-icon>location_on</mat-icon>
-            {{ match.venue }}
-          </p>
-          <p class="info-item">
-            <mat-icon>calendar_today</mat-icon>
-            Jornada {{ match.matchday }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Away Team -->
-      <div class="team-section away">
-        <img [src]="match.awayTeam.logoUrl" [alt]="match.awayTeam.name" class="team-logo">
-        <h2 class="team-name">{{ match.awayTeam.name }}</h2>
       </div>
     </div>
-  </mat-card>
+  </section>
 
-  <!-- Tabs -->
-  <mat-tab-group class="match-tabs" animationDuration="300ms">
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Tabs -->
+    <mat-tab-group class="match-tabs" animationDuration="300ms">
     
     <!-- Tab 1: Eventos -->
     <mat-tab label="Eventos">
@@ -203,7 +219,8 @@
       </div>
     </mat-tab>
 
-  </mat-tab-group>
+    </mat-tab-group>
+  </div>
 </div>
 
 <!-- Loading State -->
