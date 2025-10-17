@@ -41,6 +41,70 @@
         <mat-icon class="time-icon">schedule</mat-icon>
         <span class="time-text">{{ matchTime }}</span>
       </div>
+      
+      <!-- Match Control Buttons -->
+      <div class="match-control-buttons">
+        <!-- Start Match Button -->
+        <button mat-raised-button 
+                color="primary"
+                class="control-btn"
+                *ngIf="matchState === 'not_started'"
+                (click)="startMatch()">
+          <mat-icon>play_arrow</mat-icon>
+          Empezar Partido
+        </button>
+
+        <!-- End First Half Button -->
+        <button mat-raised-button 
+                color="warn"
+                class="control-btn"
+                *ngIf="matchState === 'first_half'"
+                (click)="endFirstHalf()">
+          <mat-icon>pause</mat-icon>
+          Finalizar Primer Tiempo
+        </button>
+
+        <!-- Start Second Half Button -->
+        <button mat-raised-button 
+                color="primary"
+                class="control-btn"
+                *ngIf="matchState === 'half_time'"
+                (click)="startSecondHalf()">
+          <mat-icon>play_arrow</mat-icon>
+          Empezar Segundo Tiempo
+        </button>
+
+        <!-- End Second Half Button -->
+        <button mat-raised-button 
+                color="warn"
+                class="control-btn"
+                *ngIf="matchState === 'second_half'"
+                (click)="endSecondHalf()">
+          <mat-icon>stop</mat-icon>
+          Finalizar Segundo Tiempo
+        </button>
+
+        <!-- Extra Time Button -->
+        <button mat-raised-button 
+                color="accent"
+                class="control-btn"
+                *ngIf="matchState === 'extra_time'"
+                (click)="endSecondHalf()">
+          <mat-icon>timer</mat-icon>
+          En Prórroga
+        </button>
+
+        <!-- Match State Indicator -->
+        <div class="match-state-indicator" *ngIf="matchState !== 'not_started'">
+          <span class="state-badge" [ngClass]="'state-' + matchState">
+            {{ matchState === 'first_half' ? 'Primer Tiempo' :
+               matchState === 'half_time' ? 'Descanso' :
+               matchState === 'second_half' ? 'Segundo Tiempo' :
+               matchState === 'extra_time' ? 'Prórroga' :
+               matchState === 'full_time' ? 'Finalizado' : '' }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Away Team -->

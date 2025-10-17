@@ -35,7 +35,7 @@ export interface MatchEvent {
   tournamentTeamPlayerId: number;
   eventType: MatchEventType;
   minute: number;
-  description: string;
+  description?: string;
   isHomeGoal: boolean;
 }
 
