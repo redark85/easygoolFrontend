@@ -757,6 +757,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   getMatchStatusTextByNumber(status: number): string {
     switch (status) {
       case MatchStatusType.scheduled: return 'Programado';
+      case MatchStatusType.inProgress: return 'En vivo';
       case MatchStatusType.played: return 'Jugado';
       case MatchStatusType.canceled: return 'Cancelado Eliminado';
       case MatchStatusType.postponed: return 'Postergado';
@@ -770,6 +771,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   getMatchStatusClassByNumber(status: MatchStatusType): string {
     switch (status) {
       case MatchStatusType.scheduled: return 'status-scheduled';
+      case MatchStatusType.inProgress: return 'status-in-progress';
       case MatchStatusType.played: return 'status-played';
       case MatchStatusType.canceled: return 'status-canceled';
       case MatchStatusType.postponed: return 'status-postponed';
