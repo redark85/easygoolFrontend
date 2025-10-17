@@ -459,6 +459,10 @@
             background-color: #ff9800; // Naranja - Postergado (3)
           }
 
+          &.status-in-progress {
+            background-color: #f10707;
+          }
+
           &.status-unknown {
             background-color: #9e9e9e; // Gris - Desconocido
           }

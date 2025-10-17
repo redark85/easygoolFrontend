@@ -14,3 +14,4 @@ export * from './team.service';
 export * from './fixture.service';
 export * from './manager.service';
 export * from './player.service';
+export * from './tournament-home.service';

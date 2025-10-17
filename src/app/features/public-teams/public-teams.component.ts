@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService } from '@core/services';
 
 interface Team {
   id: number;
@@ -71,14 +72,19 @@ interface PositionFilter {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicTeamsComponent implements OnInit, OnDestroy {
+  // Filtros - Fases y Grupos como public-top-scorers
+  phases: TournamentPhase[] = [];
+  groups: TournamentGroup[] = [];
+  selectedPhaseId: number | null = null;
+  selectedGroupId: number | null = null;
+  PhaseType = PhaseType; // Exponer el enum al template
+
   // Datos
   teams: Team[] = [];
   filteredTeams: Team[] = [];
-  groups: Group[] = [];
   positionFilters: PositionFilter[] = [];
   
-  // Filtros
-  selectedGroupId: number | null = null;
+  // Filtros adicionales
   selectedPositionFilter: string = 'all';
   searchText: string = '';
   
@@ -98,7 +104,9 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private managerService: ManagerService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -111,7 +119,11 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
         const id = params.get('tournamentId');
         if (id) {
           this.tournamentId = +id;
-          this.loadData();
+          console.log('Tournament ID recibido:', this.tournamentId);
+          this.loadPhases();
+        } else {
+          // Si no hay ID en la ruta, usar el ID por defecto
+          this.loadPhases();
         }
       });
   }
@@ -140,28 +152,45 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   private loadData(): void {
     this.isLoading = true;
     
-    // TODO: Cargar desde API
-    // Por ahora usar datos dummy
-    this.loadDummyData();
-    
-    this.calculateStats();
-    this.applyFilters();
-    
-    this.isLoading = false;
-    this.cdr.detectChanges();
+    try {
+      console.log('Cargando equipos - Fase:', this.selectedPhaseId, 'Grupo:', this.selectedGroupId);
+      
+      // Siempre cargar equipos dummy para mostrar algo
+      this.generateDummyTeams();
+      this.calculateStats();
+      this.applyFilters();
+      
+      console.log('Equipos cargados:', this.teams.length);
+      console.log('Equipos filtrados:', this.filteredTeams.length);
+      
+    } catch (error) {
+      console.error('Error al cargar equipos:', error);
+      // En caso de error, asegurar que tenemos datos básicos
+      this.teams = [];
+      this.filteredTeams = [];
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
+
   /**
-   * Carga datos dummy
+   * Genera equipos dummy
    */
-  private loadDummyData(): void {
-    // Grupos
-    this.groups = [
-      { id: 1, name: 'Grupo A' },
-      { id: 2, name: 'Grupo B' },
-      { id: 3, name: 'Grupo C' },
-      { id: 4, name: 'Grupo D' }
-    ];
+  private generateDummyTeams(): void {
+    // Asegurar que tenemos grupos disponibles
+    if (!this.groups || this.groups.length === 0) {
+      console.warn('No hay grupos disponibles, usando grupos por defecto');
+      this.groups = [
+        { id: 1, name: 'Grupo A' },
+        { id: 2, name: 'Grupo B' },
+        { id: 3, name: 'Grupo C' },
+        { id: 4, name: 'Grupo D' }
+      ];
+    }
+
+    console.log('Generando equipos con grupos:', this.groups);
 
     // Equipos
     const teamNames = [
@@ -187,6 +216,10 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
       const goalsFor = wins * 2 + draws + Math.floor(Math.random() * 10);
       const goalsAgainst = losses * 2 + Math.floor(Math.random() * 10);
 
+      // Calcular grupo de forma segura
+      const groupIndex = index % this.groups.length;
+      const selectedGroup = this.groups[groupIndex];
+
       return {
         id: index + 1,
         name: team.name,
@@ -202,8 +235,8 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
         goalsAgainst,
         goalDifference: goalsFor - goalsAgainst,
         totalPlayers: 20 + Math.floor(Math.random() * 10),
-        groupId: (index % 4) + 1,
-        groupName: this.groups[index % 4].name,
+        groupId: selectedGroup.id,
+        groupName: selectedGroup.name,
         coach: team.coach,
         stadium: team.stadium,
         founded: team.founded
@@ -241,8 +274,9 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     let filtered = [...this.teams];
 
-    // Filtro por grupo
-    if (this.selectedGroupId) {
+    // Filtro por grupo (solo si se selecciona específicamente)
+    // Por defecto mostrar todos los equipos sin filtrar por grupo
+    if (this.selectedGroupId && this.shouldShowGroupSelect) {
       filtered = filtered.filter(team => team.groupId === this.selectedGroupId);
     }
 
@@ -271,12 +305,6 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  /**
-   * Maneja el cambio de grupo
-   */
-  onGroupChange(): void {
-    this.applyFilters();
-  }
 
   /**
    * Maneja el cambio de posición
@@ -351,5 +379,105 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   getSelectedPositionFilterName(): string {
     const filter = this.positionFilters.find(f => f.id === this.selectedPositionFilter);
     return filter ? filter.name : '';
+  }
+
+  /**
+   * Carga las fases del torneo
+   */
+  private loadPhases(): void {
+    this.managerService.getTournamentPhases(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentDetails) => {
+          console.log('Detalles del torneo recibidos:', tournamentDetails);
+          
+          // Cargar fases
+          this.phases = tournamentDetails.phases || [];
+          console.log('Fases cargadas:', this.phases);
+          
+          // Seleccionar la primera fase por defecto
+          if (this.phases.length > 0) {
+            this.selectedPhaseId = this.phases[0].id;
+            this.onPhaseChange();
+          } else {
+            // Si no hay fases, cargar datos dummy
+            this.loadData();
+          }
+          
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fases:', error);
+          this.toastService.showError('Error al cargar las fases del torneo');
+          // Cargar datos dummy como fallback
+          this.loadData();
+        }
+      });
+  }
+
+  /**
+   * Carga los grupos de la fase seleccionada
+   */
+  private loadGroups(selectedPhase: TournamentPhase): void {
+    // Cargar los grupos desde la fase seleccionada
+    this.groups = selectedPhase.groups || [];
+    
+    console.log('Grupos cargados:', this.groups);
+
+    // Seleccionar el primer grupo por defecto
+    if (this.groups.length > 0) {
+      this.selectedGroupId = this.groups[0].id;
+      this.loadData();
+    } else {
+      this.loadData();
+    }
+    
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja el cambio de fase seleccionada
+   */
+  onPhaseChange(): void {
+    const selectedPhase = this.selectedPhase;
+    
+    if (selectedPhase) {
+      console.log('Fase seleccionada:', selectedPhase);
+      
+      // Si es fase de grupos, cargar los grupos
+      if (selectedPhase.phaseType === PhaseType.Groups) {
+        this.loadGroups(selectedPhase);
+      } else {
+        // Si es knockout, limpiar grupos y cargar datos
+        this.groups = [];
+        this.selectedGroupId = null;
+        this.loadData();
+      }
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Maneja el cambio de grupo seleccionado
+   */
+  onGroupChange(): void {
+    console.log('Cambio de grupo:', this.selectedGroupId);
+    // Solo aplicar filtros, no recargar todos los datos
+    this.applyFilters();
+  }
+
+  /**
+   * Obtiene la fase seleccionada
+   */
+  get selectedPhase(): TournamentPhase | undefined {
+    return this.phases.find(p => p.id === this.selectedPhaseId);
+  }
+
+  /**
+   * Verifica si debe mostrar el select de grupos
+   */
+  get shouldShowGroupSelect(): boolean {
+    return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 }

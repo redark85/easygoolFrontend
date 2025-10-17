@@ -1,76 +1,112 @@
 <div class="public-team-detail-container">
   <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner diameter="50"></mat-spinner>
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
     <p class="loading-text">Cargando información del equipo...</p>
   </div>
 
   <!-- Team Detail Content -->
   <div class="team-detail-content" *ngIf="!isLoading && team">
-    <!-- Back Button -->
-    <button mat-icon-button class="back-button" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-background">
+        <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+        <div class="hero-overlay"></div>
+      </div>
 
-    <!-- Team Header -->
-    <mat-card class="team-header-card">
-      <div class="team-header">
-        <div class="team-logo-container">
-          <img [src]="team.logoUrl" [alt]="team.name" class="team-logo-large">
-        </div>
-        
-        <div class="team-info">
-          <h1 class="team-name">{{ team.name }}</h1>
-          <p class="team-motto" *ngIf="team.motto">{{ team.motto }}</p>
-          
-          <div class="team-meta">
-            <div class="meta-item">
-              <mat-icon>sports_soccer</mat-icon>
-              <span>Fundado en {{ team.founded }}</span>
+      <!-- Back Button -->
+      <div class="back-button-container">
+        <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row align-items-stretch">
+          <!-- Left Column: Team Info (8 columns) -->
+          <div class="col-lg-8">
+            <div class="row align-items-center">
+              <!-- Team Logo -->
+              <div class="col-auto">
+                <div class="fixture-icon-container">
+                  <img [src]="team.logoUrl" [alt]="team.name" class="team-logo-hero">
+                </div>
+              </div>
+
+              <!-- Team Info -->
+              <div class="col">
+                <div class="fixture-info">
+                  <div class="fixture-header">
+                    <h1 class="fixture-title">{{ team.name }}</h1>
+                    <p class="fixture-subtitle" *ngIf="team.motto">{{ team.motto }}</p>
+                    <p class="fixture-subtitle" *ngIf="!team.motto">Información del Equipo</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="meta-item">
-              <mat-icon>stadium</mat-icon>
-              <span>{{ team.stadium }}</span>
+
+            <!-- Stats Row - Estadísticas en fila inferior -->
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="legend-items-hero">
+                  <div class="legend-item-hero">
+                    <div class="legend-badge">
+                      <mat-icon>emoji_events</mat-icon>
+                      {{ team.position }}° Posición
+                    </div>
+                  </div>
+                  <div class="legend-item-hero">
+                    <div class="legend-badge">
+                      <mat-icon>star</mat-icon>
+                      {{ team.points }} Puntos
+                    </div>
+                  </div>
+                  <div class="legend-item-hero">
+                    <div class="legend-badge">
+                      <mat-icon>people</mat-icon>
+                      {{ team.totalPlayers }} Jugadores
+                    </div>
+                  </div>
+                  <div class="legend-item-hero">
+                    <div class="legend-badge">
+                      <mat-icon>sports</mat-icon>
+                      {{ team.matchesPlayed }} Partidos
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="meta-item">
-              <mat-icon>person</mat-icon>
-              <span>DT: {{ team.coach }}</span>
+
+            <!-- Additional Info Row -->
+            <div class="row mt-2">
+              <div class="col-12">
+                <div class="team-meta-hero">
+                  <div class="meta-item-hero">
+                    <mat-icon>sports_soccer</mat-icon>
+                    <span>Fundado en {{ team.founded }}</span>
+                  </div>
+                  <div class="meta-item-hero">
+                    <mat-icon>stadium</mat-icon>
+                    <span>{{ team.stadium }}</span>
+                  </div>
+                  <div class="meta-item-hero">
+                    <mat-icon>person</mat-icon>
+                    <span>DT: {{ team.coach }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="team-stats-header">
-            <div class="stat">
-              <mat-icon>emoji_events</mat-icon>
-              <div class="stat-content">
-                <span class="value">{{ team.position }}°</span>
-                <span class="label">Posición</span>
-              </div>
-            </div>
-            <div class="stat">
-              <mat-icon>star</mat-icon>
-              <div class="stat-content">
-                <span class="value">{{ team.points }}</span>
-                <span class="label">Puntos</span>
-              </div>
-            </div>
-            <div class="stat">
-              <mat-icon>people</mat-icon>
-              <div class="stat-content">
-                <span class="value">{{ team.totalPlayers }}</span>
-                <span class="label">Jugadores</span>
-              </div>
-            </div>
-            <div class="stat">
-              <mat-icon>sports</mat-icon>
-              <div class="stat-content">
-                <span class="value">{{ team.matchesPlayed }}</span>
-                <span class="label">Partidos</span>
-              </div>
+          <!-- Right Column: Empty for consistency (4 columns) -->
+          <div class="col-lg-4 hero-right-section">
+            <div class="hero-right-content">
+              <!-- Placeholder for future content -->
             </div>
           </div>
         </div>
       </div>
-    </mat-card>
+    </section>
 
     <!-- Tabs Section -->
     <mat-card class="tabs-card">

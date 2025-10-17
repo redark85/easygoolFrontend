@@ -12,43 +12,33 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { MatchCardComponent } from './components/match-card/match-card.component';
+import { PublicLoadingComponent } from '@shared/components';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService, FixtureService } from '@core/services';
+import { CompleteFixtureResponse, FixtureMatchDay, FixtureMatch, MatchStatus, MatchStatusMap } from '@core/interfaces/fixture.interface';
 
-interface Team {
+// Interfaces adaptadas para la UI
+interface UIMatch {
   id: number;
-  name: string;
-  shortName: string;
-  logoUrl: string;
-}
-
-interface Match {
-  id: number;
-  homeTeam: Team;
-  awayTeam: Team;
+  homeTeam: string;
+  awayTeam: string;
+  homeTeamLogoUrl: string;
+  awayTeamLogoUrl: string;
   homeScore: number | null;
   awayScore: number | null;
   date: Date;
-  venue: string;
   status: 'upcoming' | 'live' | 'finished' | 'suspended';
   isLive: boolean;
   isFinished: boolean;
   matchday: number;
 }
 
-interface Matchday {
-  number: number;
+interface UIMatchday {
+  id: number;
+  name: string;
   date: Date;
-  matches: Match[];
+  matches: UIMatch[];
 }
 
-interface Phase {
-  id: number;
-  name: string;
-}
-
-interface Group {
-  id: number;
-  name: string;
-}
 
 /**
  * Componente para mostrar el fixture completo del torneo
@@ -68,23 +58,25 @@ interface Group {
     MatProgressSpinnerModule,
     MatChipsModule,
     FormsModule,
-    MatchCardComponent
+    MatchCardComponent,
+    PublicLoadingComponent
   ],
   templateUrl: './public-fixture.component.html',
   styleUrls: ['./public-fixture.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicFixtureComponent implements OnInit, OnDestroy {
-  // Filtros
-  phases: Phase[] = [];
-  groups: Group[] = [];
+  // Filtros - Usando los mismos tipos que tournament-home
+  phases: TournamentPhase[] = [];
+  groups: TournamentGroup[] = [];
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
   selectedStatus: string = 'all';
+  PhaseType = PhaseType; // Exponer el enum al template
 
   // Datos
-  matchdays: Matchday[] = [];
-  filteredMatchdays: Matchday[] = [];
+  matchdays: UIMatchday[] = [];
+  filteredMatchdays: UIMatchday[] = [];
   isLoading = false;
   tournamentId: number = 0;
 
@@ -101,7 +93,10 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private managerService: ManagerService,
+    private toastService: ToastService,
+    private fixtureService: FixtureService
   ) {}
 
     goBack(): void {
@@ -115,7 +110,11 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
         const id = params.get('tournamentId');
         if (id) {
           this.tournamentId = +id;
-          this.loadData();
+          console.log('Tournament ID recibido:', this.tournamentId);
+          this.loadPhases();
+        } else {
+          // Si no hay ID en la ruta, usar el ID por defecto
+          this.loadPhases();
         }
       });
   }
@@ -126,154 +125,177 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos del fixture
+   * Carga las fases del torneo
    */
-  private loadData(): void {
-    this.isLoading = true;
+  private loadPhases(): void {
+    this.managerService.getTournamentPhases(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentDetails) => {
+          console.log('Detalles del torneo recibidos:', tournamentDetails);
+          
+          // Cargar fases
+          this.phases = tournamentDetails.phases || [];
+          console.log('Fases cargadas:', this.phases);
+          
+          // Seleccionar la primera fase por defecto
+          if (this.phases.length > 0) {
+            this.selectedPhaseId = this.phases[0].id;
+            this.onPhaseChange();
+          }
+          
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fases:', error);
+          this.toastService.showError('Error al cargar las fases del torneo');
+        }
+      });
+  }
+
+  /**
+   * Carga los grupos de la fase seleccionada
+   */
+  private loadGroups(selectedPhase: TournamentPhase): void {
+    // Cargar los grupos desde la fase seleccionada
+    this.groups = selectedPhase.groups || [];
     
-    // TODO: Cargar desde API
-    // Por ahora usar datos dummy
-    this.loadDummyData();
+    console.log('Grupos cargados:', this.groups);
+
+    // Seleccionar el primer grupo por defecto
+    if (this.groups.length > 0) {
+      this.selectedGroupId = this.groups[0].id;
+      this.loadFixtureData();
+    } else {
+      this.loadFixtureData();
+    }
     
-    this.isLoading = false;
     this.cdr.detectChanges();
   }
 
   /**
-   * Carga datos dummy para demostración
+   * Carga los datos del fixture desde el API
    */
-  private loadDummyData(): void {
-    // Fases
-    this.phases = [
-      { id: 1, name: 'Fase de Grupos' },
-      { id: 2, name: 'Octavos de Final' },
-      { id: 3, name: 'Cuartos de Final' }
-    ];
-
-    // Grupos
-    this.groups = [
-      { id: 1, name: 'Grupo A' },
-      { id: 2, name: 'Grupo B' },
-      { id: 3, name: 'Grupo C' }
-    ];
-
-    // Seleccionar primera fase y grupo
-    this.selectedPhaseId = this.phases[0].id;
-    this.selectedGroupId = this.groups[0].id;
-
-    // Generar jornadas con partidos
-    this.matchdays = this.generateDummyMatchdays();
-    this.filteredMatchdays = [...this.matchdays];
-    this.calculateStats();
-  }
-
-  /**
-   * Genera jornadas dummy
-   */
-  private generateDummyMatchdays(): Matchday[] {
-    const teams: Team[] = [
-      { id: 1, name: 'Real Madrid', shortName: 'RMA', logoUrl: 'assets/team-placeholder.png' },
-      { id: 2, name: 'Barcelona', shortName: 'BAR', logoUrl: 'assets/team-placeholder.png' },
-      { id: 3, name: 'Atlético Madrid', shortName: 'ATM', logoUrl: 'assets/team-placeholder.png' },
-      { id: 4, name: 'Sevilla FC', shortName: 'SEV', logoUrl: 'assets/team-placeholder.png' },
-      { id: 5, name: 'Valencia CF', shortName: 'VAL', logoUrl: 'assets/team-placeholder.png' },
-      { id: 6, name: 'Real Betis', shortName: 'BET', logoUrl: 'assets/team-placeholder.png' }
-    ];
-
-    const matchdays: Matchday[] = [];
-    const now = new Date();
-
-    for (let i = 1; i <= 5; i++) {
-      const matchdayDate = new Date(now);
-      matchdayDate.setDate(now.getDate() + (i - 3) * 7); // -2 semanas a +2 semanas
-
-      const matches: Match[] = [];
-      
-      // Generar 3 partidos por jornada
-      for (let j = 0; j < 3; j++) {
-        const matchDate = new Date(matchdayDate);
-        matchDate.setHours(18 + j * 2, 0, 0, 0);
-
-        const homeTeamIndex = j * 2;
-        const awayTeamIndex = j * 2 + 1;
-
-        let status: 'upcoming' | 'live' | 'finished' | 'suspended';
-        let homeScore: number | null = null;
-        let awayScore: number | null = null;
-
-        // Determinar estado según la fecha
-        if (matchDate < now) {
-          status = 'finished';
-          homeScore = Math.floor(Math.random() * 4);
-          awayScore = Math.floor(Math.random() * 4);
-        } else if (Math.abs(matchDate.getTime() - now.getTime()) < 2 * 60 * 60 * 1000) {
-          status = 'live';
-          homeScore = Math.floor(Math.random() * 3);
-          awayScore = Math.floor(Math.random() * 3);
-        } else {
-          status = 'upcoming';
-        }
-
-        matches.push({
-          id: (i - 1) * 3 + j + 1,
-          homeTeam: teams[homeTeamIndex],
-          awayTeam: teams[awayTeamIndex],
-          homeScore,
-          awayScore,
-          date: matchDate,
-          venue: `Estadio ${teams[homeTeamIndex].name}`,
-          status,
-          isLive: status === 'live',
-          isFinished: status === 'finished',
-          matchday: i
-        });
-      }
-
-      matchdays.push({
-        number: i,
-        date: matchdayDate,
-        matches
-      });
+  private loadFixtureData(): void {
+    if (!this.selectedPhaseId) {
+      console.warn('No hay fase seleccionada');
+      return;
     }
 
-    return matchdays;
-  }
-
-  /**
-   * Calcula estadísticas de partidos
-   */
-  private calculateStats(): void {
-    this.stats = {
-      total: 0,
-      upcoming: 0,
-      live: 0,
-      finished: 0
-    };
-
-    this.matchdays.forEach(matchday => {
-      matchday.matches.forEach(match => {
-        this.stats.total++;
-        if (match.status === 'upcoming') this.stats.upcoming++;
-        if (match.status === 'live') this.stats.live++;
-        if (match.status === 'finished') this.stats.finished++;
+    this.isLoading = true;
+    
+    this.fixtureService.getCompleteFixture(this.selectedPhaseId, this.selectedGroupId || undefined)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeed && response.result) {
+            console.log('Datos del fixture recibidos:', response.result);
+            this.processFixtureData(response.result);
+            this.updateStats(response.result);
+          } else {
+            console.error('Error en la respuesta:', response.message);
+            this.toastService.showError(response.message || 'Error al cargar el fixture');
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fixture:', error);
+          this.toastService.showError('Error al cargar los datos del fixture');
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
       });
-    });
   }
 
   /**
-   * Maneja el cambio de fase
+   * Procesa los datos del fixture del API y los convierte al formato de la UI
+   */
+  private processFixtureData(fixtureResult: any): void {
+    this.matchdays = fixtureResult.matches.map((matchday: FixtureMatchDay) => ({
+      id: matchday.matchDayId,
+      name: matchday.matchDayName,
+      date: new Date(), // Se puede obtener de la primera fecha de partido si es necesario
+      matches: matchday.matches.map((match: FixtureMatch) => ({
+        id: match.id,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeTeamLogoUrl: match.homeTeamLogoUrl,
+        awayTeamLogoUrl: match.awayTeamLogoUrl,
+        homeScore: match.homeScore,
+        awayScore: match.awayScore,
+        date: new Date(match.matchDate),
+        status: MatchStatusMap[match.status] || 'upcoming',
+        isLive: match.status === MatchStatus.Live,
+        isFinished: match.status === MatchStatus.Finished,
+        matchday: matchday.matchDayId
+      }))
+    }));
+
+    this.filteredMatchdays = [...this.matchdays];
+    this.applyFilters();
+  }
+
+  /**
+   * Actualiza las estadísticas con los datos del API
+   */
+  private updateStats(fixtureResult: any): void {
+    this.stats = {
+      total: fixtureResult.totalMatches,
+      upcoming: fixtureResult.nextMatches,
+      live: fixtureResult.liveMatches,
+      finished: fixtureResult.finishedMatches
+    };
+  }
+
+
+  /**
+   * Maneja el cambio de fase seleccionada
    */
   onPhaseChange(): void {
-    console.log('Fase seleccionada:', this.selectedPhaseId);
-    this.applyFilters();
+    const selectedPhase = this.selectedPhase;
+    
+    if (selectedPhase) {
+      console.log('Fase seleccionada:', selectedPhase);
+      
+      // Si es fase de grupos, cargar los grupos
+      if (selectedPhase.phaseType === PhaseType.Groups) {
+        this.loadGroups(selectedPhase);
+      } else {
+        // Si es knockout, limpiar grupos y cargar datos
+        this.groups = [];
+        this.selectedGroupId = null;
+        this.loadFixtureData();
+      }
+      
+      this.cdr.detectChanges();
+    }
   }
 
   /**
-   * Maneja el cambio de grupo
+   * Maneja el cambio de grupo seleccionado
    */
   onGroupChange(): void {
-    console.log('Grupo seleccionado:', this.selectedGroupId);
-    this.applyFilters();
+    const selectedGroup = this.groups.find(g => g.id === this.selectedGroupId);
+    
+    if (selectedGroup) {
+      console.log('Grupo seleccionado:', selectedGroup);
+      this.loadFixtureData();
+    }
+  }
+
+  /**
+   * Obtiene la fase seleccionada
+   */
+  get selectedPhase(): TournamentPhase | undefined {
+    return this.phases.find(p => p.id === this.selectedPhaseId);
+  }
+
+  /**
+   * Verifica si debe mostrar el select de grupos
+   */
+  get shouldShowGroupSelect(): boolean {
+    return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 
   /**
@@ -302,7 +324,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   /**
    * Maneja el evento de ver detalles de un partido
    */
-  onViewMatchDetails(match: Match): void {
+  onViewMatchDetails(match: UIMatch): void {
     console.log('Ver detalles del partido:', match);
     this.router.navigate(['/public-match-detail', match.id]);
   }

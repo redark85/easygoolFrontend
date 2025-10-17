@@ -3,6 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT, VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT, VOCALIA_FINISH_MATCH_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
+import { MatchStatusType } from './match.service';
 
 export enum MatchEventType {
   InMatch = 0,
@@ -35,8 +36,9 @@ export interface MatchEvent {
   tournamentTeamPlayerId: number;
   eventType: MatchEventType;
   minute: number;
-  description: string;
+  description?: string;
   isHomeGoal: boolean;
+  isPenalty?: boolean;
 }
 
 export interface RegisterMatchEventRequest {
@@ -66,7 +68,22 @@ export interface VocaliaMatchData {
   homeTeam: VocaliaTeam;
   awayTeam: VocaliaTeam;
   events: VocaliaEvent[];
+  status : MatchStatusType;
+  matchProgressType? : MatchInProgressStatusType;
 }
+
+export enum MatchInProgressStatusType {
+    FirstHalf, //Primer tiempo
+    HalfTime, //Descanso
+    SecondHalf, //Segundo tiempo
+    HalfSecondTime, //Descanso para ir a prorroga
+    ExtraFirstTime, //Primer tiempo de prorroga
+    HalfFirstExtraTime, //Descanso primera prorroga
+    ExtraSecondTime, //Segundo tiempo de prorroga
+    HalfPenalties, //Descanso para penales
+    Penalty, //Penales
+}
+
 
 interface VocaliaMatchResponse {
   result: VocaliaMatchData;
