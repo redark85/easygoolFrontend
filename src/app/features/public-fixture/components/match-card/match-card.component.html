@@ -43,11 +43,11 @@
           </div>
         </div>
         <div class="team-logo-container">
-          <img [src]="match.homeTeamLogoUrl || 'assets/logo.png'" 
+          <img [src]="match.homeTeamLogoUrl || 'assets/default-team.png'" 
                [alt]="match.homeTeam" 
                class="team-logo"
                [matTooltip]="match.homeTeam"
-               (error)="$event.target.src='assets/logo.png'">
+               (error)="$event.target.src='assets/default-team.png'">
         </div>
       </div>
 
@@ -67,11 +67,11 @@
           </div>
         </div>
         <div class="team-logo-container">
-          <img [src]="match.awayTeamLogoUrl || 'assets/logo.png'" 
+          <img [src]="match.awayTeamLogoUrl || 'assets/default-team.png'" 
                [alt]="match.awayTeam" 
                class="team-logo"
                [matTooltip]="match.awayTeam"
-               (error)="$event.target.src='assets/logo.png'">
+               (error)="$event.target.src='assets/default-team.png'">
         </div>
       </div>
     </div>

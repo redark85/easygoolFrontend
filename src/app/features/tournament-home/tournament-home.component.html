@@ -175,7 +175,7 @@
                           </div>
                         </div>
                         <div class="team-logo-container-compact">
-                          <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo-compact" appDefaultImage="assets/logo.png">
+                          <img [src]="nextMatch.homeTeam.logo" [alt]="nextMatch.homeTeam.name" class="team-logo-compact" appDefaultImage="assets/default-team.png">
                         </div>
                         <span class="pmatch-venue" style="color: rgb(63, 62, 62);">{{ nextMatch.homeTeam.position }}° Posición</span>
 
@@ -197,7 +197,7 @@
                           </div>
                         </div>
                         <div class="team-logo-container-compact">
-                          <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo-compact" appDefaultImage="assets/logo.png">
+                          <img [src]="nextMatch.awayTeam.logo" [alt]="nextMatch.awayTeam.name" class="team-logo-compact" appDefaultImage="assets/default-team.png">
                         </div>
                         <span class="pmatch-venue" style="color: rgb(63, 62, 62);">{{ nextMatch.awayTeam.position }}° Posición</span>
 
@@ -274,7 +274,7 @@
                               </div>
                             </div>
                             <div class="team-logo-container">
-                              <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo" appDefaultImage="assets/logo.png">
+                              <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo" appDefaultImage="assets/default-team.png">
                             </div>
                           </div>
                           
@@ -294,7 +294,7 @@
                               </div>
                             </div>
                             <div class="team-logo-container">
-                              <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo" appDefaultImage="assets/logo.png">
+                              <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo" appDefaultImage="assets/default-team.png">
                             </div>
                           </div>
                         </div>
@@ -324,11 +324,11 @@
                         <div class="position-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
                           {{ i + 1 }}
                         </div>
-                        <img [src]="scorer.photo" [alt]="scorer.name" class="player-photo" appDefaultImage="assets/logo.png">
+                        <img [src]="scorer.photo" [alt]="scorer.name" class="player-photo" appDefaultImage="assets/person.jpg">
                         <div class="scorer-info">
                           <h4>{{ scorer.name }}</h4>
                           <div class="team-info">
-                            <img [src]="scorer.teamLogo" [alt]="scorer.team" class="team-logo-small" appDefaultImage="assets/logo.png">
+                            <img [src]="scorer.teamLogo" [alt]="scorer.team" class="team-logo-small" appDefaultImage="assets/default-team.png">
                             <span>{{ scorer.team }}</span>
                           </div>
                         </div>
