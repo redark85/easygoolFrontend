@@ -1,98 +1,159 @@
 <div class="standings-container">
-  <!-- Header -->
-  <div class="page-header">
-    <button mat-icon-button class="back-button" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div class="header-content">
-      <img *ngIf="tournamentDetails?.imageUrl" 
-           [src]="tournamentDetails?.imageUrl" 
-           alt="Tournament Logo" 
-           class="header-image"
-           (error)="onImageError($event)">
-      <mat-icon *ngIf="!tournamentDetails?.imageUrl" class="header-icon">emoji_events</mat-icon>
-      <div class="header-text">
-        <h1 class="page-title">{{ tournamentInfo.name }}</h1>
-        <p class="page-subtitle">{{ tournamentInfo.phase }} - {{ tournamentInfo.group }}</p>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+      <div class="hero-overlay"></div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row align-items-start">
+        <!-- Left Column: Standings Info (8 columns) -->
+        <div class="col-lg-8">
+          <div class="row align-items-center">
+            <!-- Standings Icon -->
+            <div class="col-auto">
+              <div class="standings-icon-container">
+                <img *ngIf="tournamentDetails?.imageUrl" 
+                     [src]="tournamentDetails?.imageUrl" 
+                     alt="Tournament Logo" 
+                     class="tournament-logo-hero"
+                     (error)="onImageError($event)">
+                <mat-icon *ngIf="!tournamentDetails?.imageUrl" class="standings-main-icon">emoji_events</mat-icon>
+              </div>
+            </div>
+
+            <!-- Standings Info -->
+            <div class="col">
+              <div class="standings-info">
+                <div class="standings-header">
+                  <h1 class="standings-title">{{ tournamentInfo.name }}</h1>
+                  <p class="standings-subtitle">{{ tournamentInfo.phase }} - {{ tournamentInfo.group }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="standings-stats-compact">
+                <div class="stat-item-compact">
+                  <mat-icon>event</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Temporada</span>
+                    <span class="stat-value-compact">{{ tournamentInfo.season }}</span>
+                  </div>
+                </div>
+                <div class="stat-item-compact">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Fase</span>
+                    <span class="stat-value-compact">{{ tournamentInfo.phase }}</span>
+                  </div>
+                </div>
+                <div class="stat-item-compact" *ngIf="selectedGroupId">
+                  <mat-icon>groups</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Grupo</span>
+                    <span class="stat-value-compact">{{ tournamentInfo.group }}</span>
+                  </div>
+                </div>
+                <div class="stat-item-compact">
+                  <mat-icon>info</mat-icon>
+                  <div class="stat-content-compact">
+                    <span class="stat-label-compact">Estado</span>
+                    <span class="stat-value-compact">{{ tournamentInfo.status }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Filters (4 columns) -->
+        <div class="col-lg-4 hero-right-section">
+          <div class="hero-right-content">
+            <!-- Filters Card -->
+            <mat-card class="filters-card-hero">
+              <mat-card-content>
+                <!-- Filters Row -->
+                <div class="filters-row">
+                  <div class="row g-2">
+                    <div [class]="shouldShowGroupSelect ? 'col-6' : 'col-12'">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Fase del Torneo</mat-label>
+                        <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
+                          <mat-option *ngFor="let phase of phases" [value]="phase.id">
+                            <mat-icon class="option-icon">
+                              {{ phase.phaseType === PhaseType.Groups ? 'groups' : 'emoji_events' }}
+                            </mat-icon>
+                            {{ phase.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6" *ngIf="shouldShowGroupSelect">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+                          <mat-option *ngFor="let group of groups" [value]="group.id">
+                            <mat-icon class="option-icon">flag</mat-icon>
+                            {{ group.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Search Container -->
+                <div class="search-container-hero">
+                  <span class="filter-label-chips">Buscar Equipo:</span>
+                  <mat-form-field appearance="outline" class="search-field-hero">
+                    <mat-label>Buscar equipo</mat-label>
+                    <input matInput 
+                           [(ngModel)]="matchSearchTerm" 
+                           (ngModelChange)="filterMatches()"
+                           placeholder="Ej: Real Madrid, Barcelona...">
+                    <mat-icon matPrefix>search</mat-icon>
+                    <button mat-icon-button 
+                            matSuffix 
+                            *ngIf="matchSearchTerm"
+                            (click)="clearMatchSearch()"
+                            aria-label="Limpiar">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </mat-form-field>
+                  <div class="search-results-hero" *ngIf="matchSearchTerm">
+                    <span class="results-count">{{ filteredMatches.length }} partido(s) encontrado(s)</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Tournament Info Card -->
-  <mat-card class="tournament-info-card">
-    <mat-card-content>
-      <div class="info-grid">
-        <div class="info-item">
-          <mat-icon class="info-icon">event</mat-icon>
-          <div class="info-details">
-            <span class="info-label">Temporada</span>
-            <span class="info-value">{{ tournamentInfo.season }}</span>
-          </div>
-        </div>
-        <div class="info-item">
-          <mat-icon class="info-icon">sports_soccer</mat-icon>
-          <div class="info-details">
-            <span class="info-label">Fase</span>
-            <span class="info-value">{{ tournamentInfo.phase }}</span>
-          </div>
-        </div>
-        <div class="info-item" *ngIf="selectedGroupId">
-          <mat-icon class="info-icon">groups</mat-icon>
-          <div class="info-details">
-            <span class="info-label">Grupo</span>
-            <span class="info-value">{{ tournamentInfo.group }}</span>
-          </div>
-        </div>
-        <div class="info-item">
-          <mat-icon class="info-icon">info</mat-icon>
-          <div class="info-details">
-            <span class="info-label">Estado</span>
-            <mat-chip class="status-chip">{{ tournamentInfo.status }}</mat-chip>
-          </div>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Loading Spinner -->
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p class="loading-text">Cargando tabla de posiciones...</p>
+    </div>
 
-  <!-- Filters Card -->
-  <mat-card class="filters-card">
-    <mat-card-content>
-      <div class="filters-container">
-        <!-- Select de Fase -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Fase del Torneo</mat-label>
-          <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
-            <mat-option *ngFor="let phase of phases" [value]="phase.id">
-              <mat-icon class="option-icon">
-                {{ phase.phaseType === PhaseType.Groups ? 'groups' : 'emoji_events' }}
-              </mat-icon>
-              {{ phase.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Select de Grupo (solo si es fase de grupos) -->
-        <mat-form-field appearance="outline" class="filter-field" *ngIf="shouldShowGroupSelect">
-          <mat-label>Grupo</mat-label>
-          <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
-            <mat-option *ngFor="let group of groups" [value]="group.id">
-              <mat-icon class="option-icon">flag</mat-icon>
-              {{ group.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Loading Spinner -->
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p class="loading-text">Cargando tabla de posiciones...</p>
-  </div>
-
-  <!-- Tabs Content -->
-  <mat-card class="content-card" *ngIf="!isLoading">
+    <!-- Tabs Content -->
+    <mat-card class="content-card" *ngIf="!isLoading">
     <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="tournament-tabs">
       
       <!-- Tab 1: Partidos del Campeonato -->
@@ -103,28 +164,6 @@
         </ng-template>
         
         <div class="tab-content">
-          <!-- Buscador de Partidos -->
-          <div class="search-container">
-            <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Buscar equipo</mat-label>
-              <input matInput 
-                     [(ngModel)]="matchSearchTerm" 
-                     (ngModelChange)="filterMatches()"
-                     placeholder="Ej: Real Madrid, Barcelona...">
-              <mat-icon matPrefix>search</mat-icon>
-              <button mat-icon-button 
-                      matSuffix 
-                      *ngIf="matchSearchTerm"
-                      (click)="clearMatchSearch()"
-                      aria-label="Limpiar">
-                <mat-icon>close</mat-icon>
-              </button>
-            </mat-form-field>
-            <div class="search-results" *ngIf="matchSearchTerm">
-              <span class="results-count">{{ filteredMatches.length }} partido(s) encontrado(s)</span>
-            </div>
-          </div>
-
           <div class="matches-list">
             <!-- No results message -->
             <div *ngIf="filteredMatches.length === 0" class="no-results">
@@ -335,10 +374,11 @@
     </mat-tab-group>
   </mat-card>
 
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!isLoading && standings.length === 0">
-    <mat-icon class="empty-icon">table_chart</mat-icon>
-    <h2>No hay datos disponibles</h2>
-    <p>Aún no se han jugado partidos en este grupo</p>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && standings.length === 0">
+      <mat-icon class="empty-icon">table_chart</mat-icon>
+      <h2>No hay datos disponibles</h2>
+      <p>Aún no se han jugado partidos en este grupo</p>
+    </div>
   </div>
 </div>
