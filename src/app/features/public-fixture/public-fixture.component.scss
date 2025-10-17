@@ -299,8 +299,14 @@
               height: 12px;
             }
 
+            // Estados basados en MatchStatusType
+            &.upcoming {
+              background-color: #e3f2fd;
+              color: #1976d2;
+            }
+
             &.live {
-              background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+              background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
               color: white;
 
               mat-icon {
@@ -308,19 +314,19 @@
               }
             }
 
-            &.upcoming {
-              background-color: #e3f2fd;
-              color: #1976d2;
-            }
-
             &.finished {
-              background-color: #e8f5e9;
-              color: #2e7d32;
+              background-color: #f3e5f5;
+              color: #9c27b0;
             }
 
             &.suspended {
               background-color: #fff3e0;
-              color: #f57c00;
+              color: #ff9800;
+            }
+
+            &.cancelled {
+              background-color: #ffebee;
+              color: #f44336;
             }
           }
 

@@ -50,7 +50,7 @@
                 <div class="stat-item-compact">
                   <mat-icon>schedule</mat-icon>
                   <div class="stat-content-compact">
-                    <span class="stat-label-compact">Próximos</span>
+                    <span class="stat-label-compact">Programados</span>
                     <span class="stat-value-compact">{{ stats.upcoming }}</span>
                   </div>
                 </div>
@@ -64,7 +64,7 @@
                 <div class="stat-item-compact">
                   <mat-icon>check_circle</mat-icon>
                   <div class="stat-content-compact">
-                    <span class="stat-label-compact">Finalizados</span>
+                    <span class="stat-label-compact">Jugados</span>
                     <span class="stat-value-compact">{{ stats.finished }}</span>
                   </div>
                 </div>
@@ -79,7 +79,7 @@
                 <div class="legend-item-hero">
                   <div class="legend-badge upcoming">
                     <mat-icon>schedule</mat-icon>
-                    PRÓXIMO
+                    PROGRAMADO
                   </div>
                   <span class="legend-description">Partido programado</span>
                 </div>
@@ -93,16 +93,23 @@
                 <div class="legend-item-hero">
                   <div class="legend-badge finished">
                     <mat-icon>check_circle</mat-icon>
-                    FINALIZADO
+                    JUGADO
                   </div>
                   <span class="legend-description">Partido terminado</span>
                 </div>
                 <div class="legend-item-hero">
                   <div class="legend-badge suspended">
                     <mat-icon>pause_circle</mat-icon>
-                    SUSPENDIDO
+                    POSTERGADO
                   </div>
-                  <span class="legend-description">Partido suspendido</span>
+                  <span class="legend-description">Partido postergado</span>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge cancelled">
+                    <mat-icon>cancel</mat-icon>
+                    CANCELADO ELIMINADO
+                  </div>
+                  <span class="legend-description">Partido cancelado</span>
                 </div>
               </div>
             </div>
@@ -162,7 +169,7 @@
                         (click)="onStatusChange('upcoming')"
                         class="status-chip">
                         <mat-icon>schedule</mat-icon>
-                        Próximos
+                        Programados
                       </mat-chip-option>
                       <mat-chip-option
                         [selected]="selectedStatus === 'live'"
@@ -176,7 +183,21 @@
                         (click)="onStatusChange('finished')"
                         class="status-chip">
                         <mat-icon>check_circle</mat-icon>
-                        Finalizados
+                        Jugados
+                      </mat-chip-option>
+                      <mat-chip-option
+                        [selected]="selectedStatus === 'cancelled'"
+                        (click)="onStatusChange('cancelled')"
+                        class="status-chip">
+                        <mat-icon>cancel</mat-icon>
+                        Cancelados
+                      </mat-chip-option>
+                      <mat-chip-option
+                        [selected]="selectedStatus === 'suspended'"
+                        (click)="onStatusChange('suspended')"
+                        class="status-chip">
+                        <mat-icon>pause_circle</mat-icon>
+                        Postergados
                       </mat-chip-option>
                     </mat-chip-set>
                   </div>

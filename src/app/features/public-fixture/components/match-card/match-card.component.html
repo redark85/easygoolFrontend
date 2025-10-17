@@ -9,11 +9,15 @@
       <span class="status-badge" *ngIf="match.isFinished">
         {{ getStatusLabel() }}
       </span>
-      <span class="status-badge" *ngIf="match.status === 'suspended'">
+      <span class="status-badge" *ngIf="isPostponed()">
         <mat-icon>pause_circle</mat-icon>
         {{ getStatusLabel() }}
       </span>
-      <span class="date-time" *ngIf="!match.isLive && !match.isFinished && match.status !== 'suspended'">
+      <span class="status-badge" *ngIf="isCancelled()">
+        <mat-icon>cancel</mat-icon>
+        {{ getStatusLabel() }}
+      </span>
+      <span class="date-time" *ngIf="isScheduled()">
         {{ getDateTimeText() }}
       </span>
     </div>
