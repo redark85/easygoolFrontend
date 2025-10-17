@@ -1,11 +1,7 @@
 .public-team-detail-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
+  position: relative;
 
   // Loading
   .loading-container {
@@ -15,41 +11,244 @@
     justify-content: center;
     min-height: 60vh;
     color: white;
+    gap: 1rem;
 
     .loading-text {
-      margin-top: 1rem;
       font-size: 1.125rem;
       font-weight: 500;
+      margin: 0;
     }
   }
 
   // Team Detail Content
   .team-detail-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    position: relative;
-
-    // Back Button
-    .back-button {
-      position: absolute;
-      top: -3.5rem;
-      left: 0;
-      background-color: rgba(255, 255, 255, 0.2);
+    // Hero Section
+    .hero-section {
+      position: relative;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
       color: white;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+      overflow: hidden;
+      margin-bottom: 2rem;
 
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-4px);
+      .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+
+        .wallpaper-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .hero-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg,
+            rgba(25, 118, 210, 0.8) 0%,
+            rgba(21, 101, 192, 0.9) 100%);
+        }
       }
 
-      @media (max-width: 768px) {
-        top: -2.5rem;
+      .back-button-container {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        z-index: 10;
+
+        .back-button {
+          background-color: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+          }
+        }
+      }
+
+      .container-fluid {
+        position: relative;
+        z-index: 5;
+        padding: 2rem 3rem;
+        margin-left: 2rem;
+        height: 100%;
+
+        .row {
+          height: 100%;
+          align-items: stretch;
+        }
+
+        .col-lg-8 {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .fixture-icon-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 140px;
+          height: 140px;
+          background: transparent;
+          border-radius: 24px;
+          backdrop-filter: blur(10px);
+          border: none;
+          overflow: hidden;
+
+          .team-logo-hero {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 12px;
+          }
+        }
+
+        .fixture-info {
+          .fixture-header {
+            .fixture-title {
+              font-size: 3.5rem;
+              font-weight: 700;
+              margin: 0;
+              color: white;
+              text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .fixture-subtitle {
+              font-size: 1.4rem;
+              margin: 0.5rem 0 0 0;
+              color: white;
+              opacity: 0.9;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            }
+          }
+        }
+
+        // Legend Items (estadísticas en columna izquierda)
+        .legend-items-hero {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: flex-start;
+          margin-top: 1rem;
+
+          .legend-item-hero {
+            .legend-badge {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.6rem 1.2rem;
+              background: rgba(255, 255, 255, 0.1);
+              color: white;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 20px;
+              font-weight: 600;
+              font-size: 0.9rem;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+              backdrop-filter: blur(10px);
+              transition: all 0.3s ease;
+
+              &:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-1px);
+              }
+
+              mat-icon {
+                font-size: 1.1rem;
+                width: 1.1rem;
+                height: 1.1rem;
+                color: white;
+              }
+            }
+          }
+        }
+
+        // Team Meta (información adicional)
+        .team-meta-hero {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1.5rem;
+          margin-top: 0.5rem;
+
+          .meta-item-hero {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.9;
+
+            mat-icon {
+              font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+              color: rgba(255, 255, 255, 0.8);
+            }
+
+            span {
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            }
+          }
+        }
+
+        .hero-right-section {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100%;
+
+          .hero-right-content {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            // Placeholder para contenido futuro
+          }
+        }
       }
     }
 
-    // Team Header Card
+    // Tabs Card
+    .tabs-card {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+
+      ::ng-deep {
+        .mat-mdc-tab-group {
+          .mat-mdc-tab-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+          }
+
+          .mat-mdc-tab {
+            min-width: 120px;
+            font-weight: 500;
+          }
+
+          .mat-mdc-tab-body-wrapper {
+            padding: 2rem;
+          }
+        }
+      }
+    }
+
+    // Team Header Card (legacy - mantener para compatibilidad)
     .team-header-card {
       margin-bottom: 2rem;
       border-radius: 16px;
@@ -947,6 +1146,149 @@
               font-size: 1rem;
               margin: 0;
             }
+          }
+        }
+      }
+    }
+
+    // Responsive Design
+    @media (max-width: 991.98px) {
+      .hero-section {
+        min-height: 280px;
+
+        .container-fluid {
+          padding: 1.5rem 2rem;
+          margin-left: 1rem;
+
+          .fixture-icon-container {
+            width: 100px;
+            height: 100px;
+
+            .team-logo-hero {
+              width: 80px;
+              height: 80px;
+            }
+          }
+
+          .fixture-info {
+            .fixture-header {
+              .fixture-title {
+                font-size: 2.5rem;
+              }
+
+              .fixture-subtitle {
+                font-size: 1.1rem;
+              }
+            }
+          }
+
+          .legend-items-hero {
+            gap: 0.5rem;
+            margin-top: 1rem;
+
+            .legend-item-hero {
+              .legend-badge {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+
+                mat-icon {
+                  font-size: 1rem;
+                  width: 1rem;
+                  height: 1rem;
+                }
+              }
+            }
+          }
+
+          .team-meta-hero {
+            gap: 1rem;
+
+            .meta-item-hero {
+              font-size: 0.8rem;
+
+              mat-icon {
+                font-size: 0.9rem;
+                width: 0.9rem;
+                height: 0.9rem;
+              }
+            }
+          }
+        }
+      }
+
+      .tabs-card {
+        margin: 0 1rem;
+
+        ::ng-deep {
+          .mat-mdc-tab-body-wrapper {
+            padding: 1.5rem;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .hero-section {
+        min-height: 220px;
+
+        .container-fluid {
+          padding: 1rem;
+          margin-left: 0.5rem;
+
+          .col-lg-8 {
+            display: block;
+          }
+
+          .fixture-icon-container {
+            width: 80px;
+            height: 80px;
+
+            .team-logo-hero {
+              width: 60px;
+              height: 60px;
+            }
+          }
+
+          .fixture-info {
+            .fixture-header {
+              .fixture-title {
+                font-size: 1.8rem;
+              }
+
+              .fixture-subtitle {
+                font-size: 1rem;
+              }
+            }
+          }
+
+          .legend-items-hero {
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .legend-item-hero {
+              .legend-badge {
+                justify-content: center;
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+              }
+            }
+          }
+
+          .team-meta-hero {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+          }
+        }
+      }
+
+      .tabs-card {
+        margin: 0 0.5rem;
+        border-radius: 8px;
+
+        ::ng-deep {
+          .mat-mdc-tab-body-wrapper {
+            padding: 1rem;
           }
         }
       }

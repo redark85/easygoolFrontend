@@ -34,6 +34,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       align-items: center;
       justify-content: center;
       z-index: 9999;
+      animation: fadeIn 0.3s ease-out;
     }
 
     .loading-content {
@@ -41,10 +42,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       flex-direction: column;
       align-items: center;
       gap: 16px;
-      background: white;
+      background: transparent !important;
       padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border-radius: 0;
+      border: none !important;
+      box-shadow: none !important;
       text-align: center;
       min-width: 280px;
       animation: fadeInUp 0.4s ease-out;
@@ -54,25 +56,36 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: #1976d2;
+      color: white !important;
       letter-spacing: 0.5px;
       line-height: 1.3;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     .loading-subtext {
       margin: 0;
       font-size: 14px;
-      color: #666;
+      color: white !important;
       font-weight: 400;
       line-height: 1.2;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     /* Spinner styling */
     ::ng-deep .mat-mdc-progress-spinner circle {
-      stroke: #1976d2;
+      stroke: white !important;
     }
 
-    /* Animation for card */
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
     @keyframes fadeInUp {
       from {
         opacity: 0;
