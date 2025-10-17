@@ -70,8 +70,9 @@ export class MatchStatusModalComponent implements OnInit {
     // Todos los estados disponibles
     this.availableStatuses = [
       { value: MatchStatusType.scheduled, text: 'Programado' },
+      { value: MatchStatusType.inProgress, text: 'En vivo' },
       { value: MatchStatusType.played, text: 'Jugado' },
-      { value: MatchStatusType.canceled, text: 'Cancelado Eliminado' },
+      { value: MatchStatusType.canceled, text: 'Eliminado' },
       { value: MatchStatusType.postponed, text: 'Postergado' }
     ];
 
@@ -84,6 +85,7 @@ export class MatchStatusModalComponent implements OnInit {
   getCurrentStatusText(): string {
     switch (this.data.currentStatus) {
       case MatchStatusType.scheduled: return 'Programado';
+      case MatchStatusType.inProgress: return 'En vivo';
       case MatchStatusType.played: return 'Jugado';
       case MatchStatusType.canceled: return 'Cancelado';
       case MatchStatusType.postponed: return 'Postergado';
@@ -94,6 +96,7 @@ export class MatchStatusModalComponent implements OnInit {
   getStatusClass(status: MatchStatusType): string {
     switch (status) {
       case MatchStatusType.scheduled: return 'status-scheduled';
+      case MatchStatusType.inProgress: return 'status-in-progress';
       case MatchStatusType.played: return 'status-played';
       case MatchStatusType.canceled: return 'status-canceled';
       case MatchStatusType.postponed: return 'status-postponed';

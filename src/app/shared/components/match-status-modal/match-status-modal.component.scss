@@ -135,6 +135,10 @@
             &.status-postponed {
               background-color: #ff9800;
             }
+
+             &.status-in-progress {
+              background-color: #f10707;
+            }
           }
         }
 
