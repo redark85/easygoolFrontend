@@ -23,8 +23,8 @@
 
       <div class="container-fluid">
         <div class="row align-items-stretch">
-          <!-- Left Column: Team Info (8 columns) -->
-          <div class="col-lg-8">
+          <!-- Left Column: Team Info (7 columns) -->
+          <div class="col-lg-7">
             <div class="row align-items-center">
               <!-- Team Logo -->
               <div class="col-auto">
@@ -98,10 +98,99 @@
             </div>
           </div>
 
-          <!-- Right Column: Empty for consistency (4 columns) -->
-          <div class="col-lg-4 hero-right-section">
+          <!-- Right Column: Team Summary (5 columns) -->
+          <div class="col-lg-5 hero-right-section px-0">
             <div class="hero-right-content">
-              <!-- Placeholder for future content -->
+              <!-- Primera Fila -->
+              <div class="row g-2 mb-3">
+                <!-- Record Section -->
+                <div class="col-6">
+                  <div class="summary-section-mini record">
+                    <h4>
+                      <mat-icon>bar_chart</mat-icon>
+                      Récord
+                    </h4>
+                    <div class="record-stats-mini">
+                      <div class="stat-mini wins">
+                        <span class="number-mini">{{ team.wins }}</span>
+                        <span class="label-mini">V</span>
+                      </div>
+                      <div class="stat-mini draws">
+                        <span class="number-mini">{{ team.draws }}</span>
+                        <span class="label-mini">E</span>
+                      </div>
+                      <div class="stat-mini losses">
+                        <span class="number-mini">{{ team.losses }}</span>
+                        <span class="label-mini">D</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Goals Section -->
+                <div class="col-6">
+                  <div class="summary-section-mini goals">
+                    <h4>
+                      <mat-icon>sports_soccer</mat-icon>
+                      Goles
+                    </h4>
+                    <div class="goals-stats-mini">
+                      <div class="stat-mini for">
+                        <span class="number-mini">{{ team.goalsFor }}</span>
+                        <span class="label-mini">GF</span>
+                      </div>
+                      <div class="stat-mini against">
+                        <span class="number-mini">{{ team.goalsAgainst }}</span>
+                        <span class="label-mini">GC</span>
+                      </div>
+                      <div class="stat-mini difference" [class.positive]="team.goalDifference > 0" [class.negative]="team.goalDifference < 0">
+                        <span class="number-mini">{{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}</span>
+                        <span class="label-mini">DG</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Segunda Fila -->
+              <div class="row g-2">
+                <!-- Form Section -->
+                <div class="col-6">
+                  <div class="summary-section-mini form">
+                    <h4>
+                      <mat-icon>trending_up</mat-icon>
+                      Forma
+                    </h4>
+                    <div class="form-badges-mini">
+                      <div *ngFor="let result of team.lastFiveResults" 
+                           [class]="'result-badge-mini ' + getResultClass(result)"
+                           [matTooltip]="result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'">
+                        {{ getResultText(result) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="col-6">
+                  <div class="summary-section-mini quick-stats">
+                    <h4>
+                      <mat-icon>analytics</mat-icon>
+                      Stats
+                    </h4>
+                    <div class="quick-stats-grid-mini">
+                      <div class="quick-stat-mini">
+                        <span class="value-mini">{{ (team.points / team.matchesPlayed) | number:'1.1-1' }}</span>
+                        <span class="label-mini">PPP</span>
+                      </div>
+                      <div class="quick-stat-mini">
+                        <span class="value-mini">{{ getWinPercentage() | number:'1.0-0' }}%</span>
+                        <span class="label-mini">Efect.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -111,99 +200,6 @@
     <!-- Tabs Section -->
     <mat-card class="tabs-card">
       <mat-tab-group animationDuration="300ms">
-        <!-- Tab: Resumen -->
-        <mat-tab label="Resumen">
-          <div class="team-summary">
-            <!-- Record Section -->
-            <div class="summary-section record">
-              <h3>
-                <mat-icon>bar_chart</mat-icon>
-                Récord
-              </h3>
-              <div class="record-stats">
-                <div class="stat wins">
-                  <span class="number">{{ team.wins }}</span>
-                  <span class="label">Victorias</span>
-                  <div class="percentage">{{ getWinPercentage() | number:'1.0-0' }}%</div>
-                </div>
-                <div class="stat draws">
-                  <span class="number">{{ team.draws }}</span>
-                  <span class="label">Empates</span>
-                </div>
-                <div class="stat losses">
-                  <span class="number">{{ team.losses }}</span>
-                  <span class="label">Derrotas</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Goals Section -->
-            <div class="summary-section goals">
-              <h3>
-                <mat-icon>sports_soccer</mat-icon>
-                Goles
-              </h3>
-              <div class="goals-stats">
-                <div class="stat for">
-                  <span class="number">{{ team.goalsFor }}</span>
-                  <span class="label">A Favor</span>
-                  <div class="average">{{ getGoalsPerMatch() | number:'1.1-1' }} por partido</div>
-                </div>
-                <div class="stat against">
-                  <span class="number">{{ team.goalsAgainst }}</span>
-                  <span class="label">En Contra</span>
-                </div>
-                <div class="stat difference" [class.positive]="team.goalDifference > 0" [class.negative]="team.goalDifference < 0">
-                  <span class="number">{{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}</span>
-                  <span class="label">Diferencia</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Form Section -->
-            <div class="summary-section form">
-              <h3>
-                <mat-icon>trending_up</mat-icon>
-                Forma Reciente
-              </h3>
-              <div class="form-badges">
-                <div *ngFor="let result of team.lastFiveResults" 
-                     [class]="'result-badge ' + getResultClass(result)"
-                     [matTooltip]="result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'">
-                  {{ getResultText(result) }}
-                </div>
-              </div>
-              <p class="form-description">Últimos 5 partidos</p>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="summary-section quick-stats">
-              <h3>
-                <mat-icon>analytics</mat-icon>
-                Estadísticas Rápidas
-              </h3>
-              <div class="quick-stats-grid">
-                <div class="quick-stat">
-                  <span class="label">Partidos Jugados</span>
-                  <span class="value">{{ team.matchesPlayed }}</span>
-                </div>
-                <div class="quick-stat">
-                  <span class="label">Puntos por Partido</span>
-                  <span class="value">{{ (team.points / team.matchesPlayed) | number:'1.2-2' }}</span>
-                </div>
-                <div class="quick-stat">
-                  <span class="label">Efectividad</span>
-                  <span class="value">{{ getWinPercentage() | number:'1.0-0' }}%</span>
-                </div>
-                <div class="quick-stat">
-                  <span class="label">Goles por Partido</span>
-                  <span class="value">{{ getGoalsPerMatch() | number:'1.1-1' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-
         <!-- Tab: Plantilla -->
         <mat-tab label="Plantilla">
           <div class="team-roster">
