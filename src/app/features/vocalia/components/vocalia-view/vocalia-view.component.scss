@@ -182,6 +182,66 @@
       gap: 12px;
       margin-top: 16px;
 
+      .state-selector {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 8px;
+
+        .selector-btn {
+          min-width: 260px;
+          height: 48px;
+          font-size: 0.95rem;
+          font-weight: 600;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          transition: all 0.3s ease;
+          background: linear-gradient(135deg, #673ab7 0%, #9c27b0 100%);
+          color: white;
+
+          mat-icon {
+            margin-right: 8px;
+          }
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(103, 58, 183, 0.5);
+            background: linear-gradient(135deg, #7e57c2 0%, #ab47bc 100%);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+
+      .decision-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+
+        .decision-text {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #ffd700;
+          margin: 0 0 8px 0;
+          text-align: center;
+        }
+
+        .decision-btn {
+          width: 100%;
+          max-width: 280px;
+          height: 50px;
+          font-size: 1.05rem;
+        }
+      }
+
       .control-btn {
         min-width: 220px;
         height: 44px;
@@ -218,32 +278,54 @@
           letter-spacing: 0.5px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
-          &.state-first_half {
+          &.state-first-half {
             background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
             color: white;
             animation: pulse 2s ease-in-out infinite;
           }
 
-          &.state-half_time {
+          &.state-half-time {
             background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
             color: white;
           }
 
-          &.state-second_half {
+          &.state-second-half {
             background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
             color: white;
             animation: pulse 2s ease-in-out infinite;
           }
 
-          &.state-extra_time {
+          &.state-half-second-time {
+            background: linear-gradient(135deg, #ff6f00 0%, #e65100 100%);
+            color: white;
+          }
+
+          &.state-extra-first {
             background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
             color: white;
             animation: pulse 1.5s ease-in-out infinite;
           }
 
-          &.state-full_time {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+          &.state-half-extra-first {
+            background: linear-gradient(135deg, #8e24aa 0%, #6a1b9a 100%);
             color: white;
+          }
+
+          &.state-extra-second {
+            background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+            color: white;
+            animation: pulse 1.5s ease-in-out infinite;
+          }
+
+          &.state-half-penalties {
+            background: linear-gradient(135deg, #f57c00 0%, #e64a19 100%);
+            color: white;
+          }
+
+          &.state-penalty {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            color: white;
+            animation: pulse 1s ease-in-out infinite;
           }
         }
       }

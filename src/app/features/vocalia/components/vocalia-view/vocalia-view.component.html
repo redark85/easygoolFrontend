@@ -39,69 +39,147 @@
       </div>
       <div class="match-time">
         <mat-icon class="time-icon">schedule</mat-icon>
-        <span class="time-text">{{ matchTime }}</span>
+        <span class="time-text">{{ formattedTime }}</span>
       </div>
       
       <!-- Match Control Buttons -->
       <div class="match-control-buttons">
-        <!-- Start Match Button -->
+        
+
+        <!-- 1. Iniciar Primer Tiempo -->
         <button mat-raised-button 
                 color="primary"
                 class="control-btn"
-                *ngIf="matchState === 'not_started'"
-                (click)="startMatch()">
+                *ngIf="matchProgressType === null"
+                (click)="startFirstHalf()">
           <mat-icon>play_arrow</mat-icon>
           Empezar Partido
         </button>
 
-        <!-- End First Half Button -->
+        <!-- 2. Finalizar Primer Tiempo -->
         <button mat-raised-button 
                 color="warn"
                 class="control-btn"
-                *ngIf="matchState === 'first_half'"
+                *ngIf="matchProgressType === MatchInProgressStatusType.FirstHalf"
                 (click)="endFirstHalf()">
           <mat-icon>pause</mat-icon>
           Finalizar Primer Tiempo
         </button>
 
-        <!-- Start Second Half Button -->
+        <!-- 3. Iniciar Segundo Tiempo -->
         <button mat-raised-button 
                 color="primary"
                 class="control-btn"
-                *ngIf="matchState === 'half_time'"
+                *ngIf="matchProgressType === MatchInProgressStatusType.HalfTime"
                 (click)="startSecondHalf()">
           <mat-icon>play_arrow</mat-icon>
           Empezar Segundo Tiempo
         </button>
 
-        <!-- End Second Half Button -->
+        <!-- 4. Finalizar Segundo Tiempo -->
         <button mat-raised-button 
                 color="warn"
                 class="control-btn"
-                *ngIf="matchState === 'second_half'"
+                *ngIf="matchProgressType === MatchInProgressStatusType.SecondHalf"
                 (click)="endSecondHalf()">
           <mat-icon>stop</mat-icon>
           Finalizar Segundo Tiempo
         </button>
 
-        <!-- Extra Time Button -->
+        <!-- 4.1 Opciones después del Segundo Tiempo -->
+        <div class="decision-buttons" *ngIf="matchProgressType === MatchInProgressStatusType.HalfSecondTime">
+          <p class="decision-text">¿Qué deseas hacer?</p>
+          
+          <button mat-raised-button 
+                  color="accent"
+                  class="control-btn decision-btn"
+                  (click)="startExtraFirstTime()">
+            <mat-icon>timer</mat-icon>
+            Iniciar Prórroga
+          </button>
+
+          <button mat-raised-button 
+                  color="primary"
+                  class="control-btn decision-btn"
+                  (click)="goToPenalties()">
+            <mat-icon>sports_soccer</mat-icon>
+            Ir a Penales Directos
+          </button>
+        </div>
+
+        <!-- 6. Finalizar Primer Tiempo de Prórroga -->
+        <button mat-raised-button 
+                color="warn"
+                class="control-btn"
+                *ngIf="matchProgressType === MatchInProgressStatusType.ExtraFirstTime"
+                (click)="endExtraFirstTime()">
+          <mat-icon>pause</mat-icon>
+          Finalizar Prórroga (1er Tiempo)
+        </button>
+
+        <!-- 7. Iniciar Segundo Tiempo de Prórroga -->
         <button mat-raised-button 
                 color="accent"
                 class="control-btn"
-                *ngIf="matchState === 'extra_time'"
-                (click)="endSecondHalf()">
+                *ngIf="matchProgressType === MatchInProgressStatusType.HalfFirstExtraTime"
+                (click)="startExtraSecondTime()">
           <mat-icon>timer</mat-icon>
-          En Prórroga
+          Iniciar Prórroga (2do Tiempo)
+        </button>
+
+        <!-- 8. Finalizar Segundo Tiempo de Prórroga -->
+        <button mat-raised-button 
+                color="warn"
+                class="control-btn"
+                *ngIf="matchProgressType === MatchInProgressStatusType.ExtraSecondTime"
+                (click)="endExtraSecondTime()">
+          <mat-icon>stop</mat-icon>
+          Finalizar Prórroga (2do Tiempo)
+        </button>
+
+        <!-- 9. Iniciar Penales -->
+        <button mat-raised-button 
+                color="accent"
+                class="control-btn"
+                *ngIf="matchProgressType === MatchInProgressStatusType.HalfPenalties"
+                (click)="startPenalties()">
+          <mat-icon>sports_soccer</mat-icon>
+          Iniciar Tanda de Penales
+        </button>
+
+        <!-- 10. Terminar Penales -->
+        <button mat-raised-button 
+                color="warn"
+                class="control-btn"
+                *ngIf="matchProgressType === MatchInProgressStatusType.Penalty"
+                (click)="endPenalties()">
+          <mat-icon>flag</mat-icon>
+          Terminar Tanda de Penales
         </button>
 
         <!-- Match State Indicator -->
-        <div class="match-state-indicator" *ngIf="matchState !== 'not_started'">
-          <span class="state-badge" [ngClass]="'state-' + matchState">
-            {{ matchState === 'first_half' ? 'Primer Tiempo' :
-               matchState === 'half_time' ? 'Descanso' :
-               matchState === 'second_half' ? 'Segundo Tiempo' :
-               matchState === 'extra_time' ? 'Prórroga' :
-               matchState === 'full_time' ? 'Finalizado' : '' }}
+        <div class="match-state-indicator" *ngIf="matchProgressType !== null">
+          <span class="state-badge" 
+                [ngClass]="{
+                  'state-first-half': matchProgressType === MatchInProgressStatusType.FirstHalf,
+                  'state-half-time': matchProgressType === MatchInProgressStatusType.HalfTime,
+                  'state-second-half': matchProgressType === MatchInProgressStatusType.SecondHalf,
+                  'state-half-second-time': matchProgressType === MatchInProgressStatusType.HalfSecondTime,
+                  'state-extra-first': matchProgressType === MatchInProgressStatusType.ExtraFirstTime,
+                  'state-half-extra-first': matchProgressType === MatchInProgressStatusType.HalfFirstExtraTime,
+                  'state-extra-second': matchProgressType === MatchInProgressStatusType.ExtraSecondTime,
+                  'state-half-penalties': matchProgressType === MatchInProgressStatusType.HalfPenalties,
+                  'state-penalty': matchProgressType === MatchInProgressStatusType.Penalty
+                }">
+            {{ matchProgressType === MatchInProgressStatusType.FirstHalf ? 'Primer Tiempo' :
+               matchProgressType === MatchInProgressStatusType.HalfTime ? 'Descanso' :
+               matchProgressType === MatchInProgressStatusType.SecondHalf ? 'Segundo Tiempo' :
+               matchProgressType === MatchInProgressStatusType.HalfSecondTime ? 'Descanso (Pre-Prórroga)' :
+               matchProgressType === MatchInProgressStatusType.ExtraFirstTime ? 'Prórroga 1er Tiempo' :
+               matchProgressType === MatchInProgressStatusType.HalfFirstExtraTime ? 'Descanso (Prórroga)' :
+               matchProgressType === MatchInProgressStatusType.ExtraSecondTime ? 'Prórroga 2do Tiempo' :
+               matchProgressType === MatchInProgressStatusType.HalfPenalties ? 'Descanso (Pre-Penales)' :
+               matchProgressType === MatchInProgressStatusType.Penalty ? 'Tanda de Penales' : '' }}
           </span>
         </div>
       </div>
