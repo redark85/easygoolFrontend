@@ -13,7 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { VocaliaService, VocaliaPlayer, AvailablePlayer, MatchEventType, RegisterMatchEventRequest, MatchEvent } from '@core/services/vocalia.service';
+import { VocaliaService, VocaliaPlayer, AvailablePlayer, MatchEventType, RegisterMatchEventRequest, MatchEvent, MatchInProgressStatusType } from '@core/services/vocalia.service';
 
 interface Player {
   id: number;
@@ -69,6 +69,19 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   matchTime = '00:00';
   isMatchActive = true;
   
+  // Match State Control usando el enum del API
+  matchProgressType: MatchInProgressStatusType | null = null;
+  timerInterval: any = null;
+  elapsedSeconds = 0;
+  
+  // NUEVO DE CHATGPT - Timer persistente
+  isRunning = false;
+  private intervalId: any;
+  private lastStartTime: number | null = null;
+  
+  // Enum para usar en el template
+  MatchInProgressStatusType = MatchInProgressStatusType;
+  
   // Team IDs
   homeTeamId: number | null = null;
   awayTeamId: number | null = null;
@@ -107,9 +120,28 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
         this.loadMatchData(this.matchId);
       }
     });
+
+    //NUEVO DE CHATGPT
+    // Cargar estado guardado
+    const savedState = localStorage.getItem('timerState');
+    if (savedState) {
+      const { startTime, elapsedSeconds, isRunning } = JSON.parse(savedState);
+
+      this.elapsedSeconds = elapsedSeconds;
+      this.isRunning = isRunning;
+    this.lastStartTime = startTime;
+      // Si estaba corriendo, recalcular cuánto tiempo pasó mientras la app no estaba abierta
+      if (isRunning && startTime) {
+        const now = Date.now();
+        const diff = Math.floor((now - startTime) / 1000);
+        this.elapsedSeconds += diff;
+        this.start(true);
+      }
+    }
   }
 
   ngOnDestroy(): void {
+    this.stopInterval();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -153,6 +185,11 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
 
           // Convertir eventos del API al formato interno
           this.incidents = data.events.map(e => this.convertToIncident(e));
+
+          // Cargar el estado del partido desde el API
+          if (data.matchProgressType !== undefined && data.matchProgressType !== null) {
+            this.matchProgressType = data.matchProgressType;
+          }
 
           this.cdr.detectChanges();
         },
@@ -212,25 +249,42 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     Swal.fire({
       title: '¿Registrar gol?',
       html: `
-        <p>¿Estás seguro de registrar un gol para:</p>
-        <p style="margin-top: 10px;"><strong>#${player.number} ${player.name}</strong></p>
-        <p style="color: #666;">${teamName}</p>
+        <div style="text-align: left;">
+          <p style="text-align: center;">¿Estás seguro de registrar un gol para:</p>
+          <p style="margin-top: 10px; text-align: center;"><strong>#${player.number} ${player.name}</strong></p>
+          <p style="color: #666; text-align: center; margin-bottom: 20px;">${teamName}</p>
+          
+          <div style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; background: #f5f5f5; border-radius: 8px; margin-top: 15px;">
+            <input type="checkbox" id="isPenaltyCheckbox" style="width: 20px; height: 20px; cursor: pointer;">
+            <label for="isPenaltyCheckbox" style="margin: 0; font-size: 1rem; font-weight: 500; cursor: pointer;">
+              ⚽ ¿Es gol de penal?
+            </label>
+          </div>
+        </div>
       `,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, registrar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#4caf50',
-      cancelButtonColor: '#d33'
+      cancelButtonColor: '#d33',
+      preConfirm: () => {
+        const checkbox = document.getElementById('isPenaltyCheckbox') as HTMLInputElement;
+        return {
+          isPenalty: checkbox ? checkbox.checked : false
+        };
+      }
     }).then((result) => {
-      if (result.isConfirmed) {
+      if (result.isConfirmed && result.value) {
         const isHomeTeam = team === 'home';
+        const isPenalty = result.value.isPenalty;
+        
         const event: MatchEvent = {
           tournamentTeamPlayerId: player.id,
           eventType: MatchEventType.Goal,
-          minute: 0,
-          description: `Gol de #${player.number} ${player.name} (${teamName})`,
-          isHomeGoal: isHomeTeam
+          minute: this.getCurrentMinute(),
+          isHomeGoal: isHomeTeam,
+          isPenalty: isPenalty
         };
 
         const request: RegisterMatchEventRequest = {
@@ -258,7 +312,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
 
               Swal.fire({
                 title: '¡Gol registrado!',
-                text: `Gol de ${player.name}`,
+                text: `${isPenalty ? 'Gol de penal' : 'Gol'} de ${player.name}`,
                 icon: 'success',
                 timer: 2000,
                 showConfirmButton: false
@@ -282,15 +336,72 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
    * Registra una tarjeta amarilla
    */
   addYellowCard(player: Player, team: 'home' | 'away'): void {
-    player.yellowCards++;
-    
     const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
-    this.incidents.unshift({
-      minute: this.getCurrentMinute(),
-      type: 'yellow',
-      player: `#${player.number} ${player.name}`,
-      team: teamName,
-      description: `Tarjeta amarilla para #${player.number} ${player.name} (${teamName})`
+    
+    Swal.fire({
+      title: '¿Registrar tarjeta amarilla?',
+      html: `
+        <p>¿Estás seguro de registrar una tarjeta amarilla para:</p>
+        <p style="margin-top: 10px;"><strong>#${player.number} ${player.name}</strong></p>
+        <p style="color: #666;">${teamName}</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#4caf50',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const isHomeTeam = team === 'home';
+        const event: MatchEvent = {
+          tournamentTeamPlayerId: player.id,
+          eventType: MatchEventType.YellowCard,
+          minute: this.getCurrentMinute(),
+          isHomeGoal: isHomeTeam
+        };
+
+        const request: RegisterMatchEventRequest = {
+          matchId: this.matchId!,
+          events: [event]
+        };
+
+        // Mostrar loading
+        Swal.fire({
+          title: 'Registrando tarjeta amarilla...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Llamar al API
+        this.vocaliaService.registerMatchEvent(request)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Recargar información del partido desde el API
+              this.loadMatchData(this.matchId!);
+
+              Swal.fire({
+                title: 'Tarjeta amarilla registrado!',
+                text: `Amarilla para ${player.name}`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (error) => {
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo registrar la tarjeta amarilla',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          });
+      }
     });
   }
 
@@ -629,10 +740,11 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
         
         // Preparar eventos para el API
         const isHomeTeam = team === 'home';
+        const currentMinute = this.getCurrentMinute();
         const events: MatchEvent[] = addedPlayers.map(player => ({
           tournamentTeamPlayerId: player.id,
           eventType: MatchEventType.InMatch,
-          minute: 0,
+          minute: currentMinute,
           description: `${player.name} ingresa al partido`,
           isHomeGoal: isHomeTeam
         }));
@@ -809,6 +921,356 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       }
     });
   }
+  
+  /**
+   * Determina si un estado requiere cronómetro activo
+   */
+  private isPlayingState(state: MatchInProgressStatusType | null): boolean {
+    if (state === null) return false;
+    return [
+      MatchInProgressStatusType.FirstHalf,
+      MatchInProgressStatusType.SecondHalf,
+      MatchInProgressStatusType.ExtraFirstTime,
+      MatchInProgressStatusType.ExtraSecondTime,
+      MatchInProgressStatusType.Penalty
+    ].includes(state);
+  }
+
+  /**
+   * Obtiene el nombre legible del estado
+   */
+  private getStateName(state: MatchInProgressStatusType | null): string {
+    if (state === null) return 'Sin iniciar';
+    
+    const stateNames: { [key: number]: string } = {
+      [MatchInProgressStatusType.FirstHalf]: 'Primer Tiempo',
+      [MatchInProgressStatusType.HalfTime]: 'Descanso',
+      [MatchInProgressStatusType.SecondHalf]: 'Segundo Tiempo',
+      [MatchInProgressStatusType.HalfSecondTime]: 'Descanso (Pre-Prórroga)',
+      [MatchInProgressStatusType.ExtraFirstTime]: 'Prórroga - Primer Tiempo',
+      [MatchInProgressStatusType.HalfFirstExtraTime]: 'Descanso (Prórroga)',
+      [MatchInProgressStatusType.ExtraSecondTime]: 'Prórroga - Segundo Tiempo',
+      [MatchInProgressStatusType.HalfPenalties]: 'Descanso (Pre-Penales)',
+      [MatchInProgressStatusType.Penalty]: 'Tanda de Penales'
+    };
+    
+    return stateNames[state] || 'Desconocido';
+  }
+
+  /**
+   * Inicia el partido (primer tiempo)
+   */
+  startFirstHalf(): void {
+    Swal.fire({
+      title: '¿Iniciar el partido?',
+      text: 'Se comenzará a contar el tiempo del primer tiempo',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, iniciar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.FirstHalf;
+        this.elapsedSeconds = 0;
+        this.start();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Finaliza el primer tiempo
+   */
+  endFirstHalf(): void {
+    Swal.fire({
+      title: '¿Finalizar el primer tiempo?',
+      text: 'Se detendrá el cronómetro',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, finalizar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.HalfTime;
+        this.pause();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Inicia el segundo tiempo
+   */
+  startSecondHalf(): void {
+    Swal.fire({
+      title: '¿Iniciar el segundo tiempo?',
+      text: 'Se continuará contando el tiempo del partido',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, iniciar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.SecondHalf;
+        this.start();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Finaliza el segundo tiempo
+   */
+  endSecondHalf(): void {
+    Swal.fire({
+      title: '¿Finalizar el segundo tiempo?',
+      text: 'Se detendrá el cronómetro',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, finalizar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.HalfSecondTime;
+        this.pause();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Va directamente a penales (sin prórroga)
+   */
+  goToPenalties(): void {
+    Swal.fire({
+      title: '¿Ir directamente a penales?',
+      text: 'Se saltará la prórroga y se irá directo a la tanda de penales',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, ir a penales',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.Penalty;
+        this.start();
+        this.cdr.detectChanges();
+        
+        Swal.fire({
+          title: 'Tanda de penales iniciada',
+          text: 'El partido ahora está en definición por penales',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  /**
+   * Inicia el primer tiempo de prórroga
+   */
+  startExtraFirstTime(): void {
+    Swal.fire({
+      title: '¿Iniciar primer tiempo de prórroga?',
+      text: 'Se continuará con el tiempo extra',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, iniciar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.ExtraFirstTime;
+        this.start();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Finaliza el primer tiempo de prórroga
+   */
+  endExtraFirstTime(): void {
+    Swal.fire({
+      title: '¿Finalizar primer tiempo de prórroga?',
+      text: 'Se detendrá el cronómetro',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, finalizar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.HalfFirstExtraTime;
+        this.pause();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Inicia el segundo tiempo de prórroga
+   */
+  startExtraSecondTime(): void {
+    Swal.fire({
+      title: '¿Iniciar segundo tiempo de prórroga?',
+      text: 'Se continuará con el segundo tiempo extra',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, iniciar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.ExtraSecondTime;
+        this.start();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Finaliza el segundo tiempo de prórroga
+   */
+  endExtraSecondTime(): void {
+    Swal.fire({
+      title: '¿Finalizar segundo tiempo de prórroga?',
+      text: 'Se detendrá el cronómetro',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, finalizar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.HalfPenalties;
+        this.pause();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Inicia la tanda de penales
+   */
+  startPenalties(): void {
+    Swal.fire({
+      title: '¿Iniciar tanda de penales?',
+      text: 'Se procederá con la definición por penales',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, iniciar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.matchProgressType = MatchInProgressStatusType.Penalty;
+        this.start();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  /**
+   * Termina la tanda de penales
+   */
+  endPenalties(): void {
+    Swal.fire({
+      title: '¿Terminar tanda de penales?',
+      text: 'Se finalizará la tanda de penales. El partido quedará listo para finalizar.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, terminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.pause();
+        this.cdr.detectChanges();
+        
+        Swal.fire({
+          title: 'Tanda de penales finalizada',
+          text: 'Ahora puedes finalizar el partido',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  /**
+   * Inicia el cronómetro persistente
+   */
+  start(autoResume = false) {
+    if (this.isRunning && !autoResume) return;
+
+    this.isRunning = true;
+    this.lastStartTime = Date.now();
+    this.saveState();
+
+    this.stopInterval();
+    this.intervalId = setInterval(() => {
+      this.elapsedSeconds++;
+      this.updateMatchTime();
+      this.saveState();
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  /**
+   * Pausa el cronómetro persistente
+   */
+  pause() {
+    this.isRunning = false;
+    this.stopInterval();
+    this.saveState();
+  }
+
+  /**
+   * Reinicia el cronómetro
+   */
+  reset() {
+    this.elapsedSeconds = 0;
+    this.isRunning = false;
+    this.stopInterval();
+    this.updateMatchTime();
+    localStorage.removeItem('timerState');
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Detiene el intervalo del cronómetro
+   */
+  private stopInterval() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  /**
+   * Guarda el estado del cronómetro en localStorage
+   */
+  private saveState() {
+    localStorage.setItem('timerState', JSON.stringify({
+      startTime: this.isRunning ? this.lastStartTime : null,
+      elapsedSeconds: this.elapsedSeconds,
+      isRunning: this.isRunning
+    }));
+  }
+
+  /**
+   * Actualiza el tiempo del partido en formato MM:SS
+   */
+  private updateMatchTime(): void {
+    const minutes = Math.floor(this.elapsedSeconds / 60);
+    const seconds = this.elapsedSeconds % 60;
+    this.matchTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Obtiene el tiempo formateado
+   */
+  get formattedTime() {
+    const minutes = Math.floor(this.elapsedSeconds / 60);
+    const seconds = this.elapsedSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
 
   /**
    * Finaliza el partido
@@ -867,8 +1329,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
    * Obtiene el minuto actual del partido
    */
   private getCurrentMinute(): number {
-    // TODO: Implementar lógica real del cronómetro
-    return Math.floor(Math.random() * 90) + 1;
+    return Math.floor(this.elapsedSeconds / 60);
   }
 
   /**
@@ -884,4 +1345,5 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   trackByIncidentIndex(index: number): number {
     return index;
   }
+
 }
