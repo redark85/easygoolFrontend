@@ -14,7 +14,7 @@
     </div>
 
     <div class="container-fluid">
-      <div class="row align-items-start">
+      <div class="row align-items-stretch">
         <!-- Left Column: Top Scorers Info (8 columns) -->
         <div class="col-lg-8">
           <div class="row align-items-center">
@@ -35,37 +35,77 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Right Column: Legend (4 columns) -->
-        <div class="col-lg-4 hero-right-section">
-          <div class="hero-right-content">
-            <div class="legend-container">
-              <div class="legend-row">
-                <div class="legend-badge">
-                  <mat-icon>sports_soccer</mat-icon>
-                  PJ: Partidos Jugados
+          <!-- Legend Row - Movido aquí desde la columna derecha -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="legend-items-hero">
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>sports_soccer</mat-icon>
+                    PJ: Partidos Jugados
+                  </div>
                 </div>
-              </div>
-              <div class="legend-row">
-                <div class="legend-badge">
-                  <mat-icon>trending_up</mat-icon>
-                  Asist.: Asistencias
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>trending_up</mat-icon>
+                    Asist.: Asistencias
+                  </div>
                 </div>
-              </div>
-              <div class="legend-row">
-                <div class="legend-badge">
-                  <mat-icon>analytics</mat-icon>
-                  Prom.: Promedio de goles por partido
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>analytics</mat-icon>
+                    Prom.: Promedio de goles por partido
+                  </div>
                 </div>
-              </div>
-              <div class="legend-row">
-                <div class="legend-badge">
-                  <mat-icon>star</mat-icon>
-                  MOTM: Man of the Match
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>star</mat-icon>
+                    MOTM: Man of the Match
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Filters (4 columns) -->
+        <div class="col-lg-4 hero-right-section">
+          <div class="hero-right-content">
+            <!-- Filters Card -->
+            <mat-card class="filters-card-hero">
+              <mat-card-content>
+                <!-- Filters Row -->
+                <div class="filters-row">
+                  <div class="row g-2">
+                    <div [class]="shouldShowGroupSelect ? 'col-6' : 'col-12'">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Fase del Torneo</mat-label>
+                        <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
+                          <mat-option *ngFor="let phase of phases" [value]="phase.id">
+                            <mat-icon class="option-icon">
+                              {{ phase.phaseType === PhaseType.Groups ? 'groups' : 'emoji_events' }}
+                            </mat-icon>
+                            {{ phase.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6" *ngIf="shouldShowGroupSelect">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+                          <mat-option *ngFor="let group of groups" [value]="group.id">
+                            <mat-icon class="option-icon">flag</mat-icon>
+                            {{ group.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
           </div>
         </div>
       </div>
@@ -74,7 +114,7 @@
 
   <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner diameter="50"></mat-spinner>
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
     <p class="loading-text">Cargando estadísticas...</p>
   </div>
 
