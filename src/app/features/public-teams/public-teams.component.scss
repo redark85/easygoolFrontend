@@ -1,174 +1,268 @@
 .teams-container {
-  padding: 2rem;
-  max-width: 1600px;
-  margin: 0 auto;
-  background-color: #f5f5f5;
   min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
 
-  .page-header {
+  // Hero Section
+  .hero-section {
+    position: relative;
+    min-height: 300px;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e0e0e0;
-
-    .back-button {
-      color: #1976d2;
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex: 1;
-
-      .header-image {
-        width: 2.5rem;
-        height: 2.5rem;
-        object-fit: contain;
-        border-radius: 8px;
-      }
-
-      .header-icon {
-        font-size: 2.5rem;
-        width: 2.5rem;
-        height: 2.5rem;
-        color: #ffa726;
-      }
-
-      .header-text {
-        .page-title {
-          margin: 0;
-          font-size: 1.75rem;
-          font-weight: 600;
-          color: #212121;
-        }
-
-        .page-subtitle {
-          margin: 0.25rem 0 0 0;
-          font-size: 0.95rem;
-          color: #757575;
-        }
-      }
-    }
-  }
-
-  // Stats Grid
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    color: white;
+    overflow: hidden;
     margin-bottom: 2rem;
 
-    .stat-card {
-      mat-card-content {
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+
+      .wallpaper-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg,
+          rgba(25, 118, 210, 0.8) 0%,
+          rgba(21, 101, 192, 0.9) 100%);
+      }
+    }
+
+    .back-button-container {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 10;
+
+      .back-button {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.3);
+          transform: translateX(-2px);
+        }
+      }
+    }
+
+    .container-fluid {
+      position: relative;
+      z-index: 5;
+      padding: 2rem 3rem;
+      margin-left: 2rem;
+      height: 100%;
+
+      .row {
+        height: 100%;
+        align-items: stretch;
+      }
+
+      .col-lg-8 {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .fixture-icon-container {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 1.5rem !important;
+        justify-content: center;
+        width: 120px;
+        height: 120px;
+        background: transparent;
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        border: none;
 
-        .stat-icon {
-          font-size: 3rem;
-          width: 3rem;
-          height: 3rem;
-
-          &.teams {
-            color: #1976d2;
-          }
-
-          &.players {
-            color: #9c27b0;
-          }
-
-          &.goals {
-            color: #4caf50;
-          }
-
-          &.average {
-            color: #ff9800;
-          }
+        .fixture-main-icon {
+          font-size: 4.5rem;
+          width: 4.5rem;
+          height: 4.5rem;
+          color: white;
         }
+      }
 
-        .stat-info {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-
-          .stat-value {
-            font-size: 2rem;
+      .fixture-info {
+        .fixture-header {
+          .fixture-title {
+            font-size: 3rem;
             font-weight: 700;
-            color: #212121;
-            line-height: 1;
+            margin: 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
           }
 
-          .stat-label {
-            font-size: 0.875rem;
-            color: #757575;
-            font-weight: 500;
+          .fixture-subtitle {
+            font-size: 1.3rem;
+            margin: 0.5rem 0 0 0;
+            color: white;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
           }
         }
       }
-    }
-  }
 
-  // Filters Card
-  .filters-card {
-    margin-bottom: 2rem;
-
-    .filters-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-
-      .search-field {
-        flex: 2;
-        min-width: 250px;
-      }
-
-      .filter-field {
-        flex: 1;
-        min-width: 200px;
-      }
-
-      .option-icon {
-        margin-right: 8px;
-        vertical-align: middle;
-      }
-
-      button {
-        height: 56px;
-      }
-    }
-
-    .active-filters {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e0e0e0;
-
-      .filters-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #666;
-      }
-
-      .chips-container {
+      // Legend Items (estadísticas en columna izquierda)
+      .legend-items-hero {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 1rem;
+        justify-content: flex-start;
+        margin-top: 1rem;
 
-        mat-chip {
-          background-color: #e3f2fd;
-          color: #1976d2;
-          cursor: pointer;
+        .legend-item-hero {
+          .legend-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
 
-          &:hover {
-            background-color: #bbdefb;
+            &:hover {
+              background: rgba(255, 255, 255, 0.2);
+              transform: translateY(-1px);
+            }
+
+            mat-icon {
+              font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+              color: white;
+            }
+          }
+        }
+      }
+
+      .hero-right-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%;
+
+        .hero-right-content {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          // Filters Card
+          .filters-card-hero {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+
+            mat-card-content {
+              padding: 1.5rem !important;
+            }
+
+            .filters-row {
+              .filter-select {
+                width: 100%;
+
+                ::ng-deep {
+                  .mat-mdc-form-field {
+                    width: 100%;
+
+                    .mat-mdc-text-field-wrapper {
+                      border-radius: 12px;
+                      background-color: rgba(255, 255, 255, 0.8);
+                    }
+
+                    .mat-mdc-form-field-outline {
+                      border-radius: 12px;
+                    }
+
+                    .mdc-notched-outline__leading,
+                    .mdc-notched-outline__trailing {
+                      border-radius: 12px;
+                    }
+
+                    .mat-mdc-select-value {
+                      color: #333;
+                      font-weight: 500;
+                    }
+
+                    .mat-mdc-form-field-label {
+                      color: #666;
+                      font-weight: 500;
+                    }
+                  }
+
+                  .mat-mdc-select-panel {
+                    border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+                  }
+
+                  .mat-mdc-option {
+                    .option-icon {
+                      margin-right: 0.5rem;
+                      color: #1976d2;
+                    }
+                  }
+                }
+              }
+
+              // Active Filters Chips
+              .active-filters {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+                .filters-label {
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  color: #666;
+                  margin-bottom: 0.5rem;
+                  display: block;
+                }
+
+                .chips-container {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 0.5rem;
+
+                  mat-chip {
+                    font-size: 0.75rem;
+                    background-color: #e3f2fd;
+                    color: #1976d2;
+                    border: 1px solid #bbdefb;
+
+                    mat-icon {
+                      font-size: 0.875rem;
+                      width: 0.875rem;
+                      height: 0.875rem;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -197,6 +291,9 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
+    padding: 0 24px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
 
     .team-card {
       position: relative;
@@ -207,6 +304,9 @@
       flex-direction: column;
       align-items: center;
       overflow: visible;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
       &:hover {
         transform: translateY(-8px);
@@ -218,59 +318,24 @@
       }
 
       &.top3 {
-        border-top: 4px solid #ffd700;
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #8b6914;
       }
 
       &.top5 {
-        border-top: 4px solid #2196f3;
+        background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%);
+        color: white;
       }
 
       &.bottom3 {
-        border-top: 4px solid #f44336;
+        background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+        color: white;
       }
-
-      // Position Badge
-      .position-badge {
-        position: absolute;
-        top: -12px;
-        right: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        background-color: #e0e0e0;
-        color: #666;
-        font-weight: 700;
-        font-size: 0.875rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-        mat-icon {
-          font-size: 18px;
-          width: 18px;
-          height: 18px;
-        }
-
-        &.top3 {
-          background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-          color: #8b6914;
-        }
-
-        &.top5 {
-          background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%);
-          color: white;
-        }
-
-        &.bottom3 {
-          background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
-          color: white;
-        }
-      }
-
       // Team Logo
       .team-logo-container {
         width: 120px;
         height: 120px;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -485,89 +550,158 @@
       font-weight: 600;
     }
   }
-}
 
-// Responsive Design
-@media (max-width: 1200px) {
-  .teams-container {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  // Responsive Design
+  @media (max-width: 991.98px) {
+    .hero-section {
+      .container-fluid {
+        padding: 1.5rem 2rem;
+        margin-left: 1rem;
 
-    .teams-grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-  }
-}
+        .fixture-icon-container {
+          width: 80px;
+          height: 80px;
 
-@media (max-width: 768px) {
-  .teams-container {
-    padding: 1rem;
-
-    .back-button {
-      top: 0.5rem;
-      left: 0.5rem;
-    }
-
-    .page-header {
-      .header-icon {
-        font-size: 2rem;
-        width: 2rem;
-        height: 2rem;
-      }
-
-      .header-text {
-        .page-title {
-          font-size: 1.5rem;
-        }
-
-        .page-subtitle {
-          font-size: 0.875rem;
-        }
-      }
-    }
-
-    .stats-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-
-      .stat-card {
-        mat-card-content {
-          padding: 1rem !important;
-
-          .stat-icon {
-            font-size: 2rem;
-            width: 2rem;
-            height: 2rem;
+          .fixture-main-icon {
+            font-size: 3rem;
+            width: 3rem;
+            height: 3rem;
           }
+        }
 
-          .stat-info {
-            .stat-value {
-              font-size: 1.5rem;
+        .fixture-info {
+          .fixture-header {
+            .fixture-title {
+              font-size: 2rem;
+            }
+
+            .fixture-subtitle {
+              font-size: 1rem;
+            }
+          }
+        }
+
+        .legend-items-hero {
+          gap: 0.5rem;
+          margin-top: 1rem;
+
+          .legend-item-hero {
+            .legend-badge {
+              padding: 0.4rem 0.8rem;
+              font-size: 0.75rem;
+
+              mat-icon {
+                font-size: 0.9rem;
+                width: 0.9rem;
+                height: 0.9rem;
+              }
+            }
+          }
+        }
+
+        .hero-right-section {
+          margin-top: 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .hero-right-content {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .filters-card-hero {
+              width: 100%;
+              max-width: 350px;
+
+              mat-card-content {
+                padding: 1rem !important;
+              }
+
+              .filters-row {
+                .row {
+                  --bs-gutter-x: 0.5rem;
+                }
+              }
             }
           }
         }
       }
     }
 
-    .filters-card {
-      .filters-container {
-        flex-direction: column;
-        align-items: stretch;
+    .teams-grid {
+      padding: 0 16px 40px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
 
-        .search-field,
-        .filter-field {
-          width: 100%;
+  @media (max-width: 767.98px) {
+    .hero-section {
+      min-height: 250px;
+
+      .container-fluid {
+        padding: 1rem;
+        margin-left: 0.5rem;
+
+        .col-lg-8 {
+          display: block;
         }
 
-        button {
-          width: 100%;
-        }
-      }
+        .hero-right-section {
+          margin-top: 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
-      .active-filters {
-        flex-direction: column;
-        align-items: flex-start;
+          .hero-right-content {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .filters-card-hero {
+              width: 100%;
+              max-width: none;
+            }
+          }
+        }
+
+        .fixture-icon-container {
+          width: 60px;
+          height: 60px;
+
+          .fixture-main-icon {
+            font-size: 2.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+          }
+        }
+
+        .fixture-info {
+          .fixture-header {
+            .fixture-title {
+              font-size: 1.5rem;
+            }
+
+            .fixture-subtitle {
+              font-size: 0.9rem;
+            }
+          }
+        }
+
+        .legend-items-hero {
+          flex-direction: column;
+          gap: 0.5rem;
+
+          .legend-item-hero {
+            .legend-badge {
+              justify-content: center;
+              padding: 0.5rem 1rem;
+              font-size: 0.8rem;
+            }
+          }
+        }
       }
     }
 

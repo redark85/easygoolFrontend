@@ -1,138 +1,172 @@
 <div class="teams-container">
-  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img src="assets/wallpaper.jpg" alt="Background" class="wallpaper-image">
+      <div class="hero-overlay"></div>
+    </div>
 
-  <!-- Page Header -->
-  <div class="page-header">
     <!-- Back Button -->
-  <button mat-icon-button class="back-button" (click)="goBack()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-    <div class="header-content">
-    <mat-icon class="header-icon">groups</mat-icon>
-    <div class="header-text">
-      <h1 class="page-title">Equipos Participantes</h1>
-      <p class="page-subtitle">Todos los equipos del torneo</p>
+    <div class="back-button-container">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
     </div>
+
+    <div class="container-fluid">
+      <div class="row align-items-stretch">
+        <!-- Left Column: Teams Info (8 columns) -->
+        <div class="col-lg-8">
+          <div class="row align-items-center">
+            <!-- Teams Icon -->
+            <div class="col-auto">
+              <div class="fixture-icon-container">
+                <mat-icon class="fixture-main-icon">groups</mat-icon>
+              </div>
+            </div>
+
+            <!-- Teams Info -->
+            <div class="col">
+              <div class="fixture-info">
+                <div class="fixture-header">
+                  <h1 class="fixture-title">Equipos Participantes</h1>
+                  <p class="fixture-subtitle">Todos los equipos del torneo</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Row - Estadísticas en fila inferior -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="legend-items-hero">
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>shield</mat-icon>
+                    {{ stats.totalTeams }} Equipos
+                  </div>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>people</mat-icon>
+                    {{ stats.totalPlayers }} Jugadores
+                  </div>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>sports_soccer</mat-icon>
+                    {{ stats.totalGoals }} Goles Totales
+                  </div>
+                </div>
+                <div class="legend-item-hero">
+                  <div class="legend-badge">
+                    <mat-icon>trending_up</mat-icon>
+                    {{ stats.averageGoals | number:'1.1-1' }} Prom. Goles
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Filters (4 columns) -->
+        <div class="col-lg-4 hero-right-section">
+          <div class="hero-right-content">
+            <!-- Filters Card -->
+            <mat-card class="filters-card-hero">
+              <mat-card-content>
+                <!-- Filters Row -->
+                <div class="filters-row">
+                  <!-- Search -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Buscar equipo</mat-label>
+                        <input matInput 
+                               [(ngModel)]="searchText" 
+                               (ngModelChange)="onSearchChange()"
+                               placeholder="Nombre, entrenador, estadio...">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <button mat-icon-button matSuffix *ngIf="searchText" (click)="searchText = ''; onSearchChange()">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Selects Row -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-6">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+                          <mat-option [value]="null">
+                            <mat-icon class="option-icon">all_inclusive</mat-icon>
+                            Todos
+                          </mat-option>
+                          <mat-option *ngFor="let group of groups" [value]="group.id">
+                            <mat-icon class="option-icon">flag</mat-icon>
+                            {{ group.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Posición</mat-label>
+                        <mat-select [(ngModel)]="selectedPositionFilter" (selectionChange)="onPositionChange()">
+                          <mat-option *ngFor="let filter of positionFilters" [value]="filter.id">
+                            <mat-icon class="option-icon">emoji_events</mat-icon>
+                            {{ filter.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Clear Filters Button -->
+                  <div class="row g-2" *ngIf="selectedGroupId || selectedPositionFilter !== 'all' || searchText">
+                    <div class="col-12">
+                      <button mat-raised-button 
+                              color="accent" 
+                              (click)="clearFilters()"
+                              class="w-100">
+                        <mat-icon>clear_all</mat-icon>
+                        Limpiar Filtros
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Active Filters Chips -->
+                <div class="active-filters" *ngIf="selectedGroupId || selectedPositionFilter !== 'all' || searchText">
+                  <span class="filters-label">Filtros activos:</span>
+                  <div class="chips-container">
+                    <mat-chip *ngIf="searchText" (click)="searchText = ''; onSearchChange()">
+                      Búsqueda: "{{ searchText }}"
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <mat-chip *ngIf="selectedGroupId" (click)="selectedGroupId = null; onGroupChange()">
+                      {{ getSelectedGroupName() }}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <mat-chip *ngIf="selectedPositionFilter !== 'all'" (click)="selectedPositionFilter = 'all'; onPositionChange()">
+                      {{ getSelectedPositionFilterName() }}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon teams">shield</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.totalTeams }}</span>
-          <span class="stat-label">Equipos</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon players">people</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.totalPlayers }}</span>
-          <span class="stat-label">Jugadores</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon goals">sports_soccer</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.totalGoals }}</span>
-          <span class="stat-label">Goles Totales</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <mat-icon class="stat-icon average">trending_up</mat-icon>
-        <div class="stat-info">
-          <span class="stat-value">{{ stats.averageGoals | number:'1.1-1' }}</span>
-          <span class="stat-label">Prom. Goles</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <!-- Filters Card -->
-  <mat-card class="filters-card">
-    <mat-card-content>
-      <div class="filters-container">
-        <!-- Search -->
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar equipo</mat-label>
-          <input matInput 
-                 [(ngModel)]="searchText" 
-                 (ngModelChange)="onSearchChange()"
-                 placeholder="Nombre, entrenador, estadio...">
-          <mat-icon matPrefix>search</mat-icon>
-          <button mat-icon-button matSuffix *ngIf="searchText" (click)="searchText = ''; onSearchChange()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
-
-        <!-- Group Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Grupo</mat-label>
-          <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
-            <mat-option [value]="null">Todos los grupos</mat-option>
-            <mat-option *ngFor="let group of groups" [value]="group.id">
-              <mat-icon class="option-icon">flag</mat-icon>
-              {{ group.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Position Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Posición en Tabla</mat-label>
-          <mat-select [(ngModel)]="selectedPositionFilter" (selectionChange)="onPositionChange()">
-            <mat-option *ngFor="let filter of positionFilters" [value]="filter.id">
-              <mat-icon class="option-icon">emoji_events</mat-icon>
-              {{ filter.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Clear Filters Button -->
-        <button mat-raised-button 
-                color="accent" 
-                (click)="clearFilters()"
-                *ngIf="selectedGroupId || selectedPositionFilter !== 'all' || searchText">
-          <mat-icon>clear_all</mat-icon>
-          Limpiar Filtros
-        </button>
-      </div>
-
-      <!-- Active Filters Chips -->
-      <div class="active-filters" *ngIf="selectedGroupId || selectedPositionFilter !== 'all' || searchText">
-        <span class="filters-label">Filtros activos:</span>
-        <div class="chips-container">
-          <mat-chip *ngIf="searchText" (click)="searchText = ''; onSearchChange()">
-            Búsqueda: "{{ searchText }}"
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <mat-chip *ngIf="selectedGroupId" (click)="selectedGroupId = null; onGroupChange()">
-            {{ getSelectedGroupName() }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <mat-chip *ngIf="selectedPositionFilter !== 'all'" (click)="selectedPositionFilter = 'all'; onPositionChange()">
-            {{ getSelectedPositionFilterName() }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+  </section>
 
   <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner diameter="50"></mat-spinner>
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
     <p class="loading-text">Cargando equipos...</p>
   </div>
 
