@@ -77,13 +77,41 @@
               <mat-card-content>
                 <!-- Filters Row -->
                 <div class="filters-row">
-                  <!-- Search -->
+                  <!-- Selects de Fase y Grupo (Primera fila) -->
+                  <div class="row g-2 mb-3">
+                    <div [class]="shouldShowGroupSelect ? 'col-6' : 'col-12'">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Fase del Torneo</mat-label>
+                        <mat-select [(ngModel)]="selectedPhaseId" (selectionChange)="onPhaseChange()">
+                          <mat-option *ngFor="let phase of phases" [value]="phase.id">
+                            <mat-icon class="option-icon">
+                              {{ phase.phaseType === PhaseType.Groups ? 'groups' : 'emoji_events' }}
+                            </mat-icon>
+                            {{ phase.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-6" *ngIf="shouldShowGroupSelect">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Grupo</mat-label>
+                        <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
+                          <mat-option *ngFor="let group of groups" [value]="group.id">
+                            <mat-icon class="option-icon">flag</mat-icon>
+                            {{ group.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Buscador (Segunda fila) -->
                   <div class="row g-2 mb-3">
                     <div class="col-12">
                       <mat-form-field appearance="outline" class="filter-select">
                         <mat-label>Buscar equipo</mat-label>
-                        <input matInput 
-                               [(ngModel)]="searchText" 
+                        <input matInput
+                               [(ngModel)]="searchText"
                                (ngModelChange)="onSearchChange()"
                                placeholder="Nombre, entrenador, estadio...">
                         <mat-icon matPrefix>search</mat-icon>
@@ -94,26 +122,11 @@
                     </div>
                   </div>
 
-                  <!-- Selects Row -->
+                  <!-- Select de Posiciones (Tercera fila) -->
                   <div class="row g-2 mb-3">
-                    <div class="col-6">
+                    <div class="col-12">
                       <mat-form-field appearance="outline" class="filter-select">
-                        <mat-label>Grupo</mat-label>
-                        <mat-select [(ngModel)]="selectedGroupId" (selectionChange)="onGroupChange()">
-                          <mat-option [value]="null">
-                            <mat-icon class="option-icon">all_inclusive</mat-icon>
-                            Todos
-                          </mat-option>
-                          <mat-option *ngFor="let group of groups" [value]="group.id">
-                            <mat-icon class="option-icon">flag</mat-icon>
-                            {{ group.name }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </div>
-                    <div class="col-6">
-                      <mat-form-field appearance="outline" class="filter-select">
-                        <mat-label>Posición</mat-label>
+                        <mat-label>Posición en Tabla</mat-label>
                         <mat-select [(ngModel)]="selectedPositionFilter" (selectionChange)="onPositionChange()">
                           <mat-option *ngFor="let filter of positionFilters" [value]="filter.id">
                             <mat-icon class="option-icon">emoji_events</mat-icon>
@@ -127,8 +140,8 @@
                   <!-- Clear Filters Button -->
                   <div class="row g-2" *ngIf="selectedGroupId || selectedPositionFilter !== 'all' || searchText">
                     <div class="col-12">
-                      <button mat-raised-button 
-                              color="accent" 
+                      <button mat-raised-button
+                              color="accent"
                               (click)="clearFilters()"
                               class="w-100">
                         <mat-icon>clear_all</mat-icon>
@@ -172,34 +185,46 @@
 
   <!-- Teams Grid -->
   <div class="teams-grid" *ngIf="!isLoading && filteredTeams.length > 0">
-    <mat-card *ngFor="let team of filteredTeams" 
-              class="team-card" 
-              [ngClass]="getPositionClass(team.position)"
-              (click)="viewTeam(team)">
-      
-      <!-- Position Badge -->
-      <div class="position-badge" [ngClass]="getPositionClass(team.position)">
-        <mat-icon *ngIf="team.position <= 3">emoji_events</mat-icon>
-        <span>{{ team.position }}°</span>
+    <mat-card *ngFor="let team of filteredTeams"
+              class="team-card"
+              [ngClass]="getPositionClass(team.position)">
+
+      <!-- View Details Icon (Top Right Corner) -->
+      <button mat-icon-button 
+              class="view-details-icon" 
+              (click)="viewTeam(team)"
+              matTooltip="Ver detalles del equipo"
+              matTooltipPosition="above">
+        <mat-icon>visibility</mat-icon>
+      </button>
+
+      <!-- Primera Fila: Logo + Nombre/Posición/Grupo -->
+      <div class="team-header-row">
+        <!-- Team Logo -->
+        <div class="team-logo-container">
+          <img [src]="team.logoUrl" [alt]="team.name" class="team-logo">
+        </div>
+
+        <!-- Team Name and Group -->
+        <div class="team-name-section">
+          <h3 class="team-name">{{ team.name }}</h3>
+          <div class="group-badge">
+            <mat-icon>flag</mat-icon>
+            <span>{{ team.groupName }}</span>
+          </div>
+        </div>
+
+        <!-- Position Badge (Centered) -->
+        <div class="position-container">
+          <div class="position-badge" [ngClass]="getPositionClass(team.position)">
+            <mat-icon *ngIf="team.position <= 3">emoji_events</mat-icon>
+            <span>{{ team.position }}°</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Team Logo -->
-      <div class="team-logo-container">
-        <img [src]="team.logoUrl" [alt]="team.name" class="team-logo">
-      </div>
-
-      <!-- Team Name -->
-      <h3 class="team-name">{{ team.name }}</h3>
-      <p class="team-short-name">{{ team.shortName }}</p>
-
-      <!-- Group Badge -->
-      <div class="group-badge">
-        <mat-icon>flag</mat-icon>
-        <span>{{ team.groupName }}</span>
-      </div>
-
-      <!-- Team Stats -->
-      <div class="team-stats">
+      <!-- Segunda Fila: Estadísticas Principales -->
+      <div class="team-main-stats">
         <div class="stat">
           <span class="value">{{ team.points }}</span>
           <span class="label">Puntos</span>
@@ -216,43 +241,40 @@
         </div>
       </div>
 
-      <!-- Additional Info -->
-      <div class="team-info">
-        <div class="info-item">
-          <mat-icon>person</mat-icon>
-          <span>{{ team.coach }}</span>
+      <!-- Info Row: Additional Info (Col 7) + Record (Col 5) -->
+      <div class="team-info-row">
+        <div class="team-info-col">
+          <div class="info-item">
+            <mat-icon>person</mat-icon>
+            <span>{{ team.coach }}</span>
+          </div>
+          <div class="info-item">
+            <mat-icon>stadium</mat-icon>
+            <span>{{ team.stadium }}</span>
+          </div>
+          <div class="info-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>Fundado: {{ team.founded }}</span>
+          </div>
         </div>
-        <div class="info-item">
-          <mat-icon>stadium</mat-icon>
-          <span>{{ team.stadium }}</span>
-        </div>
-        <div class="info-item">
-          <mat-icon>calendar_today</mat-icon>
-          <span>Fundado: {{ team.founded }}</span>
+        
+        <div class="team-record-col">
+          <div class="team-record">
+            <div class="record-item wins">
+              <span class="count">{{ team.wins }}</span>
+              <span class="label">V</span>
+            </div>
+            <div class="record-item draws">
+              <span class="count">{{ team.draws }}</span>
+              <span class="label">E</span>
+            </div>
+            <div class="record-item losses">
+              <span class="count">{{ team.losses }}</span>
+              <span class="label">D</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Record -->
-      <div class="team-record">
-        <div class="record-item wins">
-          <span class="count">{{ team.wins }}</span>
-          <span class="label">V</span>
-        </div>
-        <div class="record-item draws">
-          <span class="count">{{ team.draws }}</span>
-          <span class="label">E</span>
-        </div>
-        <div class="record-item losses">
-          <span class="count">{{ team.losses }}</span>
-          <span class="label">D</span>
-        </div>
-      </div>
-
-      <!-- View Details Button -->
-      <button mat-button color="primary" class="view-details-btn">
-        <mat-icon>visibility</mat-icon>
-        Ver Detalles
-      </button>
     </mat-card>
   </div>
 
