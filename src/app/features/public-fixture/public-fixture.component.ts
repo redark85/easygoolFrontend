@@ -14,7 +14,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { MatchCardComponent } from './components/match-card/match-card.component';
 import { PublicLoadingComponent } from '@shared/components';
 import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService, FixtureService } from '@core/services';
-import { CompleteFixtureResponse, FixtureMatchDay, FixtureMatch, MatchStatus, MatchStatusMap } from '@core/interfaces/fixture.interface';
+import { MatchStatusType } from '../../core/services/match.service';
+import { CompleteFixtureResponse, FixtureMatchDay, FixtureMatch } from '@core/interfaces/fixture.interface';
 
 // Interfaces adaptadas para la UI
 interface UIMatch {
@@ -26,7 +27,7 @@ interface UIMatch {
   homeScore: number | null;
   awayScore: number | null;
   date: Date;
-  status: 'upcoming' | 'live' | 'finished' | 'suspended';
+  status: MatchStatusType;
   isLive: boolean;
   isFinished: boolean;
   matchday: number;
@@ -225,15 +226,35 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
         homeScore: match.homeScore,
         awayScore: match.awayScore,
         date: new Date(match.matchDate),
-        status: MatchStatusMap[match.status] || 'upcoming',
-        isLive: match.status === MatchStatus.Live,
-        isFinished: match.status === MatchStatus.Finished,
+        status: this.mapApiStatusToMatchStatusType(match.status),
+        isLive: match.status === 1, // MatchStatusType.inProgress
+        isFinished: match.status === 2, // MatchStatusType.played
         matchday: matchday.matchDayId
       }))
     }));
 
     this.filteredMatchdays = [...this.matchdays];
     this.applyFilters();
+  }
+
+  /**
+   * Mapea el estado del API al MatchStatusType
+   */
+  private mapApiStatusToMatchStatusType(apiStatus: number): MatchStatusType {
+    switch (apiStatus) {
+      case 0:
+        return MatchStatusType.scheduled;
+      case 1:
+        return MatchStatusType.inProgress;
+      case 2:
+        return MatchStatusType.played;
+      case 3:
+        return MatchStatusType.canceled;
+      case 4:
+        return MatchStatusType.postponed;
+      default:
+        return MatchStatusType.scheduled;
+    }
   }
 
   /**
@@ -307,6 +328,26 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Mapea el filtro de string a MatchStatusType
+   */
+  private mapFilterToMatchStatusType(filter: string): MatchStatusType | null {
+    switch (filter) {
+      case 'upcoming':
+        return MatchStatusType.scheduled;
+      case 'live':
+        return MatchStatusType.inProgress;
+      case 'finished':
+        return MatchStatusType.played;
+      case 'suspended':
+        return MatchStatusType.postponed;
+      case 'cancelled':
+        return MatchStatusType.canceled;
+      default:
+        return null;
+    }
+  }
+
+  /**
    * Aplica los filtros seleccionados
    */
   private applyFilters(): void {
@@ -314,7 +355,8 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
       ...matchday,
       matches: matchday.matches.filter(match => {
         if (this.selectedStatus === 'all') return true;
-        return match.status === this.selectedStatus;
+        const filterStatus = this.mapFilterToMatchStatusType(this.selectedStatus);
+        return filterStatus !== null && match.status === filterStatus;
       })
     })).filter(matchday => matchday.matches.length > 0);
 
@@ -330,15 +372,36 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Obtiene el badge de estado
+   * Obtiene el badge de estado basado en MatchStatusType
    */
   getStatusBadge(status: string): { label: string; color: string } {
     const badges: { [key: string]: { label: string; color: string } } = {
-      upcoming: { label: 'Próximos', color: '#2196f3' },
-      live: { label: 'En Vivo', color: '#f44336' },
-      finished: { label: 'Finalizados', color: '#4caf50' },
-      suspended: { label: 'Suspendidos', color: '#ff9800' }
+      upcoming: { label: 'Programados', color: '#1976d2' },
+      live: { label: 'En Vivo', color: '#4caf50' },
+      finished: { label: 'Jugados', color: '#9c27b0' },
+      suspended: { label: 'Postergados', color: '#ff9800' },
+      cancelled: { label: 'Cancelados', color: '#f44336' }
     };
     return badges[status] || badges['upcoming'];
+  }
+
+  /**
+   * Obtiene el texto del estado basado en MatchStatusType
+   */
+  getMatchStatusText(status: MatchStatusType): string {
+    switch (status) {
+      case MatchStatusType.scheduled:
+        return 'PROGRAMADO';
+      case MatchStatusType.inProgress:
+        return 'EN VIVO';
+      case MatchStatusType.played:
+        return 'JUGADO';
+      case MatchStatusType.canceled:
+        return 'CANCELADO ELIMINADO';
+      case MatchStatusType.postponed:
+        return 'POSTERGADO';
+      default:
+        return 'DESCONOCIDO';
+    }
   }
 }

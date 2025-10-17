@@ -140,18 +140,35 @@
             border-radius: 20px;
             padding: 8px 16px;
 
+            // Estados basados en MatchStatusType
+            &.status-scheduled {
+              background-color: #1976d2; // Azul - Programado
+              color: white;
+            }
+
             &.status-live {
-              background-color: #f44336;
+              background-color: #4caf50; // Verde - En vivo
+              color: white;
+              animation: pulse 2s infinite;
+            }
+
+            &.status-completed {
+              background-color: #9c27b0; // Púrpura - Jugado/Completado
               color: white;
             }
 
-            &.status-finished {
-              background-color: #4caf50;
+            &.status-cancelled {
+              background-color: #f44336; // Rojo - Cancelado Eliminado
               color: white;
             }
 
-            &.status-upcoming {
-              background-color: #2196f3;
+            &.status-postponed {
+              background-color: #ff9800; // Naranja - Postergado
+              color: white;
+            }
+
+            &.status-unknown {
+              background-color: #607d8b; // Gris - Desconocido
               color: white;
             }
           }
@@ -832,5 +849,21 @@
         }
       }
     }
+  }
+}
+
+// Animación pulse para estado en vivo
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
   }
 }

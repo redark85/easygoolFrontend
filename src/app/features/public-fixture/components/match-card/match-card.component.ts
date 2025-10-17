@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatchStatusType } from '../../../../core/services/match.service';
 
 interface Match {
   id: number;
@@ -14,7 +15,7 @@ interface Match {
   homeScore: number | null;
   awayScore: number | null;
   date: Date;
-  status: 'upcoming' | 'live' | 'finished' | 'suspended';
+  status: MatchStatusType;
   isLive: boolean;
   isFinished: boolean;
   matchday: number;
@@ -49,23 +50,43 @@ export class MatchCardComponent {
   }
 
   /**
-   * Obtiene el label del estado
+   * Obtiene el label del estado basado en MatchStatusType
    */
   getStatusLabel(): string {
-    const labels: { [key: string]: string } = {
-      upcoming: 'PRÓXIMO',
-      live: 'EN VIVO',
-      finished: 'FINALIZADO',
-      suspended: 'SUSPENDIDO'
-    };
-    return labels[this.match.status] || '';
+    switch (this.match.status) {
+      case MatchStatusType.scheduled:
+        return 'PROGRAMADO';
+      case MatchStatusType.inProgress:
+        return 'EN VIVO';
+      case MatchStatusType.played:
+        return 'JUGADO';
+      case MatchStatusType.canceled:
+        return 'CANCELADO ELIMINADO';
+      case MatchStatusType.postponed:
+        return 'POSTERGADO';
+      default:
+        return 'DESCONOCIDO';
+    }
   }
 
   /**
-   * Obtiene la clase CSS del estado
+   * Obtiene la clase CSS del estado basado en MatchStatusType
    */
   getStatusClass(): string {
-    return `status-${this.match.status}`;
+    switch (this.match.status) {
+      case MatchStatusType.scheduled:
+        return 'status-scheduled';
+      case MatchStatusType.inProgress:
+        return 'status-live';
+      case MatchStatusType.played:
+        return 'status-completed';
+      case MatchStatusType.canceled:
+        return 'status-cancelled';
+      case MatchStatusType.postponed:
+        return 'status-postponed';
+      default:
+        return 'status-unknown';
+    }
   }
 
   /**
@@ -73,6 +94,27 @@ export class MatchCardComponent {
    */
   shouldShowScore(): boolean {
     return this.match.isLive || this.match.isFinished;
+  }
+
+  /**
+   * Verifica si el partido está programado
+   */
+  isScheduled(): boolean {
+    return this.match.status === MatchStatusType.scheduled;
+  }
+
+  /**
+   * Verifica si el partido está postergado
+   */
+  isPostponed(): boolean {
+    return this.match.status === MatchStatusType.postponed;
+  }
+
+  /**
+   * Verifica si el partido está cancelado
+   */
+  isCancelled(): boolean {
+    return this.match.status === MatchStatusType.canceled;
   }
 
   /**

@@ -29,7 +29,7 @@
 
             <!-- Score Section -->
             <div class="score-section">
-              <mat-chip [ngClass]="getStatusClass()" class="status-chip">
+              <mat-chip [ngClass]="getStatusClass()" class="status-chip" *ngIf="shouldShowMatchStatus()">
                 {{ getMatchStatus() }}
               </mat-chip>
 
@@ -48,13 +48,13 @@
                   <mat-icon>schedule</mat-icon>
                   <span>{{ getFormattedTime(match.date) || 'Hora por definir' }}</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" *ngIf="match.venue">
                   <mat-icon>location_on</mat-icon>
-                  <span>{{ match.venue || 'Estadio por definir' }}</span>
+                  <span>{{ match.venue }}</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" *ngIf="match.matchday">
                   <mat-icon>calendar_today</mat-icon>
-                  <span>Jornada {{ match.matchday || 'TBD' }}</span>
+                  <span>Jornada {{ match.matchday }}</span>
                 </div>
               </div>
             </div>
@@ -125,7 +125,7 @@
                              class="team-logo-small"
                              (error)="$event.target.src='assets/logo.png'">
                       </div>
-                      <mat-chip class="formation-chip" *ngIf="lineups.home.formation && lineups.home.formation !== '4-3-3'">{{ lineups.home.formation }}</mat-chip>
+                      <mat-chip class="formation-chip" *ngIf="match.homeFormation">{{ match.homeFormation }}</mat-chip>
                     </div>
 
                     <!-- Solo mostrar lista de jugadores si existen -->
@@ -168,7 +168,7 @@
                              class="team-logo-small"
                              (error)="$event.target.src='assets/logo.png'">
                       </div>
-                      <mat-chip class="formation-chip" *ngIf="lineups.away.formation && lineups.away.formation !== '4-3-3'">{{ lineups.away.formation }}</mat-chip>
+                      <mat-chip class="formation-chip" *ngIf="match.awayFormation">{{ match.awayFormation }}</mat-chip>
                     </div>
 
                     <!-- Solo mostrar lista de jugadores si existen -->

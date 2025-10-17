@@ -1,10 +1,421 @@
 .standings-container {
-  padding: 2rem;
-  max-width: 1600px;
-  margin: 0 auto;
-  background-color: #f5f5f5;
   min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
+
+  // Hero Section - Similar to fixture
+  .hero-section {
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 20px 0;
+
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+
+      .wallpaper-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(25, 118, 210, 0.7) 0%, rgba(156, 39, 176, 0.7) 100%);
+      z-index: 1;
+    }
+
+    // Back Button
+    .back-button-container {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+
+      .back-button {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        width: 48px;
+        height: 48px;
+
+        &:hover {
+          background: white;
+          transform: translateX(-2px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+          border-color: rgba(25, 118, 210, 0.3);
+        }
+
+        mat-icon {
+          color: #1976d2;
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+          transition: color 0.3s ease;
+        }
+
+        &:hover mat-icon {
+          color: #1565c0;
+        }
+      }
+    }
+
+    .container-fluid {
+      position: relative;
+      z-index: 2;
+      color: white;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 10px 24px;
+
+      .standings-icon-container {
+        position: relative;
+
+        .standings-main-icon {
+          font-size: 120px;
+          width: 120px;
+          height: 120px;
+          color: white;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .tournament-logo-hero {
+          width: 120px;
+          height: 120px;
+          object-fit: contain;
+          border-radius: 12px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      .standings-info {
+        .standings-header {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-bottom: 12px;
+
+          .standings-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
+          }
+
+          .standings-subtitle {
+            font-size: 16px;
+            margin: 0;
+            opacity: 0.9;
+            font-weight: 500;
+          }
+        }
+      }
+
+      // Right Column Content
+      .hero-right-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        height: 100%;
+
+        .filters-card-hero {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+          .filters-row {
+            .filter-select {
+              width: 100%;
+
+              ::ng-deep .mat-mdc-form-field {
+                font-size: 14px;
+                background-color: white;
+                border-radius: 8px;
+              }
+
+              ::ng-deep .mat-mdc-select {
+                color: #333;
+              }
+
+              ::ng-deep .mat-mdc-form-field-outline {
+                color: rgba(0, 0, 0, 0.3);
+              }
+
+              ::ng-deep .mat-mdc-floating-label {
+                color: rgba(0, 0, 0, 0.6);
+              }
+
+              // Estilos para los íconos en las opciones
+              ::ng-deep .mat-mdc-option {
+                .option-icon {
+                  margin-right: 8px;
+                  font-size: 18px;
+                  width: 18px;
+                  height: 18px;
+                  color: #1976d2;
+                  vertical-align: middle;
+                }
+              }
+            }
+          }
+
+          .search-container-hero {
+            margin-top: 16px;
+
+            .filter-label-chips {
+              display: block;
+              font-size: 14px;
+              font-weight: 600;
+              color: #333;
+              margin-bottom: 8px;
+            }
+
+            .search-field-hero {
+              width: 100%;
+
+              ::ng-deep .mat-mdc-form-field {
+                font-size: 14px;
+                background-color: white;
+                border-radius: 8px;
+              }
+
+              ::ng-deep .mat-mdc-form-field-outline {
+                color: rgba(0, 0, 0, 0.3);
+              }
+
+              ::ng-deep .mat-mdc-floating-label {
+                color: rgba(0, 0, 0, 0.6);
+              }
+            }
+
+            .search-results-hero {
+              margin-top: 8px;
+
+              .results-count {
+                font-size: 12px;
+                color: #666;
+                font-style: italic;
+              }
+            }
+          }
+        }
+      }
+
+      // Standings Stats Compact
+      .standings-stats-compact {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        background: transparent;
+        padding: 16px;
+
+        .stat-item-compact {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1;
+          min-width: 0;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            color: white;
+            flex-shrink: 0;
+          }
+
+          .stat-content-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+
+            .stat-label-compact {
+              font-size: 11px;
+              color: rgba(255, 255, 255, 0.8);
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              line-height: 1;
+            }
+
+            .stat-value-compact {
+              font-size: 18px;
+              font-weight: 700;
+              color: white;
+              line-height: 1.2;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .hero-right-section {
+    background: transparent;
+    padding: 0 !important;
+  }
+
+  // Content Wrapper
+  .content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    background-color: transparent;
+  }
+
+  // Main Content Layout
+  .main-content-layout {
+    .row {
+      align-items: stretch; // Hacer que las columnas tengan la misma altura
+    }
+
+    // Full height card for scorers
+    .full-height {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .scorers-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    // Compact Scorers Design
+    .scorers-list-compact {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+
+      .scorer-card-compact {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+        min-height: 60px;
+
+        &:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          transform: translateY(-1px);
+        }
+
+        .scorer-position-compact {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          background: #f5f5f5;
+          color: #757575;
+          flex-shrink: 0;
+
+          &.position-gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+          }
+
+          &.position-silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(192, 192, 192, 0.3);
+          }
+
+          &.position-bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #d4a574 100%);
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(205, 127, 50, 0.3);
+          }
+        }
+
+        .scorer-info-compact {
+          flex: 1;
+          min-width: 0;
+
+          .scorer-name-compact {
+            font-size: 13px;
+            font-weight: 600;
+            color: #212121;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .scorer-team-compact {
+            font-size: 11px;
+            color: #757575;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .scorer-stats-compact {
+          display: flex;
+          gap: 8px;
+          flex-shrink: 0;
+
+          .stat-item-compact {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+
+            .stat-icon-compact {
+              font-size: 14px;
+              width: 14px;
+              height: 14px;
+              color: #1976d2;
+            }
+
+            .stat-value-compact {
+              font-size: 12px;
+              font-weight: 600;
+              color: #212121;
+              min-width: 20px;
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+
+    // Section headers
+    .section-icon {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+  }
 
   .page-header {
     display: flex;
@@ -278,7 +689,7 @@
           min-width: 200px;
           padding: 1rem 1.5rem;
           font-weight: 500;
-          
+
           .tab-icon {
             margin-right: 0.5rem;
           }
@@ -506,7 +917,7 @@
 
     .search-results {
       padding: 0.5rem 0;
-      
+
       .results-count {
         font-size: 0.875rem;
         color: #757575;

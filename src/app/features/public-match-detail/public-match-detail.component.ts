@@ -11,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { PublicLoadingComponent } from '../../shared/components/public-loading/public-loading.component';
 import { PublicMatchDetailService } from './services/public-match-detail.service';
+import { MatchStatusType } from '../../core/services/match.service';
 import { 
   PublicMatchDetailResponse, 
   MatchInfo, 
@@ -72,11 +73,11 @@ interface Match {
   homeScore: number;
   awayScore: number;
   date: Date;
-  venue: string;
-  matchday: number;
-  status: 'upcoming' | 'live' | 'finished';
-  homeFormation: string;
-  awayFormation: string;
+  venue: string | null;
+  matchday: number | null;
+  status: MatchStatusType;
+  homeFormation: string | null;
+  awayFormation: string | null;
   homeLineup: Player[];
   awayLineup: Player[];
   events: MatchEvent[];
@@ -115,6 +116,9 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   // Propiedades para la nueva estructura
   lineups: any = null;
   events: MatchEvent[] = [];
+  
+  // Control de visualización de estado
+  hasValidStatus = false;
 
   private destroy$ = new Subject<void>();
 
@@ -150,6 +154,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
    * Inicializa datos por defecto para mostrar la vista mientras carga
    */
   private initializeDefaultData(): void {
+    // Los datos por defecto no tienen estado válido del API
+    this.hasValidStatus = false;
     // Crear match por defecto con imágenes por defecto
     this.match = {
       id: 0,
@@ -168,11 +174,11 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       homeScore: 0,
       awayScore: 0,
       date: new Date(),
-      venue: 'Estadio por definir',
-      matchday: 1,
-      status: 'upcoming',
-      homeFormation: '',
-      awayFormation: '',
+      venue: null,
+      matchday: null,
+      status: MatchStatusType.scheduled,
+      homeFormation: null,
+      awayFormation: null,
       homeLineup: [],
       awayLineup: [],
       events: [],
@@ -263,11 +269,11 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       homeScore: matchInfo.homeScore,
       awayScore: matchInfo.awayScore,
       date: new Date(matchInfo.matchDate),
-      venue: 'Estadio', // No viene en el API, usar valor por defecto
-      matchday: parseInt(matchInfo.matchDayName.replace(/\D/g, '')) || 1,
+      venue: matchInfo.venue || null, // Solo mostrar si viene del API
+      matchday: parseInt(matchInfo.matchDayName.replace(/\D/g, '')) || null,
       status: this.determineMatchStatus(matchInfo),
-      homeFormation: '', // No mostrar formación por defecto
-      awayFormation: '', // No mostrar formación por defecto
+      homeFormation: matchInfo.homeFormation || null, // Solo mostrar si viene del API
+      awayFormation: matchInfo.awayFormation || null, // Solo mostrar si viene del API
       homeLineup: this.processLineup(result.homeTeamLineUp, 'home'),
       awayLineup: this.processLineup(result.awayTeamLineUp, 'away'),
       events: this.processEvents(result.events),
@@ -313,17 +319,18 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   /**
    * Determina el estado del partido basado en la información
    */
-  private determineMatchStatus(matchInfo: any): 'upcoming' | 'live' | 'finished' {
-    const matchDate = new Date(matchInfo.matchDate);
-    const now = new Date();
-    
-    if (matchInfo.homeScore > 0 || matchInfo.awayScore > 0) {
-      return 'finished';
-    } else if (matchDate <= now) {
-      return 'live';
-    } else {
-      return 'upcoming';
+  private determineMatchStatus(matchInfo: any): MatchStatusType {
+    // Si el API proporciona el status directamente, usarlo y marcarlo como válido
+    if (matchInfo.status !== undefined && matchInfo.status !== null) {
+      this.hasValidStatus = true;
+      return matchInfo.status as MatchStatusType;
     }
+    
+    // Si no viene del API, no mostrar estado (marcar como inválido)
+    this.hasValidStatus = false;
+    
+    // Retornar un valor por defecto pero que no se mostrará
+    return MatchStatusType.scheduled;
   }
 
   /**
@@ -414,6 +421,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
    * Carga datos dummy del partido
    */
   private loadDummyMatch(): void {
+    // Los datos dummy tienen un estado válido para demostración
+    this.hasValidStatus = true;
     this.match = {
       id: this.matchId,
       homeTeam: {
@@ -433,7 +442,7 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       date: new Date('2024-10-15T20:00:00'),
       venue: 'Estadio Santiago Bernabéu',
       matchday: 10,
-      status: 'finished',
+      status: MatchStatusType.played,
       homeFormation: '4-3-3',
       awayFormation: '4-4-2',
       homeLineup: this.generateLineup('home', '4-3-3'),
@@ -703,24 +712,53 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Obtiene el estado del partido
+   * Verifica si el estado del partido debe mostrarse
    */
-  getMatchStatus(): string {
-    if (!this.match) return '';
-    
-    const statuses: { [key: string]: string } = {
-      upcoming: 'PRÓXIMO',
-      live: 'EN VIVO',
-      finished: 'FINALIZADO'
-    };
-    return statuses[this.match.status] || '';
+  shouldShowMatchStatus(): boolean {
+    return this.match !== null && this.hasValidStatus;
   }
 
   /**
-   * Obtiene la clase del estado
+   * Obtiene el estado del partido basado en MatchStatusType
+   */
+  getMatchStatus(): string {
+    if (!this.match || !this.hasValidStatus) return '';
+    
+    switch (this.match.status) {
+      case MatchStatusType.scheduled:
+        return 'PROGRAMADO';
+      case MatchStatusType.inProgress:
+        return 'EN VIVO';
+      case MatchStatusType.played:
+        return 'JUGADO';
+      case MatchStatusType.canceled:
+        return 'CANCELADO ELIMINADO';
+      case MatchStatusType.postponed:
+        return 'POSTERGADO';
+      default:
+        return 'DESCONOCIDO';
+    }
+  }
+
+  /**
+   * Obtiene la clase CSS del estado basada en MatchStatusType
    */
   getStatusClass(): string {
     if (!this.match) return '';
-    return `status-${this.match.status}`;
+    
+    switch (this.match.status) {
+      case MatchStatusType.scheduled:
+        return 'status-scheduled';
+      case MatchStatusType.inProgress:
+        return 'status-live';
+      case MatchStatusType.played:
+        return 'status-completed';
+      case MatchStatusType.canceled:
+        return 'status-cancelled';
+      case MatchStatusType.postponed:
+        return 'status-postponed';
+      default:
+        return 'status-unknown';
+    }
   }
 }

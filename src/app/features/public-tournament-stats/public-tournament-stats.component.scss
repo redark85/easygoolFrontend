@@ -1,11 +1,7 @@
-.public-tournament-stats-container {
+﻿.public-tournament-stats-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
+  position: relative;
 
   // Loading
   .loading-container {
@@ -15,665 +11,836 @@
     justify-content: center;
     min-height: 60vh;
     color: white;
+    gap: 1rem;
 
     .loading-text {
-      margin-top: 1rem;
       font-size: 1.125rem;
       font-weight: 500;
+      margin: 0;
     }
   }
 
   // Tournament Stats Content
   .tournament-stats-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    position: relative;
-
-    // Back Button
-    .back-button {
-      position: absolute;
-      top: -3.5rem;
-      left: 0;
-      background-color: rgba(255, 255, 255, 0.2);
-      color: white;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-4px);
-      }
-
-      @media (max-width: 768px) {
-        top: -2.5rem;
-      }
-    }
-
-    // Page Header
-    .page-header {
+    // Hero Section
+    .hero-section {
+      position: relative;
+      min-height: 350px;
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      color: white;
+      overflow: hidden;
       margin-bottom: 2rem;
-      padding: 2rem;
-      background-color: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
-      @media (max-width: 768px) {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
+      .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+
+        .wallpaper-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .hero-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg,
+            rgba(25, 118, 210, 0.8) 0%,
+            rgba(21, 101, 192, 0.9) 100%);
+        }
       }
 
-      .header-icon {
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+      .back-button-container {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        z-index: 10;
 
-        mat-icon {
-          font-size: 48px;
-          width: 48px;
-          height: 48px;
+        .back-button {
+          background-color: rgba(255, 255, 255, 0.2);
           color: white;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+          }
         }
       }
 
-      .header-content {
-        flex: 1;
+      .container-fluid {
+        position: relative;
+        z-index: 5;
+        padding: 2rem 3rem;
+        margin-left: 2rem;
+        height: 100%;
 
-        h1 {
-          margin: 0 0 0.5rem 0;
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #1a202c;
-
-          @media (max-width: 768px) {
-            font-size: 2rem;
-          }
+        .row {
+          height: 100%;
+          align-items: stretch;
         }
 
-        p {
-          margin: 0;
-          font-size: 1.125rem;
-          color: #718096;
-        }
-      }
-    }
-
-    // Stats Overview
-    .stats-overview {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-
-      .stat-card {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        transition: transform 0.2s ease;
-
-        &:hover {
-          transform: translateY(-4px);
-        }
-
-        .stat-icon {
-          width: 48px;
-          height: 48px;
-          font-size: 48px;
-          color: #667eea;
-
-          &.goals {
-            color: #48bb78;
-          }
-
-          &.yellow {
-            color: #ed8936;
-          }
-
-          &.red {
-            color: #f56565;
-          }
-
-          &.penalty {
-            color: #9f7aea;
-          }
-        }
-
-        .stat-content {
+        .col-lg-7 {
           display: flex;
           flex-direction: column;
-
-          .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1a202c;
-            line-height: 1;
-          }
-
-          .stat-label {
-            font-size: 0.875rem;
-            color: #718096;
-            margin-top: 0.5rem;
-          }
-
-          .stat-detail {
-            font-size: 0.813rem;
-            color: #4a5568;
-            margin-top: 0.25rem;
-          }
+          justify-content: center;
         }
-      }
-    }
 
-    // Tabs Card
-    .tabs-card {
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-
-      ::ng-deep {
-        .mat-mdc-tab-group {
-          .mat-mdc-tab-header {
-            background-color: #f7fafc;
-            border-bottom: 2px solid #e2e8f0;
-          }
-
-          .mat-mdc-tab-labels {
-            .mat-mdc-tab {
-              min-width: 120px;
-              font-weight: 600;
-              color: #4a5568;
-
-              &.mat-mdc-tab-active {
-                color: #667eea;
-              }
-            }
-          }
-
-          .mat-mdc-tab-body-wrapper {
-            padding: 2rem;
-
-            @media (max-width: 768px) {
-              padding: 1rem;
-            }
-          }
-        }
-      }
-
-      // Records Section
-      .records-section {
-        .section-title {
+        .tournament-icon-container {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          margin: 0 0 2rem 0;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #1a202c;
+          justify-content: center;
+          width: 140px;
+          height: 140px;
+          background: transparent;
+          border-radius: 24px;
+          backdrop-filter: blur(10px);
+          border: none;
+          overflow: hidden;
 
-          mat-icon {
-            color: #667eea;
+          .tournament-icon-hero {
+            font-size: 80px;
+            width: 80px;
+            height: 80px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
           }
         }
 
-        .tournament-records {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 1.5rem;
-
-          .record-card {
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-
-            &:hover {
-              transform: translateY(-4px);
-              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            }
-
-            &.highlight {
-              background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-              border-color: #fc8181;
-            }
-
-            .record-icon {
-              width: 60px;
-              height: 60px;
-              margin: 0 auto 1rem;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background-color: #667eea;
-              border-radius: 50%;
-
-              mat-icon {
-                font-size: 32px;
-                width: 32px;
-                height: 32px;
-                color: white;
-              }
-            }
-
-            h3 {
-              margin: 0 0 1rem 0;
-              font-size: 1rem;
-              font-weight: 600;
-              color: #718096;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-
-            .record-value {
-              margin: 0 0 0.5rem 0;
-              font-size: 2.5rem;
+        .tournament-info {
+          .tournament-header {
+            .tournament-title {
+              font-size: 3.5rem;
               font-weight: 700;
-              color: #1a202c;
-              line-height: 1;
+              margin: 0;
+              color: white;
+              text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             }
 
-            .record-detail {
-              margin: 0.5rem 0;
-              font-size: 1.125rem;
-              font-weight: 600;
-              color: #4a5568;
-            }
-
-            .record-date,
-            .record-period,
-            .record-average,
-            .record-goalkeeper,
-            .record-score {
+            .tournament-subtitle {
+              font-size: 1.4rem;
               margin: 0.5rem 0 0 0;
-              font-size: 0.875rem;
-              color: #718096;
-            }
-
-            .fair-play-stats {
-              display: flex;
-              justify-content: center;
-              gap: 1rem;
-              margin-top: 1rem;
-              font-size: 1.125rem;
-              font-weight: 600;
-
-              .yellow-stat {
-                color: #ed8936;
-              }
-
-              .red-stat {
-                color: #f56565;
-              }
+              color: white;
+              opacity: 0.9;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             }
           }
         }
-      }
 
-      // Charts Section
-      .charts-section {
-        .chart-container {
-          margin-bottom: 3rem;
+        // Tournament Meta
+        .tournament-meta-hero {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1.5rem;
+          margin-top: 0.5rem;
 
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          .chart-title {
+          .meta-item-hero {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin: 0 0 1rem 0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1a202c;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.9;
 
             mat-icon {
-              color: #667eea;
+              font-size: 1rem;
+              width: 1rem;
+              height: 1rem;
+              color: rgba(255, 255, 255, 0.8);
+            }
+
+            span {
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             }
           }
+        }
 
-          .chart-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+        .hero-right-section {
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          min-height: 100%;
+          padding-top: 1rem;
 
-            .chart-stat {
-              font-size: 0.938rem;
-              color: #4a5568;
+          .hero-right-content {
+            width: 100%;
+            display: block;
+            padding: 0 1rem;
+            box-sizing: border-box;
 
-              strong {
-                color: #1a202c;
+            // Asegurar altura uniforme en filas
+            .row {
+              .col-6 {
+                display: flex;
+                align-items: stretch;
+                width: 100%;
+                max-width: none;
+                flex: 1;
               }
             }
-          }
 
-          // Bar Chart
-          .bar-chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 0.5rem;
-            padding: 2rem 1rem;
-            background-color: #f7fafc;
-            border-radius: 12px;
-            min-height: 300px;
-            overflow-x: auto;
-
-            .bar-item {
-              flex: 1;
+            // Summary Sections Mini
+            .summary-section-mini {
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 12px;
+              padding: 0.75rem;
+              backdrop-filter: blur(10px);
+              transition: all 0.3s ease;
+              height: 100%;
+              width: 100%;
               display: flex;
               flex-direction: column;
-              align-items: center;
-              min-width: 40px;
+              box-sizing: border-box;
 
-              .bar-wrapper {
-                width: 100%;
-                height: 250px;
-                display: flex;
-                align-items: flex-end;
-                justify-content: center;
-
-                .bar {
-                  width: 100%;
-                  max-width: 40px;
-                  border-radius: 8px 8px 0 0;
-                  transition: all 0.3s ease;
-                  display: flex;
-                  align-items: flex-start;
-                  justify-content: center;
-                  padding-top: 0.5rem;
-                  cursor: pointer;
-
-                  &:hover {
-                    opacity: 0.8;
-                    transform: scaleY(1.05);
-                  }
-
-                  .bar-value {
-                    font-size: 0.813rem;
-                    font-weight: 700;
-                    color: white;
-                  }
-                }
+              &:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-1px);
               }
 
-              .bar-label {
-                margin-top: 0.5rem;
-                font-size: 0.813rem;
-                color: #718096;
-                font-weight: 600;
-              }
-            }
-          }
-
-          // Result Distribution
-          .result-distribution {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-
-            .result-item {
-              display: flex;
-              align-items: center;
-              gap: 1rem;
-
-              .result-bar {
+              h4 {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                padding: 1rem 1.5rem;
-                border-radius: 8px;
-                transition: all 0.3s ease;
-                color: white;
+                gap: 0.4rem;
+                margin: 0 0 0.75rem 0;
+                font-size: 0.875rem;
                 font-weight: 600;
-                min-width: 200px;
+                color: white;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+                flex-shrink: 0;
 
-                &:hover {
-                  transform: translateX(4px);
-                }
-
-                .result-label {
+                mat-icon {
                   font-size: 1rem;
-                }
-
-                .result-value {
-                  font-size: 1.5rem;
-                  font-weight: 700;
+                  width: 1rem;
+                  height: 1rem;
+                  color: rgba(255, 255, 255, 0.9);
                 }
               }
 
-              .result-percentage {
-                font-size: 1.125rem;
-                font-weight: 700;
-                color: #1a202c;
-                min-width: 60px;
-              }
-
-              &.home .result-bar {
-                background-color: #48bb78;
-              }
-
-              &.draw .result-bar {
-                background-color: #ed8936;
-              }
-
-              &.away .result-bar {
-                background-color: #4299e1;
-              }
-            }
-          }
-
-          // Attendance Chart
-          .attendance-chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 0.5rem;
-            padding: 2rem 1rem;
-            background-color: #f7fafc;
-            border-radius: 12px;
-            min-height: 300px;
-            overflow-x: auto;
-
-            .attendance-item {
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              min-width: 40px;
-
-              .attendance-bar-wrapper {
-                position: relative;
-                width: 100%;
-                max-width: 40px;
-                height: 250px;
+              .stat-display-mini {
                 display: flex;
-                align-items: flex-end;
+                flex-direction: column;
+                align-items: center;
+                flex: 1;
                 justify-content: center;
 
-                .attendance-bar {
-                  position: absolute;
-                  bottom: 0;
-                  width: 100%;
-                  border-radius: 8px 8px 0 0;
+                .number-mini {
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  color: white;
+                  line-height: 1;
+                  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+                }
 
-                  &.capacity {
-                    height: 100%;
-                    background-color: #e2e8f0;
-                  }
+                .label-mini {
+                  font-size: 0.75rem;
+                  color: rgba(255, 255, 255, 0.8);
+                  margin-top: 0.25rem;
+                  font-weight: 500;
+                }
+              }
 
-                  &.filled {
-                    background-color: #667eea;
-                    transition: all 0.3s ease;
-                    cursor: pointer;
+              .detail-mini {
+                font-size: 0.7rem;
+                color: rgba(255, 255, 255, 0.7);
+                text-align: center;
+                margin-top: 0.5rem;
+              }
 
-                    &:hover {
-                      background-color: #5568d3;
+              // Cards Stats Mini
+              &.cards {
+                .cards-stats-mini {
+                  display: flex;
+                  justify-content: space-around;
+                  align-items: center;
+                  flex: 1;
+                  gap: 0.5rem;
+
+                  .card-stat {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    .number-mini {
+                      font-size: 1.25rem;
+                      font-weight: 700;
+                      color: white;
+                      line-height: 1;
+                      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+                    }
+
+                    .label-mini {
+                      font-size: 1rem;
+                      margin-top: 0.25rem;
+                    }
+
+                    &.yellow .number-mini {
+                      color: #fbbf24;
+                    }
+
+                    &.red .number-mini {
+                      color: #f87171;
                     }
                   }
                 }
               }
+            }
 
-              .attendance-label {
-                margin-top: 0.5rem;
-                font-size: 0.813rem;
-                color: #718096;
-                font-weight: 600;
+            // Responsive Design
+            @media (max-width: 991px) {
+              padding: 0;
+              margin-top: 1.5rem;
+
+              .row {
+                margin: 0;
+
+                .col-6 {
+                  display: flex;
+                  align-items: stretch;
+                  width: 100%;
+                  max-width: none;
+                  flex: 1;
+                }
+              }
+
+              .summary-section-mini {
+                margin-bottom: 0.75rem;
+                height: 100%;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Main Content Section
+    .main-content-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      background: transparent;
+      border-radius: 12px;
+      box-shadow: none;
+
+      .container-fluid {
+        padding: 0;
+      }
+
+      .row {
+        margin: 0;
+        min-height: 600px;
+        align-items: stretch;
+      }
+
+      // Left Column: Records & Scorers (8 columns)
+      .col-lg-8 {
+        display: flex;
+        flex-direction: column;
+        padding-right: 2rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+
+        // Records Section
+        .records-section-main {
+          margin-bottom: 2rem;
+
+          .section-header {
+            margin-bottom: 1.5rem;
+
+            h3 {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              margin: 0;
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: white;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+
+              mat-icon {
+                color: white;
+              }
+            }
+          }
+
+          .tournament-records-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+
+            .record-card-mini {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              padding: 1rem;
+              background-color: rgba(255, 255, 255, 0.95);
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              transition: all 0.3s ease;
+
+              &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+              }
+
+              &.highlight {
+                background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+                border: 1px solid #fc8181;
+              }
+
+              .record-icon-mini {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #667eea;
+                border-radius: 50%;
+                flex-shrink: 0;
+
+                mat-icon {
+                  font-size: 20px;
+                  width: 20px;
+                  height: 20px;
+                  color: white;
+                }
+              }
+
+              .record-content-mini {
+                flex: 1;
+                min-width: 0;
+
+                h4 {
+                  margin: 0 0 0.25rem 0;
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  color: #718096;
+                  text-transform: uppercase;
+                }
+
+                .record-value-mini {
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  color: #1a202c;
+                  line-height: 1;
+                  margin: 0;
+                }
+
+                .record-detail-mini {
+                  font-size: 0.813rem;
+                  color: #4a5568;
+                  margin: 0.25rem 0 0 0;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+
+                .fair-play-mini {
+                  display: flex;
+                  gap: 0.5rem;
+                  margin-top: 0.25rem;
+                  font-size: 0.813rem;
+                  font-weight: 600;
+
+                  span {
+                    color: #4a5568;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Scorers Section
+        .scorers-section-main {
+          .section-header {
+            margin-bottom: 1.5rem;
+
+            h3 {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              margin: 0;
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: white;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+
+              mat-icon {
+                color: white;
+              }
+            }
+          }
+
+          .scorers-list-mini {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+
+            .scorer-item-mini {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              padding: 1rem;
+              background-color: rgba(255, 255, 255, 0.95);
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+              transition: all 0.3s ease;
+              border-left: 3px solid #e2e8f0;
+
+              &:hover {
+                transform: translateX(4px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+              }
+
+              &.top1 {
+                border-left-color: #ffd700;
+                background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+              }
+
+              &.top2 {
+                border-left-color: #c0c0c0;
+                background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
+              }
+
+              &.top3 {
+                border-left-color: #cd7f32;
+                background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+              }
+
+              .scorer-position-mini {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 50px;
+
+                .position-number-mini {
+                  font-size: 1.125rem;
+                  font-weight: 700;
+                  color: #1a202c;
+                }
+
+                .trophy-mini {
+                  font-size: 18px;
+                  width: 18px;
+                  height: 18px;
+
+                  &.trophy-1 {
+                    color: #ffd700;
+                  }
+
+                  &.trophy-2 {
+                    color: #c0c0c0;
+                  }
+
+                  &.trophy-3 {
+                    color: #cd7f32;
+                  }
+                }
+              }
+
+              .scorer-info-mini {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+
+                .scorer-name-mini {
+                  font-size: 0.938rem;
+                  font-weight: 600;
+                  color: #1a202c;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+
+                .scorer-team-mini {
+                  font-size: 0.813rem;
+                  color: #718096;
+                  margin-top: 0.125rem;
+                }
+              }
+
+              .scorer-stats-mini {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+
+                .goals-mini,
+                .matches-mini {
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  color: #667eea;
+                  white-space: nowrap;
+                }
               }
             }
           }
         }
       }
 
-      // Scorers Section
-      .scorers-section {
-        .section-title {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin: 0 0 2rem 0;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #1a202c;
+      // Right Column: Charts & Analysis (4 columns)
+      .col-lg-4 {
+        display: flex;
+        flex-direction: column;
+        padding-left: 2rem;
 
-          mat-icon {
-            color: #667eea;
-          }
-        }
-
-        .scorers-list {
+        .right-column-content {
+          height: 100%;
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 2rem;
 
-          .scorer-item {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            background-color: white;
+          // Chart Section
+          .chart-section-mini {
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
-            border-left: 4px solid #e2e8f0;
+            padding: 1.5rem;
+            flex: 1;
 
-            &:hover {
-              transform: translateX(4px);
-              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-            }
+            .section-header {
+              margin-bottom: 1rem;
 
-            &.top1 {
-              border-left-color: #ffd700;
-              background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-            }
-
-            &.top2 {
-              border-left-color: #c0c0c0;
-              background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
-            }
-
-            &.top3 {
-              border-left-color: #cd7f32;
-              background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-            }
-
-            .scorer-position {
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-              min-width: 60px;
-
-              .position-number {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #1a202c;
-              }
-
-              .trophy {
-                font-size: 28px;
-                width: 28px;
-                height: 28px;
-
-                &.gold {
-                  color: #ffd700;
-                }
-
-                &.silver {
-                  color: #c0c0c0;
-                }
-
-                &.bronze {
-                  color: #cd7f32;
-                }
-              }
-            }
-
-            .scorer-info {
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-
-              .scorer-name {
-                font-size: 1.125rem;
-                font-weight: 700;
-                color: #1a202c;
-              }
-
-              .scorer-team {
-                font-size: 0.938rem;
-                color: #718096;
-                margin-top: 0.25rem;
-              }
-            }
-
-            .scorer-stats {
-              display: flex;
-              gap: 1.5rem;
-              align-items: center;
-
-              @media (max-width: 768px) {
-                flex-direction: column;
-                gap: 0.5rem;
-                align-items: flex-end;
-              }
-
-              .stat-item {
+              h4 {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
+                margin: 0;
+                font-size: 1.125rem;
+                font-weight: 700;
+                color: #1a202c;
+
+                mat-icon {
+                  color: #667eea;
+                }
+              }
+            }
+
+            .chart-mini-container {
+              .chart-stats-mini {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1rem;
+                font-size: 0.875rem;
+                color: #4a5568;
+              }
+
+              .bar-chart-mini {
+                display: flex;
+                align-items: flex-end;
+                gap: 0.25rem;
+                padding: 1rem;
+                background-color: #f7fafc;
+                border-radius: 8px;
+                min-height: 120px;
+
+                .bar-item-mini {
+                  flex: 1;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  min-width: 20px;
+
+                  .bar-mini {
+                    width: 100%;
+                    max-width: 20px;
+                    border-radius: 4px 4px 0 0;
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+
+                    &:hover {
+                      opacity: 0.8;
+                    }
+                  }
+
+                  .bar-label-mini {
+                    margin-top: 0.25rem;
+                    font-size: 0.7rem;
+                    color: #718096;
+                    font-weight: 600;
+                  }
+                }
+              }
+            }
+          }
+
+          // Distribution Section
+          .distribution-section-mini {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            flex: 1;
+
+            .section-header {
+              margin-bottom: 1rem;
+
+              h4 {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin: 0;
+                font-size: 1.125rem;
+                font-weight: 700;
+                color: #1a202c;
+
+                mat-icon {
+                  color: #667eea;
+                }
+              }
+            }
+
+            .result-distribution-mini {
+              display: flex;
+              flex-direction: column;
+              gap: 0.75rem;
+
+              .result-item-mini {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.75rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+
+                &:hover {
+                  transform: translateX(2px);
+                }
+
+                .result-info-mini {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+
+                  mat-icon {
+                    font-size: 18px;
+                    width: 18px;
+                    height: 18px;
+                  }
+
+                  .result-label-mini {
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    color: #1a202c;
+                  }
+                }
+
+                .result-stats-mini {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+
+                  .result-value-mini {
+                    font-size: 1.125rem;
+                    font-weight: 700;
+                    color: #1a202c;
+                  }
+
+                  .result-percentage-mini {
+                    font-size: 0.875rem;
+                    color: #718096;
+                  }
+                }
+
+                &.home {
+                  background-color: #f0fdf4;
+
+                  mat-icon {
+                    color: #48bb78;
+                  }
+                }
+
+                &.draw {
+                  background-color: #fffbeb;
+
+                  mat-icon {
+                    color: #ed8936;
+                  }
+                }
+
+                &.away {
+                  background-color: #eff6ff;
+
+                  mat-icon {
+                    color: #4299e1;
+                  }
+                }
+              }
+            }
+          }
+
+          // Insights Section
+          .insights-section-mini {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            flex: 1;
+
+            .section-header {
+              margin-bottom: 1rem;
+
+              h4 {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin: 0;
+                font-size: 1.125rem;
+                font-weight: 700;
+                color: #1a202c;
+
+                mat-icon {
+                  color: #667eea;
+                }
+              }
+            }
+
+            .insights-grid-mini {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 0.75rem;
+
+              .insight-item-mini {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem;
+                background-color: #f7fafc;
+                border-radius: 8px;
 
                 mat-icon {
                   font-size: 20px;
                   width: 20px;
                   height: 20px;
                   color: #667eea;
+                  flex-shrink: 0;
                 }
 
-                .stat-value {
-                  font-size: 1.125rem;
-                  font-weight: 700;
-                  color: #1a202c;
-                }
+                .insight-content-mini {
+                  display: flex;
+                  flex-direction: column;
 
-                &.average {
-                  .stat-label {
-                    font-size: 0.875rem;
-                    color: #718096;
+                  .insight-value-mini {
+                    font-size: 1.125rem;
+                    font-weight: 700;
+                    color: #1a202c;
+                    line-height: 1;
                   }
 
-                  .stat-value {
-                    font-size: 1rem;
-                    color: #667eea;
+                  .insight-label-mini {
+                    font-size: 0.7rem;
+                    color: #718096;
+                    margin-top: 0.125rem;
                   }
                 }
               }
@@ -682,158 +849,139 @@
         }
       }
 
-      // Analysis Section
-      .analysis-section {
-        .section-title {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin: 0 0 2rem 0;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #1a202c;
+      // Responsive Design
+      @media (max-width: 991px) {
+        padding: 1rem;
 
-          mat-icon {
-            color: #667eea;
+        .row {
+          flex-direction: column;
+          min-height: auto;
+        }
+
+        .col-lg-8 {
+          padding-right: 0;
+          border-right: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+          padding-bottom: 2rem;
+          margin-bottom: 2rem;
+
+          .tournament-records-grid {
+            grid-template-columns: 1fr;
           }
         }
 
-        .analysis-card {
-          padding: 2rem;
-          background-color: #f7fafc;
-          border-radius: 12px;
-          margin-bottom: 2rem;
+        .col-lg-4 {
+          padding-left: 0;
 
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          h4 {
-            margin: 0 0 1.5rem 0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1a202c;
-          }
-
-          // Venue Stats
-          .venue-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          .right-column-content {
             gap: 1.5rem;
 
-            .venue-stat {
-              display: flex;
-              align-items: center;
-              gap: 1rem;
-              padding: 1.5rem;
-              background-color: white;
-              border-radius: 12px;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            .chart-section-mini,
+            .distribution-section-mini,
+            .insights-section-mini {
+              padding: 1rem;
+            }
 
-              mat-icon {
-                font-size: 40px;
-                width: 40px;
-                height: 40px;
+            .insights-section-mini {
+              .insights-grid-mini {
+                grid-template-columns: 1fr;
+              }
+            }
+          }
+        }
+      }
+
+      @media (max-width: 576px) {
+        padding: 0.5rem;
+
+        .col-lg-8 {
+          .tournament-records-grid {
+            .record-card-mini {
+              flex-direction: column;
+              text-align: center;
+              gap: 0.75rem;
+            }
+          }
+
+          .scorers-list-mini {
+            .scorer-item-mini {
+              flex-direction: column;
+              text-align: center;
+              gap: 0.75rem;
+
+              .scorer-stats-mini {
+                justify-content: center;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Responsive Design for Hero
+    @media (max-width: 991.98px) {
+      .hero-section {
+        min-height: 280px;
+
+        .container-fluid {
+          padding: 1.5rem 2rem;
+          margin-left: 1rem;
+
+          .tournament-icon-container {
+            width: 100px;
+            height: 100px;
+
+            .tournament-icon-hero {
+              font-size: 60px;
+              width: 60px;
+              height: 60px;
+            }
+          }
+
+          .tournament-info {
+            .tournament-header {
+              .tournament-title {
+                font-size: 2.5rem;
               }
 
-              .venue-content {
-                display: flex;
-                flex-direction: column;
-
-                .venue-label {
-                  font-size: 0.938rem;
-                  color: #718096;
-                }
-
-                .venue-value {
-                  font-size: 2rem;
-                  font-weight: 700;
-                  color: #1a202c;
-                  margin-top: 0.25rem;
-                }
-              }
-
-              &.home mat-icon {
-                color: #48bb78;
-              }
-
-              &.draw mat-icon {
-                color: #ed8936;
-              }
-
-              &.away mat-icon {
-                color: #4299e1;
+              .tournament-subtitle {
+                font-size: 1.1rem;
               }
             }
           }
 
-          // Insights Grid
-          .insights-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
+          .tournament-meta-hero {
+            gap: 0.5rem;
+            margin-top: 1rem;
 
-            .insight-item {
-              display: flex;
-              gap: 1rem;
-              padding: 1.5rem;
-              background-color: white;
-              border-radius: 12px;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            .meta-item-hero {
+              font-size: 0.8rem;
 
               mat-icon {
-                font-size: 36px;
-                width: 36px;
-                height: 36px;
-                color: #667eea;
-                flex-shrink: 0;
-              }
-
-              .insight-content {
-                display: flex;
-                flex-direction: column;
-
-                .insight-label {
-                  font-size: 0.875rem;
-                  color: #718096;
-                  margin-bottom: 0.5rem;
-                }
-
-                .insight-value {
-                  font-size: 1.75rem;
-                  font-weight: 700;
-                  color: #1a202c;
-                  line-height: 1;
-                }
-
-                .insight-description {
-                  font-size: 0.813rem;
-                  color: #4a5568;
-                  margin-top: 0.25rem;
-                }
+                font-size: 0.9rem;
+                width: 0.9rem;
+                height: 0.9rem;
               }
             }
           }
+        }
+      }
+    }
 
-          // Summary
-          &.summary {
-            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+    @media (max-width: 576px) {
+      .hero-section {
+        .container-fluid {
+          padding: 1rem;
+          margin-left: 0;
 
-            .summary-text {
-              font-size: 1rem;
-              line-height: 1.8;
-              color: #1a202c;
-              margin-bottom: 1rem;
+          .row {
+            flex-direction: column;
+            text-align: center;
+          }
 
-              &:last-child {
-                margin-bottom: 0;
-              }
-
-              strong {
-                color: #667eea;
-                font-weight: 700;
-              }
-            }
+          .tournament-meta-hero {
+            justify-content: center;
+            flex-wrap: wrap;
           }
         }
       }
