@@ -197,259 +197,203 @@
       </div>
     </section>
 
-    <!-- Tabs Section -->
-    <mat-card class="tabs-card">
-      <mat-tab-group animationDuration="300ms">
-        <!-- Tab: Plantilla -->
-        <mat-tab label="Plantilla">
-          <div class="team-roster">
-            <div class="roster-header">
-              <h3>
-                <mat-icon>groups</mat-icon>
-                Plantilla Completa
-              </h3>
-              <p class="roster-count">{{ team.totalPlayers }} jugadores registrados</p>
-            </div>
+    <!-- Main Content Section -->
+    <div class="main-content-section">
+      <div class="container-fluid">
+        <div class="row">
+          <!-- Left Column: Team Roster (7 columns) -->
+          <div class="col-lg-7">
+            <div class="team-roster-section">
+              <div class="roster-header">
+                <h3>
+                  <mat-icon>groups</mat-icon>
+                  Plantilla Completa
+                </h3>
+                <p class="roster-count">{{ team.totalPlayers }} jugadores registrados</p>
+              </div>
 
-            <div class="players-by-position">
-              <div *ngFor="let position of positions" class="position-group">
-                <h4 class="position-title">
-                  <mat-icon>
-                    {{ position.value === 'GK' ? 'sports_handball' : 
-                       position.value === 'DEF' ? 'shield' : 
-                       position.value === 'MID' ? 'swap_horiz' : 'flash_on' }}
-                  </mat-icon>
-                  {{ position.name }}
-                  <span class="player-count">({{ getPlayersByPosition(position.value).length }})</span>
-                </h4>
+              <div class="players-by-position">
+                <div *ngFor="let position of positions" class="position-group">
+                  <h4 class="position-title">
+                    <mat-icon>
+                      {{ position.value === 'GK' ? 'sports_handball' : 
+                         position.value === 'DEF' ? 'shield' : 
+                         position.value === 'MID' ? 'swap_horiz' : 'flash_on' }}
+                    </mat-icon>
+                    {{ position.name }}
+                    <span class="player-count">({{ getPlayersByPosition(position.value).length }})</span>
+                  </h4>
+                  
+                  <div class="players-list">
+                    <div *ngFor="let player of getPlayersByPosition(position.value)" 
+                         class="player-card">
+                      <div class="player-number">{{ player.jerseyNumber }}</div>
+                      <img [src]="player.photoUrl" [alt]="player.name" class="player-photo">
+                      <div class="player-info">
+                        <span class="player-name">{{ player.name }}</span>
+                        <span class="player-matches">{{ player.matchesPlayed }} PJ</span>
+                      </div>
+                      <div class="player-stats">
+                        <span *ngIf="player.goals > 0" class="stat-badge goals" matTooltip="Goles">
+                          ⚽ {{ player.goals }}
+                        </span>
+                        <span *ngIf="player.assists > 0" class="stat-badge assists" matTooltip="Asistencias">
+                          🎯 {{ player.assists }}
+                        </span>
+                        <span *ngIf="player.yellowCards > 0" class="stat-badge yellow" matTooltip="Tarjetas Amarillas">
+                          🟨 {{ player.yellowCards }}
+                        </span>
+                        <span *ngIf="player.redCards > 0" class="stat-badge red" matTooltip="Tarjetas Rojas">
+                          🟥 {{ player.redCards }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Matches & Stats (5 columns) -->
+          <div class="col-lg-5">
+            <div class="right-column-content">
+              <!-- Matches Section (Top Row) -->
+              <div class="matches-section-mini">
+                <div class="section-header">
+                  <h4>
+                    <mat-icon>event</mat-icon>
+                    Partidos
+                  </h4>
+                </div>
                 
-                <div class="players-list">
-                  <div *ngFor="let player of getPlayersByPosition(position.value)" 
-                       class="player-card">
-                    <div class="player-number">{{ player.jerseyNumber }}</div>
-                    <img [src]="player.photoUrl" [alt]="player.name" class="player-photo">
-                    <div class="player-info">
-                      <span class="player-name">{{ player.name }}</span>
-                      <span class="player-matches">{{ player.matchesPlayed }} PJ</span>
+                <div class="matches-content">
+                  <!-- Upcoming Matches -->
+                  <div class="matches-group" *ngIf="team.upcomingMatches.length > 0">
+                    <h5 class="group-title">Próximos</h5>
+                    <div class="matches-list-mini">
+                      <div *ngFor="let match of team.upcomingMatches.slice(0, 2)" 
+                           class="match-item-mini upcoming"
+                           (click)="viewMatchDetail(match.id)">
+                        <div class="match-date-mini">
+                          <span class="day">{{ match.date | date:'dd' }}</span>
+                          <span class="month">{{ match.date | date:'MMM' }}</span>
+                        </div>
+                        <div class="match-info-mini">
+                          <div class="match-teams-mini">
+                            <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
+                            <span class="vs">vs</span>
+                            <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
+                          </div>
+                          <div class="match-venue-mini">
+                            <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
+                            <span>{{ match.isHome ? 'Local' : 'Visitante' }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div class="player-stats">
-                      <span *ngIf="player.goals > 0" class="stat-badge goals" matTooltip="Goles">
-                        ⚽ {{ player.goals }}
-                      </span>
-                      <span *ngIf="player.assists > 0" class="stat-badge assists" matTooltip="Asistencias">
-                        🎯 {{ player.assists }}
-                      </span>
-                      <span *ngIf="player.yellowCards > 0" class="stat-badge yellow" matTooltip="Tarjetas Amarillas">
-                        🟨 {{ player.yellowCards }}
-                      </span>
-                      <span *ngIf="player.redCards > 0" class="stat-badge red" matTooltip="Tarjetas Rojas">
-                        🟥 {{ player.redCards }}
-                      </span>
+                  </div>
+
+                  <!-- Past Matches -->
+                  <div class="matches-group" *ngIf="team.pastMatches.length > 0">
+                    <h5 class="group-title">Recientes</h5>
+                    <div class="matches-list-mini">
+                      <div *ngFor="let match of team.pastMatches.slice(0, 2)" 
+                           class="match-item-mini finished"
+                           (click)="viewMatchDetail(match.id)">
+                        <div class="match-date-mini">
+                          <span class="day">{{ match.date | date:'dd' }}</span>
+                          <span class="month">{{ match.date | date:'MMM' }}</span>
+                        </div>
+                        <div class="match-info-mini">
+                          <div class="match-teams-mini">
+                            <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
+                            <span class="score">{{ match.score }}</span>
+                            <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
+                          </div>
+                        </div>
+                        <div class="match-result-mini">
+                          <div [class]="'result-badge-mini ' + getResultClass(match.result || 'D')">
+                            {{ getResultText(match.result || 'D') }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Statistics Section (Bottom Row) -->
+              <div class="stats-section-mini">
+                <div class="section-header">
+                  <h4>
+                    <mat-icon>insights</mat-icon>
+                    Estadísticas
+                  </h4>
+                </div>
+                
+                <div class="stats-content">
+                  <!-- Performance Stats -->
+                  <div class="stats-grid-mini">
+                    <div class="stat-card-mini">
+                      <div class="stat-icon-mini wins">
+                        <mat-icon>emoji_events</mat-icon>
+                      </div>
+                      <div class="stat-content-mini">
+                        <span class="stat-value-mini">{{ team.wins }}</span>
+                        <span class="stat-label-mini">Victorias</span>
+                      </div>
+                    </div>
+
+                    <div class="stat-card-mini">
+                      <div class="stat-icon-mini goals">
+                        <mat-icon>sports_soccer</mat-icon>
+                      </div>
+                      <div class="stat-content-mini">
+                        <span class="stat-value-mini">{{ team.goalsFor }}</span>
+                        <span class="stat-label-mini">Goles</span>
+                      </div>
+                    </div>
+
+                    <div class="stat-card-mini">
+                      <div class="stat-icon-mini defense">
+                        <mat-icon>shield</mat-icon>
+                      </div>
+                      <div class="stat-content-mini">
+                        <span class="stat-value-mini">{{ team.goalsAgainst }}</span>
+                        <span class="stat-label-mini">Recibidos</span>
+                      </div>
+                    </div>
+
+                    <div class="stat-card-mini">
+                      <div class="stat-icon-mini points">
+                        <mat-icon>star</mat-icon>
+                      </div>
+                      <div class="stat-content-mini">
+                        <span class="stat-value-mini">{{ team.points }}</span>
+                        <span class="stat-label-mini">Puntos</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Top Player -->
+                  <div class="top-player-mini" *ngIf="team.players.length > 0">
+                    <div class="player-highlight-mini">
+                      <img [src]="team.players[12].photoUrl" [alt]="team.players[12].name" class="player-photo-mini">
+                      <div class="player-details-mini">
+                        <span class="name-mini">{{ team.players[12].name }}</span>
+                        <span class="stat-mini">{{ team.players[12].goals }} goles</span>
+                      </div>
+                      <div class="player-badge-mini">
+                        <mat-icon>sports_soccer</mat-icon>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </mat-tab>
-
-        <!-- Tab: Partidos -->
-        <mat-tab label="Partidos">
-          <div class="team-matches">
-            <!-- Upcoming Matches -->
-            <div class="matches-section" *ngIf="team.upcomingMatches.length > 0">
-              <h3>
-                <mat-icon>event</mat-icon>
-                Próximos Partidos
-              </h3>
-              <div class="matches-list">
-                <div *ngFor="let match of team.upcomingMatches" 
-                     class="match-item upcoming"
-                     (click)="viewMatchDetail(match.id)">
-                  <div class="match-date">
-                    <span class="day">{{ match.date | date:'dd' }}</span>
-                    <span class="month">{{ match.date | date:'MMM' }}</span>
-                  </div>
-                  <div class="match-info">
-                    <div class="match-teams">
-                      <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
-                      <span class="vs">vs</span>
-                      <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
-                    </div>
-                    <div class="match-venue">
-                      <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
-                      <span>{{ match.isHome ? 'Local' : 'Visitante' }}</span>
-                    </div>
-                  </div>
-                  <div class="match-action">
-                    <mat-icon>chevron_right</mat-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <mat-divider *ngIf="team.upcomingMatches.length > 0 && team.pastMatches.length > 0"></mat-divider>
-
-            <!-- Past Matches -->
-            <div class="matches-section" *ngIf="team.pastMatches.length > 0">
-              <h3>
-                <mat-icon>history</mat-icon>
-                Partidos Anteriores
-              </h3>
-              <div class="matches-list">
-                <div *ngFor="let match of team.pastMatches" 
-                     class="match-item finished"
-                     (click)="viewMatchDetail(match.id)">
-                  <div class="match-date">
-                    <span class="day">{{ match.date | date:'dd' }}</span>
-                    <span class="month">{{ match.date | date:'MMM' }}</span>
-                  </div>
-                  <div class="match-info">
-                    <div class="match-teams">
-                      <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
-                      <span class="score">{{ match.score }}</span>
-                      <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
-                    </div>
-                    <div class="match-venue">
-                      <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
-                      <span>{{ match.isHome ? 'Local' : 'Visitante' }}</span>
-                    </div>
-                  </div>
-                  <div class="match-result">
-                    <div [class]="'result-badge ' + getResultClass(match.result || 'D')">
-                      {{ getResultText(match.result || 'D') }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-
-        <!-- Tab: Estadísticas -->
-        <mat-tab label="Estadísticas">
-          <div class="team-detailed-stats">
-            <h3>
-              <mat-icon>insights</mat-icon>
-              Estadísticas Detalladas
-            </h3>
-
-            <!-- Performance Overview -->
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon wins">
-                  <mat-icon>emoji_events</mat-icon>
-                </div>
-                <div class="stat-content">
-                  <span class="stat-value">{{ team.wins }}</span>
-                  <span class="stat-label">Victorias</span>
-                  <span class="stat-percentage">{{ getWinPercentage() | number:'1.0-0' }}%</span>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-icon goals">
-                  <mat-icon>sports_soccer</mat-icon>
-                </div>
-                <div class="stat-content">
-                  <span class="stat-value">{{ team.goalsFor }}</span>
-                  <span class="stat-label">Goles Anotados</span>
-                  <span class="stat-percentage">{{ getGoalsPerMatch() | number:'1.1-1' }} por partido</span>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-icon defense">
-                  <mat-icon>shield</mat-icon>
-                </div>
-                <div class="stat-content">
-                  <span class="stat-value">{{ team.goalsAgainst }}</span>
-                  <span class="stat-label">Goles Recibidos</span>
-                  <span class="stat-percentage">{{ (team.goalsAgainst / team.matchesPlayed) | number:'1.1-1' }} por partido</span>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-icon points">
-                  <mat-icon>star</mat-icon>
-                </div>
-                <div class="stat-content">
-                  <span class="stat-value">{{ team.points }}</span>
-                  <span class="stat-label">Puntos Totales</span>
-                  <span class="stat-percentage">{{ (team.points / team.matchesPlayed) | number:'1.2-2' }} por partido</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Top Players -->
-            <div class="top-players-section">
-              <h4>
-                <mat-icon>military_tech</mat-icon>
-                Jugadores Destacados
-              </h4>
-              
-              <div class="top-players-grid">
-                <!-- Top Scorer -->
-                <div class="top-player-card">
-                  <div class="card-header">
-                    <mat-icon>sports_soccer</mat-icon>
-                    <span>Máximo Goleador</span>
-                  </div>
-                  <div class="player-highlight" *ngIf="team.players.length > 0">
-                    <img [src]="team.players[12].photoUrl" [alt]="team.players[12].name">
-                    <div class="player-details">
-                      <span class="name">{{ team.players[12].name }}</span>
-                      <span class="stat">{{ team.players[12].goals }} goles</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Top Assists -->
-                <div class="top-player-card">
-                  <div class="card-header">
-                    <mat-icon>assistant</mat-icon>
-                    <span>Más Asistencias</span>
-                  </div>
-                  <div class="player-highlight" *ngIf="team.players.length > 0">
-                    <img [src]="team.players[13].photoUrl" [alt]="team.players[13].name">
-                    <div class="player-details">
-                      <span class="name">{{ team.players[13].name }}</span>
-                      <span class="stat">{{ team.players[13].assists }} asistencias</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Most Played -->
-                <div class="top-player-card">
-                  <div class="card-header">
-                    <mat-icon>timer</mat-icon>
-                    <span>Más Partidos</span>
-                  </div>
-                  <div class="player-highlight" *ngIf="team.players.length > 0">
-                    <img [src]="team.players[9].photoUrl" [alt]="team.players[9].name">
-                    <div class="player-details">
-                      <span class="name">{{ team.players[9].name }}</span>
-                      <span class="stat">{{ team.players[9].matchesPlayed }} partidos</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Performance Chart Placeholder -->
-            <div class="chart-section">
-              <h4>
-                <mat-icon>show_chart</mat-icon>
-                Rendimiento en el Torneo
-              </h4>
-              <div class="chart-placeholder">
-                <mat-icon>insert_chart</mat-icon>
-                <p>Gráfico de rendimiento disponible próximamente</p>
-              </div>
-            </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-    </mat-card>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
