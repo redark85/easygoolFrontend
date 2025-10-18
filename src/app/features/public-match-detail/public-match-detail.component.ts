@@ -12,6 +12,7 @@ import { Subject, takeUntil, finalize } from 'rxjs';
 import { PublicLoadingComponent } from '../../shared/components/public-loading/public-loading.component';
 import { PublicMatchDetailService } from './services/public-match-detail.service';
 import { MatchStatusType } from '../../core/services/match.service';
+import { SignalRService, MatchUpdateData } from '../../core/services/signalr.service';
 import { 
   PublicMatchDetailResponse, 
   MatchInfo, 
@@ -126,7 +127,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private publicMatchDetailService: PublicMatchDetailService
+    private publicMatchDetailService: PublicMatchDetailService,
+    private signalRService: SignalRService
   ) {
     // Inicializar datos por defecto para mostrar la vista mientras carga
     this.initializeDefaultData();
@@ -141,13 +143,72 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
         if (id) {
           this.matchId = +id;
           this.loadMatchDetail();
+          this.initializeSignalR();
         }
       });
   }
 
   ngOnDestroy(): void {
+    // Salir del grupo de SignalR antes de destruir el componente
+    if (this.matchId) {
+      this.signalRService.leaveMatchGroup(this.matchId).catch(err => {
+        console.error('Error al salir del grupo:', err);
+      });
+    }
+    
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Inicializa la conexión de SignalR y se suscribe a las actualizaciones
+   */
+  private initializeSignalR(): void {
+    // Conectar a SignalR
+    this.signalRService.startConnection()
+      .then(() => {
+        // Unirse al grupo del partido
+        return this.signalRService.joinMatchGroup(this.matchId);
+      })
+      .then(() => {
+        console.log('Conectado a SignalR y unido al grupo del partido');
+        
+        // Suscribirse a las actualizaciones del partido
+        this.signalRService.matchUpdate$
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((data: MatchUpdateData) => {
+            // Verificar que la actualización es para este partido
+            if (data.matchId === this.matchId) {
+              console.log('Actualización en tiempo real recibida:', data);
+              this.processMatchDataFromSignalR(data);
+            }
+          });
+      })
+      .catch(err => {
+        console.error('Error al inicializar SignalR:', err);
+        // No mostrar error al usuario, el partido seguirá funcionando sin actualizaciones en tiempo real
+      });
+  }
+
+  /**
+   * Procesa los datos del partido recibidos desde SignalR
+   * Usa la misma estructura que getPublicMatchDetail
+   */
+  private processMatchDataFromSignalR(data: MatchUpdateData): void {
+    // Crear el objeto result con la misma estructura que el API
+    const result = {
+      matchInfo: data.matchInfo,
+      homeTeamLineUp: data.homeTeamLineUp,
+      awayTeamLineUp: data.awayTeamLineUp,
+      events: data.events,
+      statistics: data.statistics
+    };
+
+    // Reutilizar el método existente de procesamiento
+    this.processMatchData(result);
+    
+    // Forzar detección de cambios para actualizar la vista
+    this.cdr.detectChanges();
   }
 
   /**
