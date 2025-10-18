@@ -1,4 +1,4 @@
-﻿.public-tournament-stats-container {
+.public-tournament-stats-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
@@ -982,6 +982,72 @@
           .tournament-meta-hero {
             justify-content: center;
             flex-wrap: wrap;
+          }
+        }
+      }
+    }
+  }
+
+  // Estilos para los filtros en el hero-section
+  .hero-right-section {
+    .hero-right-content {
+      .filters-card-hero {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        margin-bottom: 16px;
+
+        .filters-row {
+          .filter-select {
+            width: 100%;
+
+            ::ng-deep .mat-mdc-form-field {
+              font-size: 14px;
+              background-color: white;
+              border-radius: 8px;
+            }
+
+            ::ng-deep .mat-mdc-select {
+              color: #333;
+            }
+
+            ::ng-deep .mat-mdc-form-field-outline {
+              color: rgba(0, 0, 0, 0.3);
+            }
+
+            ::ng-deep .mat-mdc-floating-label {
+              color: rgba(0, 0, 0, 0.6);
+            }
+
+            // Estilos para los íconos en las opciones
+            ::ng-deep .mat-mdc-option {
+              .option-icon {
+                margin-right: 8px;
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+                color: #1976d2;
+                vertical-align: middle;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Responsive para filtros
+    @media (max-width: 768px) {
+      .filters-card-hero {
+        .filters-row {
+          .row {
+            flex-direction: column;
+            gap: 12px;
+
+            .col-6 {
+              width: 100% !important;
+              max-width: 100% !important;
+            }
           }
         }
       }

@@ -8,7 +8,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subject, takeUntil } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { Subject, takeUntil, finalize } from 'rxjs';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService, ApiService } from '@core/services';
+import { PublicLoadingComponent } from '@shared/components/public-loading/public-loading.component';
+import { FIXTURE_GET_TOURNAMENT_STATS_ENDPOINT } from '@core/config/endpoints';
+import { TournamentStatsApiResponse, TournamentStatsData, TournamentStatsParams } from './models/tournament-stats.interface';
 
 interface TournamentRecord {
   biggestWin: {
@@ -105,7 +112,11 @@ interface TournamentStats {
     MatTabsModule,
     MatProgressSpinnerModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    FormsModule,
+    PublicLoadingComponent
   ],
   templateUrl: './public-tournament-stats.component.html',
   styleUrls: ['./public-tournament-stats.component.scss'],
@@ -115,10 +126,73 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
   tournamentId: number = 0;
   isLoading = false;
   
-  records: TournamentRecord | null = null;
-  stats: TournamentStats | null = null;
+  // Filtros - Fases y Grupos
+  phases: TournamentPhase[] = [];
+  groups: TournamentGroup[] = [];
+  selectedPhaseId: number | null = null;
+  selectedGroupId: number | null = null;
+  PhaseType = PhaseType; // Exponer el enum al template
+  
+  records: TournamentRecord = {
+    biggestWin: {
+      score: 'N/A',
+      winner: 'Sin datos',
+      loser: 'Sin datos',
+      date: new Date()
+    },
+    highestScoring: {
+      totalGoals: 0,
+      match: 'Sin datos',
+      score: 'N/A',
+      date: new Date()
+    },
+    bestStreak: {
+      wins: 0,
+      team: 'Sin datos',
+      period: 'N/A'
+    },
+    bestDefense: {
+      goalsAgainst: 0,
+      team: 'Sin datos',
+      matchesPlayed: 0
+    },
+    bestAttack: {
+      goalsFor: 0,
+      team: 'Sin datos',
+      matchesPlayed: 0
+    },
+    mostCleanSheets: {
+      count: 0,
+      team: 'Sin datos',
+      goalkeeper: 'Sin datos'
+    },
+    fairPlayLeader: {
+      team: 'Sin datos',
+      yellowCards: 0,
+      redCards: 0
+    },
+    longestWinningStreak: {
+      team: 'Sin datos',
+      matches: 0
+    }
+  };
+  stats: TournamentStats = {
+    totalMatches: 0,
+    totalGoals: 0,
+    averageGoalsPerMatch: 0,
+    totalYellowCards: 0,
+    totalRedCards: 0,
+    totalPenalties: 0,
+    homeWinPercentage: 0,
+    awayWinPercentage: 0,
+    drawPercentage: 0
+  };
   goalsPerMatchday: GoalsPerMatchday[] = [];
-  resultDistribution: ResultDistribution | null = null;
+  resultDistribution: ResultDistribution = {
+    homeWins: 0,
+    draws: 0,
+    awayWins: 0
+  };
   attendanceData: AttendanceData[] = [];
   topScorers: TopScorer[] = [];
 
@@ -127,7 +201,10 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private managerService: ManagerService,
+    private toastService: ToastService,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -138,7 +215,11 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
         const id = params.get('tournamentId');
         if (id) {
           this.tournamentId = +id;
-          this.loadTournamentStats();
+          console.log('Tournament ID recibido:', this.tournamentId);
+          this.loadPhases();
+        } else {
+          // Si no hay ID en la ruta, usar el ID por defecto
+          this.loadPhases();
         }
       });
   }
@@ -149,21 +230,310 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga las estadísticas del torneo
+   * Carga las fases del torneo
    */
-  private loadTournamentStats(): void {
-    this.isLoading = true;
+  private loadPhases(): void {
+    this.managerService.getTournamentPhases(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournamentDetails) => {
+          console.log('Detalles del torneo recibidos:', tournamentDetails);
+          
+          // Cargar fases
+          this.phases = tournamentDetails.phases || [];
+          console.log('Fases cargadas:', this.phases);
+          
+          // Seleccionar la primera fase por defecto
+          if (this.phases.length > 0) {
+            this.selectedPhaseId = this.phases[0].id;
+            this.onPhaseChange();
+          }
+          
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar fases:', error);
+          this.toastService.showError('Error al cargar las fases del torneo');
+        }
+      });
+  }
+
+  /**
+   * Carga los grupos de la fase seleccionada
+   */
+  private loadGroups(selectedPhase: TournamentPhase): void {
+    // Cargar los grupos desde la fase seleccionada
+    this.groups = selectedPhase.groups || [];
     
-    // TODO: Cargar desde API
-    // Por ahora usar datos dummy
-    this.loadDummyData();
+    console.log('Grupos cargados:', this.groups);
+
+    // Seleccionar el primer grupo por defecto
+    if (this.groups.length > 0) {
+      this.selectedGroupId = this.groups[0].id;
+      this.loadTournamentStats();
+    } else {
+      this.loadTournamentStats();
+    }
     
-    this.isLoading = false;
     this.cdr.detectChanges();
   }
 
   /**
-   * Carga datos dummy
+   * Carga las estadísticas del torneo desde el API
+   */
+  private loadTournamentStats(): void {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+    
+    const params: TournamentStatsParams = {
+      phaseId: this.selectedPhaseId || 0,
+      groupId: this.selectedGroupId || 0
+    };
+    
+    console.log('🏆 Cargando estadísticas para:', params);
+    
+    this.apiService.get<TournamentStatsApiResponse>(
+      `${FIXTURE_GET_TOURNAMENT_STATS_ENDPOINT}?PhaseId=${params.phaseId}&GroupId=${params.groupId}`
+    )
+    .pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (response) => {
+        console.log('✅ Respuesta del API de estadísticas:', response);
+        
+        if (response.succeed && response.result) {
+          this.processApiData(response.result);
+        } else {
+          console.warn('⚠️ API response no exitosa:', response.message);
+          this.toastService.showWarning(response.message || 'No se pudieron cargar las estadísticas');
+          this.clearData();
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar estadísticas:', error);
+        this.toastService.showError('Error al cargar las estadísticas del torneo');
+        this.clearData();
+      }
+    });
+  }
+
+  /**
+   * Procesa los datos recibidos del API
+   */
+  private processApiData(data: TournamentStatsData): void {
+    console.log('🔄 Procesando datos del API:', data);
+    
+    // Procesar estadísticas principales
+    this.stats = {
+      totalMatches: data.matchesPlayed || 0,
+      totalGoals: data.totalGoals || 0,
+      averageGoalsPerMatch: data.goalsPerMatch || 0,
+      totalYellowCards: data.yellowCards || 0,
+      totalRedCards: data.redCards || 0,
+      totalPenalties: 0, // No viene en el API, mantener en 0
+      homeWinPercentage: data.resultsDistribution?.homeWinPercentage || 0,
+      awayWinPercentage: data.resultsDistribution?.awayWinPercentage || 0,
+      drawPercentage: data.resultsDistribution?.drawPercentage || 0
+    };
+    
+    // Procesar récords
+    this.records = {
+      biggestWin: data.records?.biggestWin ? {
+        score: data.records.biggestWin.score,
+        winner: data.records.biggestWin.winner,
+        loser: data.records.biggestWin.loser,
+        date: new Date(data.records.biggestWin.date)
+      } : {
+        score: 'N/A',
+        winner: 'Sin datos',
+        loser: 'Sin datos',
+        date: new Date()
+      },
+      
+      highestScoring: data.records?.highestScoringMatch ? {
+        totalGoals: data.records.highestScoringMatch.totalGoals,
+        match: data.records.highestScoringMatch.match,
+        score: data.records.highestScoringMatch.score,
+        date: new Date(data.records.highestScoringMatch.date)
+      } : {
+        totalGoals: 0,
+        match: 'Sin datos',
+        score: 'N/A',
+        date: new Date()
+      },
+      
+      bestStreak: data.records?.bestStreak ? {
+        wins: data.records.bestStreak.wins,
+        team: data.records.bestStreak.team,
+        period: data.records.bestStreak.period
+      } : {
+        wins: 0,
+        team: 'Sin datos',
+        period: 'N/A'
+      },
+      
+      bestDefense: data.records?.bestDefense ? {
+        goalsAgainst: data.records.bestDefense.goalsAgainst,
+        team: data.records.bestDefense.team,
+        matchesPlayed: data.records.bestDefense.matchesPlayed
+      } : {
+        goalsAgainst: 0,
+        team: 'Sin datos',
+        matchesPlayed: 0
+      },
+      
+      bestAttack: data.records?.bestOffense ? {
+        goalsFor: data.records.bestOffense.goalsFor,
+        team: data.records.bestOffense.team,
+        matchesPlayed: data.records.bestOffense.matchesPlayed
+      } : {
+        goalsFor: 0,
+        team: 'Sin datos',
+        matchesPlayed: 0
+      },
+      
+      mostCleanSheets: data.records?.mostCleanSheets ? {
+        count: data.records.mostCleanSheets.count,
+        team: data.records.mostCleanSheets.team,
+        goalkeeper: data.records.mostCleanSheets.goalkeeper
+      } : {
+        count: 0,
+        team: 'Sin datos',
+        goalkeeper: 'Sin datos'
+      },
+      
+      fairPlayLeader: data.records?.fairPlayLeader ? {
+        team: data.records.fairPlayLeader.team,
+        yellowCards: data.records.fairPlayLeader.yellowCards,
+        redCards: data.records.fairPlayLeader.redCards
+      } : {
+        team: 'Sin datos',
+        yellowCards: 0,
+        redCards: 0
+      },
+      
+      longestWinningStreak: data.records?.bestStreak ? {
+        team: data.records.bestStreak.team,
+        matches: data.records.bestStreak.wins
+      } : {
+        team: 'Sin datos',
+        matches: 0
+      }
+    };
+    
+    // Procesar goles por jornada
+    this.goalsPerMatchday = data.goalsByMatchDay?.map(item => ({
+      matchday: item.matchday,
+      goals: item.goals
+    })) || [];
+    
+    // Procesar distribución de resultados
+    this.resultDistribution = data.resultsDistribution ? {
+      homeWins: data.resultsDistribution.homeWins,
+      draws: data.resultsDistribution.draws,
+      awayWins: data.resultsDistribution.awayWins
+    } : {
+      homeWins: 0,
+      draws: 0,
+      awayWins: 0
+    };
+    
+    // Procesar goleadores
+    this.topScorers = data.topScorers?.map(scorer => ({
+      name: scorer.name || 'Jugador sin nombre',
+      team: scorer.team || 'Equipo sin nombre',
+      goals: scorer.goals || 0,
+      matches: scorer.matches || 0
+    })) || [];
+    
+    // Datos de asistencia (no vienen del API, mantener vacío)
+    this.attendanceData = [];
+    
+    console.log('✅ Datos procesados correctamente');
+    console.log('Stats:', this.stats);
+    console.log('Records:', this.records);
+    console.log('Top Scorers:', this.topScorers.length);
+  }
+  
+  /**
+   * Limpia los datos cuando hay error o no hay resultados
+   */
+  private clearData(): void {
+    // Resetear a valores por defecto en lugar de null
+    this.stats = {
+      totalMatches: 0,
+      totalGoals: 0,
+      averageGoalsPerMatch: 0,
+      totalYellowCards: 0,
+      totalRedCards: 0,
+      totalPenalties: 0,
+      homeWinPercentage: 0,
+      awayWinPercentage: 0,
+      drawPercentage: 0
+    };
+    
+    this.records = {
+      biggestWin: {
+        score: 'N/A',
+        winner: 'Sin datos',
+        loser: 'Sin datos',
+        date: new Date()
+      },
+      highestScoring: {
+        totalGoals: 0,
+        match: 'Sin datos',
+        score: 'N/A',
+        date: new Date()
+      },
+      bestStreak: {
+        wins: 0,
+        team: 'Sin datos',
+        period: 'N/A'
+      },
+      bestDefense: {
+        goalsAgainst: 0,
+        team: 'Sin datos',
+        matchesPlayed: 0
+      },
+      bestAttack: {
+        goalsFor: 0,
+        team: 'Sin datos',
+        matchesPlayed: 0
+      },
+      mostCleanSheets: {
+        count: 0,
+        team: 'Sin datos',
+        goalkeeper: 'Sin datos'
+      },
+      fairPlayLeader: {
+        team: 'Sin datos',
+        yellowCards: 0,
+        redCards: 0
+      },
+      longestWinningStreak: {
+        team: 'Sin datos',
+        matches: 0
+      }
+    };
+    
+    this.resultDistribution = {
+      homeWins: 0,
+      draws: 0,
+      awayWins: 0
+    };
+    
+    this.goalsPerMatchday = [];
+    this.topScorers = [];
+    this.attendanceData = [];
+  }
+  
+  /**
+   * Carga datos dummy (mantenido como fallback)
    */
   private loadDummyData(): void {
     // Records
@@ -244,7 +614,7 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
       capacity: 50000
     }));
 
-    // Top scorers
+    // Top scorers (datos dummy como fallback)
     this.topScorers = [
       { name: 'Karim Benzema', team: 'Real Madrid', goals: 28, matches: 25 },
       { name: 'Robert Lewandowski', team: 'Barcelona', goals: 26, matches: 24 },
@@ -252,6 +622,8 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
       { name: 'Antoine Griezmann', team: 'Atlético Madrid', goals: 19, matches: 25 },
       { name: 'Iago Aspas', team: 'Celta Vigo', goals: 17, matches: 24 }
     ];
+    
+    console.log('⚠️ Usando datos dummy como fallback');
   }
 
   /**
@@ -330,5 +702,54 @@ export class PublicTournamentStatsComponent implements OnInit, OnDestroy {
       month: 'long', 
       year: 'numeric' 
     }).format(date);
+  }
+
+  /**
+   * Maneja el cambio de fase seleccionada
+   */
+  onPhaseChange(): void {
+    const selectedPhase = this.selectedPhase;
+    
+    if (selectedPhase) {
+      console.log('Fase seleccionada:', selectedPhase);
+      
+      // Si es fase de grupos, cargar los grupos
+      if (selectedPhase.phaseType === PhaseType.Groups) {
+        this.loadGroups(selectedPhase);
+      } else {
+        // Si es knockout, limpiar grupos y cargar datos
+        this.groups = [];
+        this.selectedGroupId = null;
+        this.loadTournamentStats();
+      }
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Maneja el cambio de grupo seleccionado
+   */
+  onGroupChange(): void {
+    const selectedGroup = this.groups.find(g => g.id === this.selectedGroupId);
+    
+    if (selectedGroup) {
+      console.log('Grupo seleccionado:', selectedGroup);
+      this.loadTournamentStats();
+    }
+  }
+
+  /**
+   * Obtiene la fase seleccionada
+   */
+  get selectedPhase(): TournamentPhase | undefined {
+    return this.phases.find(p => p.id === this.selectedPhaseId);
+  }
+
+  /**
+   * Verifica si debe mostrar el select de grupos
+   */
+  get shouldShowGroupSelect(): boolean {
+    return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 }
