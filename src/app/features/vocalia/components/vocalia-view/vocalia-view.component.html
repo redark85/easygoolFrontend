@@ -258,6 +258,7 @@
               <mat-icon>square</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="!hasMatchStarted"
                     class="action-btn remove-btn"
                     (click)="removePlayer(player, 'home')"
                     [matTooltip]="'Eliminar jugador'"

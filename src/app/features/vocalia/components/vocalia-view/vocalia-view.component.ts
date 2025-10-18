@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { VocaliaService, VocaliaPlayer, AvailablePlayer, MatchEventType, RegisterMatchEventRequest, MatchEvent, MatchInProgressStatusType } from '@core/services/vocalia.service';
+import { MatchStatusType } from '@core/services/match.service';
 
 interface Player {
   id: number;
@@ -100,7 +101,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   
   // Incidents
   incidents: MatchIncident[] = [];
-
+  hasMatchStarted = false;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -174,6 +175,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
           if (data.matchProgressType !== undefined && data.matchProgressType !== null) {
             this.matchProgressType = data.matchProgressType;
           }
+          this.hasMatchStarted = data.status === MatchStatusType.inProgress;
 
           this.cdr.detectChanges();
         },
@@ -390,13 +392,72 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     player.yellowCards += 2;
     player.redCards++;
     
-    const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
-    this.incidents.unshift({
-      minute: this.getCurrentMinute(),
-      type: MatchEventType.DoubleYellowCard,
-      player: `#${player.number} ${player.name}`,
-      team: teamName,
-      description: `Doble amarilla (expulsión) para #${player.number} ${player.name} (${teamName})`
+   const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
+    
+    Swal.fire({
+      title: '¿Registrar tarjeta amarilla?',
+      html: `
+        <p>¿Estás seguro de registrar una doble amarilla para:</p>
+        <p style="margin-top: 10px;"><strong>#${player.number} ${player.name}</strong></p>
+        <p style="color: #666;">${teamName}</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#4caf50',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const isHomeTeam = team === 'home';
+        const event: MatchEvent = {
+          tournamentTeamPlayerId: player.id,
+          eventType: MatchEventType.DoubleYellowCard,
+          minute: this.getCurrentMinute(),
+          isHomeGoal: isHomeTeam
+        };
+
+        const request: RegisterMatchEventRequest = {
+          matchId: this.matchId!,
+          events: [event]
+        };
+
+        // Mostrar loading
+        Swal.fire({
+          title: 'Registrando doble amarilla...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Llamar al API
+        this.vocaliaService.registerMatchEvent(request)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Recargar información del partido desde el API
+              this.loadMatchData(this.matchId!);
+
+              Swal.fire({
+                title: 'Doble amarilla registrada!',
+                text: `Doble amarilla para ${player.name}`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (error) => {
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo registrar la tarjeta amarilla',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          });
+      }
     });
   }
 
@@ -407,12 +468,71 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     player.redCards++;
     
     const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
-    this.incidents.unshift({
-      minute: this.getCurrentMinute(),
-      type: MatchEventType.RedCard,
-      player: `#${player.number} ${player.name}`,
-      team: teamName,
-      description: `Tarjeta roja directa para #${player.number} ${player.name} (${teamName})`
+    
+    Swal.fire({
+      title: '¿Registrar tarjeta roja?',
+      html: `
+        <p>¿Estás seguro de registrar una tarjeta roja para:</p>
+        <p style="margin-top: 10px;"><strong>#${player.number} ${player.name}</strong></p>
+        <p style="color: #666;">${teamName}</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#4caf50',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const isHomeTeam = team === 'home';
+        const event: MatchEvent = {
+          tournamentTeamPlayerId: player.id,
+          eventType: MatchEventType.RedCard,
+          minute: this.getCurrentMinute(),
+          isHomeGoal: isHomeTeam
+        };
+
+        const request: RegisterMatchEventRequest = {
+          matchId: this.matchId!,
+          events: [event]
+        };
+
+        // Mostrar loading
+        Swal.fire({
+          title: 'Registrando tarjeta roja...',
+          text: 'Por favor espera',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Llamar al API
+        this.vocaliaService.registerMatchEvent(request)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Recargar información del partido desde el API
+              this.loadMatchData(this.matchId!);
+
+              Swal.fire({
+                title: 'Tarjeta roja registrada!',
+                text: `Roja para ${player.name}`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (error) => {
+              Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo registrar la tarjeta amarilla',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          });
+      }
     });
   }
 
