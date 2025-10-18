@@ -923,6 +923,33 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
   
   /**
+   * Actualiza el estado del partido en el servidor
+   */
+  private updateMatchProgressInServer(newState: MatchInProgressStatusType): void {
+    if (!this.matchId) {
+      console.error('No hay matchId disponible');
+      return;
+    }
+
+    this.vocaliaService.updateMatchProgress(this.matchId, newState)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Estado del partido actualizado en el servidor:', newState);
+        },
+        error: (error) => {
+          console.error('Error al actualizar estado del partido:', error);
+          Swal.fire({
+            title: 'Advertencia',
+            text: 'El estado se actualizó localmente pero hubo un error al sincronizar con el servidor',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+  }
+
+  /**
    * Determina si un estado requiere cronómetro activo
    */
   private isPlayingState(state: MatchInProgressStatusType | null): boolean {
@@ -973,6 +1000,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
         this.matchProgressType = MatchInProgressStatusType.FirstHalf;
         this.elapsedSeconds = 0;
         this.start();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.FirstHalf);
         this.cdr.detectChanges();
       }
     });
@@ -993,6 +1021,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.HalfTime;
         this.pause();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.HalfTime);
         this.cdr.detectChanges();
       }
     });
@@ -1013,6 +1042,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.SecondHalf;
         this.start();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.SecondHalf);
         this.cdr.detectChanges();
       }
     });
@@ -1033,6 +1063,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.HalfSecondTime;
         this.pause();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.HalfSecondTime);
         this.cdr.detectChanges();
       }
     });
@@ -1053,6 +1084,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.Penalty;
         this.start();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.Penalty);
         this.cdr.detectChanges();
         
         Swal.fire({
@@ -1081,6 +1113,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.ExtraFirstTime;
         this.start();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.ExtraFirstTime);
         this.cdr.detectChanges();
       }
     });
@@ -1101,6 +1134,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.HalfFirstExtraTime;
         this.pause();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.HalfFirstExtraTime);
         this.cdr.detectChanges();
       }
     });
@@ -1121,6 +1155,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.ExtraSecondTime;
         this.start();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.ExtraSecondTime);
         this.cdr.detectChanges();
       }
     });
@@ -1141,6 +1176,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.HalfPenalties;
         this.pause();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.HalfPenalties);
         this.cdr.detectChanges();
       }
     });
@@ -1161,6 +1197,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this.matchProgressType = MatchInProgressStatusType.Penalty;
         this.start();
+        this.updateMatchProgressInServer(MatchInProgressStatusType.Penalty);
         this.cdr.detectChanges();
       }
     });

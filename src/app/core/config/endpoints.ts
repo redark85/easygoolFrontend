@@ -69,6 +69,7 @@ export const VOCALIA_GET_MATCH_ENDPOINT = '/api/Vocalia/GetMatch';
 export const VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT = '/api/Vocalia/GetAvailablePlayers';
 export const VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT = '/api/Vocalia/RegisterMatchEvent';
 export const VOCALIA_FINISH_MATCH_ENDPOINT = '/api/Vocalia/FinishMatch';
+export const VOCALIA_UPDATE_MATCH_PROGRESS_ENDPOINT = '/api/Vocalia/UpdateMatchProgress';
 
 // Fixture Endpoints
 export const FIXTURE_GET_ENDPOINT = '/api/Fixture/GetFixture';
@@ -154,6 +155,7 @@ export const EndpointsConfig = {
   VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT,
   VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT,
   VOCALIA_FINISH_MATCH_ENDPOINT,
+  VOCALIA_UPDATE_MATCH_PROGRESS_ENDPOINT,
 
   // Manager
   MANAGER_GET_TEAMS_ENDPOINT,

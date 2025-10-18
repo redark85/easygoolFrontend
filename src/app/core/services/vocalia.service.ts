@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT, VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT, VOCALIA_FINISH_MATCH_ENDPOINT } from '../config/endpoints';
+import { VOCALIA_GET_MATCH_ENDPOINT, VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT, VOCALIA_REGISTER_MATCH_EVENT_ENDPOINT, VOCALIA_FINISH_MATCH_ENDPOINT, VOCALIA_UPDATE_MATCH_PROGRESS_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 import { MatchStatusType } from './match.service';
 
@@ -189,6 +189,27 @@ export class VocaliaService {
           return true;
         }
         throw new Error(response.message || 'Error al finalizar el partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Actualiza el estado de progreso del partido
+   * @param matchId ID del partido
+   * @param progressType Tipo de progreso del partido (enum MatchInProgressStatusType)
+   * @returns Observable con la respuesta del servidor
+   */
+  updateMatchProgress(matchId: number, progressType: MatchInProgressStatusType): Observable<boolean> {
+    return this.apiService.put<FinishMatchResponse>(
+      `${VOCALIA_UPDATE_MATCH_PROGRESS_ENDPOINT}/${matchId}?progressType=${progressType}`, 
+      {}
+    ).pipe(
+      map(response => {
+        if (response.succeed) {
+          return true;
+        }
+        throw new Error(response.message || 'Error al actualizar el estado del partido');
       }),
       catchError(this.handleError)
     );
