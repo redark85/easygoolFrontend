@@ -207,7 +207,7 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
       this.topScorers = data.players.map((player: any, index: number) => ({
         position: index + 1,
         name: player.name || 'Jugador sin nombre',
-        imageUrl: player.imageUrl || 'assets/player-placeholder.png',
+        imageUrl: player.imageUrl || 'assets/person.jpg',
         teamName: player.teamName || 'Equipo sin nombre',
         teamLogoUrl: player.teamLogoUrl || 'assets/team-placeholder.png',
         goals: player.goals || 0,
@@ -226,7 +226,7 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
       this.cardPlayers = data.cards.map((card: any, index: number) => ({
         position: index + 1,
         name: card.name || 'Jugador sin nombre',
-        imageUrl: card.imageUrl || 'assets/player-placeholder.png',
+        imageUrl: card.imageUrl || 'assets/person.jpg',
         teamName: card.teamName || 'Equipo sin nombre',
         teamLogoUrl: card.teamLogoUrl || 'assets/team-placeholder.png',
         goals: card.goals || 0,
