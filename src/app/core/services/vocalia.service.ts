@@ -56,7 +56,7 @@ export interface VocaliaEvent {
   matchEventId: number;
   minute: number;
   description: string;
-  type: number;
+  type: MatchEventType;
 }
 
 export interface VocaliaMatchData {

@@ -26,7 +26,7 @@ interface Player {
 
 interface MatchIncident {
   minute: number;
-  type: 'goal' | 'yellow' | 'red' | 'substitution';
+  type: MatchEventType;
   player: string;
   team: string;
   description: string;
@@ -188,15 +188,9 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
    * Convierte un evento del API al formato interno
    */
   private convertToIncident(apiEvent: any): MatchIncident {
-    // Determinar el tipo basado en el type del API
-    let type: 'goal' | 'yellow' | 'red' | 'substitution' = 'substitution';
-    if (apiEvent.type === 1) type = 'goal';
-    else if (apiEvent.type === 2) type = 'yellow';
-    else if (apiEvent.type === 3 || apiEvent.type === 4) type = 'red';
-
     return {
       minute: apiEvent.minute,
-      type: type,
+      type: apiEvent.type as MatchEventType,
       player: '',
       team: '',
       description: apiEvent.description
@@ -287,7 +281,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
     this.incidents.unshift({
       minute: this.getCurrentMinute(),
-      type: 'yellow',
+      type: MatchEventType.YellowCard,
       player: `#${player.number} ${player.name}`,
       team: teamName,
       description: `Tarjeta amarilla para #${player.number} ${player.name} (${teamName})`
@@ -304,7 +298,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
     this.incidents.unshift({
       minute: this.getCurrentMinute(),
-      type: 'red',
+      type: MatchEventType.DoubleYellowCard,
       player: `#${player.number} ${player.name}`,
       team: teamName,
       description: `Doble amarilla (expulsión) para #${player.number} ${player.name} (${teamName})`
@@ -320,7 +314,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
     this.incidents.unshift({
       minute: this.getCurrentMinute(),
-      type: 'red',
+      type: MatchEventType.RedCard,
       player: `#${player.number} ${player.name}`,
       team: teamName,
       description: `Tarjeta roja directa para #${player.number} ${player.name} (${teamName})`
@@ -757,7 +751,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       if (result.isConfirmed && result.value) {
         const newIncident: MatchIncident = {
           minute: result.value.minute,
-          type: 'substitution', // Tipo genérico para incidencias personalizadas
+          type: MatchEventType.Other, // Tipo genérico para incidencias personalizadas
           player: '',
           team: '',
           description: result.value.description
@@ -883,5 +877,30 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
    */
   trackByIncidentIndex(index: number): number {
     return index;
+  }
+
+  /**
+   * Obtiene la clase CSS para el tipo de incidencia
+   */
+  getIncidentTypeClass(type: MatchEventType): string {
+    switch (type) {
+      case MatchEventType.Goal:
+        return 'goal';
+      case MatchEventType.YellowCard:
+        return 'yellow';
+      case MatchEventType.DoubleYellowCard:
+      case MatchEventType.RedCard:
+        return 'red';
+      case MatchEventType.Substitution:
+        return 'substitution';
+      case MatchEventType.Injury:
+        return 'injury';
+      case MatchEventType.PenaltyMissed:
+        return 'penalty';
+      case MatchEventType.Other:
+      case MatchEventType.InMatch:
+      default:
+        return 'other';
+    }
   }
 }

@@ -218,7 +218,7 @@
     <div class="incidents-list">
       <div *ngFor="let incident of incidents; let i = index; trackBy: trackByIncidentIndex" 
            class="incident-item"
-           [ngClass]="'incident-' + incident.type">
+           [ngClass]="'incident-' + getIncidentTypeClass(incident.type)">
         <span class="incident-minute">[{{ incident.minute }}']</span>
         <span class="incident-description">{{ incident.description }}</span>
         <button mat-icon-button 
