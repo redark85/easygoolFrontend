@@ -537,6 +537,191 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Sustituye un jugador por otro que no está en cancha
+   */
+  substitutePlayer(playerOut: Player, team: 'home' | 'away'): void {
+    const phaseTeamId = team === 'home' ? this.homeTeamId : this.awayTeamId;
+    const teamName = team === 'home' ? this.homeTeam : this.awayTeam;
+    
+    if (!phaseTeamId || !this.tournamentId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo obtener la información del equipo',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Obtener jugadores disponibles (que no están en cancha)
+    this.vocaliaService.getAvailablePlayers(phaseTeamId, this.tournamentId, this.matchId!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (players) => {
+          if (players.length === 0) {
+            Swal.fire({
+              title: 'Sin jugadores disponibles',
+              text: 'No hay jugadores disponibles para sustituir',
+              icon: 'info',
+              confirmButtonText: 'Aceptar'
+            });
+            return;
+          }
+
+          // Crear opciones para el select
+          const inputOptions: { [key: string]: string } = {};
+          players.forEach(player => {
+            inputOptions[player.tournamentTeamPlayerId.toString()] = `#${player.jerseyNumber} - ${player.fullName}`;
+          });
+
+          // Mostrar modal para seleccionar jugador entrante
+          Swal.fire({
+            title: 'Sustituir jugador',
+            html: `
+              <p style="margin-bottom: 15px;">Jugador que sale:</p>
+              <p style="font-weight: bold; color: #d32f2f; margin-bottom: 20px;">
+                #${playerOut.number} ${playerOut.name}
+              </p>
+              <p style="margin-bottom: 10px;">Selecciona el jugador que entra:</p>
+            `,
+            input: 'select',
+            inputOptions: inputOptions,
+            inputPlaceholder: 'Selecciona un jugador',
+            showCancelButton: true,
+            confirmButtonText: 'Siguiente',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#4caf50',
+            cancelButtonColor: '#d33',
+            inputValidator: (value) => {
+              if (!value) {
+                return 'Debes seleccionar un jugador';
+              }
+              return null;
+            }
+          }).then((result) => {
+            if (result.isConfirmed && result.value) {
+              const selectedPlayerId = parseInt(result.value);
+              const playerIn = players.find(p => p.tournamentTeamPlayerId === selectedPlayerId);
+
+              if (!playerIn) {
+                Swal.fire({
+                  title: 'Error',
+                  text: 'No se pudo encontrar el jugador seleccionado',
+                  icon: 'error',
+                  confirmButtonText: 'Aceptar'
+                });
+                return;
+              }
+
+              // Mostrar confirmación
+              Swal.fire({
+                title: '¿Confirmar sustitución?',
+                html: `
+                  <div style="text-align: left; padding: 0 20px;">
+                    <p style="margin-bottom: 15px;"><strong>Sustitución en ${teamName}</strong></p>
+                    <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                      <p style="margin: 0; color: #d32f2f;">
+                        <mat-icon style="vertical-align: middle;">arrow_upward</mat-icon>
+                        Sale: #${playerOut.number} ${playerOut.name}
+                      </p>
+                    </div>
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                      <p style="margin: 0; color: #2e7d32;">
+                        <mat-icon style="vertical-align: middle;">arrow_downward</mat-icon>
+                        Entra: #${playerIn.jerseyNumber} ${playerIn.fullName}
+                      </p>
+                    </div>
+                    <p style="margin-top: 15px; color: #666;">Minuto: ${this.getCurrentMinute()}'</p>
+                  </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, sustituir',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#4caf50',
+                cancelButtonColor: '#d33'
+              }).then((confirmResult) => {
+                if (confirmResult.isConfirmed) {
+                  this.executeSubstitution(playerOut, playerIn, team, teamName);
+                }
+              });
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Error al obtener jugadores disponibles:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar los jugadores disponibles',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+  }
+
+  /**
+   * Ejecuta la sustitución del jugador
+   */
+  private executeSubstitution(playerOut: Player, playerIn: AvailablePlayer, team: 'home' | 'away', teamName: string): void {
+    const isHomeTeam = team === 'home';
+    
+    // Crear evento de sustitución
+    const event: MatchEvent = {
+      tournamentTeamPlayerId: playerIn.tournamentTeamPlayerId,
+      eventType: MatchEventType.Substitution,
+      minute: this.getCurrentMinute(),
+      isHomeGoal: isHomeTeam,
+      description: `Sustitución: Sale #${playerOut.number} ${playerOut.name}, Entra #${playerIn.jerseyNumber} ${playerIn.fullName} (${teamName})`
+    };
+
+    const request: RegisterMatchEventRequest = {
+      matchId: this.matchId!,
+      events: [event]
+    };
+
+    // Mostrar loading
+    Swal.fire({
+      title: 'Registrando sustitución...',
+      text: 'Por favor espera',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // Llamar al API
+    this.vocaliaService.registerMatchEvent(request)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // Recargar información del partido desde el API
+          this.loadMatchData(this.matchId!);
+
+          Swal.fire({
+            title: '¡Sustitución registrada!',
+            html: `
+              <p>Sale: #${playerOut.number} ${playerOut.name}</p>
+              <p>Entra: #${playerIn.jerseyNumber} ${playerIn.fullName}</p>
+            `,
+            icon: 'success',
+            timer: 3000,
+            showConfirmButton: false
+          });
+        },
+        error: (error) => {
+          console.error('Error al registrar sustitución:', error);
+          Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudo registrar la sustitución',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+  }
+
+  /**
    * Filtra los jugadores por número de camiseta o nombre
    * Busca en la lista de jugadores obtenida del API (playerInGame)
    */

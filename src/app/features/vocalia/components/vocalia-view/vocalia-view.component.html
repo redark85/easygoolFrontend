@@ -258,6 +258,14 @@
               <mat-icon>square</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
+                    class="action-btn substitution-btn"
+                    (click)="substitutePlayer(player, 'home')"
+                    [matTooltip]="'Sustituir jugador'"
+                    matTooltipPosition="above">
+              <mat-icon>swap_horiz</mat-icon>
+            </button>
+            <button mat-mini-fab 
                     *ngIf="!hasMatchStarted"
                     class="action-btn remove-btn"
                     (click)="removePlayer(player, 'home')"
@@ -331,6 +339,15 @@
               <mat-icon>square</mat-icon>
             </button>
             <button mat-mini-fab 
+                    class="action-btn substitution-btn"
+                    *ngIf="hasMatchStarted"
+                    (click)="substitutePlayer(player, 'away')"
+                    [matTooltip]="'Sustituir jugador'"
+                    matTooltipPosition="above">
+              <mat-icon>swap_horiz</mat-icon>
+            </button>
+            <button mat-mini-fab 
+                    *ngIf="!hasMatchStarted"
                     class="action-btn remove-btn"
                     (click)="removePlayer(player, 'away')"
                     [matTooltip]="'Eliminar jugador'"
