@@ -49,15 +49,15 @@
                   <div class="tournament-meta-hero">
                     <div class="meta-item-hero">
                       <mat-icon>sports_soccer</mat-icon>
-                      <span>{{ stats?.totalMatches || 0 }} Partidos Jugados</span>
+                      <span>{{ stats.totalMatches || 0 }} Partidos Jugados</span>
                     </div>
                     <div class="meta-item-hero">
                       <mat-icon>sports</mat-icon>
-                      <span>{{ stats?.totalGoals || 0 }} Goles Totales</span>
+                      <span>{{ stats.totalGoals || 0 }} Goles Totales</span>
                     </div>
                     <div class="meta-item-hero">
                       <mat-icon>trending_up</mat-icon>
-                      <span>{{ (stats?.averageGoalsPerMatch || 0) | number:'1.1-1' }} Goles/Partido</span>
+                      <span>{{ (stats.averageGoalsPerMatch || 0) | number:'1.1-1' }} Goles/Partido</span>
                     </div>
                   </div>
                 </div>
@@ -113,10 +113,10 @@
                       Goles
                     </h4>
                     <div class="stat-display-mini">
-                      <span class="number-mini">{{ stats?.totalGoals || 0 }}</span>
+                      <span class="number-mini">{{ stats.totalGoals || 0 }}</span>
                       <span class="label-mini">Total</span>
                     </div>
-                    <div class="detail-mini">{{ (stats?.averageGoalsPerMatch || 0) | number:'1.1-1' }}/partido</div>
+                    <div class="detail-mini">{{ (stats.averageGoalsPerMatch || 0) | number:'1.1-1' }}/partido</div>
                   </div>
                 </div>
 
@@ -129,11 +129,11 @@
                     </h4>
                     <div class="cards-stats-mini">
                       <div class="card-stat yellow">
-                        <span class="number-mini">{{ stats?.totalYellowCards || 0 }}</span>
+                        <span class="number-mini">{{ stats.totalYellowCards || 0 }}</span>
                         <span class="label-mini">🟨</span>
                       </div>
                       <div class="card-stat red">
-                        <span class="number-mini">{{ stats?.totalRedCards || 0 }}</span>
+                        <span class="number-mini">{{ stats.totalRedCards || 0 }}</span>
                         <span class="label-mini">🟥</span>
                       </div>
                     </div>
@@ -151,10 +151,10 @@
                       Penales
                     </h4>
                     <div class="stat-display-mini">
-                      <span class="number-mini">{{ stats?.totalPenalties || 0 }}</span>
+                      <span class="number-mini">{{ stats.totalPenalties || 0 }}</span>
                       <span class="label-mini">Total</span>
                     </div>
-                    <div class="detail-mini">{{ ((stats?.totalPenalties || 0) / (stats?.totalMatches || 1)) | number:'1.1-1' }}/partido</div>
+                    <div class="detail-mini">{{ ((stats.totalPenalties || 0) / (stats.totalMatches || 1)) | number:'1.1-1' }}/partido</div>
                   </div>
                 </div>
 
@@ -166,7 +166,7 @@
                       Localía
                     </h4>
                     <div class="stat-display-mini">
-                      <span class="number-mini">{{ (stats?.homeWinPercentage || 0) | number:'1.0-0' }}%</span>
+                      <span class="number-mini">{{ (stats.homeWinPercentage || 0) | number:'1.0-0' }}%</span>
                       <span class="label-mini">Victoria</span>
                     </div>
                     <div class="detail-mini">Factor cancha</div>
@@ -202,8 +202,8 @@
                   </div>
                   <div class="record-content-mini">
                     <h4>Mayor Goleada</h4>
-                    <p class="record-value-mini">{{ records?.biggestWin?.score || 'N/A' }}</p>
-                    <p class="record-detail-mini">{{ records?.biggestWin?.winner || 'Sin datos' }} vs {{ records?.biggestWin?.loser || 'Sin datos' }}</p>
+                    <p class="record-value-mini">{{ records.biggestWin.score || 'N/A' }}</p>
+                    <p class="record-detail-mini">{{ records.biggestWin.winner || 'Sin datos' }} vs {{ records.biggestWin.loser || 'Sin datos' }}</p>
                   </div>
                 </div>
 
@@ -214,8 +214,8 @@
                   </div>
                   <div class="record-content-mini">
                     <h4>Más Goles</h4>
-                    <p class="record-value-mini">{{ records?.highestScoring?.totalGoals || 0 }}</p>
-                    <p class="record-detail-mini">{{ records?.highestScoring?.score || 'N/A' }}</p>
+                    <p class="record-value-mini">{{ records.highestScoring.totalGoals || 0 }}</p>
+                    <p class="record-detail-mini">{{ records.highestScoring.score || 'N/A' }}</p>
                   </div>
                 </div>
 
@@ -226,8 +226,8 @@
                   </div>
                   <div class="record-content-mini">
                     <h4>Mejor Racha</h4>
-                    <p class="record-value-mini">{{ records?.bestStreak?.wins || 0 }}</p>
-                    <p class="record-detail-mini">{{ records?.bestStreak?.team || 'Sin datos' }}</p>
+                    <p class="record-value-mini">{{ records.bestStreak.wins || 0 }}</p>
+                    <p class="record-detail-mini">{{ records.bestStreak.team || 'Sin datos' }}</p>
                   </div>
                 </div>
 
@@ -238,8 +238,8 @@
                   </div>
                   <div class="record-content-mini">
                     <h4>Mejor Defensa</h4>
-                    <p class="record-value-mini">{{ records?.bestDefense?.goalsAgainst || 0 }}</p>
-                    <p class="record-detail-mini">{{ records?.bestDefense?.team || 'Sin datos' }}</p>
+                    <p class="record-value-mini">{{ records.bestDefense.goalsAgainst || 0 }}</p>
+                    <p class="record-detail-mini">{{ records.bestDefense.team || 'Sin datos' }}</p>
                   </div>
                 </div>
 
@@ -250,8 +250,8 @@
                   </div>
                   <div class="record-content-mini">
                     <h4>Mejor Ataque</h4>
-                    <p class="record-value-mini">{{ records?.bestAttack?.goalsFor || 0 }}</p>
-                    <p class="record-detail-mini">{{ records?.bestAttack?.team || 'Sin datos' }}</p>
+                    <p class="record-value-mini">{{ records.bestAttack.goalsFor || 0 }}</p>
+                    <p class="record-detail-mini">{{ records.bestAttack.team || 'Sin datos' }}</p>
                   </div>
                 </div>
 
@@ -262,10 +262,10 @@
                   </div>
                   <div class="record-content-mini">
                     <h4>Fair Play</h4>
-                    <p class="record-detail-mini">{{ records?.fairPlayLeader?.team || 'Sin datos' }}</p>
+                    <p class="record-detail-mini">{{ records.fairPlayLeader.team || 'Sin datos' }}</p>
                     <div class="fair-play-mini">
-                      <span>🟨{{ records?.fairPlayLeader?.yellowCards || 0 }}</span>
-                      <span>🟥{{ records?.fairPlayLeader?.redCards || 0 }}</span>
+                      <span>🟨{{ records.fairPlayLeader.yellowCards || 0 }}</span>
+                      <span>🟥{{ records.fairPlayLeader.redCards || 0 }}</span>
                     </div>
                   </div>
                 </div>
@@ -350,8 +350,8 @@
                       <span class="result-label-mini">Local</span>
                     </div>
                     <div class="result-stats-mini">
-                      <span class="result-value-mini">{{ resultDistribution?.homeWins || 0 }}</span>
-                      <span class="result-percentage-mini">{{ ((resultDistribution?.homeWins || 0) / (stats?.totalMatches || 1) * 100) | number:'1.0-0' }}%</span>
+                      <span class="result-value-mini">{{ resultDistribution.homeWins || 0 }}</span>
+                      <span class="result-percentage-mini">{{ ((resultDistribution.homeWins || 0) / (stats.totalMatches || 1) * 100) | number:'1.0-0' }}%</span>
                     </div>
                   </div>
                   
@@ -361,8 +361,8 @@
                       <span class="result-label-mini">Empate</span>
                     </div>
                     <div class="result-stats-mini">
-                      <span class="result-value-mini">{{ resultDistribution?.draws || 0 }}</span>
-                      <span class="result-percentage-mini">{{ ((resultDistribution?.draws || 0) / (stats?.totalMatches || 1) * 100) | number:'1.0-0' }}%</span>
+                      <span class="result-value-mini">{{ resultDistribution.draws || 0 }}</span>
+                      <span class="result-percentage-mini">{{ ((resultDistribution.draws || 0) / (stats.totalMatches || 1) * 100) | number:'1.0-0' }}%</span>
                     </div>
                   </div>
                   
@@ -372,8 +372,8 @@
                       <span class="result-label-mini">Visit.</span>
                     </div>
                     <div class="result-stats-mini">
-                      <span class="result-value-mini">{{ resultDistribution?.awayWins || 0 }}</span>
-                      <span class="result-percentage-mini">{{ ((resultDistribution?.awayWins || 0) / (stats?.totalMatches || 1) * 100) | number:'1.0-0' }}%</span>
+                      <span class="result-value-mini">{{ resultDistribution.awayWins || 0 }}</span>
+                      <span class="result-percentage-mini">{{ ((resultDistribution.awayWins || 0) / (stats.totalMatches || 1) * 100) | number:'1.0-0' }}%</span>
                     </div>
                   </div>
                 </div>
@@ -392,7 +392,7 @@
                   <div class="insight-item-mini">
                     <mat-icon>sports_soccer</mat-icon>
                     <div class="insight-content-mini">
-                      <span class="insight-value-mini">{{ (stats?.averageGoalsPerMatch || 0) | number:'1.1-1' }}</span>
+                      <span class="insight-value-mini">{{ (stats.averageGoalsPerMatch || 0) | number:'1.1-1' }}</span>
                       <span class="insight-label-mini">Goles/Partido</span>
                     </div>
                   </div>
@@ -400,7 +400,7 @@
                   <div class="insight-item-mini">
                     <mat-icon>style</mat-icon>
                     <div class="insight-content-mini">
-                      <span class="insight-value-mini">{{ (((stats?.totalYellowCards || 0) + (stats?.totalRedCards || 0)) / (stats?.totalMatches || 1)) | number:'1.1-1' }}</span>
+                      <span class="insight-value-mini">{{ (((stats.totalYellowCards || 0) + (stats.totalRedCards || 0)) / (stats.totalMatches || 1)) | number:'1.1-1' }}</span>
                       <span class="insight-label-mini">Tarjetas/Partido</span>
                     </div>
                   </div>
@@ -408,7 +408,7 @@
                   <div class="insight-item-mini">
                     <mat-icon>home</mat-icon>
                     <div class="insight-content-mini">
-                      <span class="insight-value-mini">{{ (stats?.homeWinPercentage || 0) | number:'1.0-0' }}%</span>
+                      <span class="insight-value-mini">{{ (stats.homeWinPercentage || 0) | number:'1.0-0' }}%</span>
                       <span class="insight-label-mini">Factor Cancha</span>
                     </div>
                   </div>
@@ -416,7 +416,7 @@
                   <div class="insight-item-mini">
                     <mat-icon>gps_fixed</mat-icon>
                     <div class="insight-content-mini">
-                      <span class="insight-value-mini">{{ ((stats?.totalPenalties || 0) / (stats?.totalMatches || 1)) | number:'1.1-1' }}</span>
+                      <span class="insight-value-mini">{{ ((stats.totalPenalties || 0) / (stats.totalMatches || 1)) | number:'1.1-1' }}</span>
                       <span class="insight-label-mini">Penales/Partido</span>
                     </div>
                   </div>
