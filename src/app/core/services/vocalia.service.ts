@@ -146,9 +146,9 @@ export class VocaliaService {
    * @param tournamentId ID del torneo
    * @returns Observable con la lista de jugadores disponibles
    */
-  getAvailablePlayers(phaseTeamId: number, tournamentId: number): Observable<AvailablePlayer[]> {
+  getAvailablePlayers(phaseTeamId: number, tournamentId: number, matchId:number): Observable<AvailablePlayer[]> {
     return this.apiService.get<AvailablePlayersResponse>(
-      `${VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT}?phaseTeamId=${phaseTeamId}&tournamentId=${tournamentId}`
+      `${VOCALIA_GET_AVAILABLE_PLAYERS_ENDPOINT}/${matchId}?phaseTeamId=${phaseTeamId}&tournamentId=${tournamentId}`
     ).pipe(
       map(response => {
         if (response.succeed && response.result) {

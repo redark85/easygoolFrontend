@@ -223,25 +223,20 @@
             <div class="match-events" *ngIf="events && events.length > 0; else noEvents">
               <div class="timeline">
                 <div class="event" *ngFor="let event of events">
-                  <div class="event-content" [ngClass]="event.team === 'home' ? 'home' : 'away'">
+                  <div class="event-content" [ngClass]="event.isHomeTeam  ? 'home' : 'away'">
                     <span class="minute">{{ event.minute }}'</span>
 
                     <div class="event-icon-wrapper">
-                      <mat-icon class="event-icon" [ngClass]="'event-' + event.type">
+                      <mat-icon class="event-icon" [ngClass]="'event-' + mapEventType(event.type)">
                         {{ getEventIcon(event.type) }}
                       </mat-icon>
                     </div>
 
                     <div class="event-details">
-                      <span class="player">{{ event.player }}</span>
-                      <div class="assist" *ngIf="event.assistedBy">
-                        <mat-icon>trending_up</mat-icon>
-                        Asistencia: {{ event.assistedBy }}
-                      </div>
-                      <div class="substitution" *ngIf="event.playerOut">
-                        <mat-icon>swap_horiz</mat-icon>
-                        Sale: {{ event.playerOut }}
-                      </div>
+                      <span class="player">{{ event.description }}</span>
+                      <div class="assist" *ngIf="event.isPenalty">                       
+                        Penalty
+                      </div>                     
                     </div>
                   </div>
                 </div>

@@ -31,7 +31,10 @@ export interface MatchEvent {
   matchEventId: number;
   minute: number;
   description: string;
-  type: number;
+  type: MatchEventType;
+  isHomeTeam: boolean;
+  isPenalty: boolean;
+
 }
 
 export interface TeamLineUp {

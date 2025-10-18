@@ -118,26 +118,10 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       this.matchId = params['id'] ? +params['id'] : null;
       if (this.matchId) {
         this.loadMatchData(this.matchId);
+        // Cargar estado guardado para este partido específico
+        this.loadTimerState();
       }
     });
-
-    //NUEVO DE CHATGPT
-    // Cargar estado guardado
-    const savedState = localStorage.getItem('timerState');
-    if (savedState) {
-      const { startTime, elapsedSeconds, isRunning } = JSON.parse(savedState);
-
-      this.elapsedSeconds = elapsedSeconds;
-      this.isRunning = isRunning;
-    this.lastStartTime = startTime;
-      // Si estaba corriendo, recalcular cuánto tiempo pasó mientras la app no estaba abierta
-      if (isRunning && startTime) {
-        const now = Date.now();
-        const diff = Math.floor((now - startTime) / 1000);
-        this.elapsedSeconds += diff;
-        this.start(true);
-      }
-    }
   }
 
   ngOnDestroy(): void {
@@ -493,7 +477,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     });
 
     // Obtener jugadores disponibles del API
-    this.vocaliaService.getAvailablePlayers(phaseTeamId, this.tournamentId)
+    this.vocaliaService.getAvailablePlayers(phaseTeamId, this.tournamentId, this.matchId!)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (players) => {
@@ -1231,7 +1215,13 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     if (this.isRunning && !autoResume) return;
 
     this.isRunning = true;
-    this.lastStartTime = Date.now();
+    
+    // Solo actualizar lastStartTime si NO es un autoResume
+    // En autoResume, lastStartTime ya fue actualizado en loadTimerState()
+    if (!autoResume) {
+      this.lastStartTime = Date.now();
+    }
+    
     this.saveState();
 
     this.stopInterval();
@@ -1260,7 +1250,13 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     this.isRunning = false;
     this.stopInterval();
     this.updateMatchTime();
-    localStorage.removeItem('timerState');
+    
+    // Eliminar el estado guardado para este partido
+    if (this.matchId) {
+      const key = `timerState_${this.matchId}`;
+      localStorage.removeItem(key);
+    }
+    
     this.cdr.detectChanges();
   }
 
@@ -1275,14 +1271,55 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Guarda el estado del cronómetro en localStorage
+   * Guarda el estado del cronómetro en localStorage asociado al matchId
    */
   private saveState() {
-    localStorage.setItem('timerState', JSON.stringify({
+    if (!this.matchId) return;
+    
+    const key = `timerState_${this.matchId}`;
+    localStorage.setItem(key, JSON.stringify({
+      matchId: this.matchId,
       startTime: this.isRunning ? this.lastStartTime : null,
       elapsedSeconds: this.elapsedSeconds,
-      isRunning: this.isRunning
+      isRunning: this.isRunning,
+      matchProgressType: this.matchProgressType
     }));
+  }
+
+  /**
+   * Carga el estado del cronómetro desde localStorage para el partido actual
+   */
+  private loadTimerState() {
+    if (!this.matchId) return;
+
+    const key = `timerState_${this.matchId}`;
+    const savedState = localStorage.getItem(key);
+    
+    if (savedState) {
+      const { matchId, startTime, elapsedSeconds, isRunning, matchProgressType } = JSON.parse(savedState);
+
+      // Verificar que el estado sea del partido correcto
+      if (matchId === this.matchId) {
+        this.elapsedSeconds = elapsedSeconds;
+        this.isRunning = isRunning;
+        this.matchProgressType = matchProgressType;
+        
+        // Si estaba corriendo, recalcular cuánto tiempo pasó mientras la app no estaba abierta
+        if (isRunning && startTime) {
+          const now = Date.now();
+          const diff = Math.floor((now - startTime) / 1000);
+          this.elapsedSeconds += diff;
+          // Actualizar lastStartTime al momento actual para evitar duplicación
+          this.lastStartTime = now;
+          this.start(true);
+        } else {
+          this.lastStartTime = startTime;
+        }
+        
+        this.updateMatchTime();
+        this.cdr.detectChanges();
+      }
+    }
   }
 
   /**
