@@ -25,6 +25,7 @@ export interface PlayerScorer {
   goals: number;
   matchesPlayed: number;
   goalAverage: number;
+  penaltyGoals : number;
 }
 
 // Jugador con tarjetas desde API

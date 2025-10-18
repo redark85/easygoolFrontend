@@ -190,6 +190,11 @@
                       <mat-icon>sports_soccer</mat-icon>
                       {{ scorer.goals }}
                     </span>
+                     <span class="penalty-info" *ngIf="scorer.penaltyGoals > 0" 
+                        [matTooltip]="scorer.penaltyGoals + ' penaltis'">
+                    ({{ scorer.penaltyGoals }})
+                  </span>
+
                   </td>
                 </ng-container>
 

@@ -212,7 +212,8 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
         teamLogoUrl: player.teamLogoUrl || 'assets/team-placeholder.png',
         goals: player.goals || 0,
         matchesPlayed: player.matchesPlayed || 0,
-        goalAverage: player.goalAverage || 0
+        goalAverage: player.goalAverage || 0,
+        penaltyGoals: player.penaltyGoals || 0
       }));
       
       console.log('⚽ Goleadores procesados:', this.topScorers.length);
