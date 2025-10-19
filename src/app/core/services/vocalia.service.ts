@@ -22,6 +22,7 @@ export interface VocaliaPlayer {
   name: string;
   jersey: number;
   type: number;
+  matchAway? : boolean;
 }
 
 export interface AvailablePlayer {
@@ -34,6 +35,7 @@ export interface AvailablePlayer {
 
 export interface MatchEvent {
   tournamentTeamPlayerId: number;
+  tournamentTeamPlayerSustitutionId   ?: number;
   eventType: MatchEventType;
   minute: number;
   description?: string;

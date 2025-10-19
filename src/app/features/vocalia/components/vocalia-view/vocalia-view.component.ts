@@ -23,6 +23,7 @@ interface Player {
   goals: number;
   yellowCards: number;
   redCards: number;
+  matchAway? : boolean;
 }
 
 interface MatchIncident {
@@ -203,7 +204,8 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
       name: apiPlayer.name,
       goals: 0,
       yellowCards: 0,
-      redCards: 0
+      redCards: 0,
+      matchAway: apiPlayer.matchAway
     };
   }
 
@@ -669,10 +671,10 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     // Crear evento de sustitución
     const event: MatchEvent = {
       tournamentTeamPlayerId: playerIn.tournamentTeamPlayerId,
+      tournamentTeamPlayerSustitutionId: playerOut.id,
       eventType: MatchEventType.Substitution,
       minute: this.getCurrentMinute(),
       isHomeGoal: isHomeTeam,
-      description: `Sustitución: Sale #${playerOut.number} ${playerOut.name}, Entra #${playerIn.jerseyNumber} ${playerIn.fullName} (${teamName})`
     };
 
     const request: RegisterMatchEventRequest = {

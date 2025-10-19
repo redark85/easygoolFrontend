@@ -227,9 +227,13 @@
           <div class="player-info">
             <span class="player-number">#{{ player.number }}</span>
             <span class="player-name">{{ player.name }}</span>
+            <span class="player-name" *ngIf="player!.matchAway">(Sustituido)</span>
+
           </div>
           <div class="player-actions">
             <button mat-mini-fab 
+                    [disabled]="player!.matchAway"
+                    *ngIf="hasMatchStarted"
                     class="action-btn goal-btn"
                     (click)="addGoal(player, 'home')"
                     [matTooltip]="'Registrar gol'"
@@ -237,6 +241,7 @@
               <mat-icon>sports_soccer</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
                     class="action-btn yellow-btn"
                     (click)="addYellowCard(player, 'home')"
                     [matTooltip]="'Tarjeta amarilla'"
@@ -244,6 +249,7 @@
               <mat-icon>square</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
                     class="action-btn double-yellow-btn"
                     (click)="addDoubleYellowCard(player, 'home')"
                     [matTooltip]="'Doble amarilla'"
@@ -251,6 +257,7 @@
               <mat-icon>content_copy</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
                     class="action-btn red-btn"
                     (click)="addRedCard(player, 'home')"
                     [matTooltip]="'Tarjeta roja'"
@@ -258,6 +265,7 @@
               <mat-icon>square</mat-icon>
             </button>
             <button mat-mini-fab 
+                    [disabled]="player!.matchAway"
                     *ngIf="hasMatchStarted"
                     class="action-btn substitution-btn"
                     (click)="substitutePlayer(player, 'home')"
@@ -311,6 +319,7 @@
           </div>
           <div class="player-actions">
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
                     class="action-btn goal-btn"
                     (click)="addGoal(player, 'away')"
                     [matTooltip]="'Registrar gol'"
@@ -318,6 +327,7 @@
               <mat-icon>sports_soccer</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
                     class="action-btn yellow-btn"
                     (click)="addYellowCard(player, 'away')"
                     [matTooltip]="'Tarjeta amarilla'"
@@ -325,6 +335,7 @@
               <mat-icon>square</mat-icon>
             </button>
             <button mat-mini-fab 
+                    *ngIf="hasMatchStarted"
                     class="action-btn double-yellow-btn"
                     (click)="addDoubleYellowCard(player, 'away')"
                     [matTooltip]="'Doble amarilla'"
@@ -332,6 +343,7 @@
               <mat-icon>content_copy</mat-icon>
             </button>
             <button mat-mini-fab 
+            *ngIf="hasMatchStarted"
                     class="action-btn red-btn"
                     (click)="addRedCard(player, 'away')"
                     [matTooltip]="'Tarjeta roja'"
