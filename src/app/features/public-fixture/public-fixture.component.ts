@@ -265,7 +265,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
       total: fixtureResult.totalMatches,
       upcoming: fixtureResult.nextMatches,
       live: fixtureResult.liveMatches,
-      finished: fixtureResult.finishedMatches
+      finished: fixtureResult.playedMatches
     };
   }
 

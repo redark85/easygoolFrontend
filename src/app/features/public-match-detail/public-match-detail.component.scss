@@ -218,6 +218,80 @@
               }
             }
           }
+
+          .match-control-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+
+            .match-state-indicator {
+              margin-top: 8px;
+
+              .state-badge {
+                display: inline-block;
+                padding: 8px 20px;
+                border-radius: 24px;
+                font-size: 0.95rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(10px);
+
+                &.state-first-half {
+                  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+                  color: white;
+                  animation: pulse 2s ease-in-out infinite;
+                }
+
+                &.state-half-time {
+                  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                  color: white;
+                }
+
+                &.state-second-half {
+                  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                  color: white;
+                  animation: pulse 2s ease-in-out infinite;
+                }
+
+                &.state-half-second-time {
+                  background: linear-gradient(135deg, #ff6f00 0%, #e65100 100%);
+                  color: white;
+                }
+
+                &.state-extra-first {
+                  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+                  color: white;
+                  animation: pulse 1.5s ease-in-out infinite;
+                }
+
+                &.state-half-extra-first {
+                  background: linear-gradient(135deg, #8e24aa 0%, #6a1b9a 100%);
+                  color: white;
+                }
+
+                &.state-extra-second {
+                  background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+                  color: white;
+                  animation: pulse 1.5s ease-in-out infinite;
+                }
+
+                &.state-half-penalties {
+                  background: linear-gradient(135deg, #f57c00 0%, #e64a19 100%);
+                  color: white;
+                }
+
+                &.state-penalty {
+                  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+                  color: white;
+                  animation: pulse 1s ease-in-out infinite;
+                }
+              }
+            }
+          }
         }
       }
     }

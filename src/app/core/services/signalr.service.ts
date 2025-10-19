@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { MatchInProgressStatusType } from './vocalia.service';
 
 export interface MatchUpdateData {
   matchId: number;
@@ -12,6 +13,7 @@ export interface MatchUpdateData {
   matchInfo: any;
   homeTeamLineUp: any;
   awayTeamLineUp: any;
+  progressStatus: MatchInProgressStatusType;
 }
 
 @Injectable({

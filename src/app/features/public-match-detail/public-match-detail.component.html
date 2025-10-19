@@ -58,6 +58,34 @@
                   <span>Jornada {{ match.matchday }}</span>
                 </div>
               </div>
+
+              <!-- Match Control Buttons -->
+              <div class="match-control-buttons" *ngIf="match.progressStatus !== null && match.status === MatchStatusType.inProgress">
+                <!-- Match State Indicator -->
+                <div class="match-state-indicator">
+                  <span class="state-badge" [ngClass]="{
+                    'state-first-half': match.progressStatus === MatchInProgressStatusType.FirstHalf,
+                    'state-half-time': match.progressStatus === MatchInProgressStatusType.HalfTime,
+                    'state-second-half': match.progressStatus === MatchInProgressStatusType.SecondHalf,
+                    'state-half-second-time': match.progressStatus === MatchInProgressStatusType.HalfSecondTime,
+                    'state-extra-first': match.progressStatus === MatchInProgressStatusType.ExtraFirstTime,
+                    'state-half-extra-first': match.progressStatus === MatchInProgressStatusType.HalfFirstExtraTime,
+                    'state-extra-second': match.progressStatus === MatchInProgressStatusType.ExtraSecondTime,
+                    'state-half-penalties': match.progressStatus === MatchInProgressStatusType.HalfPenalties,
+                    'state-penalty': match.progressStatus === MatchInProgressStatusType.Penalty
+                  }">
+                    {{ match.progressStatus === MatchInProgressStatusType.FirstHalf ? 'Primer Tiempo' :
+                       match.progressStatus === MatchInProgressStatusType.HalfTime ? 'Descanso' :
+                       match.progressStatus === MatchInProgressStatusType.SecondHalf ? 'Segundo Tiempo' :
+                       match.progressStatus === MatchInProgressStatusType.HalfSecondTime ? 'Descanso (2do Tiempo)' :
+                       match.progressStatus === MatchInProgressStatusType.ExtraFirstTime ? 'Prórroga 1er Tiempo' :
+                       match.progressStatus === MatchInProgressStatusType.HalfFirstExtraTime ? 'Descanso (Prórroga)' :
+                       match.progressStatus === MatchInProgressStatusType.ExtraSecondTime ? 'Prórroga 2do Tiempo' :
+                       match.progressStatus === MatchInProgressStatusType.HalfPenalties ? 'Descanso (Pre-Penales)' :
+                       match.progressStatus === MatchInProgressStatusType.Penalty ? 'Tanda de Penales' : '' }}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <!-- Away Team -->

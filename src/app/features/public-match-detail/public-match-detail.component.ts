@@ -124,6 +124,7 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   matchProgressType: MatchInProgressStatusType | null = null;
     // Enum para usar en el template
   MatchInProgressStatusType = MatchInProgressStatusType;
+  MatchStatusType = MatchStatusType;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -204,7 +205,8 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       homeTeamLineUp: data.homeTeamLineUp,
       awayTeamLineUp: data.awayTeamLineUp,
       events: data.events,
-      statistics: data.statistics
+      statistics: data.statistics,
+      progressStatus: data.progressStatus
     };
 
     // Reutilizar el método existente de procesamiento
