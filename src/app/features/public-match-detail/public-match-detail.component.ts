@@ -21,6 +21,7 @@ import {
   MatchStatistics,
   TeamLineUp 
 } from './models/match-detail.interface';
+import { MatchInProgressStatusType } from '@core/services/vocalia.service';
 
 interface Team {
   id: number;
@@ -82,6 +83,7 @@ interface Match {
   awayLineup: Player[];
   events: MatchEvent[];
   stats: MatchStats;
+  progressStatus? : MatchInProgressStatusType;
 }
 
 /**
@@ -119,7 +121,9 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   
   // Control de visualización de estado
   hasValidStatus = false;
-
+  matchProgressType: MatchInProgressStatusType | null = null;
+    // Enum para usar en el template
+  MatchInProgressStatusType = MatchInProgressStatusType;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -314,6 +318,7 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
     // Crear objeto match compatible con la estructura actual
     this.match = {
       id: this.matchId,
+      progressStatus: result.progressStatus,
       homeTeam: {
         id: 1,
         name: matchInfo.homeTeamName,

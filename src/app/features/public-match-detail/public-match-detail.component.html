@@ -8,7 +8,8 @@
 
     <!-- Back Button -->
     <div class="back-button-container">
-      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás" matTooltipPosition="right">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Volver atrás"
+        matTooltipPosition="right">
         <mat-icon>arrow_back</mat-icon>
       </button>
     </div>
@@ -20,10 +21,10 @@
           <div class="match-header">
             <!-- Home Team -->
             <div class="team-section home">
-              <img [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/logo.png'" 
-                   [alt]="match.homeTeam.name || 'Equipo Local'" 
-                   class="team-logo"
-                   (error)="$event.target.src='assets/logo.png'">
+              <img
+                [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/logo.png'"
+                [alt]="match.homeTeam.name || 'Equipo Local'" class="team-logo"
+                (error)="$event.target.src='assets/logo.png'">
               <h2 class="team-name">{{ match.homeTeam.name || 'Equipo Local' }}</h2>
             </div>
 
@@ -61,10 +62,10 @@
 
             <!-- Away Team -->
             <div class="team-section away">
-              <img [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/logo.png'" 
-                   [alt]="match.awayTeam.name || 'Equipo Visitante'" 
-                   class="team-logo"
-                   (error)="$event.target.src='assets/logo.png'">
+              <img
+                [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/logo.png'"
+                [alt]="match.awayTeam.name || 'Equipo Visitante'" class="team-logo"
+                (error)="$event.target.src='assets/logo.png'">
               <h2 class="team-name">{{ match.awayTeam.name || 'Equipo Visitante' }}</h2>
             </div>
           </div>
@@ -120,16 +121,17 @@
                     <div class="team-header">
                       <div class="team-logo-container">
                         <h2 class="team-name-overlay">{{ match.homeTeam.name || 'Equipo Local' }}</h2>
-                        <img [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/logo.png'" 
-                             [alt]="match.homeTeam.name || 'Equipo Local'" 
-                             class="team-logo-small"
-                             (error)="$event.target.src='assets/logo.png'">
+                        <img
+                          [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/logo.png'"
+                          [alt]="match.homeTeam.name || 'Equipo Local'" class="team-logo-small"
+                          (error)="$event.target.src='assets/logo.png'">
                       </div>
                       <mat-chip class="formation-chip" *ngIf="match.homeFormation">{{ match.homeFormation }}</mat-chip>
                     </div>
 
                     <!-- Solo mostrar lista de jugadores si existen -->
-                    <div class="players-list" *ngIf="lineups.home.startingXI && lineups.home.startingXI.length > 0; else noPlayersMessage">
+                    <div class="players-list"
+                      *ngIf="lineups.home.startingXI && lineups.home.startingXI.length > 0; else noPlayersMessage">
                       <h4 class="list-title">Titulares</h4>
                       <div class="player-item" *ngFor="let player of lineups.home.startingXI">
                         <span class="number">{{ player.number }}</span>
@@ -137,7 +139,8 @@
                         <mat-chip class="position-chip">{{ player.position }}</mat-chip>
                       </div>
 
-                      <h4 class="list-title" *ngIf="lineups.home.substitutes && lineups.home.substitutes.length > 0">Suplentes</h4>
+                      <h4 class="list-title" *ngIf="lineups.home.substitutes && lineups.home.substitutes.length > 0">
+                        Suplentes</h4>
                       <div class="player-item" *ngFor="let player of lineups.home.substitutes">
                         <span class="number">{{ player.number }}</span>
                         <span class="name">{{ player.name }}</span>
@@ -163,16 +166,17 @@
                     <div class="team-header">
                       <div class="team-logo-container">
                         <h2 class="team-name-overlay">{{ match.awayTeam.name || 'Equipo Visitante' }}</h2>
-                        <img [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/logo.png'" 
-                             [alt]="match.awayTeam.name || 'Equipo Visitante'" 
-                             class="team-logo-small"
-                             (error)="$event.target.src='assets/logo.png'">
+                        <img
+                          [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/logo.png'"
+                          [alt]="match.awayTeam.name || 'Equipo Visitante'" class="team-logo-small"
+                          (error)="$event.target.src='assets/logo.png'">
                       </div>
                       <mat-chip class="formation-chip" *ngIf="match.awayFormation">{{ match.awayFormation }}</mat-chip>
                     </div>
 
                     <!-- Solo mostrar lista de jugadores si existen -->
-                    <div class="players-list" *ngIf="lineups.away.startingXI && lineups.away.startingXI.length > 0; else noAwayPlayersMessage">
+                    <div class="players-list"
+                      *ngIf="lineups.away.startingXI && lineups.away.startingXI.length > 0; else noAwayPlayersMessage">
                       <h4 class="list-title">Titulares</h4>
                       <div class="player-item" *ngFor="let player of lineups.away.startingXI">
                         <span class="number">{{ player.number }}</span>
@@ -180,7 +184,8 @@
                         <mat-chip class="position-chip">{{ player.position }}</mat-chip>
                       </div>
 
-                      <h4 class="list-title" *ngIf="lineups.away.substitutes && lineups.away.substitutes.length > 0">Suplentes</h4>
+                      <h4 class="list-title" *ngIf="lineups.away.substitutes && lineups.away.substitutes.length > 0">
+                        Suplentes</h4>
                       <div class="player-item" *ngFor="let player of lineups.away.substitutes">
                         <span class="number">{{ player.number }}</span>
                         <span class="name">{{ player.name }}</span>
@@ -234,9 +239,9 @@
 
                     <div class="event-details">
                       <span class="player">{{ event.description }}</span>
-                      <div class="assist" *ngIf="event.isPenalty">                       
+                      <div class="assist" *ngIf="event.isPenalty">
                         Penalty
-                      </div>                     
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -257,10 +262,7 @@
 </div>
 
 <!-- Loading State -->
-<app-public-loading
-  [isVisible]="isLoading"
-  text="Cargando detalles del partido..."
-  subtext="Por favor espere">
+<app-public-loading [isVisible]="isLoading" text="Cargando detalles del partido..." subtext="Por favor espere">
 </app-public-loading>
 
 <!-- Empty State -->

@@ -1,3 +1,5 @@
+import { MatchInProgressStatusType } from "@core/services/vocalia.service";
+
 export interface PublicMatchDetailResponse {
   succeed: boolean;
   message: string;
@@ -12,6 +14,7 @@ export interface PublicMatchDetailResult {
   homeTeamLineUp: TeamLineUp;
   awayTeamLineUp: TeamLineUp;
   statistics: MatchStatistics;
+  progressStatus: MatchInProgressStatusType;
 }
 
 export interface MatchInfo {

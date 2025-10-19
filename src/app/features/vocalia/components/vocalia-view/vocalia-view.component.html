@@ -228,7 +228,6 @@
             <span class="player-number">#{{ player.number }}</span>
             <span class="player-name">{{ player.name }}</span>
             <span class="player-name" *ngIf="player!.matchAway">(Sustituido)</span>
-
           </div>
           <div class="player-actions">
             <button mat-mini-fab 
@@ -316,9 +315,11 @@
           <div class="player-info">
             <span class="player-number">#{{ player.number }}</span>
             <span class="player-name">{{ player.name }}</span>
+             <span class="player-name" *ngIf="player!.matchAway">(Sustituido)</span>
           </div>
           <div class="player-actions">
             <button mat-mini-fab 
+                    [disabled]="player!.matchAway"
                     *ngIf="hasMatchStarted"
                     class="action-btn goal-btn"
                     (click)="addGoal(player, 'away')"
@@ -353,6 +354,7 @@
             <button mat-mini-fab 
                     class="action-btn substitution-btn"
                     *ngIf="hasMatchStarted"
+                    [disabled]="player!.matchAway"
                     (click)="substitutePlayer(player, 'away')"
                     [matTooltip]="'Sustituir jugador'"
                     matTooltipPosition="above">
