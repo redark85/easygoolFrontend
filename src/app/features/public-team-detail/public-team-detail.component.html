@@ -1,12 +1,15 @@
-<div class="public-team-detail-container">
-  <!-- Loading State -->
-  <div class="loading-container" *ngIf="isLoading">
-    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
-    <p class="loading-text">Cargando información del equipo...</p>
-  </div>
+<!-- Loading State -->
+<app-public-loading 
+  [isVisible]="isLoading"
+  text="Cargando información del equipo..."
+  subtext="Obteniendo datos desde el servidor"
+  [diameter]="50"
+  [strokeWidth]="3">
+</app-public-loading>
 
-  <!-- Team Detail Content -->
-  <div class="team-detail-content" *ngIf="!isLoading && team">
+<div class="public-team-detail-container">
+  <!-- Team Detail Content - Always visible -->
+  <div class="team-detail-content">
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-background">
@@ -29,7 +32,7 @@
               <!-- Team Logo -->
               <div class="col-auto">
                 <div class="fixture-icon-container">
-                  <img [src]="team.logoUrl" [alt]="team.name" class="team-logo-hero">
+                  <img [src]="team?.logoUrl || 'assets/team-placeholder.png'" [alt]="team?.name || 'Equipo'" class="team-logo-hero">
                 </div>
               </div>
 
@@ -37,9 +40,8 @@
               <div class="col">
                 <div class="fixture-info">
                   <div class="fixture-header">
-                    <h1 class="fixture-title">{{ team.name }}</h1>
-                    <p class="fixture-subtitle" *ngIf="team.motto">{{ team.motto }}</p>
-                    <p class="fixture-subtitle" *ngIf="!team.motto">Información del Equipo</p>
+                    <h1 class="fixture-title">{{ team?.name || 'Nombre del Equipo' }}</h1>
+                    <p class="fixture-subtitle">{{ team?.motto || 'Información del Equipo' }}</p>
                   </div>
                 </div>
               </div>
@@ -52,25 +54,25 @@
                   <div class="legend-item-hero">
                     <div class="legend-badge">
                       <mat-icon>emoji_events</mat-icon>
-                      {{ team.position }}° Posición
+                      {{ team?.position || 0 }}° Posición
                     </div>
                   </div>
                   <div class="legend-item-hero">
                     <div class="legend-badge">
                       <mat-icon>star</mat-icon>
-                      {{ team.points }} Puntos
+                      {{ team?.points || 0 }} Puntos
                     </div>
                   </div>
                   <div class="legend-item-hero">
                     <div class="legend-badge">
                       <mat-icon>people</mat-icon>
-                      {{ team.totalPlayers }} Jugadores
+                      {{ team?.totalPlayers || 0 }} Jugadores
                     </div>
                   </div>
                   <div class="legend-item-hero">
                     <div class="legend-badge">
                       <mat-icon>sports</mat-icon>
-                      {{ team.matchesPlayed }} Partidos
+                      {{ team?.matchesPlayed || 0 }} Partidos
                     </div>
                   </div>
                 </div>
@@ -83,15 +85,15 @@
                 <div class="team-meta-hero">
                   <div class="meta-item-hero">
                     <mat-icon>sports_soccer</mat-icon>
-                    <span>Fundado en {{ team.founded }}</span>
+                    <span>Fundado en {{ team?.founded || 'N/A' }}</span>
                   </div>
                   <div class="meta-item-hero">
                     <mat-icon>stadium</mat-icon>
-                    <span>{{ team.stadium }}</span>
+                    <span>{{ team?.stadium || 'Estadio por definir' }}</span>
                   </div>
                   <div class="meta-item-hero">
                     <mat-icon>person</mat-icon>
-                    <span>DT: {{ team.coach }}</span>
+                    <span>DT: {{ team?.coach || 'Por definir' }}</span>
                   </div>
                 </div>
               </div>
@@ -112,15 +114,15 @@
                     </h4>
                     <div class="record-stats-mini">
                       <div class="stat-mini wins">
-                        <span class="number-mini">{{ team.wins }}</span>
+                        <span class="number-mini">{{ team?.wins || 0 }}</span>
                         <span class="label-mini">V</span>
                       </div>
                       <div class="stat-mini draws">
-                        <span class="number-mini">{{ team.draws }}</span>
+                        <span class="number-mini">{{ team?.draws || 0 }}</span>
                         <span class="label-mini">E</span>
                       </div>
                       <div class="stat-mini losses">
-                        <span class="number-mini">{{ team.losses }}</span>
+                        <span class="number-mini">{{ team?.losses || 0 }}</span>
                         <span class="label-mini">D</span>
                       </div>
                     </div>
@@ -136,15 +138,15 @@
                     </h4>
                     <div class="goals-stats-mini">
                       <div class="stat-mini for">
-                        <span class="number-mini">{{ team.goalsFor }}</span>
+                        <span class="number-mini">{{ team?.goalsFor || 0 }}</span>
                         <span class="label-mini">GF</span>
                       </div>
                       <div class="stat-mini against">
-                        <span class="number-mini">{{ team.goalsAgainst }}</span>
+                        <span class="number-mini">{{ team?.goalsAgainst || 0 }}</span>
                         <span class="label-mini">GC</span>
                       </div>
-                      <div class="stat-mini difference" [class.positive]="team.goalDifference > 0" [class.negative]="team.goalDifference < 0">
-                        <span class="number-mini">{{ team.goalDifference > 0 ? '+' : '' }}{{ team.goalDifference }}</span>
+                      <div class="stat-mini difference" [class.positive]="(team?.goalDifference || 0) > 0" [class.negative]="(team?.goalDifference || 0) < 0">
+                        <span class="number-mini">{{ (team?.goalDifference || 0) > 0 ? '+' : '' }}{{ team?.goalDifference || 0 }}</span>
                         <span class="label-mini">DG</span>
                       </div>
                     </div>
@@ -162,7 +164,7 @@
                       Forma
                     </h4>
                     <div class="form-badges-mini">
-                      <div *ngFor="let result of team.lastFiveResults" 
+                      <div *ngFor="let result of team?.lastFiveResults || []" 
                            [class]="'result-badge-mini ' + getResultClass(result)"
                            [matTooltip]="result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'">
                         {{ getResultText(result) }}
@@ -180,7 +182,7 @@
                     </h4>
                     <div class="quick-stats-grid-mini">
                       <div class="quick-stat-mini">
-                        <span class="value-mini">{{ (team.points / team.matchesPlayed) | number:'1.1-1' }}</span>
+                        <span class="value-mini">{{ ((team?.points || 0) / (team?.matchesPlayed || 1)) | number:'1.1-1' }}</span>
                         <span class="label-mini">PPP</span>
                       </div>
                       <div class="quick-stat-mini">
@@ -209,7 +211,7 @@
                   <mat-icon>groups</mat-icon>
                   Plantilla Completa
                 </h3>
-                <p class="roster-count">{{ team.totalPlayers }} jugadores registrados</p>
+                <p class="roster-count">{{ team?.totalPlayers || 0 }} jugadores registrados</p>
               </div>
 
               <div class="players-by-position">
@@ -228,7 +230,7 @@
                     <div *ngFor="let player of getPlayersByPosition(position.value)" 
                          class="player-card">
                       <div class="player-number">{{ player.jerseyNumber }}</div>
-                      <img [src]="player.photoUrl" [alt]="player.name" class="player-photo">
+                      <img [src]="player.photoUrl || 'assets/person.jpg'" [alt]="player.name" class="player-photo" (error)="$event.target.src='assets/person.jpg'">
                       <div class="player-info">
                         <span class="player-name">{{ player.name }}</span>
                         <span class="player-matches">{{ player.matchesPlayed }} PJ</span>
@@ -268,10 +270,10 @@
                 
                 <div class="matches-content">
                   <!-- Upcoming Matches -->
-                  <div class="matches-group" *ngIf="team.upcomingMatches.length > 0">
+                  <div class="matches-group" *ngIf="(team?.upcomingMatches?.length || 0) > 0">
                     <h5 class="group-title">Próximos</h5>
                     <div class="matches-list-mini">
-                      <div *ngFor="let match of team.upcomingMatches.slice(0, 2)" 
+                      <div *ngFor="let match of (team?.upcomingMatches || []).slice(0, 2)" 
                            class="match-item-mini upcoming"
                            (click)="viewMatchDetail(match.id)">
                         <div class="match-date-mini">
@@ -280,9 +282,9 @@
                         </div>
                         <div class="match-info-mini">
                           <div class="match-teams-mini">
-                            <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
+                            <span class="team-name">{{ match.isHome ? (team?.name || 'Equipo') : match.opponent }}</span>
                             <span class="vs">vs</span>
-                            <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
+                            <span class="team-name">{{ match.isHome ? match.opponent : (team?.name || 'Equipo') }}</span>
                           </div>
                           <div class="match-venue-mini">
                             <mat-icon>{{ match.isHome ? 'home' : 'flight_takeoff' }}</mat-icon>
@@ -294,10 +296,10 @@
                   </div>
 
                   <!-- Past Matches -->
-                  <div class="matches-group" *ngIf="team.pastMatches.length > 0">
+                  <div class="matches-group" *ngIf="(team?.pastMatches?.length || 0) > 0">
                     <h5 class="group-title">Recientes</h5>
                     <div class="matches-list-mini">
-                      <div *ngFor="let match of team.pastMatches.slice(0, 2)" 
+                      <div *ngFor="let match of (team?.pastMatches || []).slice(0, 2)" 
                            class="match-item-mini finished"
                            (click)="viewMatchDetail(match.id)">
                         <div class="match-date-mini">
@@ -306,9 +308,9 @@
                         </div>
                         <div class="match-info-mini">
                           <div class="match-teams-mini">
-                            <span class="team-name">{{ match.isHome ? team.name : match.opponent }}</span>
+                            <span class="team-name">{{ match.isHome ? (team?.name || 'Equipo') : match.opponent }}</span>
                             <span class="score">{{ match.score }}</span>
-                            <span class="team-name">{{ match.isHome ? match.opponent : team.name }}</span>
+                            <span class="team-name">{{ match.isHome ? match.opponent : (team?.name || 'Equipo') }}</span>
                           </div>
                         </div>
                         <div class="match-result-mini">
@@ -339,7 +341,7 @@
                         <mat-icon>emoji_events</mat-icon>
                       </div>
                       <div class="stat-content-mini">
-                        <span class="stat-value-mini">{{ team.wins }}</span>
+                        <span class="stat-value-mini">{{ team?.wins || 0 }}</span>
                         <span class="stat-label-mini">Victorias</span>
                       </div>
                     </div>
@@ -349,7 +351,7 @@
                         <mat-icon>sports_soccer</mat-icon>
                       </div>
                       <div class="stat-content-mini">
-                        <span class="stat-value-mini">{{ team.goalsFor }}</span>
+                        <span class="stat-value-mini">{{ team?.goalsFor || 0 }}</span>
                         <span class="stat-label-mini">Goles</span>
                       </div>
                     </div>
@@ -359,7 +361,7 @@
                         <mat-icon>shield</mat-icon>
                       </div>
                       <div class="stat-content-mini">
-                        <span class="stat-value-mini">{{ team.goalsAgainst }}</span>
+                        <span class="stat-value-mini">{{ team?.goalsAgainst || 0 }}</span>
                         <span class="stat-label-mini">Recibidos</span>
                       </div>
                     </div>
@@ -369,19 +371,19 @@
                         <mat-icon>star</mat-icon>
                       </div>
                       <div class="stat-content-mini">
-                        <span class="stat-value-mini">{{ team.points }}</span>
+                        <span class="stat-value-mini">{{ team?.points || 0 }}</span>
                         <span class="stat-label-mini">Puntos</span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Top Player -->
-                  <div class="top-player-mini" *ngIf="team.players.length > 0">
+                  <div class="top-player-mini" *ngIf="(team?.players?.length || 0) > 0">
                     <div class="player-highlight-mini">
-                      <img [src]="team.players[12].photoUrl" [alt]="team.players[12].name" class="player-photo-mini">
+                      <img [src]="team?.players?.[0]?.photoUrl || 'assets/person.jpg'" [alt]="team?.players?.[0]?.name || 'Jugador'" class="player-photo-mini" (error)="$event.target.src='assets/person.jpg'">
                       <div class="player-details-mini">
-                        <span class="name-mini">{{ team.players[12].name }}</span>
-                        <span class="stat-mini">{{ team.players[12].goals }} goles</span>
+                        <span class="name-mini">{{ team?.players?.[0]?.name || 'Jugador destacado' }}</span>
+                        <span class="stat-mini">{{ team?.players?.[0]?.goals || 0 }} goles</span>
                       </div>
                       <div class="player-badge-mini">
                         <mat-icon>sports_soccer</mat-icon>

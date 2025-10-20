@@ -10,55 +10,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
-
-interface Player {
-  id: number;
-  name: string;
-  jerseyNumber: number;
-  position: string;
-  photoUrl: string;
-  goals: number;
-  assists: number;
-  yellowCards: number;
-  redCards: number;
-  matchesPlayed: number;
-}
-
-interface Match {
-  id: number;
-  opponent: string;
-  opponentLogo: string;
-  date: Date;
-  isHome: boolean;
-  score?: string;
-  result?: 'W' | 'D' | 'L';
-  status: 'upcoming' | 'finished';
-}
-
-interface Team {
-  id: number;
-  name: string;
-  shortName: string;
-  logoUrl: string;
-  motto: string;
-  position: number;
-  points: number;
-  matchesPlayed: number;
-  wins: number;
-  draws: number;
-  losses: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
-  totalPlayers: number;
-  coach: string;
-  stadium: string;
-  founded: number;
-  lastFiveResults: ('W' | 'D' | 'L')[];
-  players: Player[];
-  upcomingMatches: Match[];
-  pastMatches: Match[];
-}
+import { TeamDetailService } from './services/team-detail.service';
+import { TeamDetailForComponent } from './models/team-detail.interface';
+import { PublicLoadingComponent } from '../../shared/components/public-loading/public-loading.component';
 
 interface Position {
   value: string;
@@ -81,16 +35,19 @@ interface Position {
     MatChipsModule,
     MatProgressSpinnerModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    PublicLoadingComponent
   ],
   templateUrl: './public-team-detail.component.html',
   styleUrls: ['./public-team-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicTeamDetailComponent implements OnInit, OnDestroy {
-  team: Team | null = null;
-  teamId: number = 0;
+  team: TeamDetailForComponent | null = null;
+  tournamentTeamId: number = 0;
   isLoading = false;
+  hasError = false;
+  errorMessage = '';
 
   positions: Position[] = [
     { value: 'GK', name: 'Porteros' },
@@ -104,18 +61,25 @@ export class PublicTeamDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private teamDetailService: TeamDetailService
   ) {}
 
   ngOnInit(): void {
-    // Obtener teamId de la ruta
+    console.log('🚀 PublicTeamDetailComponent - Initializing...');
+    
+    // Obtener tournamentTeamId de la ruta
     this.route.paramMap
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         const id = params.get('teamId');
-        if (id) {
-          this.teamId = +id;
+        if (id && !isNaN(+id)) {
+          this.tournamentTeamId = +id;
+          console.log('📋 PublicTeamDetailComponent - Tournament Team ID from route:', this.tournamentTeamId);
           this.loadTeamDetail();
+        } else {
+          console.error('❌ PublicTeamDetailComponent - Invalid team ID in route:', id);
+          this.handleError('ID de equipo inválido');
         }
       });
   }
@@ -126,110 +90,58 @@ export class PublicTeamDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los detalles del equipo
+   * Carga los detalles del equipo desde el API
    */
-  private loadTeamDetail(): void {
+  loadTeamDetail(): void {
+    console.log('📡 PublicTeamDetailComponent - Loading team details from API...');
+    
     this.isLoading = true;
-    
-    // TODO: Cargar desde API
-    // Por ahora usar datos dummy
-    this.loadDummyTeam();
-    
-    this.isLoading = false;
+    this.hasError = false;
+    this.errorMessage = '';
     this.cdr.detectChanges();
+    
+    this.teamDetailService.getTeamDetails(this.tournamentTeamId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (teamData) => {
+          console.log('✅ PublicTeamDetailComponent - Team data received:', teamData);
+          
+          if (teamData) {
+            this.team = teamData;
+            console.log('🏆 PublicTeamDetailComponent - Team loaded successfully:', this.team.name);
+          } else {
+            console.warn('⚠️ PublicTeamDetailComponent - No team data received');
+            this.handleError('No se encontraron datos del equipo');
+          }
+          
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('❌ PublicTeamDetailComponent - Error loading team details:', error);
+          this.handleError('Error al cargar los datos del equipo');
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   /**
-   * Carga datos dummy del equipo
+   * Maneja errores de carga
    */
-  private loadDummyTeam(): void {
-    this.team = {
-      id: this.teamId,
-      name: 'Real Madrid',
-      shortName: 'RMA',
-      logoUrl: 'assets/team-placeholder.png',
-      motto: 'Hala Madrid',
-      position: 1,
-      points: 68,
-      matchesPlayed: 25,
-      wins: 21,
-      draws: 5,
-      losses: 4,
-      goalsFor: 65,
-      goalsAgainst: 28,
-      goalDifference: 37,
-      totalPlayers: 25,
-      coach: 'Carlo Ancelotti',
-      stadium: 'Santiago Bernabéu',
-      founded: 1902,
-      lastFiveResults: ['W', 'W', 'D', 'W', 'L'],
-      players: this.generateDummyPlayers(),
-      upcomingMatches: this.generateUpcomingMatches(),
-      pastMatches: this.generatePastMatches()
-    };
+  private handleError(message: string): void {
+    this.hasError = true;
+    this.errorMessage = message;
+    this.team = null;
   }
 
-  /**
-   * Genera jugadores dummy
-   */
-  private generateDummyPlayers(): Player[] {
-    const players: Player[] = [
-      // Porteros
-      { id: 1, name: 'Thibaut Courtois', jerseyNumber: 1, position: 'GK', photoUrl: 'assets/player-placeholder.png', goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 20 },
-      { id: 2, name: 'Andriy Lunin', jerseyNumber: 13, position: 'GK', photoUrl: 'assets/player-placeholder.png', goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 5 },
-      
-      // Defensas
-      { id: 3, name: 'Dani Carvajal', jerseyNumber: 2, position: 'DEF', photoUrl: 'assets/player-placeholder.png', goals: 2, assists: 4, yellowCards: 5, redCards: 0, matchesPlayed: 22 },
-      { id: 4, name: 'Éder Militão', jerseyNumber: 3, position: 'DEF', photoUrl: 'assets/player-placeholder.png', goals: 3, assists: 1, yellowCards: 4, redCards: 0, matchesPlayed: 23 },
-      { id: 5, name: 'David Alaba', jerseyNumber: 4, position: 'DEF', photoUrl: 'assets/player-placeholder.png', goals: 2, assists: 3, yellowCards: 3, redCards: 0, matchesPlayed: 20 },
-      { id: 6, name: 'Ferland Mendy', jerseyNumber: 23, position: 'DEF', photoUrl: 'assets/player-placeholder.png', goals: 1, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 18 },
-      { id: 7, name: 'Antonio Rüdiger', jerseyNumber: 22, position: 'DEF', photoUrl: 'assets/player-placeholder.png', goals: 2, assists: 1, yellowCards: 6, redCards: 1, matchesPlayed: 24 },
-      
-      // Mediocampistas
-      { id: 8, name: 'Luka Modrić', jerseyNumber: 10, position: 'MID', photoUrl: 'assets/player-placeholder.png', goals: 4, assists: 8, yellowCards: 3, redCards: 0, matchesPlayed: 23 },
-      { id: 9, name: 'Toni Kroos', jerseyNumber: 8, position: 'MID', photoUrl: 'assets/player-placeholder.png', goals: 3, assists: 10, yellowCards: 2, redCards: 0, matchesPlayed: 24 },
-      { id: 10, name: 'Federico Valverde', jerseyNumber: 15, position: 'MID', photoUrl: 'assets/player-placeholder.png', goals: 6, assists: 5, yellowCards: 4, redCards: 0, matchesPlayed: 25 },
-      { id: 11, name: 'Eduardo Camavinga', jerseyNumber: 12, position: 'MID', photoUrl: 'assets/player-placeholder.png', goals: 2, assists: 3, yellowCards: 3, redCards: 0, matchesPlayed: 20 },
-      { id: 12, name: 'Aurélien Tchouaméni', jerseyNumber: 18, position: 'MID', photoUrl: 'assets/player-placeholder.png', goals: 1, assists: 2, yellowCards: 5, redCards: 0, matchesPlayed: 22 },
-      
-      // Delanteros
-      { id: 13, name: 'Karim Benzema', jerseyNumber: 9, position: 'FWD', photoUrl: 'assets/player-placeholder.png', goals: 22, assists: 8, yellowCards: 2, redCards: 0, matchesPlayed: 24 },
-      { id: 14, name: 'Vinícius Jr', jerseyNumber: 7, position: 'FWD', photoUrl: 'assets/player-placeholder.png', goals: 18, assists: 12, yellowCards: 4, redCards: 0, matchesPlayed: 25 },
-      { id: 15, name: 'Rodrygo', jerseyNumber: 11, position: 'FWD', photoUrl: 'assets/player-placeholder.png', goals: 12, assists: 7, yellowCards: 1, redCards: 0, matchesPlayed: 23 },
-      { id: 16, name: 'Marco Asensio', jerseyNumber: 20, position: 'FWD', photoUrl: 'assets/player-placeholder.png', goals: 8, assists: 4, yellowCards: 2, redCards: 0, matchesPlayed: 18 }
-    ];
 
-    return players;
-  }
 
-  /**
-   * Genera partidos próximos
-   */
-  private generateUpcomingMatches(): Match[] {
-    return [
-      { id: 1, opponent: 'Barcelona', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), isHome: true, status: 'upcoming' },
-      { id: 2, opponent: 'Atlético Madrid', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), isHome: false, status: 'upcoming' },
-      { id: 3, opponent: 'Sevilla FC', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), isHome: true, status: 'upcoming' }
-    ];
-  }
-
-  /**
-   * Genera partidos pasados
-   */
-  private generatePastMatches(): Match[] {
-    return [
-      { id: 4, opponent: 'Valencia CF', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), isHome: true, score: '3-1', result: 'W', status: 'finished' },
-      { id: 5, opponent: 'Real Betis', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), isHome: false, score: '2-2', result: 'D', status: 'finished' },
-      { id: 6, opponent: 'Athletic Bilbao', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), isHome: true, score: '4-0', result: 'W', status: 'finished' },
-      { id: 7, opponent: 'Villarreal CF', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), isHome: false, score: '1-2', result: 'L', status: 'finished' },
-      { id: 8, opponent: 'Real Sociedad', opponentLogo: 'assets/team-placeholder.png', date: new Date(Date.now() - 17 * 24 * 60 * 60 * 1000), isHome: true, score: '2-0', result: 'W', status: 'finished' }
-    ];
-  }
 
   /**
    * Obtiene jugadores por posición
    */
-  getPlayersByPosition(position: string): Player[] {
+  getPlayersByPosition(position: string): any[] {
     if (!this.team) return [];
     return this.team.players.filter(p => p.position === position);
   }
@@ -257,7 +169,13 @@ export class PublicTeamDetailComponent implements OnInit, OnDestroy {
    * Navega hacia atrás
    */
   goBack(): void {
-    this.router.navigate(['/public-teams', 1]); // TODO: Usar tournamentId real
+    // Intentar navegar hacia atrás en el historial
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback a la página principal de equipos públicos
+      this.router.navigate(['/public-teams']);
+    }
   }
 
   /**
@@ -271,15 +189,15 @@ export class PublicTeamDetailComponent implements OnInit, OnDestroy {
    * Obtiene el porcentaje de victorias
    */
   getWinPercentage(): number {
-    if (!this.team || this.team.matchesPlayed === 0) return 0;
-    return (this.team.wins / this.team.matchesPlayed) * 100;
+    if (!this.team || (this.team.matchesPlayed || 0) === 0) return 0;
+    return ((this.team.wins || 0) / (this.team.matchesPlayed || 1)) * 100;
   }
 
   /**
    * Obtiene el promedio de goles por partido
    */
   getGoalsPerMatch(): number {
-    if (!this.team || this.team.matchesPlayed === 0) return 0;
-    return this.team.goalsFor / this.team.matchesPlayed;
+    if (!this.team || (this.team.matchesPlayed || 0) === 0) return 0;
+    return (this.team.goalsFor || 0) / (this.team.matchesPlayed || 1);
   }
 }
