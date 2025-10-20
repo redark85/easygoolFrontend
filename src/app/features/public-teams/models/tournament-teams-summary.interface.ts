@@ -20,6 +20,7 @@ export interface TeamSummary {
   draws: number;
   losses: number;
   position: number;
+  tournamentTeamId : number;
 }
 
 export interface TournamentTeamsSummaryData {

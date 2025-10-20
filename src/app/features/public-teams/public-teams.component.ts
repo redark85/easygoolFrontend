@@ -213,7 +213,7 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
     
     // Procesar equipos
     this.teams = data.teams?.map((teamData: TeamSummary, index: number) => ({
-      id: index + 1, // Generar ID secuencial
+      id: teamData.tournamentTeamId, 
       name: teamData.teamName || 'Equipo sin nombre',
       shortName: teamData.teamName?.substring(0, 3).toUpperCase() || 'TBD', // Generar shortName
       logoUrl: teamData.teamLogoUrl || 'assets/default-team.png',
