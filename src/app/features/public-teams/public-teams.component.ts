@@ -11,29 +11,33 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
-import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService } from '@core/services';
+import { Subject, takeUntil, finalize } from 'rxjs';
+import { ManagerService, TournamentPhase, TournamentGroup, PhaseType, ToastService, ApiService } from '@core/services';
+import { FIXTURE_GET_TOURNAMENT_TEAMS_SUMMARY_ENDPOINT } from '@core/config/endpoints';
+import { TournamentTeamsSummaryApiResponse, TournamentTeamsSummaryData, TournamentTeamsSummaryParams, TeamSummary } from './models/tournament-teams-summary.interface';
+import { PublicLoadingComponent } from '@shared/components/public-loading/public-loading.component';
 
 interface Team {
-  id: number;
-  name: string;
-  shortName: string;
-  logoUrl: string;
+  id?: number; // Opcional para compatibilidad
+  name: string; // Mapea de teamName
+  shortName?: string; // Opcional, no viene del API
+  logoUrl: string; // Mapea de teamLogoUrl
   position: number;
   points: number;
-  matchesPlayed: number;
+  matchesPlayed?: number; // Calculado de wins + draws + losses
   wins: number;
   draws: number;
   losses: number;
   goalsFor: number;
   goalsAgainst: number;
   goalDifference: number;
-  totalPlayers: number;
-  groupId: number;
+  totalPlayers: number; // Mapea de playersCount
+  groupId?: number; // Opcional, calculado del groupName
   groupName: string;
-  coach: string;
-  stadium: string;
-  founded: number;
+  // Campos adicionales para UI (no vienen del API)
+  coach?: string;
+  stadium?: string;
+  founded?: number;
 }
 
 interface Group {
@@ -65,7 +69,8 @@ interface PositionFilter {
     MatChipsModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    PublicLoadingComponent
   ],
   templateUrl: './public-teams.component.html',
   styleUrls: ['./public-teams.component.scss'],
@@ -106,7 +111,8 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private managerService: ManagerService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -147,33 +153,113 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos de los equipos
+   * Carga los datos de los equipos desde el API
    */
   private loadData(): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
     
-    try {
-      console.log('Cargando equipos - Fase:', this.selectedPhaseId, 'Grupo:', this.selectedGroupId);
-      
-      // Siempre cargar equipos dummy para mostrar algo
-      this.generateDummyTeams();
-      this.calculateStats();
-      this.applyFilters();
-      
-      console.log('Equipos cargados:', this.teams.length);
-      console.log('Equipos filtrados:', this.filteredTeams.length);
-      
-    } catch (error) {
-      console.error('Error al cargar equipos:', error);
-      // En caso de error, asegurar que tenemos datos básicos
-      this.teams = [];
-      this.filteredTeams = [];
-    } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }
+    const params: TournamentTeamsSummaryParams = {
+      phaseId: this.selectedPhaseId || 0,
+      groupId: this.selectedGroupId || 0
+    };
+    
+    console.log('🏆 Cargando equipos para:', params);
+    
+    this.apiService.get<TournamentTeamsSummaryApiResponse>(
+      `${FIXTURE_GET_TOURNAMENT_TEAMS_SUMMARY_ENDPOINT}?PhaseId=${params.phaseId}&GroupId=${params.groupId}`
+    )
+    .pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (response) => {
+        console.log('✅ Respuesta del API de equipos:', response);
+        
+        if (response.succeed && response.result) {
+          this.processApiData(response.result);
+        } else {
+          console.warn('⚠️ API response no exitosa:', response.message);
+          this.toastService.showWarning(response.message || 'No se pudieron cargar los equipos');
+          this.clearData();
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar equipos:', error);
+        this.toastService.showError('Error al cargar los equipos del torneo');
+        this.clearData();
+      }
+    });
   }
 
+  /**
+   * Procesa los datos recibidos del API
+   */
+  private processApiData(data: TournamentTeamsSummaryData): void {
+    console.log('🔄 Procesando datos del API:', data);
+    console.log('📊 Teams recibidos del API:', data.teams?.length || 0);
+    
+    // Procesar estadísticas principales
+    this.stats = {
+      totalTeams: data.totalTeams || 0,
+      totalPlayers: data.totalPlayers || 0,
+      totalGoals: data.totalGoals || 0,
+      averageGoals: data.goalsAverage || 0
+    };
+    
+    // Procesar equipos
+    this.teams = data.teams?.map((teamData: TeamSummary, index: number) => ({
+      id: index + 1, // Generar ID secuencial
+      name: teamData.teamName || 'Equipo sin nombre',
+      shortName: teamData.teamName?.substring(0, 3).toUpperCase() || 'TBD', // Generar shortName
+      logoUrl: teamData.teamLogoUrl || 'assets/default-team.png',
+      position: teamData.position || 0,
+      points: teamData.points || 0,
+      matchesPlayed: (teamData.wins || 0) + (teamData.draws || 0) + (teamData.losses || 0),
+      wins: teamData.wins || 0,
+      draws: teamData.draws || 0,
+      losses: teamData.losses || 0,
+      goalsFor: teamData.goalsFor || 0,
+      goalsAgainst: teamData.goalsAgainst || 0,
+      goalDifference: teamData.goalDifference || 0,
+      totalPlayers: teamData.playersCount || 0,
+      groupId: index + 1, // Generar groupId basado en el índice
+      groupName: teamData.groupName || 'Sin grupo',
+      // Campos adicionales para UI (valores por defecto)
+      coach: 'Entrenador no disponible',
+      stadium: 'Estadio no disponible',
+      founded: 2000
+    })) || [];
+    
+    // Aplicar filtros después de procesar
+    this.applyFilters();
+    
+    console.log('✅ Datos procesados correctamente');
+    console.log('📈 Stats:', this.stats);
+    console.log('🏆 Teams procesados:', this.teams.length);
+    console.log('🔍 Teams filtrados:', this.filteredTeams.length);
+    console.log('👥 Equipos:', this.teams.map(t => ({ name: t.name, group: t.groupName, position: t.position })));
+  }
+  
+  /**
+   * Limpia los datos cuando hay error o no hay resultados
+   */
+  private clearData(): void {
+    // Resetear a valores por defecto
+    this.stats = {
+      totalTeams: 0,
+      totalPlayers: 0,
+      totalGoals: 0,
+      averageGoals: 0
+    };
+    
+    this.teams = [];
+    this.filteredTeams = [];
+  }
 
   /**
    * Genera equipos dummy
@@ -269,16 +355,13 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Aplica los filtros
+   * Aplica los filtros locales (sin grupo, ya que el grupo se maneja via API)
    */
   applyFilters(): void {
     let filtered = [...this.teams];
 
-    // Filtro por grupo (solo si se selecciona específicamente)
-    // Por defecto mostrar todos los equipos sin filtrar por grupo
-    if (this.selectedGroupId && this.shouldShowGroupSelect) {
-      filtered = filtered.filter(team => team.groupId === this.selectedGroupId);
-    }
+    // NOTA: El filtro por grupo se eliminó porque ahora se maneja via API
+    // Cada cambio de grupo consume el API directamente
 
     // Filtro por posición
     if (this.selectedPositionFilter !== 'all') {
@@ -295,9 +378,9 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
       const search = this.searchText.toLowerCase().trim();
       filtered = filtered.filter(team => 
         team.name.toLowerCase().includes(search) ||
-        team.shortName.toLowerCase().includes(search) ||
-        team.coach.toLowerCase().includes(search) ||
-        team.stadium.toLowerCase().includes(search)
+        team.shortName?.toLowerCase().includes(search) ||
+        team.coach?.toLowerCase().includes(search) ||
+        team.stadium?.toLowerCase().includes(search)
       );
     }
 
@@ -324,7 +407,8 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
    * Limpia todos los filtros
    */
   clearFilters(): void {
-    this.selectedGroupId = null;
+    // NOTA: No resetear selectedGroupId porque se maneja via API
+    // Solo limpiar filtros locales
     this.selectedPositionFilter = 'all';
     this.searchText = '';
     this.applyFilters();
@@ -462,9 +546,9 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
    * Maneja el cambio de grupo seleccionado
    */
   onGroupChange(): void {
-    console.log('Cambio de grupo:', this.selectedGroupId);
-    // Solo aplicar filtros, no recargar todos los datos
-    this.applyFilters();
+    console.log('🔄 Cambio de grupo:', this.selectedGroupId);
+    // Consumir API con el nuevo grupo seleccionado
+    this.loadData();
   }
 
   /**

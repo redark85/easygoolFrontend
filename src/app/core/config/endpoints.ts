@@ -79,6 +79,7 @@ export const FIXTURE_GET_COMPLETE_FIXTURE_ENDPOINT = '/api/Fixture/GetCompleteFi
 export const FIXTURE_GET_PUBLIC_MATCH_DETAIL_ENDPOINT = '/api/Fixture/GetPublicMatchDetail';
 export const FIXTURE_GET_TOP_SCORERS_ENDPOINT = '/api/Fixture/GetTopScorers';
 export const FIXTURE_GET_TOURNAMENT_STATS_ENDPOINT = '/api/Fixture/GetTournamentStats';
+export const FIXTURE_GET_TOURNAMENT_TEAMS_SUMMARY_ENDPOINT = '/api/Fixture/GetTournamentTeamsSummary';
 
 // Manager Endpoints
 export const MANAGER_GET_TEAMS_ENDPOINT = '/api/Manager/ManagerTeams';
