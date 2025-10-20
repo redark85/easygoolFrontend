@@ -28,23 +28,7 @@ interface QuickStat {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuickStatsCardComponent implements OnInit {
-  quickStats: QuickStat[] = [
-    {
-      icon: 'sports_score',
-      label: 'Goles a Favor',
-      value: 25,
-      color: '#4caf50',
-      trend: 'up',
-      trendValue: '+3'
-    },
-    {
-      icon: 'shield',
-      label: 'Goles en Contra',
-      value: 8,
-      color: '#f44336',
-      trend: 'down',
-      trendValue: '-2'
-    },
+  quickStats: QuickStat[] = [   
     {
       icon: 'trending_up',
       label: 'Racha Actual',
