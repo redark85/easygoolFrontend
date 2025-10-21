@@ -136,7 +136,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
           console.log('Detalles del torneo recibidos:', tournamentDetails);
           
           // Cargar fases
-          this.phases = tournamentDetails.phases || [];
+          //this.phases = tournamentDetails.phases || [];
           console.log('Fases cargadas:', this.phases);
           
           // Seleccionar la primera fase por defecto

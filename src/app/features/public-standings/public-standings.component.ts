@@ -68,9 +68,11 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
   tournamentId: number = 0;
   matchSearchTerm: string = '';
   
-  // Selects de Fase y Grupo
+  // Selects de Categoría, Fase y Grupo
+  categories: any[] = [];
   phases: TournamentPhase[] = [];
   groups: TournamentGroup[] = [];
+  selectedCategoryId: number | null = null;
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
   PhaseType = PhaseType; // Exponer el enum al template
@@ -81,6 +83,7 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
     name: '',
     season: '',
     status: '',
+    category: '',
     phase: '',
     group: ''
   };
@@ -120,7 +123,7 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga las fases del torneo
+   * Carga las categorías del torneo
    */
   private loadPhases(): void {
     this.isLoading = true;
@@ -128,39 +131,79 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
     this.managerService.getTournamentPhases(this.tournamentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (tournamentDetails) => {
-          console.log('Detalles del torneo recibidos:', tournamentDetails);
+        next: (response: any) => {
+          console.log('Respuesta del torneo recibida:', response);
           
-          // Guardar detalles del torneo
-          this.tournamentDetails = tournamentDetails;
-          
-          // Actualizar información del torneo
-          this.tournamentInfo = {
-            name: tournamentDetails.name,
-            season: new Date(tournamentDetails.startDate).getFullYear().toString(),
-            status: this.getStatusText(tournamentDetails.status),
-            phase: '',
-            group: ''
-          };
-          
-          // Cargar fases
-          this.phases = tournamentDetails.phases || [];
-          console.log('Fases cargadas:', this.phases);
-          
-          // Seleccionar la primera fase por defecto
-          if (this.phases.length > 0) {
-            this.selectedPhaseId = this.phases[0].id;
-            this.onPhaseChange();
-          } else {
-            this.isLoading = false;
+          if (response) {
+            const tournamentDetails = response;
+            
+            // Guardar detalles del torneo
+            this.tournamentDetails = tournamentDetails;
+            
+            // Actualizar información del torneo
+            this.tournamentInfo = {
+              name: tournamentDetails.name,
+              season: new Date(tournamentDetails.startDate).getFullYear().toString(),
+              status: this.getStatusText(tournamentDetails.status),
+              category: '',
+              phase: '',
+              group: ''
+            };
+            
+            // Cargar categorías
+            this.categories = tournamentDetails.categories || [];
+            console.log('Categorías cargadas:', this.categories);
+            
+            // Seleccionar la primera categoría por defecto
+            if (this.categories.length > 0) {
+              this.selectedCategoryId = this.categories[0].id;
+              this.onCategoryChange();
+            } else {
+              this.isLoading = false;
+            }
           }
+          this.cdr.detectChanges();
+
         },
         error: (error) => {
-          console.error('Error al cargar fases:', error);
-          this.toastService.showError('Error al cargar las fases del torneo');
+          console.error('Error al cargar categorías:', error);
+          this.toastService.showError('Error al cargar las categorías del torneo');
           this.isLoading = false;
         }
       });
+  }
+
+  /**
+   * Maneja el cambio de categoría seleccionada
+   */
+  onCategoryChange(): void {
+    const selectedCategory = this.categories.find(c => c.id === this.selectedCategoryId);
+    
+    if (selectedCategory) {
+      console.log('Categoría seleccionada:', selectedCategory);
+      this.tournamentInfo.category = selectedCategory.name;
+      
+      // Cargar fases de la categoría seleccionada
+      this.phases = selectedCategory.phases || [];
+      console.log('Fases de la categoría:', this.phases);
+      
+      // Limpiar selecciones de fase y grupo
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.groups = [];
+      this.tournamentInfo.phase = '';
+      this.tournamentInfo.group = '';
+      this.loadStandings();
+      
+      // Seleccionar la primera fase por defecto
+      if (this.phases.length > 0) {
+        this.onPhaseChange();
+      } else {
+        this.isLoading = false;
+      }
+      
+      this.cdr.detectChanges();
+    }
   }
 
   /**
@@ -181,6 +224,7 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
         this.groups = [];
         this.selectedGroupId = null;
         this.tournamentInfo.group = '';
+        this.isLoading = false;
       }
     }
   }
@@ -232,15 +276,23 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
     return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
   }
 
+  /**
+   * Verifica si hay categorías disponibles
+   */
+  get hasCategoriesData(): boolean {
+    return this.categories && this.categories.length > 0;
+  }
+
   private loadStandings(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
     
     // Por ahora usar IDs quemados
-    const phaseId = this.selectedPhaseId;
-    const groupId = this.selectedGroupId;
+    const phaseId = this.selectedPhaseId || 0;
+    const groupId = this.selectedGroupId || 0;
+    const categoryId = this.selectedCategoryId;
 
-    this.fixtureService.getFixture(phaseId!, groupId!)
+    this.fixtureService.getFixture(categoryId!, phaseId, groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (standings) => {

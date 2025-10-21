@@ -29,6 +29,12 @@ export interface TournamentDetails {
   endDate: string;
   imageUrl: string;
   status: number;
+  categories: CateroryDetails[];
+}
+
+export interface CateroryDetails {
+  id: number;
+  name: string;
   phases: TournamentPhase[];
 }
 

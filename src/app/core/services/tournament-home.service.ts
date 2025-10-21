@@ -20,8 +20,8 @@ export class TournamentHomeService {
    * @param groupId ID del grupo (0 si no tiene grupos)
    * @returns Observable con los datos del home del torneo
    */
-  getTournamentHome(tournamentId: number, phaseId: number, groupId: number = 0): Observable<TournamentHomeResponse> {
-    const url = `${FIXTURE_GET_TOURNAMENT_HOME_ENDPOINT}/${tournamentId}?PhaseId=${phaseId}&GroupId=${groupId}`;
+  getTournamentHome(tournamentId: number,categoryId:number, phaseId: number = 0, groupId: number = 0): Observable<TournamentHomeResponse> {
+    const url = `${FIXTURE_GET_TOURNAMENT_HOME_ENDPOINT}/${tournamentId}?CategoryId=${categoryId}&PhaseId=${phaseId}&GroupId=${groupId}`;
     return this.apiService.get<TournamentHomeResponse>(url);
   }
 }

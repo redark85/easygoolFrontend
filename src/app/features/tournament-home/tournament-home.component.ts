@@ -30,6 +30,7 @@ interface Tournament {
   status: 'upcoming' | 'ongoing' | 'finished';
   startDate: Date;
   endDate: Date;
+  type: string;
 }
 
 interface NextMatch {
@@ -123,12 +124,13 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     currentPhase: 'Cargando...',
     status: 'upcoming',
     startDate: new Date(),
-    endDate: new Date()
+    endDate: new Date(),
+    type : 'Cargando...'
   };
 
   // Next Featured Match
   nextMatch: NextMatch = {
-    id: 1,
+    id: 0,
     homeTeam: {
       name: 'Cargando...',
       logo: 'assets/team-placeholder.png',
@@ -204,9 +206,11 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     seconds: 0
   };
 
-  // Selects de Fase y Grupo
+  // Selects de Categoría, Fase y Grupo
+  categories: any[] = [];
   phases: TournamentPhase[] = [];
   groups: TournamentGroup[] = [];
+  selectedCategoryId: number | null = null;
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
   PhaseType = PhaseType; // Exponer el enum al template
@@ -325,42 +329,67 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga las fases del torneo
+   * Carga las categorías del torneo
    */
   private loadPhases(): void {
     this.managerService.getTournamentPhases(this.tournamentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (tournamentDetails) => {
-          console.log('Detalles del torneo recibidos:', tournamentDetails);
+        next: (response) => {
+          console.log('Respuesta del torneo recibida:', response);
           
-          // Guardar detalles del torneo
-          this.tournamentDetails = tournamentDetails;
-          
-          // Actualizar información del torneo existente
-          this.tournament.name = tournamentDetails.name;
-          this.tournament.startDate = new Date(tournamentDetails.startDate);
-          this.tournament.endDate = new Date(tournamentDetails.endDate);
-          // Usar la imagen del torneo si está disponible, sino mantener la por defecto
-          this.tournament.logoUrl = tournamentDetails.imageUrl || 'assets/logo.png';
-          
-          // Cargar fases
-          this.phases = tournamentDetails.phases || [];
-          console.log('Fases cargadas:', this.phases);
-          
-          // Seleccionar la primera fase por defecto
-          if (this.phases.length > 0) {
-            this.selectedPhaseId = this.phases[0].id;
-            this.onPhaseChange();
+          if (response ) {
+            const tournamentDetails = response;
+            
+            // Guardar detalles del torneo
+            this.tournamentDetails = tournamentDetails;
+            
+            // Actualizar información del torneo existente
+            this.tournament.name = tournamentDetails.name;
+            this.tournament.startDate = new Date(tournamentDetails.startDate);
+            this.tournament.endDate = new Date(tournamentDetails.endDate);
+            this.tournament.logoUrl = tournamentDetails.imageUrl || 'assets/logo.png';
+            
+            // Cargar categorías
+            this.categories = tournamentDetails.categories || [];
+            console.log('Categorías cargadas:', this.categories);
+            
+            // Seleccionar la primera categoría por defecto
+            if (this.categories.length > 0) {
+              this.selectedCategoryId = this.categories[0].id;
+              this.onCategoryChange();
+            }
           }
           
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error al cargar fases:', error);
-          this.toastService.showError('Error al cargar las fases del torneo');
+          console.error('Error al cargar categorías:', error);
+          this.toastService.showError('Error al cargar las categorías del torneo');
         }
       });
+  }
+
+  /**
+   * Maneja el cambio de categoría seleccionada
+   */
+  onCategoryChange(): void {
+    const selectedCategory = this.categories.find(c => c.id === this.selectedCategoryId);
+    
+    if (selectedCategory) {
+      console.log('Categoría seleccionada:', selectedCategory);
+      
+      // Cargar fases de la categoría seleccionada
+      this.phases = selectedCategory.phases || [];
+      console.log('Fases de la categoría:', this.phases);
+      
+      // Limpiar selecciones de fase y grupo
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.groups = [];
+      this.loadTournamentHomeData();
+      this.cdr.detectChanges();
+    }
   }
 
   /**
@@ -431,10 +460,17 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Verifica si hay categorías disponibles
+   */
+  get hasCategoriesData(): boolean {
+    return this.categories && this.categories.length > 0;
+  }
+
+  /**
    * Carga los datos del home del torneo desde el API
    */
   private loadTournamentHomeData(): void {
-    if (!this.selectedPhaseId) {
+    if (!this.selectedCategoryId) {
       console.warn('No hay fase seleccionada');
       return;
     }
@@ -442,7 +478,9 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     this.isLoadingTournamentData = true;
     const groupId = this.selectedGroupId || 0; // 0 si no hay grupo seleccionado
 
-    this.tournamentHomeService.getTournamentHome(this.tournamentId, this.selectedPhaseId, groupId)
+    const phaseId = this.selectedPhaseId || 0; // 0 si no hay grupo seleccionado
+
+    this.tournamentHomeService.getTournamentHome(this.tournamentId, this.selectedCategoryId!, phaseId, groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
