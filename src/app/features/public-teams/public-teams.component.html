@@ -73,11 +73,26 @@
         <div class="col-lg-4 hero-right-section">
           <div class="hero-right-content">
             <!-- Filters Card -->
-            <mat-card class="filters-card-hero">
+            <mat-card class="filters-card-hero" *ngIf="hasCategoriesData">
               <mat-card-content>
                 <!-- Filters Row -->
                 <div class="filters-row">
-                  <!-- Selects de Fase y Grupo (Primera fila) -->
+                  <!-- Select de Categoría (Primera fila) -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Categoría</mat-label>
+                        <mat-select [(ngModel)]="selectedCategoryId" (selectionChange)="onCategoryChange()">
+                          <mat-option *ngFor="let category of categories" [value]="category.id">
+                            <mat-icon class="option-icon">category</mat-icon>
+                            {{ category.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Selects de Fase y Grupo (Segunda fila) -->
                   <div class="row g-2 mb-3">
                     <div [class]="shouldShowGroupSelect ? 'col-6' : 'col-12'">
                       <mat-form-field appearance="outline" class="filter-select">
@@ -105,7 +120,7 @@
                     </div>
                   </div>
 
-                  <!-- Buscador (Segunda fila) -->
+                  <!-- Buscador (Tercera fila) -->
                   <div class="row g-2 mb-3">
                     <div class="col-12">
                       <mat-form-field appearance="outline" class="filter-select">
@@ -122,7 +137,7 @@
                     </div>
                   </div>
 
-                  <!-- Select de Posiciones (Tercera fila) -->
+                  <!-- Select de Posiciones (Cuarta fila) -->
                   <div class="row g-2 mb-3">
                     <div class="col-12">
                       <mat-form-field appearance="outline" class="filter-select">
@@ -168,6 +183,17 @@
                 </div>
               </mat-card-content>
             </mat-card>
+
+            <!-- Mensaje cuando no hay categorías -->
+            <mat-card class="filters-card-hero" *ngIf="!hasCategoriesData">
+              <mat-card-content>
+                <div class="no-data-message-hero">
+                  <mat-icon class="info-icon-hero">info</mat-icon>
+                  <h3>Información Pendiente</h3>
+                  <p>El organizador del torneo aún no ha configurado las categorías y fases.</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
           </div>
         </div>
       </div>
@@ -183,8 +209,15 @@
     [strokeWidth]="3">
   </app-public-loading>
 
+  <!-- Mensaje cuando no hay categorías -->
+  <div class="empty-state" *ngIf="!isLoading && !hasCategoriesData">
+    <mat-icon class="empty-icon">pending</mat-icon>
+    <h2 style="color: white;">Información Pendiente</h2>
+    <p style="color: white;">El organizador del torneo aún no ha configurado las categorías y fases.</p>
+  </div>
+
   <!-- Teams Grid -->
-  <div class="teams-grid" *ngIf="!isLoading && filteredTeams.length > 0">
+  <div class="teams-grid" *ngIf="!isLoading && hasCategoriesData && filteredTeams.length > 0">
     <mat-card *ngFor="let team of filteredTeams"
               class="team-card"
               [ngClass]="getPositionClass(team.position)">
@@ -282,17 +315,15 @@
   </div>
 
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="!isLoading && filteredTeams.length === 0">
+  <div class="empty-state" *ngIf="!isLoading && hasCategoriesData && filteredTeams.length === 0">
     <mat-icon class="empty-icon">search_off</mat-icon>
-    <h2>No se encontraron equipos</h2>
-    <p>No hay equipos que coincidan con los filtros seleccionados</p>
-    <button mat-raised-button color="primary" (click)="clearFilters()">
-      Limpiar Filtros
-    </button>
+    <h2 style="color: white;">No se encontraron equipos</h2>
+    <p style="color: white;">No hay equipos que coincidan con los filtros seleccionados</p>
+  
   </div>
 
   <!-- Results Count -->
-  <div class="results-count" *ngIf="!isLoading && filteredTeams.length > 0">
+  <div class="results-count" *ngIf="!isLoading && hasCategoriesData && filteredTeams.length > 0">
     <p>Mostrando {{ filteredTeams.length }} de {{ teams.length }} equipos</p>
   </div>
 </div>
