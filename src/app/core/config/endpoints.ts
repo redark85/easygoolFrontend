@@ -27,6 +27,10 @@ export const GROUP_CREATE_ENDPOINT = '/api/Group/CreateGroup';
 export const GROUP_UPDATE_ENDPOINT = '/api/Group/UpdateGroup';
 export const GROUP_DELETE_ENDPOINT = '/api/Group/DeleteGroup';
 
+// Category Endpoints
+export const CATEGORY_GET_ALL_ENDPOINT = '/api/Phase/GetAllCategories';
+export const CATEGORY_CREATE_ENDPOINT = '/api/Tournament/CreateCategory';
+
 // Team Endpoints
 export const TEAM_GET_ALL_TEAMS_ENDPOINT = '/api/Team/GetAllTeams';
 export const TEAM_GET_BY_TOURNAMENT_ENDPOINT = '/api/Team/GetByTournament';
@@ -119,6 +123,10 @@ export const EndpointsConfig = {
   GROUP_CREATE_ENDPOINT,
   GROUP_UPDATE_ENDPOINT,
   GROUP_DELETE_ENDPOINT,
+
+  // Category
+  CATEGORY_GET_ALL_ENDPOINT,
+  CATEGORY_CREATE_ENDPOINT,
 
   // Team
   TEAM_GET_ALL_TEAMS_ENDPOINT,

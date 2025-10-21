@@ -1,0 +1,55 @@
+@use '../../../../shared/styles/mixins.scss' as mixins;
+
+.modal-container {
+  position: relative;
+  @include mixins.modal-layout('category-form');
+
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+
+    @media (max-width: 768px) {
+      top: 4px;
+      right: 4px;
+    }
+  }
+}
+
+h2[mat-dialog-title] {
+  margin: 0 0 16px 0;
+  padding: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+}
+
+.dialog-actions {
+  padding: 16px 0 0 0;
+  gap: 12px;
+
+  button {
+    min-width: 100px;
+
+    &[mat-flat-button] {
+      font-weight: 500;
+    }
+  }
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-progress-spinner {
+      ::ng-deep circle {
+        stroke: white;
+      }
+    }
+  }
+}

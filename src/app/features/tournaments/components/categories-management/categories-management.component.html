@@ -1,0 +1,100 @@
+<div class="categories-management-container">
+  <!-- Header -->
+  <div class="management-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h2 class="section-title">
+          <mat-icon class="title-icon">category</mat-icon>
+          Categorías del Torneo
+        </h2>
+        <p class="section-subtitle">Administra las categorías de tu torneo</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+    <p class="loading-text">Cargando categorías...</p>
+  </div>
+
+  <!-- Categories Content -->
+  <div class="categories-content" *ngIf="!loading">
+    
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="categories.length === 0">
+      <div class="empty-state-content">
+        <mat-icon class="empty-icon">category</mat-icon>
+        <h3 class="empty-title">No hay categorías configuradas</h3>
+        <p class="empty-description">
+          Comienza creando la primera categoría de tu torneo
+        </p>
+        <button mat-raised-button 
+                color="primary" 
+                class="empty-action-btn"
+                (click)="createCategory()">
+          <mat-icon>add</mat-icon>
+          Crear Primera Categoría
+        </button>
+      </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="categories-grid" *ngIf="categories.length > 0">
+      <mat-card *ngFor="let category of categories; trackBy: trackByCategoryId" 
+                class="category-card">
+        <mat-card-header>
+          <div mat-card-avatar class="category-avatar">
+            <mat-icon>category</mat-icon>
+          </div>
+          <mat-card-title>{{ category.name }}</mat-card-title>
+          <mat-card-subtitle>{{ category.description }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="category-stats">
+            <div class="stat-item">
+              <mat-icon class="stat-icon">timeline</mat-icon>
+              <span class="stat-value">{{ categoryService.getPhasesCount(category) }}</span>
+              <span class="stat-label">fases</span>
+            </div>
+            <div class="stat-item">
+              <mat-icon class="stat-icon">groups</mat-icon>
+              <span class="stat-value">{{ categoryService.getTotalTeamsCount(category) }}</span>
+              <span class="stat-label">equipos</span>
+            </div>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end" class="card-actions">
+          <button mat-icon-button 
+                  color="primary"
+                  matTooltip="Editar categoría"
+                  matTooltipPosition="above"
+                  (click)="editCategory(category)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          
+          <button mat-icon-button 
+                  color="warn"
+                  matTooltip="Eliminar categoría"
+                  matTooltipPosition="above"
+                  (click)="deleteCategory(category)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button mat-fab 
+          color="primary" 
+          class="fab-button"
+          matTooltip="Crear nueva categoría"
+          matTooltipPosition="left"
+          (click)="createCategory()"
+          *ngIf="!loading">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

@@ -21,6 +21,7 @@ import { TournamentService } from '@features/tournaments/services/tournament.ser
 import { TournamentDetail, TournamentStatusType, TournamentModality } from '@features/tournaments/models/tournament.interface';
 import { Phase, Group, PhaseType } from '@features/tournaments/models/phase.interface';
 import { Team, CreateTeamRequest, UpdateTeamRequest } from '@features/tournaments/models/team.interface';
+import { Category } from '@features/tournaments/models/category.interface';
 import { Title } from '@angular/platform-browser';
 import { TournamentStore } from '@core/store/tournament.store';
 import { ToastService } from '@core/services/toast.service';
@@ -36,6 +37,7 @@ import { PhasesGroupsManagementComponent } from '../phases-groups-management/pha
 import { TeamsManagementComponent } from '../teams-management/teams-management.component';
 import { MatchesManagementComponent } from '../matches-management/matches-management.component';
 import { StatisticsManagementComponent } from '../statistics-management/statistics-management.component';
+import { CategoriesManagementComponent } from '../categories-management/categories-management.component';
 import { PhaseFormData, PhaseModalResult, CreatePhaseRequest, UpdatePhaseRequest } from '../../models/phase-form.interface';
 import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest } from '../../models/group-form.interface';
 
@@ -60,7 +62,8 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
     MatSlideToggleModule,
     PhasesGroupsManagementComponent,
     TeamsManagementComponent,
-    MatchesManagementComponent
+    MatchesManagementComponent,
+    CategoriesManagementComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   templateUrl: './tournament-management.component.html',
@@ -71,6 +74,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   tournament: TournamentDetail | null = null;
   phases: Phase[] = [];
   teams: Team[] = [];
+  categories: Category[] = [];
   isLoading = false;
   tournamentId: number = 0;
   selectedTabIndex: number = 0;
@@ -132,6 +136,14 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     // Cuando se actualizan los equipos, también refrescar fases
     // para mostrar equipos actualizados en grupos
     this.loadPhases();
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja la actualización de categorías desde el componente hijo
+   */
+  onCategoriesUpdated(categories: Category[]): void {
+    this.categories = categories;
     this.cdr.detectChanges();
   }
 
@@ -885,16 +897,22 @@ trackByTeamId(index: number, team: Team): number {
 
     switch (this.selectedTabIndex) {
       case 0:
-        this.loadPhases();
+        // Tab Categorías - se carga automáticamente en el componente hijo
         break;
       case 1:
+        // Tab Fases - se carga automáticamente en el componente hijo
+        this.loadPhases();
+        break;
+      case 2:
+        // Tab Equipos - se carga automáticamente en el componente hijo
         this.loadTeams();
+        break;
+      case 3:
+        // Tab Partidos - se carga automáticamente en el componente hijo
         break;
       default:
         break;
     }
-
-    // Refrescar los servicios dependiendo del tab en que se encuentra o hace click
 
     this.cdr.detectChanges();
   }

@@ -178,7 +178,23 @@
                    (selectedTabChange)="onTabChange($event)"
                    animationDuration="300ms">
 
-      <!-- Tab 1: Fases -->
+      <!-- Tab 1: Categorías -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">category</mat-icon>
+          <span class="tab-text">Categorías</span>
+        </ng-template>
+
+        <div class="tab-content">
+          <app-categories-management
+            [tournamentId]="tournamentId"
+            [categories]="categories"
+            (categoriesUpdated)="onCategoriesUpdated($event)">
+          </app-categories-management>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Fases -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">timeline</mat-icon>
@@ -194,7 +210,7 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 2: Equipos -->
+      <!-- Tab 3: Equipos -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">groups</mat-icon>
@@ -210,7 +226,7 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 3: Partidos -->
+      <!-- Tab 4: Partidos -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">sports_soccer</mat-icon>
