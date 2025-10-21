@@ -57,7 +57,7 @@ export class TeamDetailService {
       id: teamId,
       name: apiData.teamName,
       shortName: apiData.shortName,
-      logoUrl: apiData.logo || 'assets/team-placeholder.png',
+      logoUrl: apiData.logo || 'assets/default-team.png',
       groupName: apiData.groupName,
       motto: `Grupo ${apiData.groupName}`, // Usar grupo como motto por defecto
       position: apiData.position,
@@ -166,7 +166,7 @@ export class TeamDetailService {
     return upcomingMatches.map((match, index) => ({
       id: match.matchId || index + 1000,
       opponent: match.opponent,
-      opponentLogo: 'assets/team-placeholder.png',
+      opponentLogo: 'assets/default-team.png',
       date: new Date(match.matchDate),
       isHome: match.isHome,
       status: 'upcoming' as const,
@@ -181,7 +181,7 @@ export class TeamDetailService {
     return recentMatches.map((match, index) => ({
       id: match.matchId || index + 2000,
       opponent: match.opponent,
-      opponentLogo: 'assets/team-placeholder.png',
+      opponentLogo: 'assets/default-team.png',
       date: new Date(match.matchDate),
       isHome: match.isHome,
       score: `${match.homeScore}-${match.awayScore}`,

@@ -32,7 +32,7 @@
               <!-- Team Logo -->
               <div class="col-auto">
                 <div class="fixture-icon-container">
-                  <img [src]="team?.logoUrl || 'assets/team-placeholder.png'" [alt]="team?.name || 'Equipo'" class="team-logo-hero">
+                  <img [src]="team?.logoUrl || 'assets/default-team.png'" [alt]="team?.name || 'Equipo'" class="team-logo-hero" (error)="$event.target.src='assets/default-team.png'">
                 </div>
               </div>
 

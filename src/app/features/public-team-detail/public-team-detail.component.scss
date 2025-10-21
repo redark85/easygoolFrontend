@@ -10,11 +10,11 @@
     justify-content: center;
     min-height: 60vh;
     padding: 40px 20px;
-    
+
     .error-content {
       text-align: center;
       max-width: 400px;
-      
+
       .error-icon {
         font-size: 64px;
         width: 64px;
@@ -22,21 +22,21 @@
         color: #f44336;
         margin-bottom: 16px;
       }
-      
+
       .error-title {
         font-size: 24px;
         font-weight: 600;
         color: #333;
         margin: 0 0 12px 0;
       }
-      
+
       .error-message {
         font-size: 16px;
         color: #666;
         margin: 0 0 24px 0;
         line-height: 1.5;
       }
-      
+
       .retry-button {
         .mat-icon {
           margin-right: 8px;
@@ -258,6 +258,7 @@
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
+            width: 100%;
 
             &:hover {
               background: rgba(255, 255, 255, 0.15);
@@ -437,7 +438,7 @@
   .main-content-section {
     background: transparent;
     min-height: 40vh;
-    padding: 3rem 0;
+    padding: 0 5%;
 
     .container-fluid {
       .row {
