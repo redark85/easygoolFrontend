@@ -68,8 +68,10 @@ interface UIMatchday {
 })
 export class PublicFixtureComponent implements OnInit, OnDestroy {
   // Filtros - Usando los mismos tipos que tournament-home
+  categories: any[] = [];
   phases: TournamentPhase[] = [];
   groups: TournamentGroup[] = [];
+  selectedCategoryId: number | null = null;
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
   selectedStatus: string = 'all';
@@ -126,30 +128,34 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga las fases del torneo
+   * Carga las categorías del torneo
    */
   private loadPhases(): void {
     this.managerService.getTournamentPhases(this.tournamentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (tournamentDetails) => {
-          console.log('Detalles del torneo recibidos:', tournamentDetails);
+        next: (response: any) => {
+          console.log('Respuesta del torneo recibida:', response);
           
-          // Cargar fases
-          this.phases = tournamentDetails.phases || [];
-          console.log('Fases cargadas:', this.phases);
-          
-          // Seleccionar la primera fase por defecto
-          if (this.phases.length > 0) {
-            this.selectedPhaseId = this.phases[0].id;
-            this.onPhaseChange();
+          if (response) {
+            const tournamentDetails = response;
+            
+            // Cargar categorías
+            this.categories = tournamentDetails.categories || [];
+            console.log('Categorías cargadas:', this.categories);
+            
+            // Seleccionar la primera categoría por defecto
+            if (this.categories.length > 0) {
+              this.selectedCategoryId = this.categories[0].id;
+              this.onCategoryChange();
+            }
           }
           
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error al cargar fases:', error);
-          this.toastService.showError('Error al cargar las fases del torneo');
+          console.error('Error al cargar categorías:', error);
+          this.toastService.showError('Error al cargar las categorías del torneo');
         }
       });
   }
@@ -178,14 +184,16 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
    * Carga los datos del fixture desde el API
    */
   private loadFixtureData(): void {
-    if (!this.selectedPhaseId) {
-      console.warn('No hay fase seleccionada');
+    if (!this.selectedCategoryId) {
+      console.warn('No hay categoría seleccionada');
       return;
     }
 
     this.isLoading = true;
+    const phaseId = this.selectedPhaseId || 0;
+    const groupId = this.selectedGroupId || 0;
     
-    this.fixtureService.getCompleteFixture(this.selectedPhaseId, this.selectedGroupId || undefined)
+    this.fixtureService.getCompleteFixture(phaseId, groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -271,6 +279,34 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
 
 
   /**
+   * Maneja el cambio de categoría seleccionada
+   */
+  onCategoryChange(): void {
+    const selectedCategory = this.categories.find(c => c.id === this.selectedCategoryId);
+    
+    if (selectedCategory) {
+      console.log('Categoría seleccionada:', selectedCategory);
+      
+      // Cargar fases de la categoría seleccionada
+      this.phases = selectedCategory.phases || [];
+      console.log('Fases de la categoría:', this.phases);
+      
+      // Limpiar selecciones de fase y grupo
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.groups = [];
+      
+      // Seleccionar la primera fase por defecto
+      if (this.phases.length > 0) {
+        this.selectedPhaseId = this.phases[0].id;
+        this.onPhaseChange();
+      }
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
    * Maneja el cambio de fase seleccionada
    */
   onPhaseChange(): void {
@@ -317,6 +353,13 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
    */
   get shouldShowGroupSelect(): boolean {
     return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
+  }
+
+  /**
+   * Verifica si hay categorías disponibles
+   */
+  get hasCategoriesData(): boolean {
+    return this.categories && this.categories.length > 0;
   }
 
   /**

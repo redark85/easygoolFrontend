@@ -110,7 +110,7 @@
                   <mat-icon>sports</mat-icon>
                   <div class="info-content-compact">
                     <span class="info-label-compact">Formato</span>
-                    <span class="info-value-compact">Todos contra Todos</span>
+                    <span class="info-value-compact">{{ tournament.type }}</span>
                   </div>
                 </div>
               </div>
@@ -121,9 +121,23 @@
         <!-- Right Column: Filters & Next Match (4 columns) -->
         <div class="col-lg-4 hero-right-section">
           <div class="hero-right-content">
-            <!-- Filters Row -->
-            <div class="filters-row">
+            <!-- Filters Row - Solo si hay categorías -->
+            <div class="filters-row" *ngIf="hasCategoriesData">
               <div class="row g-2">
+                <!-- Select de Categoría -->
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="filter-select">
+                    <mat-label>Categoría</mat-label>
+                    <mat-select [(ngModel)]="selectedCategoryId" (selectionChange)="onCategoryChange()">
+                      <mat-option *ngFor="let category of categories" [value]="category.id">
+                        <mat-icon class="option-icon">category</mat-icon>
+                        {{ category.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <!-- Select de Fase -->
                 <div [class]="shouldShowGroupSelect ? 'col-6' : 'col-12'">
                   <mat-form-field appearance="outline" class="filter-select">
                     <mat-label>Fase del Torneo</mat-label>
@@ -137,6 +151,8 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
+
+                <!-- Select de Grupo (si aplica) -->
                 <div class="col-6" *ngIf="shouldShowGroupSelect">
                   <mat-form-field appearance="outline" class="filter-select">
                     <mat-label>Grupo</mat-label>
@@ -151,16 +167,29 @@
               </div>
             </div>
 
-            <!-- Next Match Card -->
-            <div class="hero-next-match">
+            <!-- Mensaje cuando no hay categorías -->
+            <div class="no-data-message" *ngIf="!hasCategoriesData">
+              <mat-card class="info-card">
+                <mat-card-content>
+                  <div class="info-content">
+                    <mat-icon class="info-icon">info</mat-icon>
+                    <h3>Información Pendiente</h3>
+                    <p>El organizador del torneo aún no ha configurado las categorías y fases.</p>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- Next Match Card - Solo si hay categorías -->
+            <div class="hero-next-match" *ngIf="hasCategoriesData">
               <mat-card class="next-match-card-compact" [routerLink]="['/public-fixture', tournamentId]" style="cursor: pointer;">
                 <mat-card-header>
                   <mat-card-title>
                     <mat-icon>schedule</mat-icon>
-                    Próximo Partido
+                    Próximo Partido {{ nextMatch.id == 0 ? 'No definido ' : '' }}
                   </mat-card-title>
                 </mat-card-header>
-                <mat-card-content>
+                <mat-card-content *ngIf="nextMatch.id > 0">
                   <div class="match-info-compact">
                     <div class="matchday-badge">
                       <span>Jornada {{ nextMatch.matchday }}</span>
@@ -250,12 +279,21 @@
                       <mat-icon>history</mat-icon>
                       Últimos Resultados
                     </mat-card-title>
-                    <button mat-button [routerLink]="['/public-fixture', tournamentId]" class="view-all-btn">
+                    <button mat-button [routerLink]="['/public-fixture', tournamentId]" class="view-all-btn" *ngIf="hasCategoriesData">
                       Ver todos
                       <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </mat-card-header>
                   <mat-card-content>
+                    <!-- Mensaje cuando no hay categorías -->
+                    <div class="empty-state" *ngIf="!hasCategoriesData">
+                      <mat-icon class="empty-icon">pending</mat-icon>
+                      <h3>Información Pendiente</h3>
+                      <p>El organizador del torneo aún no ha cargado los partidos.</p>
+                    </div>
+
+                    <!-- Contenido normal cuando hay categorías -->
+                    <div *ngIf="hasCategoriesData">
                     <div class="matches-list">
                       <div *ngFor="let match of recentMatches" class="match-item" [routerLink]="['/public-fixture', tournamentId]" style="cursor: pointer;">
                         <div class="match-header">
@@ -300,6 +338,7 @@
                         </div>
                       </div>
                     </div>
+                    </div>
                   </mat-card-content>
                 </mat-card>
               </section>
@@ -313,13 +352,21 @@
                       <mat-icon>sports_soccer</mat-icon>
                       Máximos Goleadores
                     </mat-card-title>
-                    <button mat-button [routerLink]="['/public-top-scorers', tournamentId]" class="view-all-btn">
+                    <button mat-button [routerLink]="['/public-top-scorers', tournamentId]" class="view-all-btn" *ngIf="hasCategoriesData">
                       Ver tabla completa
                       <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </mat-card-header>
                   <mat-card-content>
-                    <div class="scorers-list">
+                    <!-- Mensaje cuando no hay categorías -->
+                    <div class="empty-state" *ngIf="!hasCategoriesData">
+                      <mat-icon class="empty-icon">pending</mat-icon>
+                      <h3>Información Pendiente</h3>
+                      <p>El organizador del torneo aún no ha cargado los goleadores.</p>
+                    </div>
+
+                    <!-- Contenido normal cuando hay categorías -->
+                    <div class="scorers-list" *ngIf="hasCategoriesData">
                       <div *ngFor="let scorer of topScorers; let i = index" class="scorer-item" [routerLink]="['/public-top-scorers', tournamentId]" style="cursor: pointer;">
                         <div class="position-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
                           {{ i + 1 }}
@@ -346,7 +393,7 @@
         </div>
         <div class="col-lg-3">
           <!-- Secciones de navegación -->
-          <div class="navigation-sections">
+          <div class="navigation-sections" *ngIf="hasCategoriesData">
             <!-- Tabla de Posiciones -->
             <mat-card class="nav-section-card" [routerLink]="['/public-standings', tournamentId]">
               <mat-card-content>

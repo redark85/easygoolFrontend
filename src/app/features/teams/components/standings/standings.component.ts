@@ -140,7 +140,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
           };
           
           // Cargar las fases
-          this.phases = tournamentDetails.phases || [];
+          this.phases = tournamentDetails.categories[0].phases || [];
           
           // Seleccionar la primera fase por defecto
           if (this.phases.length > 0) {
@@ -257,7 +257,7 @@ export class StandingsComponent implements OnInit, OnDestroy {
     const phaseId = this.selectedPhaseId;
     const groupId = this.selectedGroupId;
 
-    this.fixtureService.getFixture(phaseId!, groupId!)
+    this.fixtureService.getFixture(0,phaseId!, groupId!)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (standings) => {

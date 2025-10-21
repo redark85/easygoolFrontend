@@ -77,9 +77,11 @@ interface PositionFilter {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicTeamsComponent implements OnInit, OnDestroy {
-  // Filtros - Fases y Grupos como public-top-scorers
+  // Filtros - Categorías, Fases y Grupos
+  categories: any[] = [];
   phases: TournamentPhase[] = [];
   groups: TournamentGroup[] = [];
+  selectedCategoryId: number | null = null;
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
   PhaseType = PhaseType; // Exponer el enum al template
@@ -156,6 +158,11 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
    * Carga los datos de los equipos desde el API
    */
   private loadData(): void {
+    if (!this.selectedCategoryId) {
+      console.warn('No hay categoría seleccionada');
+      return;
+    }
+
     this.isLoading = true;
     this.cdr.detectChanges();
     
@@ -466,35 +473,34 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga las fases del torneo
+   * Carga las categorías del torneo
    */
   private loadPhases(): void {
     this.managerService.getTournamentPhases(this.tournamentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (tournamentDetails) => {
-          console.log('Detalles del torneo recibidos:', tournamentDetails);
+        next: (response: any) => {
+          console.log('Respuesta del torneo recibida:', response);
           
-          // Cargar fases
-          this.phases = tournamentDetails.phases || [];
-          console.log('Fases cargadas:', this.phases);
-          
-          // Seleccionar la primera fase por defecto
-          if (this.phases.length > 0) {
-            this.selectedPhaseId = this.phases[0].id;
-            this.onPhaseChange();
-          } else {
-            // Si no hay fases, cargar datos dummy
-            this.loadData();
+          if (response) {
+            const tournamentDetails = response;
+            
+            // Cargar categorías
+            this.categories = tournamentDetails.categories || [];
+            console.log('Categorías cargadas:', this.categories);
+            
+            // Seleccionar la primera categoría por defecto
+            if (this.categories.length > 0) {
+              this.selectedCategoryId = this.categories[0].id;
+              this.onCategoryChange();
+            }
           }
           
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error al cargar fases:', error);
-          this.toastService.showError('Error al cargar las fases del torneo');
-          // Cargar datos dummy como fallback
-          this.loadData();
+          console.error('Error al cargar categorías:', error);
+          this.toastService.showError('Error al cargar las categorías del torneo');
         }
       });
   }
@@ -517,6 +523,35 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
     }
     
     this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja el cambio de categoría seleccionada
+   */
+  onCategoryChange(): void {
+    const selectedCategory = this.categories.find(c => c.id === this.selectedCategoryId);
+    
+    if (selectedCategory) {
+      console.log('Categoría seleccionada:', selectedCategory);
+      
+      // Cargar fases de la categoría seleccionada
+      this.phases = selectedCategory.phases || [];
+      console.log('Fases de la categoría:', this.phases);
+      
+      // Limpiar selecciones de fase y grupo
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+      this.groups = [];
+      this.loadData();
+      
+      // Seleccionar la primera fase por defecto
+      if (this.phases.length > 0) {
+          this.selectedPhaseId = this.phases[0].id;
+        this.onPhaseChange();
+      }
+      
+      this.cdr.detectChanges();
+    }
   }
 
   /**
@@ -563,5 +598,12 @@ export class PublicTeamsComponent implements OnInit, OnDestroy {
    */
   get shouldShowGroupSelect(): boolean {
     return this.selectedPhase?.phaseType === PhaseType.Groups && this.groups.length > 0;
+  }
+
+  /**
+   * Verifica si hay categorías disponibles
+   */
+  get hasCategoriesData(): boolean {
+    return this.categories && this.categories.length > 0;
   }
 }

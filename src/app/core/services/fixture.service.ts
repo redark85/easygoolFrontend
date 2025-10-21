@@ -58,8 +58,8 @@ export class FixtureService {
    * @param groupId ID del grupo
    * @returns Observable con la tabla de posiciones
    */
-  getFixture(phaseId: number, groupId: number): Observable<FixtureTeam[]> {
-    return this.apiService.get<FixtureResponse>(`${FIXTURE_GET_ENDPOINT}?PhaseId=${phaseId}&GroupId=${groupId}`).pipe(
+  getFixture(categoryId:number, phaseId: number = 0, groupId: number = 0): Observable<FixtureTeam[]> {
+    return this.apiService.get<FixtureResponse>(`${FIXTURE_GET_ENDPOINT}?CategoryId=${categoryId}&PhaseId=${phaseId}&GroupId=${groupId}`).pipe(
       map(response => {
               if (response.succeed && response.result) {
                 return response.result;
