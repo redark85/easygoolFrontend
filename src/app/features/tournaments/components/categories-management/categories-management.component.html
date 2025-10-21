@@ -102,11 +102,12 @@
                     <!-- Actions a la derecha -->
                     <div class="col-auto">
                       <div class="category-actions d-flex align-items-center">
+                        <!-- Botón delegado al componente hijo -->
                         <button mat-icon-button
                                 color="accent"
                                 matTooltip="Crear nueva fase"
                                 matTooltipPosition="below"
-                                (click)="createPhase(selectedCategory.categoryId)"
+                                (click)="triggerCreatePhase()"
                                 [disabled]="loading">
                           <mat-icon>add</mat-icon>
                         </button>
@@ -135,6 +136,7 @@
               <mat-card-content>
                 <!-- Phases Groups Management Component -->
                 <app-phases-groups-management
+                  #phasesGroupsComponent
                   [tournamentId]="tournamentId"
                   [categoryId]="selectedCategory.categoryId"
                   [phases]="selectedCategory.phases || []"

@@ -186,10 +186,13 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
           return;
         }
 
+        console.log('🚀 Creando fase con categoryId:', this.categoryId, 'data:', createData);
         this.phaseService.createPhase(this.categoryId, createData).subscribe({
           next: (response) => {
+            console.log('✅ Respuesta de creación de fase:', response);
             this.isSubmitting = false;
             if (response.succeed) {
+              console.log('🎉 Fase creada exitosamente, cerrando modal');
               this.dialogRef.close({
                 action: 'create',
                 data: response.result

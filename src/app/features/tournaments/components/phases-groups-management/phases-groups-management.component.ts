@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,11 +43,11 @@ import Swal from 'sweetalert2';
   styleUrls: ['./phases-groups-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PhasesGroupsManagementComponent implements OnInit {
+export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDestroy {
   @Input() tournamentId!: number;
   @Input() categoryId!: number;
   @Input() phases: Phase[] = [];
-  @Output() phasesUpdated = new EventEmitter<Phase[]>();
+  @Output() phasesUpdated = new EventEmitter<any>();
 
   // Control de expansión de grupos
   expandedGroupIndex: number = -1;
@@ -67,6 +67,29 @@ export class PhasesGroupsManagementComponent implements OnInit {
 
   ngOnInit(): void {
     // Ya no carga fases automáticamente, las recibe como input
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['phases'] && changes['phases'].currentValue) {
+      console.log('🔄 Phases input changed:', changes['phases'].currentValue.length, 'fases');
+      // Forzar detección de cambios agresiva cuando las fases cambian
+      this.forceChangeDetection();
+    }
+  }
+
+  /**
+   * Fuerza la detección de cambios de manera suave
+   */
+  private forceChangeDetection(): void {
+    // Detección de cambios suave para evitar reinicios
+    this.cdr.markForCheck();
+    this.cdr.detectChanges();
+    
+    // Un solo ciclo adicional
+    setTimeout(() => {
+      this.cdr.markForCheck();
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -90,8 +113,17 @@ export class PhasesGroupsManagementComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result: PhaseModalResult) => {
+      console.log('📝 Modal de fase cerrado con resultado:', result);
       if (result && result.action === 'create') {
+        console.log('✨ Fase creada exitosamente, iniciando actualización');
+        
+        // Mostrar mensaje de éxito inmediatamente
+        console.log('🎉 Mostrando mensaje de éxito y refrescando datos');
+        
+        // Refrescar datos
         this.refreshPhases();
+      } else {
+        console.log('❌ Modal cerrado sin crear fase o con error');
       }
     });
   }
@@ -672,9 +704,18 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * Refresca la lista de fases y notifica al componente padre
    */
   private refreshPhases(): void {
-    // Emitir evento para que el componente padre recargue las categorías
-    // y así obtener las fases actualizadas
-    this.phasesUpdated.emit(this.phases);
+    console.log('🔄 refreshPhases() llamado - solicitando recarga SOLO de esta categoría:', this.categoryId);
+    
+    // Emitir evento específico con información detallada
+    const updateEvent = {
+      categoryId: this.categoryId,
+      action: 'refresh',
+      timestamp: new Date().toISOString(),
+      source: 'phases-groups-management'
+    };
+    
+    console.log('📤 Emitiendo evento de actualización:', updateEvent);
+    this.phasesUpdated.emit(updateEvent);
   }
 
   /**
