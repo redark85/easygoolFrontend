@@ -37,7 +37,7 @@
           </div>
 
           <!-- Stats Row -->
-          <div class="row mt-3">
+          <div class="row mt-3" *ngIf="hasCategoriesData">
             <div class="col-12">
               <div class="fixture-stats-compact">
                 <div class="stat-item-compact">
@@ -77,11 +77,25 @@
         <div class="col-lg-4 hero-right-section">
           <div class="hero-right-content">
             <!-- Filters Card -->
-            <mat-card class="filters-card-hero">
+            <mat-card class="filters-card-hero" *ngIf="hasCategoriesData">
               <mat-card-content>
                 <!-- Filters Row -->
                 <div class="filters-row">
                   <div class="row g-2">
+                    <!-- Select de Categoría -->
+                    <div class="col-12">
+                      <mat-form-field appearance="outline" class="filter-select">
+                        <mat-label>Categoría</mat-label>
+                        <mat-select [(ngModel)]="selectedCategoryId" (selectionChange)="onCategoryChange()">
+                          <mat-option *ngFor="let category of categories" [value]="category.id">
+                            <mat-icon class="option-icon">category</mat-icon>
+                            {{ category.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+
+                    <!-- Select de Fase -->
                     <div [class]="shouldShowGroupSelect ? 'col-6' : 'col-12'">
                       <mat-form-field appearance="outline" class="filter-select">
                         <mat-label>Fase del Torneo</mat-label>
@@ -95,6 +109,8 @@
                         </mat-select>
                       </mat-form-field>
                     </div>
+
+                    <!-- Select de Grupo (si aplica) -->
                     <div class="col-6" *ngIf="shouldShowGroupSelect">
                       <mat-form-field appearance="outline" class="filter-select">
                         <mat-label>Grupo</mat-label>
@@ -161,6 +177,17 @@
                 </div>
               </mat-card-content>
             </mat-card>
+
+            <!-- Mensaje cuando no hay categorías -->
+            <mat-card class="filters-card-hero" *ngIf="!hasCategoriesData">
+              <mat-card-content>
+                <div class="no-data-message-hero">
+                  <mat-icon class="info-icon-hero">info</mat-icon>
+                  <h3>Información Pendiente</h3>
+                  <p>El organizador del torneo aún no ha configurado las categorías y fases.</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
           </div>
         </div>
       </div>
@@ -176,8 +203,17 @@
     [strokeWidth]="3">
   </app-public-loading>
 
+  <!-- Mensaje cuando no hay categorías -->
+  <div class="matchdays-container" *ngIf="!isLoading && !hasCategoriesData">
+    <div class="empty-state">
+      <mat-icon class="empty-icon">pending</mat-icon>
+      <h2 style="color: white;">Información Pendiente</h2>
+      <p style="color: white;">El organizador del torneo aún no ha configurado las categorías y fases.</p>
+    </div>
+  </div>
+
   <!-- Matchdays -->
-  <div class="matchdays-container" *ngIf="!isLoading">
+  <div class="matchdays-container" *ngIf="!isLoading && hasCategoriesData">
     <div class="matchday" *ngFor="let matchday of filteredMatchdays">
       <!-- Matchday Header -->
       <div class="matchday-header">
