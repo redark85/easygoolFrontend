@@ -45,6 +45,7 @@ import Swal from 'sweetalert2';
 })
 export class PhasesGroupsManagementComponent implements OnInit {
   @Input() tournamentId!: number;
+  @Input() categoryId!: number;
   @Input() phases: Phase[] = [];
   @Output() phasesUpdated = new EventEmitter<Phase[]>();
 
@@ -65,7 +66,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadPhases();
+    // Ya no carga fases automáticamente, las recibe como input
   }
 
   ngOnDestroy(): void {
@@ -84,7 +85,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
       data: {
         mode: 'create',
         isEdit: false,
-        tournamentId: this.tournamentId
+        categoryId: this.categoryId
       } as PhaseFormData
     });
 
@@ -107,7 +108,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
         mode: 'edit',
         isEdit: true,
         phase: phase,
-        tournamentId: this.tournamentId
+        categoryId: this.categoryId
       } as PhaseFormData
     });
 
@@ -153,7 +154,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
             });
 
             if (this.errorHandler.handleResponse(response, config)) {
-              this.loadPhases();
+              this.refreshPhases();
             }
           },
           error: (error) => {
@@ -313,7 +314,7 @@ export class PhasesGroupsManagementComponent implements OnInit {
             });
 
             if (this.errorHandler.handleResponse(response, config)) {
-              this.loadPhases();
+              this.refreshPhases();
             }
           },
           error: (error) => {
@@ -408,19 +409,19 @@ export class PhasesGroupsManagementComponent implements OnInit {
     this.isLoadingPhases = true;
     this.cdr.detectChanges();
 
-    this.phaseService.getPhasesByTournament(this.tournamentId).subscribe({
-      next: (phases) => {
-        this.phases = phases;
-        this.phasesUpdated.emit(phases);
-        this.isLoadingPhases = false;
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error loading phases:', error);
-        this.isLoadingPhases = false;
-        this.cdr.detectChanges();
-      }
-    });
+    // this.phaseService.getPhasesByTournament(this.tournamentId).subscribe({
+    //   next: (phases) => {
+    //     this.phases = phases;
+    //     this.phasesUpdated.emit(phases);
+    //     this.isLoadingPhases = false;
+    //     this.cdr.detectChanges();
+    //   },
+    //   error: (error) => {
+    //     console.error('Error loading phases:', error);
+    //     this.isLoadingPhases = false;
+    //     this.cdr.detectChanges();
+    //   }
+    // });
   }
 
   /**
@@ -603,8 +604,8 @@ export class PhasesGroupsManagementComponent implements OnInit {
           .subscribe({
             next: () => {
               // Recargar datos para reflejar el cambio
-              this.loadPhases();
-              
+              this.refreshPhases();
+
               Swal.fire({
                 title: '¡Equipo reactivado!',
                 text: `El equipo "${team.name}" ha sido reactivado exitosamente`,
@@ -671,16 +672,8 @@ export class PhasesGroupsManagementComponent implements OnInit {
    * Refresca la lista de fases y notifica al componente padre
    */
   private refreshPhases(): void {
-    this.loadPhases();
-    // También notificar al componente padre para que actualice equipos
-    this.notifyParentToRefreshTeams();
-  }
-
-  /**
-   * Notifica al componente padre que debe refrescar los equipos
-   */
-  private notifyParentToRefreshTeams(): void {
-    // Emitir evento para que el padre refresque los equipos
+    // Emitir evento para que el componente padre recargue las categorías
+    // y así obtener las fases actualizadas
     this.phasesUpdated.emit(this.phases);
   }
 

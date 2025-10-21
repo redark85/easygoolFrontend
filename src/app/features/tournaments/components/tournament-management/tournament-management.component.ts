@@ -373,59 +373,16 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    * Crea una nueva fase
    */
   createPhase(): void {
-    if (!this.tournament) return;
-
-    const dialogData: PhaseFormData = {
-      isEdit: false,
-      tournamentId: this.tournamentId
-    };
-
-    const dialogRef = this.dialog.open(PhaseFormComponent, {
-      width: '600px',
-      maxWidth: '90vw',
-      height: 'auto',
-      maxHeight: 'none',
-      data: dialogData,
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe((result: PhaseModalResult | undefined) => {
-      if (result && result.action === 'create') {
-        // La creación de fase ya está implementada en PhaseFormComponent
-        this.loadTournamentData(); // Recargar datos para mostrar la nueva fase
-      }
-    });
+    // Las fases ahora se crean desde las categorías, no directamente desde el torneo
+    this.toastService.showInfo('Las fases se crean desde la gestión de categorías');
   }
 
   /**
    * Edita una fase existente
    */
   editPhase(phase: Phase): void {
-    if (!this.tournament) return;
-
-    const dialogData: PhaseFormData = {
-      phase: phase,
-      isEdit: true,
-      tournamentId: this.tournamentId
-    };
-
-    const dialogRef = this.dialog.open(PhaseFormComponent, {
-      width: '600px',
-      maxWidth: '90vw',
-      height: 'auto',
-      maxHeight: 'none',
-      data: dialogData,
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe((result: PhaseModalResult | undefined) => {
-      if (result && result.action === 'update') {
-        // La actualización de fase se implementará cuando esté disponible en la API
-        const updateData = result.data as UpdatePhaseRequest;
-        this.toastService.showSuccess(`Fase "${updateData.name}" actualizada exitosamente`);
-        this.loadTournamentData(); // Recargar datos
-      }
-    });
+    // Las fases ahora se editan desde las categorías, no directamente desde el torneo
+    this.toastService.showInfo('Las fases se editan desde la gestión de categorías');
   }
 
   /**

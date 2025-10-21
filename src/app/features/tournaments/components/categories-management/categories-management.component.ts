@@ -203,14 +203,17 @@ export class CategoriesManagementComponent implements OnInit {
    * Maneja la actualización de fases desde el componente hijo
    */
   onPhasesUpdated(phases: Phase[]): void {
-    if (this.selectedCategory) {
-      this.selectedCategory.phases = phases;
-      // Actualizar también en el array principal
-      const categoryIndex = this.categories.findIndex(cat => cat.categoryId === this.selectedCategory!.categoryId);
-      if (categoryIndex !== -1) {
-        this.categories[categoryIndex].phases = phases;
-      }
-      this.cdr.detectChanges();
+    // Guardar la categoría seleccionada actual
+    const currentSelectedId = this.selectedCategoryId;
+    
+    // Recargar las categorías para obtener los datos actualizados desde la API
+    this.loadCategories();
+    
+    // Restaurar la selección después de la recarga
+    if (currentSelectedId) {
+      setTimeout(() => {
+        this.selectCategory(currentSelectedId);
+      }, 100);
     }
   }
 
@@ -229,7 +232,7 @@ export class CategoriesManagementComponent implements OnInit {
       width: '500px',
       data: {
         isEdit: false,
-        tournamentId: this.tournamentId
+        categoryId: categoryId
       } as PhaseFormData
     });
 

@@ -136,6 +136,7 @@
                 <!-- Phases Groups Management Component -->
                 <app-phases-groups-management
                   [tournamentId]="tournamentId"
+                  [categoryId]="selectedCategory.categoryId"
                   [phases]="selectedCategory.phases || []"
                   (phasesUpdated)="onPhasesUpdated($event)">
                 </app-phases-groups-management>

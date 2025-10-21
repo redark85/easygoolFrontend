@@ -12,19 +12,19 @@
 
     <mat-card-content>
       <!-- Floating Action Button for Phases -->
-      <button mat-fab
-              class="fab-fixed add-phase-btn"
-              (click)="createPhase()"
-              matTooltip="Crear nueva fase"
-              [disabled]="isLoadingPhases">
-        <mat-icon>add</mat-icon>
-      </button>
+<!--      <button mat-fab-->
+<!--              class="fab-fixed add-phase-btn"-->
+<!--              (click)="createPhase()"-->
+<!--              matTooltip="Crear nueva fase"-->
+<!--              [disabled]="isLoadingPhases">-->
+<!--        <mat-icon>add</mat-icon>-->
+<!--      </button>-->
 
       <!-- Loading State -->
-      <div class="loading-container" *ngIf="isLoadingPhases">
-        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
-        <p>Cargando fases del torneo...</p>
-      </div>
+<!--      <div class="loading-container" *ngIf="isLoadingPhases">-->
+<!--        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>-->
+<!--        <p>Cargando fases del torneo...</p>-->
+<!--      </div>-->
 
       <!-- No Phases Message -->
       <div class="no-phases" *ngIf="!isLoadingPhases && phases.length === 0">
@@ -115,7 +115,7 @@
             <div *ngIf="phase.phaseType === 0 && getGroupsForPhase(phase).length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
               <div *ngFor="let group of getGroupsForPhase(phase); trackBy: trackByGroupId; let i = index" class="col mb-4">
                 <mat-expansion-panel class="group-panel"
-                                     
+
                                      (opened)="expandedGroupIndex = i">
                   <mat-expansion-panel-header class="group-header">
                     <mat-panel-title>
@@ -202,7 +202,7 @@
                                   class="disqualify-team-btn text-warning">
                             <mat-icon>gavel</mat-icon>
                           </button>
-                          
+
                           <!-- Botón para reactivar (solo si está descalificado) -->
                           <button mat-icon-button
                                   *ngIf="canReactivateTeam(team)"
@@ -212,7 +212,7 @@
                                   style="color: #4caf50;">
                             <mat-icon>verified</mat-icon>
                           </button>
-                          
+
                           <button mat-icon-button
                                   color="warn"
                                   (click)="removeTeamFromGroup(team, group)"
@@ -262,7 +262,7 @@
                                 class="disqualify-team-btn text-warning">
                           <mat-icon>gavel</mat-icon>
                         </button>
-                        
+
                         <!-- Botón para reactivar (solo si está descalificado) -->
                         <button mat-icon-button
                                 *ngIf="canReactivateTeam(team)"
@@ -272,7 +272,7 @@
                                 style="color: #4caf50;">
                           <mat-icon>verified</mat-icon>
                         </button>
-                        
+
                         <button mat-icon-button
                                 color="warn"
                                 (click)="removeTeamFromPhase(team, phase)"

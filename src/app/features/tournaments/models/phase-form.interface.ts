@@ -15,7 +15,7 @@ export interface UpdatePhaseRequest {
 export interface PhaseFormData {
   phase?: Phase;
   isEdit: boolean;
-  tournamentId?: number; // Opcional: para cuando no se puede obtener de la ruta
+  categoryId: number; // ID de la categoría (obligatorio ya que las fases solo pertenecen a categorías)
 }
 
 export interface PhaseModalResult {

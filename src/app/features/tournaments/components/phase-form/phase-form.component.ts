@@ -38,7 +38,7 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
   phaseForm!: FormGroup;
   isEdit: boolean;
   isSubmitting = false;
-  tournamentId: number | null = null;
+  categoryId: number | null = null;
   private destroy$ = new Subject<void>();
 
   phaseTypeOptions = [
@@ -59,22 +59,13 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Priorizar tournamentId del data (prop) sobre el de la ruta
-    if (this.data.tournamentId) {
-      this.tournamentId = this.data.tournamentId;
+    // Obtener categoryId del data
+    if (this.data.categoryId) {
+      this.categoryId = this.data.categoryId;
     } else {
-      // Intentar obtener tournamentId de la ruta como fallback
-      this.route.params
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(params => {
-          const id = +params['id'];
-          if (id && !isNaN(id)) {
-            this.tournamentId = id;
-          } else {
-            this.toastService.showError('ID de torneo inválido');
-            this.dialogRef.close();
-          }
-        });
+      this.toastService.showError('ID de categoría no disponible');
+      this.dialogRef.close();
+      return;
     }
 
     if (this.isEdit && this.data.phase) {
@@ -188,13 +179,14 @@ export class PhaseFormComponent implements OnInit, OnDestroy {
           phaseType: formValue.phaseType
         };
 
-        if (!this.tournamentId) {
-          this.toastService.showError('ID de torneo no disponible');
+        // Validar que categoryId esté disponible
+        if (!this.categoryId) {
+          this.toastService.showError('ID de categoría no disponible');
           this.isSubmitting = false;
           return;
         }
 
-        this.phaseService.createPhase(this.tournamentId, createData).subscribe({
+        this.phaseService.createPhase(this.categoryId, createData).subscribe({
           next: (response) => {
             this.isSubmitting = false;
             if (response.succeed) {

@@ -21,13 +21,13 @@ export class PhaseService {
   ) { }
 
   /**
-   * Crea una nueva fase para un torneo específico
-   * @param tournamentId ID del torneo
+   * Crea una nueva fase para una categoría específica
+   * @param categoryId ID de la categoría
    * @param data Datos de la fase a crear
    * @returns Observable con la respuesta de la API
    */
-  createPhase(tournamentId: number, data: CreatePhaseRequest): Observable<ApiResponse<Phase>> {
-    const endpoint = `${PHASE_CREATE_ENDPOINT}/${tournamentId}`;
+  createPhase(categoryId: number, data: CreatePhaseRequest): Observable<ApiResponse<Phase>> {
+    const endpoint = `${PHASE_CREATE_ENDPOINT}/${categoryId}`;
     return this.apiService.post<ApiResponse<Phase>>(endpoint, data).pipe(
       map(response => {
         if (response.succeed) {
