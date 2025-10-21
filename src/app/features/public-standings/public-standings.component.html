@@ -141,30 +141,7 @@
                       </mat-form-field>
                     </div>
                   </div>
-                </div>
-
-                <!-- Search Container -->
-                <div class="search-container-hero">
-                  <span class="filter-label-chips">Buscar Equipo:</span>
-                  <mat-form-field appearance="outline" class="search-field-hero">
-                    <mat-label>Buscar equipo</mat-label>
-                    <input matInput 
-                           [(ngModel)]="matchSearchTerm" 
-                           (ngModelChange)="filterMatches()"
-                           placeholder="Ej: Real Madrid, Barcelona...">
-                    <mat-icon matPrefix>search</mat-icon>
-                    <button mat-icon-button 
-                            matSuffix 
-                            *ngIf="matchSearchTerm"
-                            (click)="clearMatchSearch()"
-                            aria-label="Limpiar">
-                      <mat-icon>close</mat-icon>
-                    </button>
-                  </mat-form-field>
-                  <div class="search-results-hero" *ngIf="matchSearchTerm">
-                    <span class="results-count">{{ filteredMatches.length }} partido(s) encontrado(s)</span>
-                  </div>
-                </div>
+                </div>                
               </mat-card-content>
             </mat-card>
 

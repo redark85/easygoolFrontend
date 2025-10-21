@@ -22,9 +22,9 @@
             <!-- Home Team -->
             <div class="team-section home">
               <img
-                [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/logo.png'"
+                [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/default-team.png'"
                 [alt]="match.homeTeam.name || 'Equipo Local'" class="team-logo"
-                (error)="$event.target.src='assets/logo.png'">
+                (error)="$event.target.src='assets/default-team.png'">
               <h2 class="team-name">{{ match.homeTeam.name || 'Equipo Local' }}</h2>
             </div>
 
@@ -91,9 +91,9 @@
             <!-- Away Team -->
             <div class="team-section away">
               <img
-                [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/logo.png'"
+                [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/default-team.png'"
                 [alt]="match.awayTeam.name || 'Equipo Visitante'" class="team-logo"
-                (error)="$event.target.src='assets/logo.png'">
+                (error)="$event.target.src='assets/default-team.png'">
               <h2 class="team-name">{{ match.awayTeam.name || 'Equipo Visitante' }}</h2>
             </div>
           </div>
@@ -150,9 +150,9 @@
                       <div class="team-logo-container">
                         <h2 class="team-name-overlay">{{ match.homeTeam.name || 'Equipo Local' }}</h2>
                         <img
-                          [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/logo.png'"
+                          [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/default-team.png'"
                           [alt]="match.homeTeam.name || 'Equipo Local'" class="team-logo-small"
-                          (error)="$event.target.src='assets/logo.png'">
+                          (error)="$event.target.src='assets/default-team.png'">
                       </div>
                       <mat-chip class="formation-chip" *ngIf="match.homeFormation">{{ match.homeFormation }}</mat-chip>
                     </div>
@@ -195,9 +195,9 @@
                       <div class="team-logo-container">
                         <h2 class="team-name-overlay">{{ match.awayTeam.name || 'Equipo Visitante' }}</h2>
                         <img
-                          [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/logo.png'"
+                          [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/default-team.png'"
                           [alt]="match.awayTeam.name || 'Equipo Visitante'" class="team-logo-small"
-                          (error)="$event.target.src='assets/logo.png'">
+                          (error)="$event.target.src='assets/default-team.png'">
                       </div>
                       <mat-chip class="formation-chip" *ngIf="match.awayFormation">{{ match.awayFormation }}</mat-chip>
                     </div>
