@@ -1,13 +1,34 @@
 <div class="categories-management-container">
   <mat-card class="categories-management-card">
     <mat-card-header>
-      <mat-card-title class="white-bold-title">
-        <mat-icon>category</mat-icon>
-        Categorías del Torneo
-      </mat-card-title>
-      <mat-card-subtitle class="categories-subtitle">
-        Administra las categorías de tu torneo
-      </mat-card-subtitle>
+      <div class="container-fluid">
+        <div class="row align-items-start">
+          <!-- Título a la derecha -->
+          <div class="col">
+            <mat-card-title class="white-bold-title">
+              <mat-icon>category</mat-icon>
+              Categorías del Torneo
+            </mat-card-title>
+            <mat-card-subtitle class="categories-subtitle">
+              Administra las categorías de tu torneo
+            </mat-card-subtitle>
+          </div>
+          <!-- Button Toggle a la izquierda -->
+          <div class="col-auto mb-2 mb-md-0" *ngIf="!loading && categories.length > 0">
+            <mat-button-toggle-group
+              [value]="selectedCategoryId"
+              (change)="onCategorySelectionChange($event.value)"
+              class="category-toggle-group">
+              <mat-button-toggle
+                *ngFor="let category of categories; trackBy: trackByCategoryId"
+                [value]="category.categoryId"
+                class="category-toggle-btn">
+                {{ category.name }}
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+        </div>
+      </div>
     </mat-card-header>
 
     <mat-card-content>
@@ -20,7 +41,7 @@
 
   <!-- Categories Content -->
   <div class="categories-content" *ngIf="!loading">
-    
+
     <!-- Empty State -->
     <div class="empty-state" *ngIf="categories.length === 0">
       <div class="empty-state-content">
@@ -29,8 +50,8 @@
         <p class="empty-description">
           Comienza creando la primera categoría de tu torneo
         </p>
-        <button mat-raised-button 
-                color="primary" 
+        <button mat-raised-button
+                color="primary"
                 class="empty-action-btn"
                 (click)="createCategory()">
           <mat-icon>add</mat-icon>
@@ -39,57 +60,103 @@
       </div>
     </div>
 
-    <!-- Categories Grid -->
-    <div class="categories-grid" *ngIf="categories.length > 0">
-      <mat-card *ngFor="let category of categories; trackBy: trackByCategoryId" 
-                class="category-card">
-        <mat-card-header>
-          <div mat-card-avatar class="category-avatar">
-            <mat-icon>category</mat-icon>
-          </div>
-          <mat-card-title>{{ category.name }}</mat-card-title>
-          <mat-card-subtitle>{{ category.description }}</mat-card-subtitle>
-        </mat-card-header>
+    <!-- Selected Category Card -->
+    <div class="selected-category-section" *ngIf="categories.length > 0 && selectedCategory">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <mat-card class="selected-category-card">
+              <mat-card-header>
+                <div mat-card-avatar class="selected-category-avatar">
+                  <mat-icon>category</mat-icon>
+                </div>
+                <mat-card-title>{{ selectedCategory.name }}</mat-card-title>
+                <mat-card-subtitle>{{ selectedCategory.description }}</mat-card-subtitle>
 
-        <mat-card-content>
-          <div class="category-stats">
-            <div class="stat-item">
-              <mat-icon class="stat-icon">timeline</mat-icon>
-              <span class="stat-value">{{ categoryService.getPhasesCount(category) }}</span>
-              <span class="stat-label">fases</span>
-            </div>
-            <div class="stat-item">
-              <mat-icon class="stat-icon">groups</mat-icon>
-              <span class="stat-value">{{ categoryService.getTotalTeamsCount(category) }}</span>
-              <span class="stat-label">equipos</span>
-            </div>
-          </div>
-        </mat-card-content>
+                <!-- Actions in header -->
+                <div class="category-actions">
+                  <button mat-icon-button
+                          color="primary"
+                          matTooltip="Editar categoría"
+                          matTooltipPosition="below"
+                          (click)="editCategory(selectedCategory)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
 
-        <mat-card-actions align="end" class="card-actions">
-          <button mat-icon-button 
-                  color="primary"
-                  matTooltip="Editar categoría"
-                  matTooltipPosition="above"
-                  (click)="editCategory(category)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          
-          <button mat-icon-button 
-                  color="warn"
-                  matTooltip="Eliminar categoría"
-                  matTooltipPosition="above"
-                  (click)="deleteCategory(category)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+                  <button mat-icon-button
+                          color="warn"
+                          matTooltip="Eliminar categoría"
+                          matTooltipPosition="below"
+                          (click)="deleteCategory(selectedCategory)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="category-details">
+                  <!-- Statistics Row -->
+                  <div class="stats-row">
+                    <div class="stat-item">
+                      <mat-icon class="stat-icon">timeline</mat-icon>
+                      <div class="stat-content">
+                        <span class="stat-value">{{ categoryService.getPhasesCount(selectedCategory) }}</span>
+                        <span class="stat-label">Fases</span>
+                      </div>
+                    </div>
+
+                    <div class="stat-item">
+                      <mat-icon class="stat-icon">groups</mat-icon>
+                      <div class="stat-content">
+                        <span class="stat-value">{{ categoryService.getTotalTeamsCount(selectedCategory) }}</span>
+                        <span class="stat-label">Equipos</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Phases Information -->
+                  <div class="phases-info" *ngIf="selectedCategory.phases && selectedCategory.phases.length > 0">
+                    <h4 class="section-title">
+                      <mat-icon>timeline</mat-icon>
+                      Fases de la Categoría
+                    </h4>
+                    <div class="phases-list">
+                      <mat-card *ngFor="let phase of selectedCategory.phases" class="phase-mini-card">
+                        <mat-card-content>
+                          <div class="phase-info">
+                            <div class="phase-header">
+                              <span class="phase-name">{{ phase.name }}</span>
+                              <mat-chip class="phase-type-chip">
+                                Tipo {{ phase.phaseType }}
+                              </mat-chip>
+                            </div>
+                            <div class="phase-stats">
+                              <span class="phase-stat" *ngIf="phase.groups && phase.groups.length > 0">
+                                <mat-icon>group_work</mat-icon>
+                                {{ phase.groups.length }} grupos
+                              </span>
+                              <span class="phase-stat" *ngIf="phase.knockoutTeams && phase.knockoutTeams.length > 0">
+                                <mat-icon>sports</mat-icon>
+                                {{ phase.knockoutTeams.length }} equipos eliminatorios
+                              </span>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Floating Action Button -->
-  <button mat-fab 
-          color="primary" 
+  <button mat-fab
+          color="primary"
           class="fab-button"
           matTooltip="Crear nueva categoría"
           matTooltipPosition="left"

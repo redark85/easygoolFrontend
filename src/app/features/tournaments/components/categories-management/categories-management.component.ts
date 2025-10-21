@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 
@@ -24,7 +26,9 @@ import { CategoryFormData, CategoryModalResult } from '../../models/category.int
     MatIconModule,
     MatProgressSpinnerModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatButtonToggleModule,
+    MatChipsModule
   ],
   templateUrl: './categories-management.component.html',
   styleUrls: ['./categories-management.component.scss'],
@@ -36,6 +40,8 @@ export class CategoriesManagementComponent implements OnInit {
   @Output() categoriesUpdated = new EventEmitter<Category[]>();
 
   loading = false;
+  selectedCategoryId: number | null = null;
+  selectedCategory: Category | null = null;
 
   constructor(
     public categoryService: CategoryService,
@@ -60,6 +66,13 @@ export class CategoriesManagementComponent implements OnInit {
       next: (categories) => {
         this.categories = categories;
         this.loading = false;
+        
+        // Seleccionar la primera categoría por defecto
+        if (categories.length > 0 && !this.selectedCategoryId) {
+          this.selectedCategoryId = categories[0].categoryId;
+          this.selectedCategory = categories[0];
+        }
+        
         this.categoriesUpdated.emit(this.categories);
         this.cdr.detectChanges();
       },
@@ -158,6 +171,15 @@ export class CategoriesManagementComponent implements OnInit {
         });
       }
     });
+  }
+
+  /**
+   * Maneja el cambio de categoría seleccionada
+   */
+  onCategorySelectionChange(categoryId: number): void {
+    this.selectedCategoryId = categoryId;
+    this.selectedCategory = this.categories.find(cat => cat.categoryId === categoryId) || null;
+    this.cdr.detectChanges();
   }
 
   /**

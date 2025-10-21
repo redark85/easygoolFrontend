@@ -20,6 +20,7 @@
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--primary-color);
+      margin: 0;
 
       mat-icon {
         font-size: 1.8rem;
@@ -42,6 +43,32 @@
       color: var(--text-secondary);
       font-size: 0.95rem;
     }
+
+    // Estilos para el button toggle
+    .category-toggle-group {
+      .category-toggle-btn {
+        font-size: 0.875rem;
+        min-width: 80px;
+        height: 36px;
+        
+        &.mat-button-toggle-checked {
+          background-color: var(--primary-color);
+          color: white;
+        }
+      }
+
+      @media (max-width: 768px) {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+
+        .category-toggle-btn {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
+    }
   }
 }
 
@@ -63,6 +90,202 @@
 // Categories Content
 .categories-content {
   flex: 1;
+
+  // Selected Category Section
+  .selected-category-section {
+    margin-top: 20px;
+
+    .selected-category-card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .mat-card-header {
+        padding: 20px 20px 0 20px;
+        position: relative;
+
+        .selected-category-avatar {
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          mat-icon {
+            font-size: 1.5rem;
+          }
+        }
+
+        .mat-card-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 4px;
+        }
+
+        .mat-card-subtitle {
+          color: var(--text-secondary);
+          line-height: 1.4;
+          font-size: 0.95rem;
+        }
+
+        .category-actions {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          display: flex;
+          gap: 8px;
+
+          button {
+            transition: all 0.2s ease;
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+
+      .mat-card-content {
+        padding: 20px;
+
+        .category-details {
+          .stats-row {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+
+            .stat-item {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .stat-icon {
+                font-size: 1.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+                color: var(--primary-color);
+              }
+
+              .stat-content {
+                display: flex;
+                flex-direction: column;
+
+                .stat-value {
+                  font-weight: 700;
+                  font-size: 1.5rem;
+                  color: var(--text-primary);
+                  line-height: 1;
+                }
+
+                .stat-label {
+                  color: var(--text-secondary);
+                  font-size: 0.875rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                }
+              }
+            }
+
+            @media (max-width: 768px) {
+              flex-direction: column;
+              gap: 16px;
+            }
+          }
+
+          .phases-info {
+            .section-title {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 16px;
+              font-size: 1.1rem;
+              font-weight: 600;
+              color: var(--text-primary);
+
+              mat-icon {
+                color: var(--primary-color);
+              }
+            }
+
+            .phases-list {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 16px;
+
+              .phase-mini-card {
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                transition: all 0.2s ease;
+
+                &:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+                }
+
+                .mat-card-content {
+                  padding: 16px;
+
+                  .phase-info {
+                    .phase-header {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-bottom: 12px;
+
+                      .phase-name {
+                        font-weight: 600;
+                        color: var(--text-primary);
+                        font-size: 1rem;
+                      }
+
+                      .phase-type-chip {
+                        background-color: var(--primary-color);
+                        color: white;
+                        font-size: 0.75rem;
+                      }
+                    }
+
+                    .phase-stats {
+                      display: flex;
+                      flex-wrap: wrap;
+                      gap: 12px;
+
+                      .phase-stat {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        color: var(--text-secondary);
+                        font-size: 0.875rem;
+
+                        mat-icon {
+                          font-size: 1rem;
+                          width: 1rem;
+                          height: 1rem;
+                          color: var(--primary-color);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   
   // Empty State
   .empty-state {
