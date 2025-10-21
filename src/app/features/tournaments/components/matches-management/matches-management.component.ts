@@ -172,6 +172,9 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.availablePhases = [];
     }
+    
+    // Forzar detección de cambios después de actualizar las selecciones
+    this.cdr.detectChanges();
   }
 
   /**
@@ -203,6 +206,9 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.availableGroups = [];
     }
+    
+    // Forzar detección de cambios después de actualizar las selecciones
+    this.cdr.detectChanges();
   }
 
   /**
@@ -212,6 +218,9 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     console.log('👥 Group changed to:', groupId);
     this.selectedGroupId = groupId;
     this.loading = false; // Reset loading state before API call
+    
+    // Forzar detección de cambios antes de cargar datos
+    this.cdr.detectChanges();
     this.loadMatchesByGroup(groupId);
   }
 
@@ -375,6 +384,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   private loadMatchesByGroup(groupId: number): void {
     console.log(`🔄 Loading matches for group: ${groupId}`);
     this.loading = true;
+    this.cdr.detectChanges(); // Forzar actualización del spinner
 
     this.matchService.getAllMatchesByGroup(groupId)
       .pipe(takeUntil(this.destroy$))
@@ -383,13 +393,19 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           console.log(`✅ Loaded ${matchDays.length} match days for group ${groupId}`);
           this.matchDays = matchDays;
           this.loading = false;
-          console.log('🔄 Loading state set to false, matchDays updated');
+          
+          // Forzar detección de cambios para actualizar la vista
+          this.cdr.detectChanges();
+          console.log('🔄 Loading state set to false, matchDays updated and view refreshed');
         },
         error: (error) => {
           console.error('❌ Error loading matches by group:', error);
           this.matchDays = [];
           this.loading = false;
-          console.log('🔄 Loading state set to false after error');
+          
+          // Forzar detección de cambios también en caso de error
+          this.cdr.detectChanges();
+          console.log('🔄 Loading state set to false after error and view refreshed');
         }
       });
   }
@@ -422,6 +438,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   private loadMatchesByPhase(phaseId: number): void {
     console.log(`🔄 Loading matches for phase: ${phaseId}`);
     this.loading = true;
+    this.cdr.detectChanges(); // Forzar actualización del spinner
 
     this.matchService.getAllMatchesByPhase(phaseId)
       .pipe(takeUntil(this.destroy$))
@@ -430,13 +447,19 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
           console.log(`✅ Loaded ${matchDays.length} match days for phase ${phaseId}`);
           this.matchDays = matchDays;
           this.loading = false;
-          console.log('🔄 Loading state set to false, matchDays updated');
+          
+          // Forzar detección de cambios para actualizar la vista
+          this.cdr.detectChanges();
+          console.log('🔄 Loading state set to false, matchDays updated and view refreshed');
         },
         error: (error) => {
           console.error('❌ Error loading matches by phase:', error);
           this.matchDays = [];
           this.loading = false;
-          console.log('🔄 Loading state set to false after error');
+          
+          // Forzar detección de cambios también en caso de error
+          this.cdr.detectChanges();
+          console.log('🔄 Loading state set to false after error and view refreshed');
         }
       });
   }
