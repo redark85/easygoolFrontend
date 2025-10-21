@@ -95,76 +95,7 @@
   <mat-card class="content-card" *ngIf="!isLoading">
     <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="tournament-tabs">
       
-      <!-- Tab 1: Partidos del Campeonato -->
-      <mat-tab label="Partidos">
-        <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">sports_soccer</mat-icon>
-          Partidos
-        </ng-template>
-        
-        <div class="tab-content">
-          <!-- Buscador de Partidos -->
-          <div class="search-container">
-            <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Buscar equipo</mat-label>
-              <input matInput 
-                     [(ngModel)]="matchSearchTerm" 
-                     (ngModelChange)="filterMatches()"
-                     placeholder="Ej: Real Madrid, Barcelona...">
-              <mat-icon matPrefix>search</mat-icon>
-              <button mat-icon-button 
-                      matSuffix 
-                      *ngIf="matchSearchTerm"
-                      (click)="clearMatchSearch()"
-                      aria-label="Limpiar">
-                <mat-icon>close</mat-icon>
-              </button>
-            </mat-form-field>
-            <div class="search-results" *ngIf="matchSearchTerm">
-              <span class="results-count">{{ filteredMatches.length }} partido(s) encontrado(s)</span>
-            </div>
-          </div>
-
-          <div class="matches-list">
-            <!-- No results message -->
-            <div *ngIf="filteredMatches.length === 0" class="no-results">
-              <mat-icon class="no-results-icon">search_off</mat-icon>
-              <h3>No se encontraron partidos</h3>
-              <p>Intenta con otro nombre de equipo</p>
-            </div>
-
-            <div *ngFor="let match of filteredMatches" class="match-card">
-              <div class="match-header">
-                <span class="match-date">{{ match.date | date: 'dd/MM/yyyy HH:mm' }}</span>
-                <span class="match-status" [ngClass]="{
-                  'status-finished': match.status === 'finished',
-                  'status-live': match.status === 'live',
-                  'status-scheduled': match.status === 'scheduled'
-                }">
-                  {{ match.status === 'finished' ? 'Finalizado' : match.status === 'live' ? 'En vivo' : 'Programado' }}
-                </span>
-              </div>
-              <div class="match-content">
-                <div class="team home-team">
-                  <span class="team-name">{{ match.homeTeam }}</span>
-                  <span class="team-score" *ngIf="match.homeScore !== null">{{ match.homeScore }}</span>
-                </div>
-                <div class="match-separator">VS</div>
-                <div class="team away-team">
-                  <span class="team-score" *ngIf="match.awayScore !== null">{{ match.awayScore }}</span>
-                  <span class="team-name">{{ match.awayTeam }}</span>
-                </div>
-              </div>
-              <div class="match-footer">
-                <mat-icon class="venue-icon">location_on</mat-icon>
-                <span class="venue-name">{{ match.venue }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </mat-tab>
-
-      <!-- Tab 2: Tabla de Posiciones -->
+      <!-- Tab 1: Tabla de Posiciones -->
       <mat-tab label="Tabla de Posiciones" *ngIf="selectedGroupId">
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">leaderboard</mat-icon>
@@ -289,7 +220,7 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 3: Goleadores -->
+      <!-- Tab 2: Goleadores -->
       <mat-tab label="Goleadores">
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">emoji_events</mat-icon>
