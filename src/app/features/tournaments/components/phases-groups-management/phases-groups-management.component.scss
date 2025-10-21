@@ -906,3 +906,12 @@
     padding: 0 !important;
   }
 }
+
+// CSS Variables for theming
+:host {
+  --primary-color: #1976d2;
+  --primary-color-dark: #1565c0;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --text-disabled: #bdbdbd;
+}

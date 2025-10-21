@@ -1,16 +1,16 @@
 <div class="categories-management-container">
-  <!-- Header -->
-  <div class="management-header">
-    <div class="header-content">
-      <div class="header-info">
-        <h2 class="section-title">
-          <mat-icon class="title-icon">category</mat-icon>
-          Categorías del Torneo
-        </h2>
-        <p class="section-subtitle">Administra las categorías de tu torneo</p>
-      </div>
-    </div>
-  </div>
+  <mat-card class="categories-management-card">
+    <mat-card-header>
+      <mat-card-title class="white-bold-title">
+        <mat-icon>category</mat-icon>
+        Categorías del Torneo
+      </mat-card-title>
+      <mat-card-subtitle class="categories-subtitle">
+        Administra las categorías de tu torneo
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
 
   <!-- Loading State -->
   <div class="loading-container" *ngIf="loading">
@@ -97,4 +97,6 @@
           *ngIf="!loading">
     <mat-icon>add</mat-icon>
   </button>
+    </mat-card-content>
+  </mat-card>
 </div>
