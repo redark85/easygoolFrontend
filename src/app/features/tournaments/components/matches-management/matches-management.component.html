@@ -24,62 +24,59 @@
         </mat-progress-spinner>
       </button>
 
-      <!-- Category, Phase and Group Selection Container - Centered -->
+      <!-- Category, Phase and Group Selection Container - Bootstrap Grid -->
       <div class="selection-container-centered" *ngIf="categories.length > 0 || loadingCategories">
-        <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
-          
-          <!-- Category Selection -->
-          <div class="category-selection min-width-input">
-            <mat-form-field appearance="outline" class="category-select" style="width: 100%;">
-              <mat-label>Categoría</mat-label>
-              <mat-select [(value)]="selectedCategoryId" 
-                         (selectionChange)="onCategoryChange($event.value)"
-                         [disabled]="loadingCategories">
-                <mat-option *ngFor="let category of categories; trackBy: trackByCategoryId" [value]="category.categoryId">
-                  {{ category.name }}
-                </mat-option>
-              </mat-select>
-              <mat-icon matSuffix *ngIf="!loadingCategories">expand_more</mat-icon>
-              <mat-progress-spinner matSuffix *ngIf="loadingCategories" diameter="20" mode="indeterminate"></mat-progress-spinner>
-            </mat-form-field>
-          </div>
+        <div class="container-fluid">
+          <div class="row align-items-center justify-content-center">
+            
+            <!-- Category Selection - Always col-4 when groups exist, col-6 when no groups -->
+            <div [class]="availableGroups.length > 0 ? 'col-4' : 'col-6'">
+              <mat-form-field appearance="outline" class="category-select w-100">
+                <mat-label>Categoría</mat-label>
+                <mat-select [(value)]="selectedCategoryId" 
+                           (selectionChange)="onCategoryChange($event.value)"
+                           [disabled]="loadingCategories">
+                  <mat-option *ngFor="let category of categories; trackBy: trackByCategoryId" [value]="category.categoryId">
+                    {{ category.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix *ngIf="!loadingCategories">expand_more</mat-icon>
+                <mat-progress-spinner matSuffix *ngIf="loadingCategories" diameter="20" mode="indeterminate"></mat-progress-spinner>
+              </mat-form-field>
+            </div>
 
-          <!-- Vertical Separator -->
-          <div class="vertical-separator" *ngIf="availablePhases.length > 0"></div>
+            <!-- Phase Selection - Always visible when phases exist -->
+            <div [class]="availableGroups.length > 0 ? 'col-4' : 'col-6'" *ngIf="availablePhases.length > 0">
+              <mat-form-field appearance="outline" class="phase-select w-100">
+                <mat-label>Fase</mat-label>
+                <mat-select [(value)]="selectedPhaseId" 
+                           (selectionChange)="onPhaseChange($event.value)"
+                           [disabled]="loadingPhases">
+                  <mat-option *ngFor="let phase of availablePhases; trackBy: trackByPhaseId" [value]="phase.id">
+                    {{ phase.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix *ngIf="!loadingPhases">expand_more</mat-icon>
+                <mat-progress-spinner matSuffix *ngIf="loadingPhases" diameter="20" mode="indeterminate"></mat-progress-spinner>
+              </mat-form-field>
+            </div>
 
-          <!-- Phase Selection -->
-          <div class="phase-selection min-width-input" *ngIf="availablePhases.length > 0">
-            <mat-form-field appearance="outline" class="phase-select" style="width: 100%;">
-              <mat-label>Fase</mat-label>
-              <mat-select [(value)]="selectedPhaseId" 
-                         (selectionChange)="onPhaseChange($event.value)"
-                         [disabled]="loadingPhases">
-                <mat-option *ngFor="let phase of availablePhases; trackBy: trackByPhaseId" [value]="phase.id">
-                  {{ phase.name }}
-                </mat-option>
-              </mat-select>
-              <mat-icon matSuffix *ngIf="!loadingPhases">expand_more</mat-icon>
-              <mat-progress-spinner matSuffix *ngIf="loadingPhases" diameter="20" mode="indeterminate"></mat-progress-spinner>
-            </mat-form-field>
-          </div>
+            <!-- Group Selection - Only visible when groups exist, always col-4 -->
+            <div class="col-4" *ngIf="availableGroups.length > 0">
+              <mat-form-field appearance="outline" class="group-select w-100">
+                <mat-label>Grupo</mat-label>
+                <mat-select [(value)]="selectedGroupId" 
+                           (selectionChange)="onGroupChange($event.value)"
+                           [disabled]="loadingGroups">
+                  <mat-option *ngFor="let group of availableGroups; trackBy: trackByGroupId" [value]="group.id">
+                    {{ group.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix *ngIf="!loadingGroups">expand_more</mat-icon>
+                <mat-progress-spinner matSuffix *ngIf="loadingGroups" diameter="20" mode="indeterminate"></mat-progress-spinner>
+              </mat-form-field>
+            </div>
 
-          <!-- Vertical Separator -->
-          <div class="vertical-separator" *ngIf="availableGroups.length > 0"></div>
-
-          <!-- Group Selection -->
-          <div class="group-selection min-width-input" *ngIf="availableGroups.length > 0">
-            <mat-form-field appearance="outline" class="group-select" style="width: 100%;">
-              <mat-label>Grupo</mat-label>
-              <mat-select [(value)]="selectedGroupId" 
-                         (selectionChange)="onGroupChange($event.value)"
-                         [disabled]="loadingGroups">
-                <mat-option *ngFor="let group of availableGroups; trackBy: trackByGroupId" [value]="group.id">
-                  {{ group.name }}
-                </mat-option>
-              </mat-select>
-              <mat-icon matSuffix *ngIf="!loadingGroups">expand_more</mat-icon>
-              <mat-progress-spinner matSuffix *ngIf="loadingGroups" diameter="20" mode="indeterminate"></mat-progress-spinner>
-            </mat-form-field>
           </div>
         </div>
       </div>

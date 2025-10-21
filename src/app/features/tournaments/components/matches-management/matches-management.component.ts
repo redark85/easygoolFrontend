@@ -47,7 +47,7 @@ import Swal from 'sweetalert2';
   ],
   templateUrl: './matches-management.component.html',
   styleUrls: ['./matches-management.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges {
   @Input() tournamentId!: number;
@@ -156,6 +156,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     this.selectedGroupId = null;
     this.availableGroups = [];
     this.matchDays = [];
+    this.loading = false; // Reset loading state
 
     // Obtener fases de la categoría seleccionada
     const selectedCategory = this.categories.find(c => c.categoryId === categoryId);
@@ -171,8 +172,6 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.availablePhases = [];
     }
-
-    this.cdr.detectChanges();
   }
 
   /**
@@ -183,6 +182,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     this.selectedPhaseId = phaseId;
     this.selectedGroupId = null;
     this.matchDays = [];
+    this.loading = false; // Reset loading state
 
     // Obtener grupos de la fase seleccionada
     const selectedPhase = this.availablePhases.find(p => p.id === phaseId);
@@ -203,8 +203,6 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.availableGroups = [];
     }
-
-    this.cdr.detectChanges();
   }
 
   /**
@@ -213,8 +211,8 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   onGroupChange(groupId: number): void {
     console.log('👥 Group changed to:', groupId);
     this.selectedGroupId = groupId;
+    this.loading = false; // Reset loading state before API call
     this.loadMatchesByGroup(groupId);
-    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -375,32 +373,23 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Carga los partidos de un grupo organizados por jornadas
    */
   private loadMatchesByGroup(groupId: number): void {
-    console.log(`Loading matches for group: ${groupId}`);
+    console.log(`🔄 Loading matches for group: ${groupId}`);
     this.loading = true;
 
     this.matchService.getAllMatchesByGroup(groupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (matchDays) => {
-          console.log(`Loaded ${matchDays.length} match days for group ${groupId}`);
+          console.log(`✅ Loaded ${matchDays.length} match days for group ${groupId}`);
           this.matchDays = matchDays;
           this.loading = false;
-
-          // Forzar detección de cambios múltiple
-          setTimeout(() => {
-            this.cdr.detectChanges();
-            this.cdr.markForCheck();
-          }, 0);
+          console.log('🔄 Loading state set to false, matchDays updated');
         },
         error: (error) => {
-          console.error('Error loading matches by group:', error);
+          console.error('❌ Error loading matches by group:', error);
           this.matchDays = [];
           this.loading = false;
-
-          setTimeout(() => {
-            this.cdr.detectChanges();
-            this.cdr.markForCheck();
-          }, 0);
+          console.log('🔄 Loading state set to false after error');
         }
       });
   }
@@ -431,33 +420,23 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    * Carga los partidos de una phase organizados por jornadas
    */
   private loadMatchesByPhase(phaseId: number): void {
-    console.log(`Loading matches for phase: ${phaseId}`);
+    console.log(`🔄 Loading matches for phase: ${phaseId}`);
     this.loading = true;
-    this.cdr.detectChanges();
 
     this.matchService.getAllMatchesByPhase(phaseId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (matchDays) => {
-          console.log(`Loaded ${matchDays.length} match days for phase ${phaseId}`);
+          console.log(`✅ Loaded ${matchDays.length} match days for phase ${phaseId}`);
           this.matchDays = matchDays;
           this.loading = false;
-
-          // Forzar detección de cambios múltiple
-          setTimeout(() => {
-            this.cdr.detectChanges();
-            this.cdr.markForCheck();
-          }, 0);
+          console.log('🔄 Loading state set to false, matchDays updated');
         },
         error: (error) => {
-          console.error('Error loading matches by phase:', error);
+          console.error('❌ Error loading matches by phase:', error);
           this.matchDays = [];
           this.loading = false;
-
-          setTimeout(() => {
-            this.cdr.detectChanges();
-            this.cdr.markForCheck();
-          }, 0);
+          console.log('🔄 Loading state set to false after error');
         }
       });
   }
