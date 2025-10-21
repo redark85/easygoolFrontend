@@ -9,14 +9,17 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDialog } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 
 import { Category, CategoryFormData, CategoryModalResult } from '../../models/category.interface';
-import { Phase, Group } from '../../models/phase.interface';
-import { Team } from '../../models/team.interface';
+import { Phase } from '../../models/phase.interface';
 import { CategoryService } from '../../services/category.service';
 import { CategoryFormComponent } from '../category-form/category-form.component';
+import { PhaseFormComponent } from '../phase-form/phase-form.component';
+import { PhasesGroupsManagementComponent } from '../phases-groups-management/phases-groups-management.component';
+import { PhaseFormData } from '../../models/phase-form.interface';
 
 @Component({
   selector: 'app-categories-management',
@@ -31,7 +34,9 @@ import { CategoryFormComponent } from '../category-form/category-form.component'
     MatTooltipModule,
     MatButtonToggleModule,
     MatChipsModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatExpansionModule,
+    PhasesGroupsManagementComponent
   ],
   templateUrl: './categories-management.component.html',
   styleUrls: ['./categories-management.component.scss'],
@@ -186,6 +191,30 @@ export class CategoriesManagementComponent implements OnInit {
   }
 
   /**
+   * Selecciona una categoría para mostrar sus detalles
+   */
+  selectCategory(categoryId: number): void {
+    this.selectedCategoryId = categoryId;
+    this.selectedCategory = this.categories.find(cat => cat.categoryId === categoryId) || null;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja la actualización de fases desde el componente hijo
+   */
+  onPhasesUpdated(phases: Phase[]): void {
+    if (this.selectedCategory) {
+      this.selectedCategory.phases = phases;
+      // Actualizar también en el array principal
+      const categoryIndex = this.categories.findIndex(cat => cat.categoryId === this.selectedCategory!.categoryId);
+      if (categoryIndex !== -1) {
+        this.categories[categoryIndex].phases = phases;
+      }
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
    * TrackBy function para optimizar el rendimiento
    */
   trackByCategoryId(index: number, category: Category): number {
@@ -193,96 +222,30 @@ export class CategoriesManagementComponent implements OnInit {
   }
 
   /**
-   * TrackBy functions para phases, groups y teams
-   */
-  trackByPhaseId(index: number, phase: Phase): number {
-    return phase.id;
-  }
-
-  trackByGroupId(index: number, group: Group): number {
-    return group.id;
-  }
-
-  trackByTeamId(index: number, team: Team): number {
-    return team.id;
-  }
-
-  /**
-   * Métodos para phases management
+   * Método para crear fase - delegado al componente hijo
    */
   createPhase(categoryId: number): void {
-    // TODO: Implementar creación de fase
-    console.log('Creating phase for category:', categoryId);
-  }
+    const dialogRef = this.dialog.open(PhaseFormComponent, {
+      width: '500px',
+      data: {
+        isEdit: false,
+        tournamentId: this.tournamentId
+      } as PhaseFormData
+    });
 
-  editPhase(phase: Phase): void {
-    // TODO: Implementar edición de fase
-    console.log('Editing phase:', phase);
-  }
-
-  deletePhase(phase: Phase): void {
-    // TODO: Implementar eliminación de fase
-    console.log('Deleting phase:', phase);
-  }
-
-  getPhaseTypeIcon(phaseType: number): string {
-    return phaseType === 0 ? 'group_work' : 'timeline';
-  }
-
-  getPhaseTypeText(phaseType: number): string {
-    return phaseType === 0 ? 'Grupos' : 'Eliminatoria';
-  }
-
-  /**
-   * Métodos para groups management
-   */
-  createGroup(phase: Phase): void {
-    // TODO: Implementar creación de grupo
-    console.log('Creating group for phase:', phase);
-  }
-
-  editGroup(group: Group): void {
-    // TODO: Implementar edición de grupo
-    console.log('Editing group:', group);
-  }
-
-  deleteGroup(group: Group): void {
-    // TODO: Implementar eliminación de grupo
-    console.log('Deleting group:', group);
-  }
-
-  /**
-   * Métodos para teams management
-   */
-  addTeamToGroup(groupId: number, groupName: string): void {
-    // TODO: Implementar agregar equipo a grupo
-    console.log('Adding team to group:', groupId, groupName);
-  }
-
-  addTeamToPhase(phaseId: number, phaseName: string): void {
-    // TODO: Implementar agregar equipo a fase
-    console.log('Adding team to phase:', phaseId, phaseName);
-  }
-
-  removeTeamFromGroup(teamId: number, groupId: number): void {
-    // TODO: Implementar remover equipo de grupo
-    console.log('Removing team from group:', teamId, groupId);
-  }
-
-  removeTeamFromPhase(teamId: number, phaseId: number): void {
-    // TODO: Implementar remover equipo de fase
-    console.log('Removing team from phase:', teamId, phaseId);
-  }
-
-  assignTeamsRandomly(phase: Phase): void {
-    // TODO: Implementar asignación aleatoria de equipos
-    console.log('Assigning teams randomly for phase:', phase);
-  }
-
-  /**
-   * Manejo de errores de imágenes
-   */
-  onImageError(event: any): void {
-    event.target.src = '/assets/images/default-team-logo.png';
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.action === 'create') {
+        // Recargar las categorías para mostrar la nueva fase
+        this.loadCategories();
+        
+        Swal.fire({
+          title: '¡Éxito!',
+          text: 'La fase ha sido creada correctamente.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
   }
 }

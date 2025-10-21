@@ -194,23 +194,7 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 2: Fases -->
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">timeline</mat-icon>
-          <span class="tab-text">Fases</span>
-        </ng-template>
-
-        <div class="tab-content">
-          <app-phases-groups-management
-            [tournamentId]="tournamentId"
-            [phases]="phases"
-            (phasesUpdated)="onPhasesUpdated($event)">
-          </app-phases-groups-management>
-        </div>
-      </mat-tab>
-
-      <!-- Tab 3: Equipos -->
+      <!-- Tab 2: Equipos -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">groups</mat-icon>
@@ -226,7 +210,7 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 4: Partidos -->
+      <!-- Tab 3: Partidos -->
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">sports_soccer</mat-icon>

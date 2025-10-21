@@ -69,38 +69,48 @@
               <mat-card-header>
                 <div class="container-fluid">
                   <div class="row align-items-center">
-                    <!-- Avatar y título a la izquierda -->
+                    <!-- Avatar, título y estadísticas juntos -->
                     <div class="col">
                       <div class="d-flex align-items-center">
                         <div mat-card-avatar class="selected-category-avatar me-3">
                           <mat-icon>category</mat-icon>
                         </div>
-                        <div>
-                          <mat-card-title class="mb-1">{{ selectedCategory.name }}</mat-card-title>
-                          <mat-card-subtitle class="mb-0">{{ selectedCategory.description }}</mat-card-subtitle>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <!-- Estadísticas en el centro -->
-                    <div class="col-auto">
-                      <div class="category-stats-header">
-                        <div class="stat-item-header">
-                          <mat-icon class="stat-icon-header">timeline</mat-icon>
-                          <span class="stat-value-header">{{ categoryService.getPhasesCount(selectedCategory) }}</span>
-                          <span class="stat-label-header">Fases</span>
-                        </div>
-                        <div class="stat-item-header">
-                          <mat-icon class="stat-icon-header">groups</mat-icon>
-                          <span class="stat-value-header">{{ categoryService.getTotalTeamsCount(selectedCategory) }}</span>
-                          <span class="stat-label-header">Equipos</span>
+                        <div class="flex-grow-1">
+                          <div class="d-flex align-items-center gap-3">
+                            <div>
+                              <mat-card-title class="mb-1">{{ selectedCategory.name }}</mat-card-title>
+                              <mat-card-subtitle class="mb-0">{{ selectedCategory.description }}</mat-card-subtitle>
+                            </div>
+                            <!-- Estadísticas al lado del título -->
+                            <div class="category-stats-inline d-flex align-items-center">
+                              <div style="margin-left: 10px;" class="stat-item-inline">
+                                <mat-icon class="stat-icon-inline">timeline</mat-icon>
+                                <span class="stat-value-inline">{{ categoryService.getPhasesCount(selectedCategory) }}</span>
+                                <span class="stat-label-inline">Fases</span>
+                              </div>
+                              <div style="margin-left: 10px;" class="stat-item-inline">
+                                <mat-icon class="stat-icon-inline">groups</mat-icon>
+                                <span class="stat-value-inline">{{ categoryService.getTotalTeamsCount(selectedCategory) }}</span>
+                                <span class="stat-label-inline">Equipos</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     <!-- Actions a la derecha -->
                     <div class="col-auto">
-                      <div class="category-actions">
+                      <div class="category-actions d-flex align-items-center">
+                        <button mat-icon-button
+                                color="accent"
+                                matTooltip="Crear nueva fase"
+                                matTooltipPosition="below"
+                                (click)="createPhase(selectedCategory.categoryId)"
+                                [disabled]="loading">
+                          <mat-icon>add</mat-icon>
+                        </button>
+
                         <button mat-icon-button
                                 color="primary"
                                 matTooltip="Editar categoría"
@@ -123,194 +133,12 @@
               </mat-card-header>
 
               <mat-card-content>
-                <!-- Phases Management Section -->
-                <div class="phases-management-section">
-                  <!-- Floating Action Button for Phases -->
-                  <button mat-fab
-                          class="fab-fixed add-phase-btn"
-                          color="primary"
-                          (click)="createPhase(selectedCategory.categoryId)"
-                          matTooltip="Crear nueva fase"
-                          [disabled]="loading">
-                    <mat-icon>add</mat-icon>
-                  </button>
-
-                  <!-- No Phases Message -->
-                  <div class="no-phases" *ngIf="!selectedCategory.phases || selectedCategory.phases.length === 0">
-                    <mat-icon class="no-phases-icon">timeline</mat-icon>
-                    <h3>No hay fases configuradas</h3>
-                    <p>Comienza creando la primera fase de esta categoría</p>
-                  </div>
-
-                  <!-- Phases Cards -->
-                  <div *ngIf="selectedCategory.phases && selectedCategory.phases.length > 0" class="phases-cards">
-                    <mat-card *ngFor="let phase of selectedCategory.phases; trackBy: trackByPhaseId" class="phase-card">
-                      <!-- Phase Header -->
-                      <mat-card-header class="phase-card-header">
-                        <div class="phase-header-content">
-                          <div class="phase-info">
-                            <mat-icon class="phase-icon">{{ getPhaseTypeIcon(phase.phaseType) }}</mat-icon>
-                            <div class="phase-details">
-                              <h3 class="phase-name">{{ phase.name }}</h3>
-                              <mat-chip class="phase-type-chip"
-                                       [class]="'phase-type-' + phase.phaseType">
-                                <strong style="color: white;">{{ getPhaseTypeText(phase.phaseType) }}</strong>
-                              </mat-chip>
-                            </div>
-                          </div>
-
-                          <div class="phase-stats">
-                            <!-- Show groups for GroupStage, teams for Knockout -->
-                            <mat-icon class="groups-count-icon"
-                                      matBadge="{{ phase.phaseType === 1 ? (phase.knockoutTeams?.length || 0) : (phase.groups?.length || 0) }}"
-                                      matBadgeColor="accent"
-                                      matBadgeSize="small"
-                                      [matTooltip]="phase.phaseType === 1 ?
-                                        ((phase.knockoutTeams?.length || 0) === 1 ? '1 equipo' : (phase.knockoutTeams?.length || 0) + ' equipos') :
-                                        ((phase.groups?.length || 0) === 1 ? '1 grupo' : (phase.groups?.length || 0) + ' grupos')">
-                              {{ phase.phaseType === 1 ? 'groups' : 'group_work' }}
-                            </mat-icon>
-
-                            <!-- Phase Action Buttons -->
-                            <div class="phase-actions-inline">
-                              <button mat-icon-button
-                                      color="primary"
-                                      (click)="phase.phaseType === 0 ? createGroup(phase) : addTeamToPhase(phase.id, phase.name)"
-                                      [matTooltip]="phase.phaseType === 1 ? 'Agregar Equipo' : 'Agregar Grupo'"
-                                      class="phase-action-btn">
-                                <mat-icon>add</mat-icon>
-                              </button>
-                              <!-- Botón para asignar equipos aleatoriamente - Solo para GroupStage -->
-                              <button mat-icon-button
-                                      *ngIf="phase.phaseType === 0"
-                                      color="accent"
-                                      (click)="assignTeamsRandomly(phase)"
-                                      matTooltip="Asignar equipos aleatoriamente"
-                                      class="phase-action-btn">
-                                <mat-icon>shuffle</mat-icon>
-                              </button>
-                              <button mat-icon-button
-                                      (click)="editPhase(phase)"
-                                      matTooltip="Editar Fase"
-                                      class="phase-action-btn">
-                                <mat-icon>edit</mat-icon>
-                              </button>
-                              <button mat-icon-button
-                                      color="warn"
-                                      (click)="deletePhase(phase)"
-                                      matTooltip="Eliminar Fase"
-                                      class="phase-action-btn">
-                                <mat-icon>delete</mat-icon>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </mat-card-header>
-
-                      <!-- Phase Content - Groups or Knockout Teams -->
-                      <mat-card-content class="phase-content">
-                        <!-- Groups Section (for GroupStage phases) -->
-                        <div *ngIf="phase.phaseType === 0 && phase.groups && phase.groups.length > 0" class="groups-section">
-                          <div class="groups-grid">
-                            <mat-card *ngFor="let group of phase.groups; trackBy: trackByGroupId" class="group-card">
-                              <mat-card-header class="group-header">
-                                <div class="group-title">
-                                  <mat-icon class="group-icon">group_work</mat-icon>
-                                  <h4>{{ group.name }}</h4>
-                                </div>
-                                <div class="group-actions">
-                                  <button mat-icon-button
-                                          color="primary"
-                                          (click)="addTeamToGroup(group.id, group.name)"
-                                          matTooltip="Agregar Equipo"
-                                          class="group-action-btn">
-                                    <mat-icon>person_add</mat-icon>
-                                  </button>
-                                  <button mat-icon-button
-                                          (click)="editGroup(group)"
-                                          matTooltip="Editar Grupo"
-                                          class="group-action-btn">
-                                    <mat-icon>edit</mat-icon>
-                                  </button>
-                                  <button mat-icon-button
-                                          color="warn"
-                                          (click)="deleteGroup(group)"
-                                          matTooltip="Eliminar Grupo"
-                                          class="group-action-btn">
-                                    <mat-icon>delete</mat-icon>
-                                  </button>
-                                </div>
-                              </mat-card-header>
-                              <mat-card-content class="group-content">
-                                <!-- Teams in Group -->
-                                <div *ngIf="group.teams && group.teams.length > 0; else noTeamsInGroup" class="teams-list">
-                                  <div *ngFor="let team of group.teams; trackBy: trackByTeamId" class="team-item">
-                                    <div class="team-info">
-                                      <img [src]="team.logoUrl || '/assets/images/default-team-logo.png'"
-                                           [alt]="team.name"
-                                           class="team-logo"
-                                           (error)="onImageError($event)">
-                                      <span class="team-name">{{ team.name }}</span>
-                                    </div>
-                                    <button mat-icon-button
-                                            color="warn"
-                                            (click)="removeTeamFromGroup(team.id, group.id)"
-                                            matTooltip="Remover del grupo"
-                                            class="remove-team-btn">
-                                      <mat-icon>remove</mat-icon>
-                                    </button>
-                                  </div>
-                                </div>
-                                <ng-template #noTeamsInGroup>
-                                  <div class="no-teams-message">
-                                    <mat-icon>groups</mat-icon>
-                                    <p>No hay equipos en este grupo</p>
-                                  </div>
-                                </ng-template>
-                              </mat-card-content>
-                            </mat-card>
-                          </div>
-                        </div>
-
-                        <!-- Knockout Teams Section (for Knockout phases) -->
-                        <div *ngIf="phase.phaseType === 1 && phase.knockoutTeams && phase.knockoutTeams.length > 0" class="knockout-section">
-                          <div class="knockout-teams-grid">
-                            <div *ngFor="let team of phase.knockoutTeams; trackBy: trackByTeamId" class="knockout-team-item">
-                              <div class="team-info">
-                                <img [src]="team.logoUrl || '/assets/images/default-team-logo.png'"
-                                     [alt]="team.name"
-                                     class="team-logo"
-                                     (error)="onImageError($event)">
-                                <span class="team-name">{{ team.name }}</span>
-                              </div>
-                              <button mat-icon-button
-                                      color="warn"
-                                      (click)="removeTeamFromPhase(team.id, phase.id)"
-                                      matTooltip="Remover de la fase"
-                                      class="remove-team-btn">
-                                <mat-icon>remove</mat-icon>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Empty State for Phases -->
-                        <div *ngIf="(phase.phaseType === 0 && (!phase.groups || phase.groups.length === 0)) || 
-                                    (phase.phaseType === 1 && (!phase.knockoutTeams || phase.knockoutTeams.length === 0))" 
-                             class="phase-empty-state">
-                          <mat-icon>{{ phase.phaseType === 0 ? 'group_work' : 'groups' }}</mat-icon>
-                          <p>{{ phase.phaseType === 0 ? 'No hay grupos en esta fase' : 'No hay equipos en esta fase' }}</p>
-                          <button mat-stroked-button
-                                  color="primary"
-                                  (click)="phase.phaseType === 0 ? createGroup(phase) : addTeamToPhase(phase.id, phase.name)">
-                            <mat-icon>add</mat-icon>
-                            {{ phase.phaseType === 0 ? 'Crear Primer Grupo' : 'Agregar Primer Equipo' }}
-                          </button>
-                        </div>
-                      </mat-card-content>
-                    </mat-card>
-                  </div>
-                </div>
+                <!-- Phases Groups Management Component -->
+                <app-phases-groups-management
+                  [tournamentId]="tournamentId"
+                  [phases]="selectedCategory.phases || []"
+                  (phasesUpdated)="onPhasesUpdated($event)">
+                </app-phases-groups-management>
               </mat-card-content>
             </mat-card>
           </div>

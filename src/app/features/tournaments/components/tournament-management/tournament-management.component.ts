@@ -33,7 +33,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeletionErrorHandlerHook } from '../../../../shared/hooks/deletion-error-handler.hook';
 import { PhaseFormComponent } from '../phase-form/phase-form.component';
 import { GroupFormComponent } from '../group-form/group-form.component';
-import { PhasesGroupsManagementComponent } from '../phases-groups-management/phases-groups-management.component';
 import { TeamsManagementComponent } from '../teams-management/teams-management.component';
 import { MatchesManagementComponent } from '../matches-management/matches-management.component';
 import { StatisticsManagementComponent } from '../statistics-management/statistics-management.component';
@@ -60,7 +59,6 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
     MatMenuModule,
     MatDialogModule,
     MatSlideToggleModule,
-    PhasesGroupsManagementComponent,
     TeamsManagementComponent,
     MatchesManagementComponent,
     CategoriesManagementComponent
@@ -117,25 +115,13 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Maneja la actualización de fases desde el componente hijo
-   */
-  onPhasesUpdated(phases: Phase[]): void {
-    this.phases = phases;
-    // Cuando se actualizan las fases, también refrescar equipos
-    // ya que pueden haber cambios en asignaciones
-    this.loadTeams();
-    this.cdr.detectChanges();
-  }
 
   /**
    * Maneja la actualización de equipos desde el componente hijo
    */
   onTeamsUpdated(teams: Team[]): void {
     this.teams = teams;
-    // Cuando se actualizan los equipos, también refrescar fases
-    // para mostrar equipos actualizados en grupos
-    this.loadPhases();
+    // Las categorías se actualizan automáticamente desde el componente hijo
     this.cdr.detectChanges();
   }
 
@@ -178,9 +164,8 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
             'Switch debe mostrar': this.registrationClosed ? 'CERRADO' : 'ABIERTO'
           });
 
-          // Cargar datos reales del backend En un inicio solo cargar las phases
-          //this.loadTeams();
-          this.loadPhases();
+          // Las categorías (con sus fases) se cargan automáticamente en el componente hijo
+          // Los equipos se cargan automáticamente en el componente hijo
 
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -286,22 +271,6 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Carga las fases del torneo desde la API
-   */
-  private loadPhases(): void {
-    this.phaseService.getPhasesByTournament(this.tournamentId).subscribe({
-      next: (phases) => {
-        this.phases = phases;
-        this.cdr.detectChanges();
-      },
-      error: (error: any) => {
-        console.error('Error loading phases:', error);
-        this.phases = [];
-        this.cdr.detectChanges();
-      }
-    });
-  }
 
   /**
    * Obtiene el texto del estado del torneo
@@ -900,14 +869,10 @@ trackByTeamId(index: number, team: Team): number {
         // Tab Categorías - se carga automáticamente en el componente hijo
         break;
       case 1:
-        // Tab Fases - se carga automáticamente en el componente hijo
-        this.loadPhases();
-        break;
-      case 2:
         // Tab Equipos - se carga automáticamente en el componente hijo
         this.loadTeams();
         break;
-      case 3:
+      case 2:
         // Tab Partidos - se carga automáticamente en el componente hijo
         break;
       default:
