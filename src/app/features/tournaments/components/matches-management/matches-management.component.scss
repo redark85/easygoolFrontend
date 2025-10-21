@@ -599,12 +599,12 @@
 
 // Pulse animation removed - no longer needed as there's no "in-progress" status
 
-.no-phases, .no-matches, .no-groups {
+.no-categories, .no-phases, .no-matches, .no-groups {
   text-align: center;
   padding: 60px 20px;
   color: var(--text-secondary);
 
-  .no-phases-icon, .no-matches-icon, .no-groups-icon {
+  .no-categories-icon, .no-phases-icon, .no-matches-icon, .no-groups-icon {
     font-size: 4rem;
     width: 4rem;
     height: 4rem;
@@ -805,24 +805,52 @@
 
   // Layout centrado responsive
   .selection-container-centered {
-    padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
 
-    .d-flex {
-      flex-direction: column;
-      gap: 0.0rem !important;
+    .min-width-input {
+      min-width: 200px;
+      flex: 1;
 
-      .phase-selection, .group-selection {
-        .phase-select, .group-select {
+      .category-select,
+      .phase-select,
+      .group-select {
+        .mat-mdc-form-field {
           width: 100%;
-          max-width: none;
+
+          .mat-mdc-select {
+            border-radius: 20px;
+          }
         }
+      }
+    }
+
+    .vertical-separator {
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(to bottom, transparent, #6c757d, transparent);
+      margin: 0 16px;
+    }
+
+    // Responsive design
+    @media (max-width: 768px) {
+      .d-flex {
+        flex-direction: column;
+        gap: 16px !important;
       }
 
       .vertical-separator {
         width: 100%;
         height: 2px;
-        background: linear-gradient(to right, transparent, var(--border-color), transparent);
+        background: linear-gradient(to right, transparent, #6c757d, transparent);
+        margin: 8px 0;
+      }
+
+      .min-width-input {
+        min-width: 100%;
       }
     }
   }

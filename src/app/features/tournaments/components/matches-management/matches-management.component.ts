@@ -17,8 +17,11 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
+import { Category } from '../../models/category.interface';
 import { Team } from '../../models/team.interface';
 import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest } from '@core/services/match.service';
+import { CategoryService } from '../../services/category.service';
+import { PhaseService } from '../../services/phase.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
 import { MatchStatusModalComponent, MatchStatusModalData, MatchStatusModalResult } from '@shared/components/match-status-modal';
 import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
@@ -53,10 +56,22 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   @Input() matches: Match[] = [];
   @Output() matchesUpdated = new EventEmitter<Match[]>();
 
+  // Datos para los selects en cascada
+  categories: Category[] = [];
+  availablePhases: Phase[] = [];
+  availableGroups: Group[] = [];
+
+  // Selecciones actuales
+  selectedCategoryId: number | null = null;
   selectedPhaseId: number | null = null;
   selectedGroupId: number | null = null;
+
+  // Estado y datos
   matchDays: MatchDay[] = [];
   loading = false;
+  loadingCategories = false;
+  loadingPhases = false;
+  loadingGroups = false;
   isCreatingMatchDay = false;
   matchStatusType = MatchStatusType;
   private destroy$ = new Subject<void>();
@@ -65,110 +80,141 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   constructor(
     private cdr: ChangeDetectorRef,
     private matchService: MatchService,
+    private categoryService: CategoryService,
+    private phaseService: PhaseService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    console.log('ngOnInit - phases available:', this.phases?.length || 0);
-    // Inicializar con datos disponibles
-    this.initializeDefaultSelections();
+    console.log('🚀 Initializing matches-management with tournamentId:', this.tournamentId);
+    if (this.tournamentId) {
+      this.loadCategories();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Reinicializar cuando cambien las fases
-    if (changes['phases']) {
-      console.log('Phases changed, reinitializing:', this.phases?.length || 0);
-
-      // Resetear estado antes de reinicializar
-      this.selectedPhaseId = null;
-      this.selectedGroupId = null;
-      this.matchDays = [];
-      this.loading = false;
-      this.isCreatingMatchDay = false;
-
-      // Reinicializar con timeout para asegurar renderizado
-      setTimeout(() => {
-        this.initializeDefaultSelections();
-      }, 50);
+    // Recargar categorías si cambia el tournamentId
+    if (changes['tournamentId'] && this.tournamentId) {
+      console.log('🔄 Tournament ID changed, reloading categories:', this.tournamentId);
+      this.resetAllSelections();
+      this.loadCategories();
     }
   }
 
   /**
-   * Inicializa las selecciones por defecto al abrir el tab
+   * Resetea todas las selecciones
    */
-  private initializeDefaultSelections(): void {
-    console.log('Initializing default selections, phases:', this.phases?.length || 0);
+  private resetAllSelections(): void {
+    this.selectedCategoryId = null;
+    this.selectedPhaseId = null;
+    this.selectedGroupId = null;
+    this.availablePhases = [];
+    this.availableGroups = [];
+    this.matchDays = [];
+  }
 
-    if (this.phases && this.phases.length > 0) {
-      // Seleccionar la primera fase por defecto
-      this.selectedPhaseId = this.phases[0].id;
-      console.log('Selected default phase:', this.selectedPhaseId);
+  /**
+   * Carga las categorías del torneo
+   */
+  private loadCategories(): void {
+    console.log('📂 Loading categories for tournament:', this.tournamentId);
+    this.loadingCategories = true;
+    this.resetAllSelections();
 
-      // Obtener los grupos de la primera fase
-      const firstPhase = this.phases[0];
-      const phaseGroups = this.getPhaseGroups(firstPhase);
-      console.log('Groups found in first phase:', phaseGroups?.length || 0);
+    this.categoryService.getCategoriesByTournament(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => {
+          console.log('✅ Categories loaded:', categories.length);
+          this.categories = categories;
+          this.loadingCategories = false;
 
-      if (phaseGroups && phaseGroups.length > 0) {
-        // Seleccionar el primer grupo automáticamente
-        this.selectedGroupId = phaseGroups[0].id;
-        console.log('Auto-selected first group:', this.selectedGroupId);
+          // Auto-seleccionar primera categoría si existe
+          if (categories.length > 0) {
+            this.selectedCategoryId = categories[0].categoryId;
+            this.onCategoryChange(this.selectedCategoryId);
+          }
 
-        // Cargar partidos del primer grupo
-        this.loadMatchesByGroup(this.selectedGroupId);
-      } else {
-        // Si no hay grupos, verificar si es fase eliminatoria
-        if (firstPhase.phaseType === PhaseType.Knockout) {
-          console.log('Knockout phase detected, loading matches by phase');
-          this.loadMatchesByPhase(this.selectedPhaseId);
-        } else {
-          console.log('No groups found and not knockout phase');
-          this.matchDays = [];
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('❌ Error loading categories:', error);
+          this.loadingCategories = false;
+          this.categories = [];
+          this.cdr.detectChanges();
         }
-      }
-
-      // Forzar detección de cambios
-      setTimeout(() => {
-        this.cdr.detectChanges();
-        this.cdr.markForCheck();
-      }, 100);
-    } else {
-      // Si no hay fases, limpiar todo
-      console.log('No phases available, clearing data');
-      this.selectedPhaseId = null;
-      this.selectedGroupId = null;
-      this.matchDays = [];
-      this.cdr.detectChanges();
-    }
+      });
   }
 
   /**
-   * Valida y carga los datos por defecto de manera robusta
+   * Maneja el cambio de categoría seleccionada
    */
-  private validateAndLoadDefaults(): void {
-    // Validar que hay fases disponibles
-    if (!this.phases || this.phases.length === 0) {
-      this.selectedPhaseId = null;
-      this.selectedGroupId = null;
-      this.matchDays = [];
-      return;
+  onCategoryChange(categoryId: number): void {
+    console.log('📂 Category changed to:', categoryId);
+    this.selectedCategoryId = categoryId;
+    this.selectedPhaseId = null;
+    this.selectedGroupId = null;
+    this.availableGroups = [];
+    this.matchDays = [];
+
+    // Obtener fases de la categoría seleccionada
+    const selectedCategory = this.categories.find(c => c.categoryId === categoryId);
+    if (selectedCategory && selectedCategory.phases) {
+      this.availablePhases = selectedCategory.phases;
+      console.log('🎯 Available phases for category:', this.availablePhases.length);
+
+      // Auto-seleccionar primera fase si existe
+      if (this.availablePhases.length > 0) {
+        this.selectedPhaseId = this.availablePhases[0].id;
+        this.onPhaseChange(this.selectedPhaseId);
+      }
+    } else {
+      this.availablePhases = [];
     }
 
-    // Si no hay fase seleccionada, seleccionar la primera
-    if (!this.selectedPhaseId) {
-      this.selectedPhaseId = this.phases[0].id;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja el cambio de fase seleccionada
+   */
+  onPhaseChange(phaseId: number): void {
+    console.log('🎯 Phase changed to:', phaseId);
+    this.selectedPhaseId = phaseId;
+    this.selectedGroupId = null;
+    this.matchDays = [];
+
+    // Obtener grupos de la fase seleccionada
+    const selectedPhase = this.availablePhases.find(p => p.id === phaseId);
+    if (selectedPhase) {
+      const phaseGroups = this.getPhaseGroups(selectedPhase);
+      this.availableGroups = phaseGroups;
+      console.log('👥 Available groups for phase:', this.availableGroups.length);
+
+      if (phaseGroups.length > 0) {
+        // Fase con grupos - auto-seleccionar primer grupo
+        this.selectedGroupId = phaseGroups[0].id;
+        this.onGroupChange(this.selectedGroupId);
+      } else if (selectedPhase.phaseType === PhaseType.Knockout) {
+        // Fase eliminatoria sin grupos - cargar partidos directamente
+        console.log('🏆 Knockout phase without groups, loading matches by phase');
+        this.loadMatchesByPhase(phaseId);
+      }
+    } else {
+      this.availableGroups = [];
     }
 
-    // Validar que la fase seleccionada existe
-    const selectedPhase = this.phases.find(p => p.id === this.selectedPhaseId);
-    if (!selectedPhase) {
-      this.selectedPhaseId = this.phases[0].id;
-      this.selectedGroupId = null;
-      this.matchDays = [];
-    }
+    this.cdr.detectChanges();
+  }
 
-    // Cargar grupos y seleccionar el primero si es necesario
-    this.loadGroupsForPhase(this.selectedPhaseId!, true);
+  /**
+   * Maneja el cambio de grupo seleccionado
+   */
+  onGroupChange(groupId: number): void {
+    console.log('👥 Group changed to:', groupId);
+    this.selectedGroupId = groupId;
+    this.loadMatchesByGroup(groupId);
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -176,122 +222,6 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     this.destroy$.complete();
   }
 
-  /**
-   * Obtiene los partidos filtrados por fase seleccionada
-   */
-  getMatchesByPhase(): Match[] {
-    if (!this.selectedPhaseId) return [];
-    return this.matches.filter(match => match.phaseId === this.selectedPhaseId);
-  }
-
-  /**
-   * Maneja el cambio de fase seleccionada (método legacy para compatibilidad)
-   */
-  onPhaseChange(phaseIndex: number): void {
-    if (phaseIndex >= 0 && phaseIndex < this.phases.length) {
-      const selectedPhase = this.phases[phaseIndex];
-      this.onPhaseSelectionChange(selectedPhase.id);
-    }
-  }
-
-  /**
-   * Maneja el cambio de fase seleccionada desde el select
-   */
-  onPhaseSelectionChange(phaseId: number): void {
-    console.log('Phase selection changed to:', phaseId);
-    this.selectedPhaseId = phaseId;
-    this.selectedGroupId = null;
-    this.matchDays = [];
-    this.isCreatingMatchDay = false;
-
-    // Buscar la fase seleccionada
-    const selectedPhase = this.phases.find(p => p.id === phaseId);
-
-    if (selectedPhase && selectedPhase.phaseType === PhaseType.Knockout) {
-      // Si es fase eliminatoria (Knockout), cargar partidos directamente
-      console.log('Fase eliminatoria detectada, cargando partidos...');
-      this.loadMatchesByPhase(phaseId);
-    } else {
-      // Si no es eliminatoria, cargar grupos como antes
-      this.loadGroupsForPhase(phaseId, true);
-    }
-
-    // Forzar detección de cambios múltiple
-    setTimeout(() => {
-      this.cdr.detectChanges();
-      this.cdr.markForCheck();
-    }, 10);
-  }
-
-  /**
-   * Carga los grupos para una fase específica
-   * @param phaseId ID de la fase
-   * @param autoSelectFirst Si debe seleccionar automáticamente el primer grupo
-   */
-  private loadGroupsForPhase(phaseId: number, autoSelectFirst: boolean = false): void {
-    // TODO: Implementar llamada a API para cargar grupos por fase
-    // Endpoint sugerido: GET /api/Group/GetByPhase/{phaseId}
-    // Por ahora usamos los grupos que ya están en la fase
-    const selectedPhase = this.phases.find(p => p.id === phaseId);
-    const phaseGroups = this.getPhaseGroups(selectedPhase);
-
-    if (selectedPhase && phaseGroups.length > 0) {
-      if (autoSelectFirst) {
-        // Seleccionar el primer grupo automáticamente
-        this.selectedGroupId = phaseGroups[0].id;
-        console.log(`Auto-selecting first group: ${this.selectedGroupId} for phase: ${phaseId}`);
-
-        // Cargar partidos del grupo seleccionado
-        this.loadMatchesByGroup(this.selectedGroupId!);
-      } else if (this.selectedGroupId) {
-        // Si ya hay un grupo seleccionado, verificar que existe en esta fase
-        const groupExists = phaseGroups.some(g => g.id === this.selectedGroupId);
-        if (groupExists) {
-          this.loadMatchesByGroup(this.selectedGroupId!);
-        } else {
-          // El grupo seleccionado no existe en esta fase, seleccionar el primero
-          this.selectedGroupId = phaseGroups[0].id;
-          this.loadMatchesByGroup(this.selectedGroupId!);
-        }
-      }
-    } else {
-      // Si no hay grupos, limpiar selección
-      console.log(`No groups found for phase: ${phaseId}`);
-      this.selectedGroupId = null;
-      this.matchDays = [];
-    }
-
-    // Forzar detección de cambios después de cargar grupos con timeout más largo
-    setTimeout(() => {
-      this.cdr.detectChanges();
-      this.cdr.markForCheck();
-    }, 50);
-  }
-
-  /**
-   * Cambia el grupo seleccionado y carga sus partidos
-   */
-  onGroupChange(groupId: number): void {
-    console.log('Group selection changed to:', groupId);
-    this.selectedGroupId = groupId;
-    this.isCreatingMatchDay = false;
-    this.loadMatchesByGroup(groupId);
-
-    // Forzar detección de cambios
-    setTimeout(() => {
-      this.cdr.detectChanges();
-      this.cdr.markForCheck();
-    }, 10);
-  }
-
-  /**
-   * Obtiene los grupos de la fase seleccionada (compatible con ambos formatos)
-   */
-  getGroupsForSelectedPhase(): Group[] {
-    if (!this.selectedPhaseId) return [];
-    const phase = this.phases.find(p => p.id === this.selectedPhaseId);
-    return this.getPhaseGroups(phase) || [];
-  }
 
   /**
    * Obtiene los grupos de una fase de manera compatible
@@ -316,7 +246,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
    */
   getSelectedPhase(): Phase | null {
     if (!this.selectedPhaseId) return null;
-    return this.phases.find(p => p.id === this.selectedPhaseId) || null;
+    return this.availablePhases.find(p => p.id === this.selectedPhaseId) || null;
   }
 
   /**
@@ -421,8 +351,16 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   /**
    * Track by functions para optimización de rendimiento
    */
+  trackByCategoryId(index: number, category: Category): number {
+    return category.categoryId;
+  }
+
   trackByPhaseId(index: number, phase: Phase): number {
     return phase.id;
+  }
+
+  trackByGroupId(index: number, group: Group): number {
+    return group.id;
   }
 
   trackByMatchDayId(index: number, matchDay: MatchDay): number {

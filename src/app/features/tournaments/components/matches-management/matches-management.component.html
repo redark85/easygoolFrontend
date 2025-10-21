@@ -24,35 +24,61 @@
         </mat-progress-spinner>
       </button>
 
-      <!-- Phase and Group Selection Container - Centered -->
-      <div class="selection-container-centered" *ngIf="phases.length > 0">
-        <div class="d-flex justify-content-center align-items-center gap-4">
-          <!-- Phase Selection -->
-          <div class="phase-selection min-width-input">
-            <mat-form-field appearance="outline" class="phase-select" style="width: 100%;">
-              <mat-label>Fase</mat-label>
-              <mat-select [(value)]="selectedPhaseId" (selectionChange)="onPhaseSelectionChange($event.value)">
-                <mat-option *ngFor="let phase of phases; trackBy: trackByPhaseId" [value]="phase.id">
-                  {{ phase.name }}
+      <!-- Category, Phase and Group Selection Container - Centered -->
+      <div class="selection-container-centered" *ngIf="categories.length > 0 || loadingCategories">
+        <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+          
+          <!-- Category Selection -->
+          <div class="category-selection min-width-input">
+            <mat-form-field appearance="outline" class="category-select" style="width: 100%;">
+              <mat-label>Categoría</mat-label>
+              <mat-select [(value)]="selectedCategoryId" 
+                         (selectionChange)="onCategoryChange($event.value)"
+                         [disabled]="loadingCategories">
+                <mat-option *ngFor="let category of categories; trackBy: trackByCategoryId" [value]="category.categoryId">
+                  {{ category.name }}
                 </mat-option>
               </mat-select>
-              <mat-icon matSuffix>expand_more</mat-icon>
+              <mat-icon matSuffix *ngIf="!loadingCategories">expand_more</mat-icon>
+              <mat-progress-spinner matSuffix *ngIf="loadingCategories" diameter="20" mode="indeterminate"></mat-progress-spinner>
             </mat-form-field>
           </div>
 
           <!-- Vertical Separator -->
-          <div class="vertical-separator" *ngIf="getGroupsForSelectedPhase().length > 0"></div>
+          <div class="vertical-separator" *ngIf="availablePhases.length > 0"></div>
+
+          <!-- Phase Selection -->
+          <div class="phase-selection min-width-input" *ngIf="availablePhases.length > 0">
+            <mat-form-field appearance="outline" class="phase-select" style="width: 100%;">
+              <mat-label>Fase</mat-label>
+              <mat-select [(value)]="selectedPhaseId" 
+                         (selectionChange)="onPhaseChange($event.value)"
+                         [disabled]="loadingPhases">
+                <mat-option *ngFor="let phase of availablePhases; trackBy: trackByPhaseId" [value]="phase.id">
+                  {{ phase.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix *ngIf="!loadingPhases">expand_more</mat-icon>
+              <mat-progress-spinner matSuffix *ngIf="loadingPhases" diameter="20" mode="indeterminate"></mat-progress-spinner>
+            </mat-form-field>
+          </div>
+
+          <!-- Vertical Separator -->
+          <div class="vertical-separator" *ngIf="availableGroups.length > 0"></div>
 
           <!-- Group Selection -->
-          <div class="group-selection min-width-input" *ngIf="getGroupsForSelectedPhase().length > 0">
+          <div class="group-selection min-width-input" *ngIf="availableGroups.length > 0">
             <mat-form-field appearance="outline" class="group-select" style="width: 100%;">
               <mat-label>Grupo</mat-label>
-              <mat-select [(value)]="selectedGroupId" (selectionChange)="onGroupChange($event.value)">
-                <mat-option *ngFor="let group of getGroupsForSelectedPhase()" [value]="group.id">
+              <mat-select [(value)]="selectedGroupId" 
+                         (selectionChange)="onGroupChange($event.value)"
+                         [disabled]="loadingGroups">
+                <mat-option *ngFor="let group of availableGroups; trackBy: trackByGroupId" [value]="group.id">
                   {{ group.name }}
                 </mat-option>
               </mat-select>
-              <mat-icon matSuffix>expand_more</mat-icon>
+              <mat-icon matSuffix *ngIf="!loadingGroups">expand_more</mat-icon>
+              <mat-progress-spinner matSuffix *ngIf="loadingGroups" diameter="20" mode="indeterminate"></mat-progress-spinner>
             </mat-form-field>
           </div>
         </div>
@@ -236,18 +262,25 @@
               </mat-accordion>
             </div>
 
-      <!-- No Groups Message -->
-      <div class="no-groups" *ngIf="getGroupsForSelectedPhase().length === 0 && !loading && getSelectedPhase()?.phaseType !== 1">
-        <mat-icon class="no-groups-icon">group_work</mat-icon>
-        <h3>No hay grupos configurados</h3>
-        <p>Esta fase no tiene grupos configurados para mostrar partidos</p>
+      <!-- No Categories Message -->
+      <div class="no-categories" *ngIf="categories.length === 0 && !loadingCategories">
+        <mat-icon class="no-categories-icon">category</mat-icon>
+        <h3>No hay categorías configuradas</h3>
+        <p>Primero debes crear categorías en tu torneo para poder programar partidos</p>
       </div>
 
       <!-- No Phases Message -->
-      <div class="no-phases" *ngIf="phases.length === 0">
+      <div class="no-phases" *ngIf="selectedCategoryId && availablePhases.length === 0 && !loadingPhases">
         <mat-icon class="no-phases-icon">timeline</mat-icon>
         <h3>No hay fases configuradas</h3>
-        <p>Primero debes crear fases en tu torneo para poder programar partidos</p>
+        <p>Esta categoría no tiene fases configuradas para mostrar partidos</p>
+      </div>
+
+      <!-- No Groups Message -->
+      <div class="no-groups" *ngIf="selectedPhaseId && availableGroups.length === 0 && !loading && getSelectedPhase()?.phaseType !== 1">
+        <mat-icon class="no-groups-icon">group_work</mat-icon>
+        <h3>No hay grupos configurados</h3>
+        <p>Esta fase no tiene grupos configurados para mostrar partidos</p>
       </div>
     </mat-card-content>
   </mat-card>
