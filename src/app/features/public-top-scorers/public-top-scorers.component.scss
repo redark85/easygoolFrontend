@@ -236,6 +236,37 @@
                 }
               }
             }
+
+            // Mensaje cuando no hay datos
+            .no-data-message-hero {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              text-align: center;
+              padding: 24px 16px;
+              gap: 12px;
+
+              .info-icon-hero {
+                font-size: 48px;
+                width: 48px;
+                height: 48px;
+                color: #ff9800;
+              }
+
+              h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #333;
+              }
+
+              p {
+                margin: 0;
+                font-size: 14px;
+                color: #666;
+                line-height: 1.5;
+              }
+            }
           }
         }
       }
@@ -1030,6 +1061,40 @@
       p {
         font-size: 0.85rem;
       }
+    }
+  }
+
+  // Empty State Main - Para mensaje principal cuando no hay categorías
+  .empty-state-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    min-height: 300px;
+
+    .empty-icon {
+      font-size: 5rem;
+      width: 5rem;
+      height: 5rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+      max-width: 500px;
     }
   }
 }
