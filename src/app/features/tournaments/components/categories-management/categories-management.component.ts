@@ -75,17 +75,15 @@ export class CategoriesManagementComponent implements OnInit {
 
     this.categoryService.getCategoriesByTournament(this.tournamentId).subscribe({
       next: (categories) => {
-        this.categories = categories;
+        console.log('📊 Categorías cargadas:', categories.length);
+        this.categories = [...categories]; // Nueva referencia para detección de cambios
         this.loading = false;
         
-        // Seleccionar la primera categoría por defecto
-        if (categories.length > 0 && !this.selectedCategoryId) {
-          this.selectedCategoryId = categories[0].categoryId;
-          this.selectedCategory = categories[0];
-        }
+        // Validar si la categoría seleccionada aún existe
+        this.validateAndUpdateSelection(categories);
         
         this.categoriesUpdated.emit(this.categories);
-        this.cdr.detectChanges();
+        this.forceChangeDetectionComplete();
       },
       error: (error) => {
         console.error('Error loading categories:', error);
@@ -138,9 +136,9 @@ export class CategoriesManagementComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: CategoryModalResult) => {
       if (result?.success) {
         if (result.category) {
-          console.log('✅ Categoría editada exitosamente, actualizando específicamente:', result.category.categoryId);
-          // Actualizar solo la categoría específica para mantener el estado
-          this.updateSpecificCategoryFromAPI(result.category.categoryId);
+          console.log('✅ Categoría editada exitosamente:', result.category.categoryId);
+          // Actualizar la categoría específica con los nuevos datos
+          this.updateCategoryInPlace(result.category);
         } else {
           console.log('🔄 Recargando todas las categorías después de edición');
           this.loadCategories();
@@ -178,7 +176,11 @@ export class CategoriesManagementComponent implements OnInit {
             this.cdr.detectChanges();
 
             if (success) {
+              console.log('✅ Categoría eliminada exitosamente, recargando lista');
+              // Limpiar selección antes de recargar para forzar nueva selección
+              this.clearSelection();
               this.loadCategories();
+              
               Swal.fire({
                 title: '¡Eliminada!',
                 text: 'La categoría ha sido eliminada exitosamente.',
@@ -229,87 +231,87 @@ export class CategoriesManagementComponent implements OnInit {
   onPhasesUpdated(event: any): void {
     console.log('📥 Evento de actualización de fases recibido:', event);
     
-    // Si es un evento de refresh con categoryId específico
-    if (event && event.categoryId && event.action === 'refresh') {
-      console.log('🎯 Actualizando categoría específica:', event.categoryId);
-      this.updateSpecificCategoryFromAPI(event.categoryId);
+    // Recargar la categoría específica desde la API para obtener fases actualizadas
+    if (event && event.categoryId) {
+      console.log('🎯 Actualizando fases de categoría:', event.categoryId);
+      this.refreshCategoryFromAPI(event.categoryId);
+    } else if (this.selectedCategoryId) {
+      console.log('🔄 Actualizando fases de categoría seleccionada');
+      this.refreshCategoryFromAPI(this.selectedCategoryId);
     } else {
-      // Fallback para compatibilidad con eventos antiguos
-      console.log('🔄 Fallback: actualizando categoría seleccionada');
-      if (!this.selectedCategoryId) {
-        console.warn('⚠️ No hay categoría seleccionada para actualizar');
-        return;
-      }
-      this.updateSpecificCategoryFromAPI(this.selectedCategoryId);
+      console.warn('⚠️ No hay categoría para actualizar fases');
     }
+  }
+  
+  /**
+   * Refresca una categoría específica desde la API para obtener fases actualizadas
+   */
+  private refreshCategoryFromAPI(categoryId: number): void {
+    this.categoryService.getCategoriesByTournament(this.tournamentId).subscribe({
+      next: (allCategories: Category[]) => {
+        const updatedCategory = allCategories.find(cat => cat.categoryId === categoryId);
+        if (updatedCategory) {
+          // Actualizar solo las fases de la categoría específica
+          const categoryIndex = this.categories.findIndex(cat => cat.categoryId === categoryId);
+          if (categoryIndex !== -1) {
+            this.categories[categoryIndex] = { ...updatedCategory };
+            
+            // Actualizar selectedCategory si es la misma
+            if (this.selectedCategoryId === categoryId) {
+              this.selectedCategory = { ...updatedCategory };
+            }
+            
+            // Crear nueva referencia y forzar detección
+            this.categories = [...this.categories];
+            this.categoriesUpdated.emit(this.categories);
+            this.forceChangeDetectionComplete();
+            
+            console.log('✅ Fases de categoría actualizadas:', updatedCategory.phases?.length || 0);
+          }
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error refrescando categoría:', error);
+      }
+    });
   }
 
   /**
-   * Actualiza una categoría específica desde la API sin recargar toda la vista
+   * Actualiza una categoría específica en el lugar sin llamadas API adicionales
    */
-  private updateSpecificCategoryFromAPI(categoryId: number): void {
-    console.log('🔄 Actualizando SOLO categoría:', categoryId, '- Manteniendo estado actual');
+  private updateCategoryInPlace(updatedCategory: any): void {
+    console.log('🔄 Actualizando categoría en el lugar:', updatedCategory.categoryId);
     
-    // Obtener todas las categorías pero solo actualizar la específica
-    this.categoryService.getCategoriesByTournament(this.tournamentId).subscribe({
-      next: (allCategories: Category[]) => {
-        console.log('📊 Categorías obtenidas del API:', allCategories.length);
-        
-        // Encontrar la categoría actualizada
-        const updatedCategory = allCategories.find(cat => cat.categoryId === categoryId);
-        if (updatedCategory) {
-          console.log('✅ Categoría encontrada con', updatedCategory.phases?.length || 0, 'fases');
-          
-          // Encontrar y actualizar solo esta categoría en el array existente
-          const categoryIndex = this.categories.findIndex(cat => cat.categoryId === categoryId);
-          if (categoryIndex !== -1) {
-            console.log('🔄 Actualizando categoría en posición:', categoryIndex);
-            
-            // Actualizar la categoría en el array creando nueva referencia
-            this.categories[categoryIndex] = { ...updatedCategory };
-            
-            // SOLO actualizar selectedCategory si es la misma que se actualizó
-            if (this.selectedCategoryId === categoryId) {
-              this.selectedCategory = { ...updatedCategory };
-              console.log('🎯 Categoría seleccionada también actualizada:', {
-                name: this.selectedCategory.name,
-                description: this.selectedCategory.description
-              });
-            }
-            
-            // Crear nueva referencia del array para forzar detección de cambios en toggle buttons
-            this.categories = [...this.categories];
-            
-            console.log('🔄 Array de categorías actualizado:', this.categories.map(c => ({id: c.categoryId, name: c.name})));
-            
-            // Emitir evento de actualización
-            this.categoriesUpdated.emit(this.categories);
-            
-            // Forzar detección de cambios múltiple para asegurar renderizado
-            this.forceChangeDetectionAggressive();
-            
-            // Logging adicional para debugging
-            console.log('✅ Toggle buttons deberían actualizarse con:', 
-              this.categories.find(c => c.categoryId === categoryId)?.name);
-            
-            console.log('🔒 Estado preservado - Vista actualizada sin reinicializar');
-          } else {
-            console.warn('⚠️ Categoría no encontrada en array local, agregándola');
-            this.categories.push(updatedCategory);
-            this.categories = [...this.categories];
-            this.categoriesUpdated.emit(this.categories);
-            this.forceChangeDetectionAggressive();
-          }
-        } else {
-          console.error('❌ Categoría no encontrada en respuesta del API');
-        }
-      },
-      error: (error: any) => {
-        console.error('❌ Error actualizando categoría específica:', error);
-        // Fallback: recargar todas las categorías si falla la actualización específica
-        this.loadCategoriesAndRestoreSelection(categoryId);
+    // Encontrar y actualizar la categoría en el array
+    const categoryIndex = this.categories.findIndex(cat => cat.categoryId === updatedCategory.categoryId);
+    if (categoryIndex !== -1) {
+      // Actualizar la categoría manteniendo las fases existentes
+      this.categories[categoryIndex] = {
+        ...this.categories[categoryIndex],
+        name: updatedCategory.name,
+        description: updatedCategory.description
+      };
+      
+      // Actualizar selectedCategory si es la misma
+      if (this.selectedCategoryId === updatedCategory.categoryId) {
+        this.selectedCategory = { ...this.categories[categoryIndex] };
+        console.log('🎯 Categoría seleccionada actualizada:', this.selectedCategory.name);
       }
-    });
+      
+      // Crear nueva referencia del array para forzar detección de cambios
+      this.categories = [...this.categories];
+      
+      // Emitir evento de actualización
+      this.categoriesUpdated.emit(this.categories);
+      
+      // Forzar detección de cambios completa
+      this.forceChangeDetectionComplete();
+      
+      console.log('✅ Categoría actualizada exitosamente en la UI');
+    } else {
+      console.warn('⚠️ Categoría no encontrada, recargando lista completa');
+      this.loadCategories();
+    }
   }
 
   /**
@@ -328,38 +330,62 @@ export class CategoriesManagementComponent implements OnInit {
   }
 
   /**
-   * Fuerza la detección de cambios de manera agresiva para asegurar renderizado
+   * Valida la selección actual y actualiza si es necesario
    */
-  private forceChangeDetectionAggressive(): void {
-    console.log('🔄 Iniciando detección de cambios agresiva...');
+  private validateAndUpdateSelection(categories: Category[]): void {
+    if (categories.length === 0) {
+      // No hay categorías, limpiar selección
+      this.clearSelection();
+      console.log('📭 No hay categorías disponibles');
+      return;
+    }
     
+    // Verificar si la categoría seleccionada aún existe
+    if (this.selectedCategoryId) {
+      const stillExists = categories.find(cat => cat.categoryId === this.selectedCategoryId);
+      if (stillExists) {
+        // La categoría aún existe, actualizar referencia
+        this.selectedCategory = stillExists;
+        console.log('✅ Categoría seleccionada aún existe:', stillExists.name);
+        return;
+      } else {
+        console.log('⚠️ Categoría seleccionada ya no existe, seleccionando primera disponible');
+      }
+    }
+    
+    // Seleccionar la primera categoría disponible
+    this.selectedCategoryId = categories[0].categoryId;
+    this.selectedCategory = categories[0];
+    console.log('🎯 Primera categoría seleccionada:', categories[0].name);
+  }
+  
+  /**
+   * Limpia la selección actual
+   */
+  private clearSelection(): void {
+    this.selectedCategoryId = null;
+    this.selectedCategory = null;
+    console.log('🧹 Selección limpiada');
+  }
+  
+  /**
+   * Fuerza la detección de cambios completa y optimizada
+   */
+  private forceChangeDetectionComplete(): void {
     // Detección inmediata
     this.cdr.markForCheck();
     this.cdr.detectChanges();
     
-    // Usar NgZone para forzar detección
+    // Usar NgZone para asegurar que Angular detecte todos los cambios
     this.ngZone.run(() => {
       this.cdr.markForCheck();
       this.cdr.detectChanges();
       
-      // Múltiples ciclos para asegurar que los toggle buttons se actualicen
+      // Un ciclo adicional para componentes hijos
       setTimeout(() => {
-        console.log('🔄 Ciclo 1 de detección de cambios');
         this.cdr.markForCheck();
         this.cdr.detectChanges();
       }, 0);
-      
-      setTimeout(() => {
-        console.log('🔄 Ciclo 2 de detección de cambios');
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
-      }, 10);
-      
-      setTimeout(() => {
-        console.log('🔄 Ciclo 3 de detección de cambios (final)');
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
-      }, 50);
     });
   }
 
