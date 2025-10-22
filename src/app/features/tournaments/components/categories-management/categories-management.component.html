@@ -13,8 +13,8 @@
               Administra las categorías de tu torneo
             </mat-card-subtitle>
           </div>
-          <!-- Button Toggle a la izquierda -->
-          <div class="col-auto mb-2 mb-md-0" *ngIf="!loading && categories.length > 0">
+          <!-- Button Toggle para Desktop -->
+          <div class="col-auto mb-2 mb-md-0 d-none d-md-block" *ngIf="!loading && categories.length > 0">
             <mat-button-toggle-group
               [value]="selectedCategoryId"
               (change)="onCategorySelectionChange($event.value)"
@@ -26,6 +26,23 @@
                 {{ category.name }}
               </mat-button-toggle>
             </mat-button-toggle-group>
+          </div>
+
+          <!-- Select para Mobile -->
+          <div class="col-auto mb-2 d-block d-md-none" *ngIf="!loading && categories.length > 0">
+            <mat-form-field appearance="outline" class="mobile-category-select">
+              <mat-label>Categoría</mat-label>
+              <mat-select 
+                [value]="selectedCategoryId"
+                (selectionChange)="onCategorySelectionChange($event.value)">
+                <mat-option 
+                  *ngFor="let category of categories; trackBy: trackByCategoryId" 
+                  [value]="category.categoryId">
+                  {{ category.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+            </mat-form-field>
           </div>
         </div>
       </div>
@@ -81,8 +98,8 @@
                               <mat-card-title class="mb-1">{{ selectedCategory.name }}</mat-card-title>
                               <mat-card-subtitle class="mb-0">{{ selectedCategory.description }}</mat-card-subtitle>
                             </div>
-                            <!-- Estadísticas al lado del título -->
-                            <div class="category-stats-inline d-flex align-items-center">
+                            <!-- Estadísticas al lado del título - Desktop -->
+                            <div class="category-stats-inline d-none d-md-flex align-items-center">
                               <div style="margin-left: 10px;" class="stat-item-inline">
                                 <mat-icon class="stat-icon-inline">timeline</mat-icon>
                                 <span class="stat-value-inline">{{ categoryService.getPhasesCount(selectedCategory) }}</span>
@@ -92,6 +109,22 @@
                                 <mat-icon class="stat-icon-inline">groups</mat-icon>
                                 <span class="stat-value-inline">{{ categoryService.getTotalTeamsCount(selectedCategory) }}</span>
                                 <span class="stat-label-inline">Equipos</span>
+                              </div>
+                            </div>
+
+                            <!-- Estadísticas para Mobile - Solo íconos con tooltips -->
+                            <div class="category-stats-mobile d-flex d-md-none align-items-center">
+                              <div class="stat-icon-mobile" 
+                                   [matTooltip]="categoryService.getPhasesCount(selectedCategory) + ' Fases'"
+                                   matTooltipPosition="below">
+                                <mat-icon>timeline</mat-icon>
+                                <span class="stat-badge">{{ categoryService.getPhasesCount(selectedCategory) }}</span>
+                              </div>
+                              <div class="stat-icon-mobile" 
+                                   [matTooltip]="categoryService.getTotalTeamsCount(selectedCategory) + ' Equipos'"
+                                   matTooltipPosition="below">
+                                <mat-icon>groups</mat-icon>
+                                <span class="stat-badge">{{ categoryService.getTotalTeamsCount(selectedCategory) }}</span>
                               </div>
                             </div>
                           </div>

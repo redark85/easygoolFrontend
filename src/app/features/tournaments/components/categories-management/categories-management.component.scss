@@ -44,7 +44,7 @@
       font-size: 0.95rem;
     }
 
-    // Estilos para el button toggle
+    // Estilos para el button toggle (Desktop)
     .category-toggle-group {
       .category-toggle-btn {
         font-size: 0.875rem;
@@ -56,16 +56,33 @@
           color: white;
         }
       }
+    }
 
-      @media (max-width: 768px) {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-
-        .category-toggle-btn {
-          flex: 1;
-          min-width: 120px;
+    // Estilos para el select móvil
+    .mobile-category-select {
+      min-width: 200px;
+      
+      .mat-form-field-wrapper {
+        padding-bottom: 0;
+      }
+      
+      .mat-form-field-infix {
+        padding: 0.5em 0;
+        border-top: 0;
+      }
+      
+      .mat-form-field-label {
+        top: 1.28125em;
+      }
+      
+      .mat-select-value {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      .mat-form-field-suffix {
+        .mat-icon {
+          color: var(--primary-color);
         }
       }
     }
@@ -153,7 +170,7 @@
           font-size: 0.95rem;
         }
 
-        // Estadísticas inline al lado del título
+        // Estadísticas inline al lado del título (Desktop)
         .category-stats-inline {
           gap: 16px;
           margin-left: 20px;
@@ -190,35 +207,51 @@
             margin-left: 12px;
             gap: 12px;
           }
+        }
 
-          @media (max-width: 768px) {
-            margin-left: 0;
-            margin-top: 8px;
-            gap: 8px;
-            flex-wrap: wrap;
+        // Estadísticas móviles - Solo íconos con badges
+        .category-stats-mobile {
+          gap: 12px;
+          margin-left: 16px;
 
-            .stat-item-inline {
-              padding: 3px 6px;
-              
-              .stat-icon-inline {
-                font-size: 0.9rem;
-              }
+          .stat-icon-mobile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(25, 118, 210, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
 
-              .stat-value-inline {
-                font-size: 0.85rem;
-              }
-
-              .stat-label-inline {
-                font-size: 0.7rem;
-              }
+            &:hover {
+              background: rgba(25, 118, 210, 0.2);
+              transform: scale(1.1);
             }
-          }
 
-          @media (max-width: 576px) {
-            .stat-item-inline {
-              flex: 1;
+            mat-icon {
+              font-size: 1.1rem;
+              color: var(--primary-color);
+            }
+
+            .stat-badge {
+              position: absolute;
+              top: -4px;
+              right: -4px;
+              background: var(--primary-color);
+              color: white;
+              font-size: 0.65rem;
+              font-weight: 700;
+              min-width: 16px;
+              height: 16px;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
               justify-content: center;
-              min-width: 80px;
+              padding: 0 4px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
             }
           }
         }
