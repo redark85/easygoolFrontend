@@ -93,8 +93,8 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
 
   private initializeForm(): void {
     this.tournamentForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', [ Validators.maxLength(250)]],
       modality: ['', Validators.required],
       startDate: ['', Validators.required],
       endDate: [''], // Removido Validators.required

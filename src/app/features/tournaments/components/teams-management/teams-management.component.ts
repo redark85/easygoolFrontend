@@ -39,6 +39,7 @@ export interface TeamFormData {
   mode: 'create' | 'edit';
   team?: Team;
   tournamentId: number;
+  allowUpdateInfo : boolean
 }
 
 export interface TeamModalResult {
@@ -230,7 +231,8 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
         mode: 'edit',
         player,
         tournamentTeamId: team.id,
-        teamName: team.name
+        teamName: team.name,
+        allowUpdateInfo: team.allowUpdateInfo
       } as PlayerFormData
     });
 
@@ -412,6 +414,38 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
    * Abre el modal para editar un equipo existente
    */
   editTeam(team: Team): void {
+    if (!team.allowUpdateInfo) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Equipo No Modificable',
+        html: `
+          <div style="text-align: left; padding: 10px;">
+            <p style="margin-bottom: 15px;">
+              <strong>${team.name}</strong> está participando activamente en otros torneos y no puede ser modificado desde aquí.
+            </p>
+            <p style="margin-bottom: 10px;">
+              <strong>¿Qué puedes hacer?</strong>
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+              <li>Contactar al dueño del equipo para solicitar cambios</li>
+              <li>Contactar al administrador del sistema</li>
+              <li>Esperar a que finalicen los torneos activos</li>
+            </ul>
+            <p style="color: #666; font-size: 0.9em; margin-top: 15px;">
+              <strong>Nota:</strong> Esta restricción protege la integridad de los datos en torneos activos.
+            </p>
+          </div>
+        `,
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#1976d2',
+        width: '500px',
+        customClass: {
+          popup: 'swal-team-restriction',
+          htmlContainer: 'swal-html-container'
+        }
+      });
+      return;
+    }
     const dialogRef = this.dialog.open(TeamFormComponent, {
       width: '600px',
       maxWidth: '90vw',
@@ -419,7 +453,8 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
       data: { 
         mode: 'edit', 
         team: team,
-        tournamentId: this.tournamentId 
+        tournamentId: this.tournamentId,
+        allowUpdateInfo: team.allowUpdateInfo
       } as TeamFormData
     });
 
@@ -442,7 +477,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
       disableClose: true,
       data: { 
         mode: 'create', 
-        tournamentTeamId: team.id,
+        tournamentTeamId: team.tournamentTeamId,
         teamName: team.name
       } as PlayerFormData
     });

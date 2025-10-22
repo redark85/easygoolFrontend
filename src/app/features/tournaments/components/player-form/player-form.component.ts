@@ -78,6 +78,16 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     this.initializeForm();
     if (this.isEdit && this.data.player) {
       this.patchForm(this.data.player);
+      if (!this.data.player.allowUpdateInfo) {
+         // Deshabilitar los campos de nombres
+            this.playerForm.get('name')?.disable();
+            this.playerForm.get('secondName')?.disable();
+            this.playerForm.get('lastName')?.disable();
+            this.playerForm.get('secondLastName')?.disable();
+            this.playerForm.get('identification')?.disable();
+            this.playerForm.get('photo')?.disable();
+
+      }
     }
   }
 
@@ -197,6 +207,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
             this.playerForm.get('name')?.disable();
             this.playerForm.get('secondName')?.disable();
             this.playerForm.get('lastName')?.disable();
+            
             this.playerForm.get('secondLastName')?.disable();
 
             // Cargar la foto si existe

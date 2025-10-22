@@ -85,7 +85,7 @@
                 <!-- Controles de registro (exactamente igual que en web) -->
                 <div class="mobile-menu-divider"></div>
                 
-                <div class="mobile-menu-item">
+                <div class="mobile-menu-item" *ngIf="hasCategories">
                   <mat-icon>settings</mat-icon>
                   <span class="menu-label">Registro:</span>
                   <div class="mobile-toggle-container">
@@ -143,7 +143,7 @@
         <!-- Tournament Registration Controls -->
         <div class="tournament-actions">
           <!-- Switch para control de registro -->
-          <div class="registration-control">
+          <div class="registration-control" *ngIf="hasCategories">
             <mat-slide-toggle
               [checked]="!registrationClosed"
               (change)="onRegistrationToggleChange($event)"
