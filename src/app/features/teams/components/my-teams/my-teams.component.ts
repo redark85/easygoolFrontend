@@ -11,6 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TeamService, ToastService } from '@core/services';
 import { ManagerTeam } from '@core/models';
 import { Subject, takeUntil } from 'rxjs';
+import { TournamentService } from '@features/tournaments/services/tournament.service';
+import Swal from 'sweetalert2';
 import { RegisterTeamModalComponent, RegisterTeamModalData } from '../register-team-modal/register-team-modal.component';
 import { CreateTeamModalComponent } from '../create-team-modal/create-team-modal.component';
 
@@ -39,6 +41,7 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
 
   constructor(
     private teamService: TeamService,
+    private tournamentService: TournamentService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private toastService: ToastService,
@@ -162,9 +165,50 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Abre el modal para crear un nuevo equipo
+   * Abre el modal para crear un nuevo equipo con validación de categorías
    */
   openCreateTeamModal(): void {
+    console.log('🏆 Validando torneos y categorías antes de abrir modal...');
+    
+    // Obtener torneos disponibles con sus categorías
+    this.tournamentService.getTournamentsToAllowTeamRegistration()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (tournaments) => {
+          console.log('📊 Torneos obtenidos:', tournaments);
+          
+          // Validar si hay torneos disponibles
+          if (!tournaments || tournaments.length === 0) {
+            this.showNoTournamentsError();
+            return;
+          }
+          
+          // Validar si al menos un torneo tiene categorías
+          const tournamentsWithCategories = tournaments.filter(tournament => 
+            tournament.categories && tournament.categories.length > 0
+          );
+          
+          if (tournamentsWithCategories.length === 0) {
+            console.log('❌ Ningún torneo tiene categorías disponibles');
+            this.showNoCategoriesError();
+            return;
+          }
+          
+          console.log('✅ Validación exitosa, abriendo modal de creación de equipo');
+          // Si hay categorías disponibles, abrir el modal
+          this.openCreateTeamModalDialog();
+        },
+        error: (error) => {
+          console.error('❌ Error al validar torneos y categorías:', error);
+          this.toastService.showError('Error al cargar los torneos disponibles');
+        }
+      });
+  }
+
+  /**
+   * Abre el modal de creación de equipo después de validar categorías
+   */
+  private openCreateTeamModalDialog(): void {
     const dialogRef = this.dialog.open(CreateTeamModalComponent, {
       width: '600px',
       disableClose: true
@@ -176,6 +220,32 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
         // Recargar la lista de equipos
         this.loadTeams();
       }
+    });
+  }
+
+  /**
+   * Muestra mensaje de error cuando no hay torneos disponibles
+   */
+  private showNoTournamentsError(): void {
+    Swal.fire({
+      title: 'Sin Torneos',
+      text: 'No hay torneos disponibles que permitan el registro de equipos.',
+      icon: 'info',
+      confirmButtonText: 'Entendido',
+      confirmButtonColor: '#1976d2'
+    });
+  }
+
+  /**
+   * Muestra mensaje de error cuando no hay categorías disponibles
+   */
+  private showNoCategoriesError(): void {
+    Swal.fire({
+      title: 'Sin Categorías',
+      text: 'No se tienen creadas categorías para este torneo.',
+      icon: 'warning',
+      confirmButtonText: 'Entendido',
+      confirmButtonColor: '#1976d2'
     });
   }
 

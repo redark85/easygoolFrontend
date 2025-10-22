@@ -184,11 +184,11 @@ export class TournamentService {
   }
 
   /**
-   * Obtiene los torneos que permiten registro de equipos
-   * @returns Observable con array de torneos disponibles
+   * Obtiene los torneos que permiten registro de equipos con sus categorías
+   * @returns Observable con array de torneos disponibles incluyendo categorías
    */
-  getTournamentsToAllowTeamRegistration(): Observable<{ id: number; name: string }[]> {
-    return this.apiService.get<ApiResponse<{ id: number; name: string }[]>>(TOURNAMENT_GET_TO_ALLOW_TEAM_REGISTRATION_ENDPOINT).pipe(
+  getTournamentsToAllowTeamRegistration(): Observable<{ id: number; name: string; categories: { id: number; name: string }[] }[]> {
+    return this.apiService.get<ApiResponse<{ id: number; name: string; categories: { id: number; name: string }[] }[]>>(TOURNAMENT_GET_TO_ALLOW_TEAM_REGISTRATION_ENDPOINT).pipe(
       map(response => {
         if (response.succeed && response.result) {
           return response.result;

@@ -18,6 +18,12 @@ import { CreateTeamRequest } from '@features/tournaments/models/team.interface';
 interface TournamentOption {
   id: number;
   name: string;
+  categories: CategoryOption[];
+}
+
+interface CategoryOption {
+  id: number;
+  name: string;
 }
 
 @Component({
@@ -78,8 +84,12 @@ export class CreateTeamModalComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (tournaments) => {
-          this.tournaments = tournaments;
+          // Filtrar solo torneos que tienen categorías disponibles
+          this.tournaments = tournaments.filter(tournament => 
+            tournament.categories && tournament.categories.length > 0
+          );
           this.isLoadingTournaments = false;
+          console.log('📊 Torneos con categorías cargados:', this.tournaments);
         },
         error: (error) => {
           console.error('Error loading tournaments:', error);
