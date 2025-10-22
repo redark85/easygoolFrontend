@@ -16,6 +16,7 @@ export interface Player {
   createdAt?: Date;
   updatedAt?: Date;
   tournamentTeamPlayerId : number;
+  allowUpdateInfo : boolean;
 }
 
 /**
@@ -61,6 +62,7 @@ export interface PlayerFormData {
   player?: Player;
   tournamentTeamId: number;
   teamName?: string;
+  allowUpdateInfo : boolean;
 }
 
 /**

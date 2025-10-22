@@ -32,6 +32,7 @@ export interface Team {
   hasUsedLink? : boolean;
   tournamentTeamId : number;
   players : Player[];
+  allowUpdateInfo: boolean;
 }
 
 export interface Manager{
