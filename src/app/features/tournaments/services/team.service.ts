@@ -44,6 +44,11 @@ export class TeamService {
     return this.apiService.get<TeamApiResponse>(`${TEAM_GET_ALL_TEAMS_ENDPOINT}/${tournamentId}`).pipe(
       map(response => {
         if (response.succeed && response.result) {
+          console.log('📊 Equipos cargados desde API:', response.result.length);
+          // Log para verificar que los equipos tienen categoryId
+          response.result.forEach(team => {
+            console.log(`🏆 Equipo: ${team.name}, CategoryId: ${team.categoryId || 'Sin categoría'}`);
+          });
           return response.result;
         }
         this.toastService.showError(response.message || 'Error al obtener equipos');

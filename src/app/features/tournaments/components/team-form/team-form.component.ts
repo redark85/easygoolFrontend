@@ -104,12 +104,31 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   }
 
   private async populateForm(team: Team): Promise<void> {
+    console.log('🔄 Poblando formulario con equipo:', {
+      id: team.id,
+      name: team.name,
+      categoryId: team.categoryId
+    });
+
     // Poblar campos básicos
     this.teamForm.patchValue({
       categoryId: team.categoryId || '',
       name: team.name,
       shortName: team.shortName
     });
+
+    // Log para verificar que la categoría se estableció correctamente
+    if (team.categoryId) {
+      console.log('✅ Categoría del equipo establecida:', team.categoryId);
+      const selectedCategory = this.categories.find(cat => cat.categoryId === team.categoryId);
+      if (selectedCategory) {
+        console.log('📋 Categoría encontrada:', selectedCategory.name);
+      } else {
+        console.warn('⚠️ Categoría no encontrada en la lista:', team.categoryId);
+      }
+    } else {
+      console.log('ℹ️ Equipo sin categoría asignada');
+    }
 
     // Manejar imagen del equipo
     if (team.logoUrl) {
@@ -181,6 +200,9 @@ export class TeamFormComponent implements OnInit, OnDestroy {
         logoContentType: logoData ? this.extractFileExtension(logoData.contentType) : null
       };
 
+      console.log('🔄 Actualizando equipo con categoryId:', formValue.categoryId);
+      console.log('📋 Request de actualización completo:', updateRequest);
+
       this.teamService.updateTeam(updateRequest).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
@@ -204,6 +226,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
       };
 
       console.log('🚀 Creando equipo con categoryId:', formValue.categoryId);
+      console.log('📋 Request completo:', createRequest);
 
       this.teamService.createTeam(createRequest).pipe(
         takeUntil(this.destroy$)
@@ -247,6 +270,16 @@ export class TeamFormComponent implements OnInit, OnDestroy {
           categoryId: this.categories[0].categoryId
         });
         console.log('✅ Primera categoría seleccionada automáticamente:', this.categories[0].name);
+      }
+      
+      // En modo edición, verificar que la categoría del equipo esté disponible
+      if (this.isEdit && this.data.team?.categoryId) {
+        const teamCategory = this.categories.find(cat => cat.categoryId === this.data.team!.categoryId);
+        if (teamCategory) {
+          console.log('✅ Categoría del equipo encontrada en la lista:', teamCategory.name);
+        } else {
+          console.warn('⚠️ La categoría del equipo no está en la lista disponible:', this.data.team.categoryId);
+        }
       }
     } catch (error) {
       console.error('Error loading categories:', error);
