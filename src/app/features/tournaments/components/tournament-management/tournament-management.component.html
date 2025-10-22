@@ -194,8 +194,8 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 2: Equipos -->
-      <mat-tab>
+      <!-- Tab 2: Equipos - Solo visible si hay categorías -->
+      <mat-tab *ngIf="hasCategories">
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">groups</mat-icon>
           <span class="tab-text">Equipos</span>
@@ -210,8 +210,8 @@
         </div>
       </mat-tab>
 
-      <!-- Tab 3: Partidos -->
-      <mat-tab>
+      <!-- Tab 3: Partidos - Solo visible si hay categorías -->
+      <mat-tab *ngIf="hasCategories">
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">sports_soccer</mat-icon>
           <span class="tab-text">Partidos</span>

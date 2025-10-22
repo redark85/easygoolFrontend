@@ -78,6 +78,7 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   selectedTabIndex: number = 0;
   registrationClosed = false; // Control para cerrar registro de equipos
   isUpdatingRegistration = false; // Estado de carga para el switch
+  hasCategories = false; // Control para mostrar/ocultar tabs de Equipos y Partidos
 
   private destroy$ = new Subject<void>();
 
@@ -130,6 +131,20 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
    */
   onCategoriesUpdated(categories: Category[]): void {
     this.categories = categories;
+    
+    // Validar si existen categorías para mostrar/ocultar tabs
+    this.hasCategories = categories && categories.length > 0;
+    
+    console.log('📊 Categorías actualizadas:', {
+      count: categories.length,
+      hasCategories: this.hasCategories,
+      showTeamsTab: this.hasCategories,
+      showMatchesTab: this.hasCategories
+    });
+    
+    // Resetear el índice del tab si es necesario
+    this.resetTabIndexIfNeeded();
+    
     this.cdr.detectChanges();
   }
 
@@ -821,22 +836,47 @@ trackByTeamId(index: number, team: Team): number {
   onTabChange(event: any): void {
     this.selectedTabIndex = event.index;
 
-    switch (this.selectedTabIndex) {
-      case 0:
-        // Tab Categorías - se carga automáticamente en el componente hijo
-        break;
-      case 1:
-        // Tab Equipos - se carga automáticamente en el componente hijo
-        this.loadTeams();
-        break;
-      case 2:
-        // Tab Partidos - se carga automáticamente en el componente hijo
-        break;
-      default:
-        break;
+    // Ajustar índices según la visibilidad de tabs
+    if (this.hasCategories) {
+      // Si hay categorías, los tabs son: 0=Categorías, 1=Equipos, 2=Partidos
+      switch (this.selectedTabIndex) {
+        case 0:
+          // Tab Categorías - se carga automáticamente en el componente hijo
+          break;
+        case 1:
+          // Tab Equipos - se carga automáticamente en el componente hijo
+          this.loadTeams();
+          break;
+        case 2:
+          // Tab Partidos - se carga automáticamente en el componente hijo
+          break;
+        default:
+          break;
+      }
+    } else {
+      // Si no hay categorías, solo está el tab: 0=Categorías
+      switch (this.selectedTabIndex) {
+        case 0:
+          // Tab Categorías - se carga automáticamente en el componente hijo
+          break;
+        default:
+          break;
+      }
     }
 
     this.cdr.detectChanges();
+  }
+
+  /**
+   * Resetea el índice del tab seleccionado cuando cambia la visibilidad de tabs
+   */
+  private resetTabIndexIfNeeded(): void {
+    // Si estamos en un tab que ya no existe (Equipos o Partidos cuando no hay categorías)
+    if (!this.hasCategories && this.selectedTabIndex > 0) {
+      console.log('🔄 Reseteando tab index a 0 porque no hay categorías');
+      this.selectedTabIndex = 0;
+      this.cdr.detectChanges();
+    }
   }
 
 }
