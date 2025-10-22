@@ -6,11 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { ToastService } from '@core/services/toast.service';
 import { TeamService } from '../../services/team.service';
+import { CategoryService } from '../../services/category.service';
 import { CreateTeamRequest, UpdateTeamRequest, Team } from '../../models/team.interface';
+import { Category } from '../../models/category.interface';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
@@ -18,6 +21,7 @@ export interface TeamFormData {
   mode: 'create' | 'edit';
   team?: Team;
   tournamentId: number;
+  categories?: Category[]; // Lista de categorías disponibles
 }
 
 @Component({
@@ -29,6 +33,7 @@ export interface TeamFormData {
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
@@ -41,12 +46,15 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   teamForm: FormGroup;
   isEdit: boolean;
   isSubmitting = false;
+  categories: Category[] = [];
+  loadingCategories = false;
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private toastService: ToastService,
     private teamService: TeamService,
+    private categoryService: CategoryService,
     public dialogRef: MatDialogRef<TeamFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TeamFormData
   ) {
@@ -55,6 +63,20 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    // Cargar categorías si no se proporcionaron
+    if (this.data.categories && this.data.categories.length > 0) {
+      this.categories = this.data.categories;
+      // Seleccionar automáticamente la primera categoría si no estamos en modo edición
+      if (!this.isEdit) {
+        this.teamForm.patchValue({
+          categoryId: this.categories[0].categoryId
+        });
+        console.log('✅ Primera categoría seleccionada automáticamente (desde data):', this.categories[0].name);
+      }
+    } else {
+      await this.loadCategories();
+    }
+    
     if (this.isEdit && this.data.team) {
       await this.populateForm(this.data.team);
     }
@@ -67,6 +89,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
 
   private createForm(): FormGroup {
     return this.fb.group({
+      categoryId: ['', [Validators.required]], // Requerido en este formulario específico
       name: ['', [
         Validators.required,
         Validators.minLength(2),
@@ -83,6 +106,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
   private async populateForm(team: Team): Promise<void> {
     // Poblar campos básicos
     this.teamForm.patchValue({
+      categoryId: team.categoryId || '',
       name: team.name,
       shortName: team.shortName
     });
@@ -150,6 +174,7 @@ export class TeamFormComponent implements OnInit, OnDestroy {
       const updateRequest: UpdateTeamRequest = {
         id: this.data.team!.id,
         tournamentId: this.data.tournamentId,
+        categoryId: formValue.categoryId, // Siempre incluir categoryId
         name: formValue.name,
         shortName: formValue.shortName.toUpperCase(),
         logoBase64: logoData ? this.cleanBase64(logoData.base64) : null,
@@ -171,11 +196,14 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     } else {
       const createRequest: CreateTeamRequest = {
         tournamentId: this.data.tournamentId,
+        categoryId: formValue.categoryId, // Siempre incluir categoryId
         name: formValue.name,
         shortName: formValue.shortName.toUpperCase(),
         logoBase64: logoData ? this.cleanBase64(logoData.base64) : null,
         logoContentType: logoData ? this.extractFileExtension(logoData.contentType) : null
       };
+
+      console.log('🚀 Creando equipo con categoryId:', formValue.categoryId);
 
       this.teamService.createTeam(createRequest).pipe(
         takeUntil(this.destroy$)
@@ -203,10 +231,45 @@ export class TeamFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Carga las categorías del torneo
+   */
+  private async loadCategories(): Promise<void> {
+    this.loadingCategories = true;
+    
+    try {
+      this.categories = await this.categoryService.getCategoriesByTournament(this.data.tournamentId).toPromise() || [];
+      console.log('📊 Categorías cargadas para team-form:', this.categories.length);
+      
+      // Seleccionar automáticamente la primera categoría si existe y no estamos en modo edición
+      if (this.categories.length > 0 && !this.isEdit) {
+        this.teamForm.patchValue({
+          categoryId: this.categories[0].categoryId
+        });
+        console.log('✅ Primera categoría seleccionada automáticamente:', this.categories[0].name);
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      this.categories = [];
+      this.toastService.showError('Error al cargar las categorías');
+    } finally {
+      this.loadingCategories = false;
+    }
+  }
+
   // Getters para validaciones en template
+  get categoryControl() { return this.teamForm.get('categoryId'); }
   get nameControl() { return this.teamForm.get('name'); }
   get shortNameControl() { return this.teamForm.get('shortName'); }
   get logoControl() { return this.teamForm.get('logo'); }
+
+  get categoryErrors(): string {
+    const control = this.categoryControl;
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) return 'La categoría es requerida';
+    }
+    return '';
+  }
 
   get nameErrors(): string {
     const control = this.nameControl;

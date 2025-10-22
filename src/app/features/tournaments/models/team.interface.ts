@@ -15,6 +15,7 @@ export interface Team {
   totalPlayers: number;
   urlRegistration: string;
   phaseTeamId: number;
+  categoryId?: number; // ID de la categoría seleccionada
   // Campos adicionales para compatibilidad
   tournamentId?: number;
   logoBase64?: string;
@@ -41,6 +42,7 @@ export interface Manager{
 
 export interface CreateTeamRequest {
   tournamentId: number;
+  categoryId?: number; // Opcional para compatibilidad
   name: string;
   shortName: string;
   logoBase64?: string | null;
@@ -50,6 +52,7 @@ export interface CreateTeamRequest {
 export interface UpdateTeamRequest {
   id: number;
   tournamentId: number;
+  categoryId?: number; // Opcional para compatibilidad
   name: string;
   shortName: string;
   logoBase64: string | null;

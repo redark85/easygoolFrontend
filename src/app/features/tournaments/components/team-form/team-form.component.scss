@@ -60,4 +60,11 @@
       }
     }
   }
+
+  // Spinner en el select
+  mat-option mat-progress-spinner {
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
