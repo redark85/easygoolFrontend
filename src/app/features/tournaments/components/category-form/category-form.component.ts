@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
 
 import { CategoryService } from '../../services/category.service';
-import { CategoryFormData, CategoryModalResult, CreateCategoryRequest } from '../../models/category.interface';
+import { CategoryFormData, CategoryModalResult, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.interface';
 
 @Component({
   selector: 'app-category-form',
@@ -76,34 +76,64 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
       this.isSubmitting = true;
 
       const formValue = this.categoryForm.value;
-      const categoryData: CreateCategoryRequest = {
-        tournamentId: this.data.tournamentId,
-        name: formValue.name,
-        description: formValue.description
-      };
 
-      const operation = this.isEditMode && this.data.category
-        ? this.categoryService.updateCategory(this.data.category.categoryId, categoryData)
-        : this.categoryService.createCategory(categoryData);
+      if (this.isEditMode && this.data.category) {
+        // Modo edición - usar UpdateCategoryRequest
+        const updateData: UpdateCategoryRequest = {
+          tournamentId: this.data.tournamentId,
+          name: formValue.name,
+          description: formValue.description
+        };
 
-      operation
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.isSubmitting = false;
-            if (response.succeed) {
-              const result: CategoryModalResult = {
-                success: true,
-                category: response.result
-              };
-              this.dialogRef.close(result);
+        console.log('Updating category:', this.data.category.categoryId, updateData);
+
+        this.categoryService.updateCategory(this.data.category.categoryId, updateData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.isSubmitting = false;
+              if (response.succeed) {
+                const result: CategoryModalResult = {
+                  success: true,
+                  category: response.result
+                };
+                this.dialogRef.close(result);
+              }
+            },
+            error: (error) => {
+              this.isSubmitting = false;
+              console.error('Error updating category:', error);
             }
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('Error saving category:', error);
-          }
-        });
+          });
+      } else {
+        // Modo creación - usar CreateCategoryRequest
+        const createData: CreateCategoryRequest = {
+          tournamentId: this.data.tournamentId,
+          name: formValue.name,
+          description: formValue.description
+        };
+
+        console.log('Creating category:', createData);
+
+        this.categoryService.createCategory(createData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.isSubmitting = false;
+              if (response.succeed) {
+                const result: CategoryModalResult = {
+                  success: true,
+                  category: response.result
+                };
+                this.dialogRef.close(result);
+              }
+            },
+            error: (error) => {
+              this.isSubmitting = false;
+              console.error('Error creating category:', error);
+            }
+          });
+      }
     } else {
       this.markFormGroupTouched();
     }

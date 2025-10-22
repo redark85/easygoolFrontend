@@ -51,6 +51,7 @@ export class CategoriesManagementComponent implements OnInit {
   loading = false;
   selectedCategoryId: number | null = null;
   selectedCategory: Category | null = null;
+  deletingCategoryId: number | null = null; // ID de la categoría que se está eliminando
 
   constructor(
     public categoryService: CategoryService,
@@ -136,7 +137,14 @@ export class CategoriesManagementComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: CategoryModalResult) => {
       if (result?.success) {
-        this.loadCategories();
+        if (result.category) {
+          console.log('✅ Categoría editada exitosamente, actualizando específicamente:', result.category.categoryId);
+          // Actualizar solo la categoría específica para mantener el estado
+          this.updateSpecificCategoryFromAPI(result.category.categoryId);
+        } else {
+          console.log('🔄 Recargando todas las categorías después de edición');
+          this.loadCategories();
+        }
       }
     });
   }
@@ -157,8 +165,18 @@ export class CategoriesManagementComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
+        // Activar loading para esta categoría específica
+        this.deletingCategoryId = category.categoryId;
+        this.cdr.detectChanges();
+
+        console.log('🗑️ Eliminando categoría:', category.name, 'ID:', category.categoryId);
+
         this.categoryService.deleteCategory(category.categoryId).subscribe({
           next: (success) => {
+            // Desactivar loading
+            this.deletingCategoryId = null;
+            this.cdr.detectChanges();
+
             if (success) {
               this.loadCategories();
               Swal.fire({
@@ -171,6 +189,10 @@ export class CategoriesManagementComponent implements OnInit {
             }
           },
           error: (error) => {
+            // Desactivar loading en caso de error
+            this.deletingCategoryId = null;
+            this.cdr.detectChanges();
+
             console.error('Error deleting category:', error);
             Swal.fire({
               title: 'Error',
@@ -243,23 +265,32 @@ export class CategoriesManagementComponent implements OnInit {
           if (categoryIndex !== -1) {
             console.log('🔄 Actualizando categoría en posición:', categoryIndex);
             
-            // Actualizar la categoría en el array SIN cambiar referencias principales
+            // Actualizar la categoría en el array creando nueva referencia
             this.categories[categoryIndex] = { ...updatedCategory };
             
             // SOLO actualizar selectedCategory si es la misma que se actualizó
             if (this.selectedCategoryId === categoryId) {
               this.selectedCategory = { ...updatedCategory };
-              console.log('🎯 Categoría seleccionada también actualizada');
+              console.log('🎯 Categoría seleccionada también actualizada:', {
+                name: this.selectedCategory.name,
+                description: this.selectedCategory.description
+              });
             }
             
-            // Crear nueva referencia para forzar detección de cambios
+            // Crear nueva referencia del array para forzar detección de cambios en toggle buttons
             this.categories = [...this.categories];
+            
+            console.log('🔄 Array de categorías actualizado:', this.categories.map(c => ({id: c.categoryId, name: c.name})));
             
             // Emitir evento de actualización
             this.categoriesUpdated.emit(this.categories);
             
             // Forzar detección de cambios múltiple para asegurar renderizado
             this.forceChangeDetectionAggressive();
+            
+            // Logging adicional para debugging
+            console.log('✅ Toggle buttons deberían actualizarse con:', 
+              this.categories.find(c => c.categoryId === categoryId)?.name);
             
             console.log('🔒 Estado preservado - Vista actualizada sin reinicializar');
           } else {
@@ -300,6 +331,8 @@ export class CategoriesManagementComponent implements OnInit {
    * Fuerza la detección de cambios de manera agresiva para asegurar renderizado
    */
   private forceChangeDetectionAggressive(): void {
+    console.log('🔄 Iniciando detección de cambios agresiva...');
+    
     // Detección inmediata
     this.cdr.markForCheck();
     this.cdr.detectChanges();
@@ -309,16 +342,24 @@ export class CategoriesManagementComponent implements OnInit {
       this.cdr.markForCheck();
       this.cdr.detectChanges();
       
-      // Múltiples ciclos para asegurar que el componente hijo se actualice
+      // Múltiples ciclos para asegurar que los toggle buttons se actualicen
       setTimeout(() => {
+        console.log('🔄 Ciclo 1 de detección de cambios');
         this.cdr.markForCheck();
         this.cdr.detectChanges();
       }, 0);
       
       setTimeout(() => {
+        console.log('🔄 Ciclo 2 de detección de cambios');
         this.cdr.markForCheck();
         this.cdr.detectChanges();
       }, 10);
+      
+      setTimeout(() => {
+        console.log('🔄 Ciclo 3 de detección de cambios (final)');
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      }, 50);
     });
   }
 

@@ -4,10 +4,11 @@ import { map } from 'rxjs/operators';
 
 import { ApiService } from '@core/services/api.service';
 import { ToastService } from '@core/services/toast.service';
-import { CATEGORY_GET_ALL_ENDPOINT, CATEGORY_CREATE_ENDPOINT } from '@core/config/endpoints';
+import { CATEGORY_GET_ALL_ENDPOINT, CATEGORY_CREATE_ENDPOINT, CATEGORY_UPDATE_ENDPOINT, CATEGORY_DELETE_ENDPOINT } from '@core/config/endpoints';
 import { 
   Category, 
   CreateCategoryRequest, 
+  UpdateCategoryRequest,
   CategoryApiResponse, 
   CreateCategoryResponse 
 } from '../models/category.interface';
@@ -66,10 +67,12 @@ export class CategoryService {
    * @param categoryData Datos actualizados
    * @returns Observable con la respuesta
    */
-  updateCategory(categoryId: number, categoryData: CreateCategoryRequest): Observable<CreateCategoryResponse> {
-    const url = `${CATEGORY_CREATE_ENDPOINT}/${categoryId}`;
+  updateCategory(categoryId: number, categoryData: UpdateCategoryRequest): Observable<CreateCategoryResponse> {
+    const url = `${CATEGORY_UPDATE_ENDPOINT}/${categoryId}`;
     
-    return this.apiService.put<CreateCategoryResponse>(url, categoryData).pipe(
+    console.log('Updating category with data:', categoryData);
+    
+    return this.apiService.post<CreateCategoryResponse>(url, categoryData).pipe(
       map(response => {
         if (response.succeed) {
           this.toastService.showSuccess('Categoría actualizada exitosamente');
@@ -87,7 +90,9 @@ export class CategoryService {
    * @returns Observable con la respuesta
    */
   deleteCategory(categoryId: number): Observable<boolean> {
-    const url = `${CATEGORY_CREATE_ENDPOINT}/${categoryId}`;
+    const url = `${CATEGORY_DELETE_ENDPOINT}?categoryId=${categoryId}`;
+    
+    console.log('Deleting category with ID:', categoryId);
     
     return this.apiService.delete<any>(url).pipe(
       map(response => {

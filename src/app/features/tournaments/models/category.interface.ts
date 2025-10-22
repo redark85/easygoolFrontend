@@ -24,6 +24,7 @@ export interface CreateCategoryRequest {
  * Request para actualizar una categoría
  */
 export interface UpdateCategoryRequest {
+  tournamentId: number;
   name: string;
   description: string;
 }

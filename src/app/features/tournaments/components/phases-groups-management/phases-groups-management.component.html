@@ -90,8 +90,14 @@
                           color="warn"
                           (click)="deletePhase(phase)"
                           matTooltip="Eliminar Fase"
-                          class="phase-action-btn">
-                    <mat-icon>delete</mat-icon>
+                          class="phase-action-btn"
+                          [disabled]="deletingPhaseId === phase.id">
+                    <mat-progress-spinner 
+                      *ngIf="deletingPhaseId === phase.id"
+                      diameter="20" 
+                      mode="indeterminate">
+                    </mat-progress-spinner>
+                    <mat-icon *ngIf="deletingPhaseId !== phase.id">delete</mat-icon>
                   </button>
                 </div>
               </div>

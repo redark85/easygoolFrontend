@@ -54,6 +54,7 @@ export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDes
 
   // Loading states
   isLoadingPhases = false;
+  deletingPhaseId: number | null = null; // ID de la fase que se está eliminando
 
   private destroy$ = new Subject<void>();
 
@@ -177,6 +178,12 @@ export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDes
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
+        // Activar loading para esta fase específica
+        this.deletingPhaseId = phase.id;
+        this.cdr.detectChanges();
+
+        console.log('🗑️ Eliminando fase:', phase.name, 'ID:', phase.id);
+
         this.phaseService.deletePhase(phase.id).subscribe({
           next: (response: any) => {
             const config = this.errorHandler.createConfig('Fase', {
@@ -185,11 +192,19 @@ export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDes
               'EGOL_115': 'No se puede eliminar la fase porque tiene partidos programados.'
             });
 
+            // Desactivar loading
+            this.deletingPhaseId = null;
+            this.cdr.detectChanges();
+
             if (this.errorHandler.handleResponse(response, config)) {
               this.refreshPhases();
             }
           },
           error: (error) => {
+            // Desactivar loading en caso de error
+            this.deletingPhaseId = null;
+            this.cdr.detectChanges();
+
             const config = this.errorHandler.createConfig('Fase');
             this.errorHandler.handleResponseError(error, config);
           }
