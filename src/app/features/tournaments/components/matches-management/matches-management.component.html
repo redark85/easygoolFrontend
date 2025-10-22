@@ -209,10 +209,10 @@
                                   </div>
                                 </div>
                                 <div class="team-logo-container">
-                                  <img [src]="match.homeTeamLogoUrl || 'assets/logo.png'"
+                                  <img [src]="match.homeTeamLogoUrl || 'assets/default-team.png'"
                                        alt="Home Team"
                                        class="team-logo"
-                                       (error)="$event.target.src='assets/logo.png'">
+                                       (error)="$event.target.src='default-team.png'">
                                 </div>
                               </div>
 
@@ -243,10 +243,10 @@
                                   </div>
                                 </div>
                                 <div class="team-logo-container">
-                                  <img [src]="match.awayTeamLogoUrl || 'assets/logo.png'"
+                                  <img [src]="match.awayTeamLogoUrl || 'assets/default-team.png'"
                                        alt="Away Team"
                                        class="team-logo"
-                                       (error)="$event.target.src='assets/logo.png'">
+                                       (error)="$event.target.src='assets/default-team.png'">
                                 </div>
                               </div>
                             </div>
