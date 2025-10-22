@@ -47,6 +47,7 @@ interface CategoryOption {
 export class CreateTeamModalComponent implements OnInit, OnDestroy {
   teamForm!: FormGroup;
   tournaments: TournamentOption[] = [];
+  availableCategories: CategoryOption[] = [];
   isLoadingTournaments = false;
   isSubmitting = false;
   private destroy$ = new Subject<void>();
@@ -72,6 +73,7 @@ export class CreateTeamModalComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.teamForm = this.fb.group({
       tournamentId: ['', Validators.required],
+      categoryId: ['', Validators.required],
       name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       shortName: ['', [Validators.maxLength(100)]],
       logo: [null]
@@ -90,6 +92,9 @@ export class CreateTeamModalComponent implements OnInit, OnDestroy {
           );
           this.isLoadingTournaments = false;
           console.log('📊 Torneos con categorías cargados:', this.tournaments);
+          
+          // Inicializar valores por defecto (primer torneo y primera categoría)
+          this.initializeDefaultValues();
         },
         error: (error) => {
           console.error('Error loading tournaments:', error);
@@ -97,6 +102,71 @@ export class CreateTeamModalComponent implements OnInit, OnDestroy {
           this.isLoadingTournaments = false;
         }
       });
+  }
+
+  /**
+   * Inicializa valores por defecto: primer torneo y primera categoría
+   */
+  private initializeDefaultValues(): void {
+    if (this.tournaments.length > 0) {
+      const firstTournament = this.tournaments[0];
+      console.log('🎯 Inicializando valores por defecto:', {
+        tournamentId: firstTournament.id,
+        tournamentName: firstTournament.name,
+        categoriesCount: firstTournament.categories.length
+      });
+      
+      // Establecer primer torneo por defecto
+      this.teamForm.patchValue({
+        tournamentId: firstTournament.id
+      });
+      
+      // Establecer categorías del primer torneo
+      this.availableCategories = firstTournament.categories;
+      
+      // Establecer primera categoría por defecto
+      if (this.availableCategories.length > 0) {
+        this.teamForm.patchValue({
+          categoryId: this.availableCategories[0].id
+        });
+        console.log('✅ Valores por defecto establecidos:', {
+          tournamentId: firstTournament.id,
+          categoryId: this.availableCategories[0].id,
+          categoryName: this.availableCategories[0].name
+        });
+      }
+    }
+  }
+
+  /**
+   * Maneja el cambio de torneo y actualiza las categorías disponibles
+   */
+  onTournamentChange(tournamentId: number): void {
+    console.log('🔄 Cambio de torneo detectado:', tournamentId);
+    
+    const selectedTournament = this.tournaments.find(t => t.id === tournamentId);
+    if (selectedTournament) {
+      // Actualizar categorías disponibles
+      this.availableCategories = selectedTournament.categories;
+      console.log('📋 Categorías actualizadas:', this.availableCategories);
+      
+      // Resetear y establecer primera categoría por defecto
+      if (this.availableCategories.length > 0) {
+        this.teamForm.patchValue({
+          categoryId: this.availableCategories[0].id
+        });
+        console.log('✅ Primera categoría seleccionada automáticamente:', {
+          categoryId: this.availableCategories[0].id,
+          categoryName: this.availableCategories[0].name
+        });
+      } else {
+        // Si no hay categorías, limpiar el campo
+        this.teamForm.patchValue({
+          categoryId: ''
+        });
+        console.log('⚠️ No hay categorías disponibles para este torneo');
+      }
+    }
   }
 
   onImageUploaded(imageData: ImageUploadData): void {
@@ -113,12 +183,20 @@ export class CreateTeamModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSubmitting = true;
     const formValue = this.teamForm.value;
+    
+    // Validación adicional para categoryId
+    if (!formValue.categoryId) {
+      this.toastService.showError('Debes seleccionar una categoría');
+      return;
+    }
+
+    this.isSubmitting = true;
     const logoData = formValue.logo as ImageUploadData;
 
     const teamData: CreateTeamRequest = {
       tournamentId: formValue.tournamentId,
+      categoryId: formValue.categoryId,
       name: formValue.name,
       shortName: formValue.shortName || '',
       logoBase64: logoData ? this.cleanBase64(logoData.base64) : '',
@@ -187,6 +265,14 @@ export class CreateTeamModalComponent implements OnInit, OnDestroy {
       if (control.errors['required']) return 'El nombre del equipo es requerido';
       if (control.errors['minlength']) return 'El nombre debe tener al menos 2 caracteres';
       if (control.errors['maxlength']) return 'El nombre no puede exceder 100 caracteres';
+    }
+    return '';
+  }
+
+  get categoryIdErrors(): string {
+    const control = this.teamForm.get('categoryId');
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) return 'Debes seleccionar una categoría';
     }
     return '';
   }
