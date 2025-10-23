@@ -180,20 +180,29 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
   private registerExistingTeam(): void {
     if (this.existingTeamForm.invalid) {
       this.markFormGroupTouched(this.existingTeamForm);
-      this.toastService.showError('Por favor, selecciona un equipo');
+      this.toastService.showError('Por favor, selecciona un equipo y categoría');
       return;
     }
 
     this.isSubmitting = true;
-    const teamId = this.existingTeamForm.value.teamId;
+    const formValue = this.existingTeamForm.value;
+    const teamId = formValue.teamId;
+    const categoryId = formValue.categoryId;
 
-    this.teamService.registerTournamentTeam(this.data.tournamentId, teamId)
+    // Validar que categoryId esté presente cuando hay token
+    if (this.data.tournamentToken && !categoryId) {
+      this.isSubmitting = false;
+      this.toastService.showError('Debes seleccionar una categoría');
+      return;
+    }
+
+    this.teamService.registerTournamentTeam(this.data.tournamentId, teamId, categoryId || 0)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.isSubmitting = false;
           this.toastService.showSuccess('Equipo registrado exitosamente en el torneo');
-          this.dialogRef.close({ success: true, isNewTeam: false, teamId });
+          this.dialogRef.close({ success: true, isNewTeam: false, teamId, categoryId });
         },
         error: (error) => {
           this.isSubmitting = false;
@@ -213,9 +222,18 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     const formValue = this.newTeamForm.value;
     const logoData = formValue.logo as ImageUploadData;
+    const categoryId = formValue.categoryId;
+
+    // Validar que categoryId esté presente cuando hay token
+    if (this.data.tournamentToken && !categoryId) {
+      this.isSubmitting = false;
+      this.toastService.showError('Debes seleccionar una categoría');
+      return;
+    }
 
     const teamData: CreateTeamRequest = {
       tournamentId: this.data.tournamentId,
+      categoryId: categoryId || 0, // Incluir categoryId obligatorio
       name: formValue.name,
       shortName: formValue.shortName || '',
       logoBase64: logoData ? this.cleanBase64(logoData.base64) : '',
@@ -227,7 +245,7 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (team) => {
           this.isSubmitting = false;
-          this.dialogRef.close({ success: true, isNewTeam: true, team });
+          this.dialogRef.close({ success: true, isNewTeam: true, team, categoryId });
         },
         error: (error) => {
           this.isSubmitting = false;

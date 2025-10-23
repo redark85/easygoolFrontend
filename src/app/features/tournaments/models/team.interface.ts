@@ -43,7 +43,7 @@ export interface Manager{
 
 export interface CreateTeamRequest {
   tournamentId: number;
-  categoryId?: number; // Opcional para compatibilidad con registro por token
+  categoryId: number; // Obligatorio - ID de la categoría seleccionada
   name: string;
   shortName: string;
   logoBase64?: string | null;
@@ -58,6 +58,12 @@ export interface UpdateTeamRequest {
   shortName: string;
   logoBase64: string | null;
   logoContentType: string | null;
+}
+
+export interface RegisterTournamentTeamRequest {
+  tournamentId: number;
+  teamId: number;
+  categoryId: number; // Obligatorio - ID de la categoría seleccionada
 }
 
 

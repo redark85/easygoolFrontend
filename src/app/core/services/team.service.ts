@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { ApiResponse } from '../models/api.interface';
 import { ManagerTeam, ManagerTeamsResponse, TournamentTokenValidationResult, TournamentCategory } from '../models/team.interface';
+import { RegisterTournamentTeamRequest } from '@features/tournaments/models/team.interface';
 import { MANAGER_GET_TEAMS_ENDPOINT, MANAGER_TOKEN_VALIDATION_ENDPOINT, MANAGER_GET_ALL_TEAMS_ENDPOINT, MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT } from '../config/endpoints';
 
 @Injectable({
@@ -77,10 +78,11 @@ export class TeamService {
    * Registra un equipo existente en un torneo
    * @param tournamentId ID del torneo
    * @param teamId ID del equipo a registrar
+   * @param categoryId ID de la categoría seleccionada
    * @returns Observable con la respuesta
    */
-  registerTournamentTeam(tournamentId: number, teamId: number): Observable<void> {
-    const body = { tournamentId, teamId };
+  registerTournamentTeam(tournamentId: number, teamId: number, categoryId: number): Observable<void> {
+    const body: RegisterTournamentTeamRequest = { tournamentId, teamId, categoryId };
     return this.apiService.post<ApiResponse<void>>(MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT, body).pipe(
       map(response => {
         if (!response.succeed) {
