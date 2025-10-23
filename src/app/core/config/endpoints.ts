@@ -56,6 +56,7 @@ export const PLAYER_REMOVE_ENDPOINT = '/api/Player/RemovePlayer';
 export const PLAYER_UPLOAD_EXCEL_ENDPOINT = '/api/Player/UploadPlayerThrowExcel';
 export const PLAYER_GET_BY_IDENTIFICATION_ENDPOINT = '/api/Player/GetByIdentification';
 export const PLAYER_ADD_TEAM_PLAYER_ENDPOINT = '/api/Player/AddTeamPlayer';
+export const PLAYER_SET_AS_TEAM_CAPITAN_ENDPOINT = '/api/Player/SetAsTeamCapitan';
 
 // Match Endpoints
 export const MATCH_GET_ALL_BY_GROUP_ENDPOINT = '/api/Match/GetAllMatchesByGroup';
@@ -94,6 +95,7 @@ export const MANAGER_TOKEN_VALIDATION_ENDPOINT = '/api/Manager/TokenValidation';
 export const MANAGER_GET_ALL_TEAMS_ENDPOINT = '/api/Manager/GetAllTeams';
 export const MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT = '/api/Manager/RegisterTournamentTeam';
 export const MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT = '/api/Manager/GetTournamentPhases';
+export const MANAGER_GET_PLAYER_LIST_ENDPOINT = '/api/Manager/GetPlayerList';
 
 // User Profile Endpoints
 export const USER_PROFILE_GET_ENDPOINT = '/api/User/GetUserProfile';
