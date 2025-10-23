@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+import { TeamDetail } from '../../../models/team-detail.interface';
 
 interface TeamSummary {
   teamName: string;
@@ -35,30 +36,61 @@ interface TeamSummary {
   styleUrls: ['./team-summary-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TeamSummaryCardComponent implements OnInit {
-  teamSummary: TeamSummary = {
-    teamName: 'Mi Equipo',
-    logoUrl: 'assets/team-placeholder.png',
-    currentPosition: 3,
-    points: 24,
-    matchesPlayed: 10,
-    wins: 7,
-    draws: 3,
-    losses: 0,
-    goalsFor: 25,
-    goalsAgainst: 8
-  };
+export class TeamSummaryCardComponent implements OnInit, OnChanges {
+  @Input() teamDetail: TeamDetail | null = null;
+  
+  teamSummary: TeamSummary | null = null;
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    // TODO: Cargar datos reales del equipo
+    this.updateTeamSummary();
+  }
+
+  ngOnChanges(): void {
+    this.updateTeamSummary();
+  }
+
+  /**
+   * Actualiza el resumen del equipo con datos reales del API
+   */
+  private updateTeamSummary(): void {
+    if (this.teamDetail) {
+      // Convertir URL HTTP a HTTPS si es necesario y usar imagen por defecto si no hay logoUrl
+      let logoUrl = this.teamDetail.logoUrl || 'assets/default-team.png';
+      if (logoUrl.startsWith('http://')) {
+        logoUrl = logoUrl.replace('http://', 'https://');
+      }
+      
+      this.teamSummary = {
+        teamName: this.teamDetail.teamName,
+        logoUrl: logoUrl,
+        currentPosition: this.teamDetail.position,
+        points: this.teamDetail.points,
+        matchesPlayed: this.teamDetail.played,
+        wins: this.teamDetail.wins,
+        draws: this.teamDetail.draws,
+        losses: this.teamDetail.losses,
+        goalsFor: this.teamDetail.goalsFor,
+        goalsAgainst: this.teamDetail.goalsAgainst
+      };
+    } else {
+      // Si no hay datos del API, limpiar el resumen
+      this.teamSummary = null;
+    }
+    
+    // Forzar detección de cambios
+    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   get goalDifference(): number {
+    if (!this.teamSummary) return 0;
     return this.teamSummary.goalsFor - this.teamSummary.goalsAgainst;
   }
 
   get winPercentage(): number {
-    if (this.teamSummary.matchesPlayed === 0) return 0;
+    if (!this.teamSummary || this.teamSummary.matchesPlayed === 0) return 0;
     return (this.teamSummary.wins / this.teamSummary.matchesPlayed) * 100;
   }
 }

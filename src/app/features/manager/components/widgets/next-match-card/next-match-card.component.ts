@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { interval, Subject, takeUntil } from 'rxjs';
+import { TeamDetail } from '../../../models/team-detail.interface';
 
 interface NextMatch {
   id: number;
@@ -38,21 +39,10 @@ interface NextMatch {
   styleUrls: ['./next-match-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NextMatchCardComponent implements OnInit, OnDestroy {
-  nextMatch: NextMatch = {
-    id: 1,
-    homeTeam: {
-      name: 'Mi Equipo',
-      logoUrl: 'assets/team-placeholder.png'
-    },
-    awayTeam: {
-      name: 'Rival FC',
-      logoUrl: 'assets/team-placeholder.png'
-    },
-    date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 días desde ahora
-    venue: 'Estadio Municipal',
-    matchday: 11
-  };
+export class NextMatchCardComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() teamDetail: TeamDetail | null = null;
+  
+  nextMatch: NextMatch | null = null;
 
   countdown = {
     days: 0,
@@ -66,12 +56,44 @@ export class NextMatchCardComponent implements OnInit, OnDestroy {
   constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
+    this.updateNextMatch();
     this.startCountdown();
+  }
+
+  ngOnChanges(): void {
+    this.updateNextMatch();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Actualiza los datos del próximo partido con datos reales del API
+   */
+  private updateNextMatch(): void {
+    if (this.teamDetail && this.teamDetail.nextMatch) {
+      const nextMatchData = this.teamDetail.nextMatch;
+      
+      this.nextMatch = {
+        id: nextMatchData.matchId,
+        homeTeam: {
+          name: nextMatchData.isHome ? this.teamDetail.teamName : nextMatchData.opponent,
+          logoUrl: nextMatchData.isHome ? (this.teamDetail.logoUrl || 'assets/default-team.png') : 'assets/default-team.png'
+        },
+        awayTeam: {
+          name: nextMatchData.isHome ? nextMatchData.opponent : this.teamDetail.teamName,
+          logoUrl: nextMatchData.isHome ? 'assets/default-team.png' : (this.teamDetail.logoUrl || 'assets/default-team.png')
+        },
+        date: new Date(nextMatchData.matchDate),
+        venue: nextMatchData.phaseName || 'Sin información de venue',
+        matchday: 0 // No viene en el API
+      };
+    } else {
+      // Si no hay próximo partido o teamDetail es null
+      this.nextMatch = null;
+    }
   }
 
   /**
@@ -89,6 +111,8 @@ export class NextMatchCardComponent implements OnInit, OnDestroy {
    * Actualiza el countdown
    */
   private updateCountdown(): void {
+    if (!this.nextMatch) return;
+    
     const now = new Date().getTime();
     const matchTime = this.nextMatch.date.getTime();
     const distance = matchTime - now;

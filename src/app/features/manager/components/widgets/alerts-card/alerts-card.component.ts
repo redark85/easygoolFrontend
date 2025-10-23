@@ -38,49 +38,11 @@ interface Alert {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlertsCardComponent implements OnInit {
-  alerts: Alert[] = [
-    {
-      id: 1,
-      type: 'warning',
-      icon: 'warning',
-      title: 'Jugador Suspendido',
-      message: 'Carlos Rodríguez no podrá jugar el próximo partido por acumulación de tarjetas amarillas.',
-      date: new Date(),
-      actionLabel: 'Ver Jugador',
-      actionRoute: '/players/1'
-    },
-    {
-      id: 2,
-      type: 'info',
-      icon: 'event',
-      title: 'Próximo Partido',
-      message: 'Recuerda confirmar la asistencia de tus jugadores para el partido del sábado.',
-      date: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      actionLabel: 'Confirmar',
-      actionRoute: '/matches/1'
-    },
-    {
-      id: 3,
-      type: 'success',
-      icon: 'check_circle',
-      title: 'Registro Completo',
-      message: 'Todos los jugadores han completado su registro para el torneo.',
-      date: new Date(Date.now() - 24 * 60 * 60 * 1000)
-    },
-    {
-      id: 4,
-      type: 'info',
-      icon: 'notifications',
-      title: 'Mensaje del Organizador',
-      message: 'Se ha publicado el calendario de la siguiente fase del torneo.',
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      actionLabel: 'Ver Calendario',
-      actionRoute: '/matches'
-    }
-  ];
+  alerts: Alert[] = [];
 
   ngOnInit(): void {
-    // TODO: Cargar alertas reales
+    // Las alertas se cargarían desde un servicio real
+    // Por ahora mantenemos el array vacío hasta que se implemente el API
   }
 
   getAlertColor(type: string): string {

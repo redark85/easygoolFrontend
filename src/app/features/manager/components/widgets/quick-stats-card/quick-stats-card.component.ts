@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { TeamDetail } from '../../../models/team-detail.interface';
 
 interface QuickStat {
   icon: string;
@@ -27,41 +28,69 @@ interface QuickStat {
   styleUrls: ['./quick-stats-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QuickStatsCardComponent implements OnInit {
-  quickStats: QuickStat[] = [   
-    {
-      icon: 'trending_up',
-      label: 'Racha Actual',
-      value: '5V',
-      color: '#2196f3',
-      trend: 'up',
-      trendValue: 'Invicto'
-    },
-    {
-      icon: 'emoji_events',
-      label: 'Máximo Goleador',
-      value: 'Juan Pérez (8)',
-      color: '#ff9800',
-      trend: 'neutral'
-    },
-    {
-      icon: 'people',
-      label: 'Total Jugadores',
-      value: 18,
-      color: '#9c27b0',
-      trend: 'neutral'
-    },
-    {
-      icon: 'star',
-      label: 'Promedio Goles/Partido',
-      value: '2.5',
-      color: '#00bcd4',
-      trend: 'up',
-      trendValue: '+0.3'
-    }
-  ];
+export class QuickStatsCardComponent implements OnInit, OnChanges {
+  @Input() teamDetail: TeamDetail | null = null;
+  
+  quickStats: QuickStat[] = [];
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    // TODO: Cargar datos reales
+    this.updateQuickStats();
+  }
+
+  ngOnChanges(): void {
+    this.updateQuickStats();
+  }
+
+  /**
+   * Actualiza las estadísticas rápidas con datos reales del API
+   */
+  private updateQuickStats(): void {
+    if (this.teamDetail) {
+      // Calcular efectividad como porcentaje
+      const effectiveness = Math.round(this.teamDetail.effectiveness);
+      const effectivenessText = effectiveness >= 70 ? 'Excelente' : effectiveness >= 50 ? 'Buena' : 'Regular';
+      
+      this.quickStats = [
+        {
+          icon: 'trending_up',
+          label: 'Efectividad',
+          value: `${effectiveness}%`,
+          color: '#2196f3',
+          trend: effectiveness >= 70 ? 'up' : effectiveness >= 50 ? 'neutral' : 'down',
+          trendValue: effectivenessText
+        },
+        {
+          icon: 'emoji_events',
+          label: 'Máximo Goleador',
+          value: this.teamDetail.topScorer ? `${this.teamDetail.topScorer.name} (${this.teamDetail.topScorer.goals})` : 'Sin datos',
+          color: '#ff9800',
+          trend: 'neutral'
+        },
+        {
+          icon: 'people',
+          label: 'Total Jugadores',
+          value: this.teamDetail.totalPlayers,
+          color: '#9c27b0',
+          trend: 'neutral'
+        },
+        {
+          icon: 'star',
+          label: 'Puntos por Partido',
+          value: this.teamDetail.pointsPerMatch.toFixed(1),
+          color: '#00bcd4',
+          trend: this.teamDetail.pointsPerMatch >= 2 ? 'up' : this.teamDetail.pointsPerMatch >= 1 ? 'neutral' : 'down',
+          trendValue: this.teamDetail.pointsPerMatch >= 2 ? 'Excelente' : this.teamDetail.pointsPerMatch >= 1 ? 'Bueno' : 'Mejorable'
+        }
+      ];
+    } else {
+      // Si no hay datos del API, limpiar las estadísticas
+      this.quickStats = [];
+    }
+    
+    // Forzar detección de cambios
+    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 }

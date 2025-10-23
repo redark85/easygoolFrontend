@@ -83,14 +83,14 @@ export class ScenarioSimulatorComponent implements OnInit, OnDestroy {
 
   // Current Standings
   currentStandings: TeamStanding[] = [
-    { position: 1, team: 'Líder FC', logo: 'assets/team-placeholder.png', matches: 10, wins: 8, draws: 1, losses: 1, goalsFor: 24, goalsAgainst: 6, goalDifference: 18, points: 25 },
-    { position: 2, team: 'Segundo United', logo: 'assets/team-placeholder.png', matches: 10, wins: 7, draws: 2, losses: 1, goalsFor: 21, goalsAgainst: 8, goalDifference: 13, points: 23 },
-    { position: 3, team: 'Mi Equipo', logo: 'assets/team-placeholder.png', matches: 10, wins: 7, draws: 2, losses: 1, goalsFor: 25, goalsAgainst: 8, goalDifference: 17, points: 23, isMyTeam: true },
-    { position: 4, team: 'Cuarto City', logo: 'assets/team-placeholder.png', matches: 10, wins: 6, draws: 3, losses: 1, goalsFor: 18, goalsAgainst: 9, goalDifference: 9, points: 21 },
-    { position: 5, team: 'Rival FC', logo: 'assets/team-placeholder.png', matches: 10, wins: 6, draws: 0, losses: 4, goalsFor: 16, goalsAgainst: 12, goalDifference: 4, points: 18 },
-    { position: 6, team: 'Deportivo Unidos', logo: 'assets/team-placeholder.png', matches: 10, wins: 4, draws: 2, losses: 4, goalsFor: 14, goalsAgainst: 15, goalDifference: -1, points: 14 },
-    { position: 7, team: 'Atlético City', logo: 'assets/team-placeholder.png', matches: 10, wins: 3, draws: 3, losses: 4, goalsFor: 12, goalsAgainst: 16, goalDifference: -4, points: 12 },
-    { position: 8, team: 'Real Deportivo', logo: 'assets/team-placeholder.png', matches: 10, wins: 2, draws: 2, losses: 6, goalsFor: 9, goalsAgainst: 18, goalDifference: -9, points: 8 }
+    { position: 1, team: 'Líder FC', logo: 'assets/default-team.png', matches: 10, wins: 8, draws: 1, losses: 1, goalsFor: 24, goalsAgainst: 6, goalDifference: 18, points: 25 },
+    { position: 2, team: 'Segundo United', logo: 'assets/default-team.png', matches: 10, wins: 7, draws: 2, losses: 1, goalsFor: 21, goalsAgainst: 8, goalDifference: 13, points: 23 },
+    { position: 3, team: 'Mi Equipo', logo: 'assets/default-team.png', matches: 10, wins: 7, draws: 2, losses: 1, goalsFor: 25, goalsAgainst: 8, goalDifference: 17, points: 23, isMyTeam: true },
+    { position: 4, team: 'Cuarto City', logo: 'assets/default-team.png', matches: 10, wins: 6, draws: 3, losses: 1, goalsFor: 18, goalsAgainst: 9, goalDifference: 9, points: 21 },
+    { position: 5, team: 'Rival FC', logo: 'assets/default-team.png', matches: 10, wins: 6, draws: 0, losses: 4, goalsFor: 16, goalsAgainst: 12, goalDifference: 4, points: 18 },
+    { position: 6, team: 'Deportivo Unidos', logo: 'assets/default-team.png', matches: 10, wins: 4, draws: 2, losses: 4, goalsFor: 14, goalsAgainst: 15, goalDifference: -1, points: 14 },
+    { position: 7, team: 'Atlético City', logo: 'assets/default-team.png', matches: 10, wins: 3, draws: 3, losses: 4, goalsFor: 12, goalsAgainst: 16, goalDifference: -4, points: 12 },
+    { position: 8, team: 'Real Deportivo', logo: 'assets/default-team.png', matches: 10, wins: 2, draws: 2, losses: 6, goalsFor: 9, goalsAgainst: 18, goalDifference: -9, points: 8 }
   ];
 
   projectedStandings: TeamStanding[] = [...this.currentStandings];

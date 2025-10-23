@@ -7,9 +7,19 @@
   </mat-card-header>
 
   <mat-card-content>
+    <!-- Estado sin datos -->
+    <div *ngIf="!teamSummary" class="no-data-state">
+      <mat-icon class="no-data-icon">info</mat-icon>
+      <h3>Sin datos disponibles</h3>
+      <p>No se pudieron cargar los datos del equipo desde el API.</p>
+    </div>
+
     <!-- Team Info -->
-    <div class="team-info">
-      <img [src]="teamSummary.logoUrl" [alt]="teamSummary.teamName" class="team-logo">
+    <div *ngIf="teamSummary" class="team-info">
+      <img [src]="teamSummary.logoUrl" 
+           [alt]="teamSummary.teamName" 
+           class="team-logo"
+           (error)="$event.target.src='assets/default-team.png'">
       <div class="team-details">
         <h2 class="team-name">{{ teamSummary.teamName }}</h2>
         <div class="team-position">
@@ -21,7 +31,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="stats-grid">
+    <div *ngIf="teamSummary" class="stats-grid">
       <!-- Matches Played -->
       <div class="stat-item">
         <mat-icon>sports_soccer</mat-icon>
@@ -96,7 +106,7 @@
     </div>
   </mat-card-content>
 
-  <mat-card-actions>
+  <mat-card-actions *ngIf="teamSummary">
     <a mat-button color="primary" routerLink="/teams/standings/1">
       <mat-icon>visibility</mat-icon>
       Ver Tabla de Posiciones

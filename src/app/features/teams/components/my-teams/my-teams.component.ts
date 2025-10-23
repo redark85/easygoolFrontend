@@ -156,9 +156,10 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
       });
   }
 
-  viewTeamDetails(): void {
-    // Navegar a la tabla de posiciones enviando el tournamentId
-    this.router.navigate(['/manager/dashboard']);
+  viewTeamDetails(tournamentTeamId: number): void {
+    console.log('🏈 Navigating to manager dashboard with tournamentTeamId:', tournamentTeamId);
+    // Navegar al dashboard del manager enviando el tournamentTeamId como parámetro de ruta
+    this.router.navigate(['/manager/dashboard', tournamentTeamId]);
   }
 
   getTeamLogo(logoUrl: string): string {

@@ -34,7 +34,7 @@
       <mat-card-content>
         <div class="logo-section">
           <div class="logo-container">
-            <img [src]="teamInfo.logoUrl" [alt]="teamInfo.name" class="team-logo">
+            <img [src]="teamInfo.logoUrl" [alt]="teamInfo.name" class="team-logo" (error)="$event.target.src='assets/default-team.png'">
             <button mat-mini-fab color="primary" class="change-logo-btn" *ngIf="isEditing" (click)="fileInput.click()">
               <mat-icon>photo_camera</mat-icon>
             </button>

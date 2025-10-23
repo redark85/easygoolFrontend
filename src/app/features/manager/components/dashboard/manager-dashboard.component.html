@@ -20,22 +20,33 @@
     <p>Cargando dashboard...</p>
   </div>
 
+  <!-- Error State -->
+  <div class="error-container" *ngIf="!isLoading && hasError">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h3>Error al cargar el dashboard</h3>
+    <p>{{ errorMessage }}</p>
+    <button mat-raised-button color="primary" (click)="onRefresh()">
+      <mat-icon>refresh</mat-icon>
+      Reintentar
+    </button>
+  </div>
+
   <!-- Dashboard Content -->
-  <div class="dashboard-content" *ngIf="!isLoading">
+  <div class="dashboard-content" *ngIf="!isLoading && !hasError && teamDetail">
     <!-- Row 1: Team Summary & Next Match -->
     <div class="dashboard-row">
       <div class="dashboard-col col-lg">
-        <app-team-summary-card></app-team-summary-card>
+        <app-team-summary-card [teamDetail]="teamDetail"></app-team-summary-card>
       </div>
       <div class="dashboard-col col-md">
-        <app-next-match-card></app-next-match-card>
+        <app-next-match-card [teamDetail]="teamDetail"></app-next-match-card>
       </div>
     </div>
 
     <!-- Row 2: Quick Stats -->
     <div class="dashboard-row">
       <div class="dashboard-col col-full">
-        <app-quick-stats-card></app-quick-stats-card>
+        <app-quick-stats-card [teamDetail]="teamDetail"></app-quick-stats-card>
       </div>
     </div>
 

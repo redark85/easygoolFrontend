@@ -7,7 +7,15 @@
   </mat-card-header>
 
   <mat-card-content>
-    <div class="stats-grid">
+    <!-- Estado sin datos -->
+    <div *ngIf="quickStats.length === 0" class="no-data-state">
+      <mat-icon class="no-data-icon">bar_chart</mat-icon>
+      <h3>Sin estadísticas disponibles</h3>
+      <p>No se pudieron cargar las estadísticas del equipo desde el API.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div *ngIf="quickStats.length > 0" class="stats-grid">
       <div *ngFor="let stat of quickStats" class="stat-box">
         <div class="stat-icon" [style.background-color]="stat.color + '20'">
           <mat-icon [style.color]="stat.color">{{ stat.icon }}</mat-icon>

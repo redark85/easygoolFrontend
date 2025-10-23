@@ -81,8 +81,8 @@ export class MatchesCalendarComponent implements OnInit, OnDestroy {
     {
       id: 1,
       date: new Date(2025, 9, 15, 18, 0), // Oct 15, 2025
-      homeTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/team-placeholder.png' },
-      awayTeam: { id: 2, name: 'Rival FC', logo: 'assets/team-placeholder.png' },
+      homeTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/default-team.png' },
+      awayTeam: { id: 2, name: 'Rival FC', logo: 'assets/default-team.png' },
       venue: 'Estadio Municipal',
       matchday: 11,
       status: 'scheduled',
@@ -91,8 +91,8 @@ export class MatchesCalendarComponent implements OnInit, OnDestroy {
     {
       id: 2,
       date: new Date(2025, 9, 20, 16, 30), // Oct 20, 2025
-      homeTeam: { id: 3, name: 'Deportivo Unidos', logo: 'assets/team-placeholder.png' },
-      awayTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/team-placeholder.png' },
+      homeTeam: { id: 3, name: 'Deportivo Unidos', logo: 'assets/default-team.png' },
+      awayTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/default-team.png' },
       venue: 'Estadio Central',
       matchday: 12,
       status: 'scheduled',
@@ -101,8 +101,8 @@ export class MatchesCalendarComponent implements OnInit, OnDestroy {
     {
       id: 3,
       date: new Date(2025, 9, 25, 19, 0), // Oct 25, 2025
-      homeTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/team-placeholder.png' },
-      awayTeam: { id: 4, name: 'Atlético City', logo: 'assets/team-placeholder.png' },
+      homeTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/default-team.png' },
+      awayTeam: { id: 4, name: 'Atlético City', logo: 'assets/default-team.png' },
       venue: 'Estadio Municipal',
       matchday: 13,
       status: 'scheduled',
@@ -111,8 +111,8 @@ export class MatchesCalendarComponent implements OnInit, OnDestroy {
     {
       id: 4,
       date: new Date(2025, 9, 5, 17, 0), // Oct 5, 2025 (past)
-      homeTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/team-placeholder.png' },
-      awayTeam: { id: 5, name: 'Real Deportivo', logo: 'assets/team-placeholder.png' },
+      homeTeam: { id: 1, name: 'Mi Equipo', logo: 'assets/default-team.png' },
+      awayTeam: { id: 5, name: 'Real Deportivo', logo: 'assets/default-team.png' },
       venue: 'Estadio Municipal',
       matchday: 10,
       status: 'finished',

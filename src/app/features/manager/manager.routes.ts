@@ -7,7 +7,7 @@ export const managerRoutes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'dashboard',
+    path: 'dashboard/:tournamentTeamId',
     loadComponent: () => import('./components/dashboard/manager-dashboard.component').then(c => c.ManagerDashboardComponent),
     title: 'Dashboard - Manager'
   },

@@ -119,7 +119,7 @@ export class MatchPredictionsComponent implements OnInit, OnDestroy {
       opponent: {
         id: 2,
         name: 'Rival FC',
-        logo: 'assets/team-placeholder.png',
+        logo: 'assets/default-team.png',
         position: 5,
         points: 18
       },
@@ -133,7 +133,7 @@ export class MatchPredictionsComponent implements OnInit, OnDestroy {
       opponent: {
         id: 3,
         name: 'Deportivo Unidos',
-        logo: 'assets/team-placeholder.png',
+        logo: 'assets/default-team.png',
         position: 8,
         points: 12
       },

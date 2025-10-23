@@ -5,6 +5,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+
+// Services
+import { ManagerService } from '../../../../core/services/manager.service';
+import { ToastService } from '../../../../core/services/toast.service';
+
+// Models
+import { TeamDetail } from '../../models/team-detail.interface';
 
 // Widgets
 import { TeamSummaryCardComponent } from '../widgets/team-summary-card/team-summary-card.component';
@@ -36,14 +44,34 @@ import { AlertsCardComponent } from '../widgets/alerts-card/alerts-card.componen
 })
 export class ManagerDashboardComponent implements OnInit, OnDestroy {
   isLoading = true;
+  hasError = false;
+  errorMessage = '';
+  teamDetail: TeamDetail | null = null;
+  tournamentTeamId: number = 0;
   private destroy$ = new Subject<void>();
 
   constructor(
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private managerService: ManagerService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    this.loadDashboardData();
+    // Obtener el tournamentTeamId de la ruta
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const tournamentTeamId = +params['tournamentTeamId']; // Convertir a número
+      if (tournamentTeamId && tournamentTeamId > 0) {
+        this.tournamentTeamId = tournamentTeamId;
+        console.log('📊 Dashboard - Tournament Team ID from route:', this.tournamentTeamId);
+        this.loadDashboardData();
+      } else {
+        console.error('📊 Dashboard - Invalid tournament team ID from route:', params['tournamentTeamId']);
+        this.toastService.showError('ID de equipo inválido');
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -52,22 +80,38 @@ export class ManagerDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos del dashboard
+   * Carga los datos del dashboard desde el API
    */
   private loadDashboardData(): void {
-    // Simular carga de datos
-    setTimeout(() => {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }, 1000);
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+    
+    this.managerService.getTeamDetail(this.tournamentTeamId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (teamDetail: TeamDetail) => {
+          this.teamDetail = teamDetail;
+          this.isLoading = false;
+          this.hasError = false;
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.teamDetail = null;
+          this.isLoading = false;
+          this.hasError = true;
+          this.errorMessage = 'Error al cargar los datos del equipo. El API devolvió null o falló la conexión.';
+          this.toastService.showError(this.errorMessage);
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   /**
    * Refresca los datos del dashboard
    */
   onRefresh(): void {
-    this.isLoading = true;
-    this.cdr.detectChanges();
     this.loadDashboardData();
   }
 }

@@ -96,6 +96,7 @@ export const MANAGER_GET_ALL_TEAMS_ENDPOINT = '/api/Manager/GetAllTeams';
 export const MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT = '/api/Manager/RegisterTournamentTeam';
 export const MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT = '/api/Manager/GetTournamentPhases';
 export const MANAGER_GET_PLAYER_LIST_ENDPOINT = '/api/Manager/GetPlayerList';
+export const MANAGER_GET_TEAM_DETAIL_ENDPOINT = '/api/Manager/GetTeamDetail';
 
 // User Profile Endpoints
 export const USER_PROFILE_GET_ENDPOINT = '/api/User/GetUserProfile';
@@ -175,6 +176,7 @@ export const EndpointsConfig = {
 
   // Manager
   MANAGER_GET_TEAMS_ENDPOINT,
+  MANAGER_GET_TEAM_DETAIL_ENDPOINT,
 
   // User Profile
   USER_PROFILE_GET_ENDPOINT,

@@ -45,7 +45,7 @@
         
         <div class="tournaments-list" *ngIf="team.tournaments.length > 0; else noTournaments">
           <div *ngFor="let tournament of team.tournaments" class="tournament-item">
-            <div class="tournament-info" (click)="viewTeamDetails()">
+            <div class="tournament-info" (click)="viewTeamDetails(tournament.tournamentTeamId)">
               <mat-icon class="tournament-icon">sports_soccer</mat-icon>
               <div class="tournament-details">
                 <span class="tournament-name">{{ tournament.tournamentName }}</span>

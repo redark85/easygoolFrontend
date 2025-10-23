@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
-import { MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT } from '../config/endpoints';
+import { MANAGER_GET_TOURNAMENT_PHASES_ENDPOINT, MANAGER_GET_TEAM_DETAIL_ENDPOINT } from '../config/endpoints';
+import { TeamDetailResponse, TeamDetail } from '../../features/manager/models/team-detail.interface';
 
 // Interfaces
 export interface TournamentGroup {
@@ -65,6 +66,26 @@ export class ManagerService {
           return response.result;
         }
         throw new Error(response.message || 'Error al obtener las fases del torneo');
+      })
+    );
+  }
+
+  /**
+   * Obtiene los detalles del equipo del manager
+   * @param tournamentTeamId ID del equipo en el torneo
+   * @returns Observable con los detalles completos del equipo
+   */
+  getTeamDetail(tournamentTeamId: number): Observable<TeamDetail> {
+    console.log('🏈 ManagerService - Getting team detail for tournamentTeamId:', tournamentTeamId);
+    
+    return this.apiService.get<TeamDetailResponse>(`${MANAGER_GET_TEAM_DETAIL_ENDPOINT}/${tournamentTeamId}`).pipe(
+      map(response => {
+        console.log('🏈 ManagerService - Team detail response:', response);
+        
+        if (response.succeed && response.result) {
+          return response.result;
+        }
+        throw new Error(response.message || 'Error al obtener los detalles del equipo');
       })
     );
   }

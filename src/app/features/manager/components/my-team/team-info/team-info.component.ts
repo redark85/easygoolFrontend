@@ -57,7 +57,7 @@ export class TeamInfoComponent implements OnInit, OnDestroy {
     id: 1,
     name: 'Club Deportivo Ejemplo',
     shortName: 'CDE',
-    logoUrl: 'assets/team-placeholder.png',
+    logoUrl: 'assets/default-team.png',
     primaryColor: '#1976d2',
     secondaryColor: '#ffffff',
     foundedYear: 2020,

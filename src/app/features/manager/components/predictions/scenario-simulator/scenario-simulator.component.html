@@ -103,7 +103,7 @@
                 <th mat-header-cell *matHeaderCellDef>Equipo</th>
                 <td mat-cell *matCellDef="let team">
                   <div class="team-cell" [class.my-team]="team.isMyTeam">
-                    <img [src]="team.logo" [alt]="team.team" class="team-logo">
+                    <img [src]="team.logo" [alt]="team.team" class="team-logo" (error)="$event.target.src='assets/default-team.png'">
                     <span class="team-name">{{ team.team }}</span>
                   </div>
                 </td>

@@ -39,7 +39,7 @@
             <mat-card-content>
               <div class="match-teams">
                 <div class="team home" [class.my-team]="match.isHome">
-                  <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo">
+                  <img [src]="match.homeTeam.logo" [alt]="match.homeTeam.name" class="team-logo" (error)="$event.target.src='assets/default-team.png'">
                   <span class="team-name">{{ match.homeTeam.name }}</span>
                 </div>
 
@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="team away" [class.my-team]="!match.isHome">
-                  <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo">
+                  <img [src]="match.awayTeam.logo" [alt]="match.awayTeam.name" class="team-logo" (error)="$event.target.src='assets/default-team.png'">
                   <span class="team-name">{{ match.awayTeam.name }}</span>
                 </div>
               </div>

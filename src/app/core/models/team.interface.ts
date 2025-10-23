@@ -3,6 +3,7 @@ export interface TeamTournament {
   tournamentId: number;
   tournamentName: string;
   playersCount: number;
+  tournamentTeamId: number; // ID del equipo en el torneo (requerido para el API)
 }
 
 export interface ManagerTeam {
