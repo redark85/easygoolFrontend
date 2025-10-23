@@ -1,7 +1,7 @@
 <div class="team-form-container">
   <h2 mat-dialog-title>
-    <mat-icon>add_circle</mat-icon>
-    Crear Nuevo Equipo
+    <mat-icon>sports_soccer</mat-icon>
+    Gestionar Equipos
   </h2>
 
   <mat-dialog-content>
@@ -19,90 +19,173 @@
       <p class="hint">Por favor, contacta al administrador o espera a que se creen nuevos torneos.</p>
     </div>
 
-    <!-- Team Form -->
-    <form [formGroup]="teamForm" *ngIf="!isLoadingTournaments && tournaments.length > 0" (ngSubmit)="onSubmit()" novalidate>
-      <div class="container-fluid">
-        <!-- Tournament Select -->
-        <div class="row mb-3">
-          <div class="col-12">
+    <!-- Tabs Structure -->
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="team-tabs" *ngIf="!isLoadingTournaments && tournaments.length > 0">
+      <!-- Tab 1: Equipo Existente -->
+      <mat-tab label="Equipo Existente">
+        <div class="tab-content">
+          <form [formGroup]="existingTeamForm">
+            <!-- Tournament Select -->
             <mat-form-field appearance="outline" class="w-100">
               <mat-label>Selecciona un Torneo</mat-label>
-              <mat-select formControlName="tournamentId" (selectionChange)="onTournamentChange($event.value)">
+              <mat-select formControlName="tournamentId" (selectionChange)="onExistingTournamentChange($event.value)">
                 <mat-option *ngFor="let tournament of tournaments" [value]="tournament.id">
                   {{ tournament.name }}
                 </mat-option>
               </mat-select>
               <mat-icon matSuffix>emoji_events</mat-icon>
-              <mat-hint>Selecciona el torneo donde participará el equipo</mat-hint>
-              <mat-error *ngIf="tournamentIdErrors">{{ tournamentIdErrors }}</mat-error>
+              <mat-hint>Selecciona el torneo donde registrar el equipo</mat-hint>
+              <mat-error *ngIf="existingTournamentIdErrors">{{ existingTournamentIdErrors }}</mat-error>
             </mat-form-field>
-          </div>
-        </div>
 
-        <!-- Category Select -->
-        <div class="row mb-3">
-          <div class="col-12">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Selecciona una Categoría</mat-label>
-              <mat-select formControlName="categoryId">
-                <mat-option *ngFor="let category of availableCategories" [value]="category.id">
-                  {{ category.name }}
-                </mat-option>
-              </mat-select>
-              <mat-icon matSuffix>category</mat-icon>
-              <mat-hint>Selecciona la categoría donde participará el equipo</mat-hint>
-              <mat-error *ngIf="categoryIdErrors">{{ categoryIdErrors }}</mat-error>
-            </mat-form-field>
-          </div>
-        </div>
+            <!-- Category Select -->
+            <div class="category-section">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Selecciona una Categoría</mat-label>
+                <mat-select formControlName="categoryId">
+                  <div *ngIf="isLoadingCategories" class="loading-option">
+                    <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                    <span>Cargando categorías...</span>
+                  </div>
+                  <mat-option *ngFor="let category of availableCategoriesExisting" [value]="category.id">
+                    {{ category.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix>category</mat-icon>
+                <mat-hint>Selecciona la categoría donde participará</mat-hint>
+                <mat-error *ngIf="existingCategoryErrors">{{ existingCategoryErrors }}</mat-error>
+              </mat-form-field>
+            </div>
+          </form>
 
-        <!-- Logo Upload -->
-        <div class="row mb-3">
-          <div class="col-12">
-            <label class="image-label">Logo del Equipo</label>
-            <app-image-uploader
-              formControlName="logo"
-              [maxFileSizeMB]="2"
-              [viewUploadText]="'Subir imagen del equipo'"
-              (imageUploaded)="onImageUploaded($event)">
-            </app-image-uploader>
+          <!-- Loading Teams -->
+          <div *ngIf="isLoadingTeams" class="loading-container">
+            <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+            <p>Cargando tus equipos...</p>
           </div>
-        </div>
 
-        <!-- Team Name -->
-        <div class="row mb-3">
-          <div class="col-12">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Nombre del Equipo</mat-label>
-              <input
-                matInput
-                formControlName="name"
-                placeholder="Ej: Real Madrid Club de Fútbol"
-                maxlength="100">
-              <mat-icon matSuffix>sports_soccer</mat-icon>
-              <mat-hint>Nombre completo del equipo (2-100 caracteres)</mat-hint>
-              <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
-            </mat-form-field>
+          <!-- No Teams Message -->
+          <div *ngIf="!isLoadingTeams && myTeams.length === 0" class="no-teams">
+            <mat-icon>info</mat-icon>
+            <p>No tienes equipos registrados aún.</p>
+            <p>Crea un nuevo equipo en la pestaña "Nuevo Equipo"</p>
           </div>
-        </div>
 
-        <!-- Short Name -->
-        <div class="row mb-3">
-          <div class="col-12">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Nombre Corto (Opcional)</mat-label>
-              <input
-                matInput
-                formControlName="shortName"
-                placeholder="Ej: RMA"
-                maxlength="100">
-              <mat-icon matSuffix>label</mat-icon>
-              <mat-hint>Abreviación del equipo (máximo 100 caracteres)</mat-hint>
-            </mat-form-field>
+          <!-- Teams List -->
+          <div *ngIf="!isLoadingTeams && myTeams.length > 0" class="teams-list">
+            <div
+              *ngFor="let team of myTeams"
+              class="team-card"
+              [class.selected]="existingTeamForm.get('teamId')?.value === team.id"
+              (click)="selectTeam(team.id)">
+              <div class="team-logo-container">
+                <img [src]="team.logoUrl || 'assets/logo.png'" [alt]="team.name" class="team-logo">
+              </div>
+              <div class="team-info">
+                <h4 class="team-name">{{ team.name }}</h4>
+                <p class="team-short-name" *ngIf="team.shortName">{{ team.shortName }}</p>
+              </div>
+              <mat-icon class="check-icon" *ngIf="existingTeamForm.get('teamId')?.value === team.id">check_circle</mat-icon>
+            </div>
+          </div>
+
+          <!-- Team Selection Error -->
+          <div *ngIf="!isLoadingTeams && myTeams.length > 0 && teamIdErrors" class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ teamIdErrors }}</span>
           </div>
         </div>
-      </div>
-    </form>
+      </mat-tab>
+
+      <!-- Tab 2: Nuevo Equipo -->
+      <mat-tab label="Nuevo Equipo">
+        <div class="tab-content">
+          <form [formGroup]="newTeamForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="container-fluid">
+              <!-- Tournament Select -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Selecciona un Torneo</mat-label>
+                    <mat-select formControlName="tournamentId" (selectionChange)="onTournamentChange($event.value)">
+                      <mat-option *ngFor="let tournament of tournaments" [value]="tournament.id">
+                        {{ tournament.name }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>emoji_events</mat-icon>
+                    <mat-hint>Selecciona el torneo donde participará el equipo</mat-hint>
+                    <mat-error *ngIf="tournamentIdErrors">{{ tournamentIdErrors }}</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Category Select -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Selecciona una Categoría</mat-label>
+                    <mat-select formControlName="categoryId">
+                      <mat-option *ngFor="let category of availableCategories" [value]="category.id">
+                        {{ category.name }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>category</mat-icon>
+                    <mat-hint>Selecciona la categoría donde participará el equipo</mat-hint>
+                    <mat-error *ngIf="categoryIdErrors">{{ categoryIdErrors }}</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Logo Upload -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label class="image-label">Logo del Equipo</label>
+                  <app-image-uploader
+                    formControlName="logo"
+                    [maxFileSizeMB]="2"
+                    [viewUploadText]="'Subir imagen del equipo'"
+                    (imageUploaded)="onImageUploaded($event)">
+                  </app-image-uploader>
+                </div>
+              </div>
+
+              <!-- Team Name -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Nombre del Equipo</mat-label>
+                    <input
+                      matInput
+                      formControlName="name"
+                      placeholder="Ej: Real Madrid Club de Fútbol"
+                      maxlength="100">
+                    <mat-icon matSuffix>sports_soccer</mat-icon>
+                    <mat-hint>Nombre completo del equipo (2-100 caracteres)</mat-hint>
+                    <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Short Name -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Nombre Corto (Opcional)</mat-label>
+                    <input
+                      matInput
+                      formControlName="shortName"
+                      placeholder="Ej: RMA"
+                      maxlength="100">
+                    <mat-icon matSuffix>label</mat-icon>
+                    <mat-hint>Abreviación del equipo (máximo 100 caracteres)</mat-hint>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="dialog-actions">
@@ -119,8 +202,11 @@
       type="submit"
       (click)="onSubmit()"
       *ngIf="!isLoadingTournaments && tournaments.length > 0"
-      [disabled]="isSubmitting || teamForm.invalid">
-      <span *ngIf="!isSubmitting">Crear Equipo</span>
+      [disabled]="isSubmitting || (selectedTabIndex === 0 && existingTeamForm.invalid) || (selectedTabIndex === 1 && newTeamForm.invalid)">
+      <span *ngIf="!isSubmitting">
+        <mat-icon>check</mat-icon>
+        {{ selectedTabIndex === 0 ? 'Registrar Equipo' : 'Crear Equipo' }}
+      </span>
       <span *ngIf="isSubmitting" class="loading-content">
         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
       </span>

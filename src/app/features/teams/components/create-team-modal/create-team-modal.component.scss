@@ -128,4 +128,144 @@
       }
     }
   }
+
+  // Estilos para tabs (copiados de register-team-modal)
+  .team-tabs {
+    .tab-content {
+      padding: 1.5rem 0;
+
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        gap: 1rem;
+
+        p {
+          color: #666;
+          margin: 0;
+        }
+      }
+
+      .no-teams {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        text-align: center;
+
+        mat-icon {
+          font-size: 4rem;
+          color: #999;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          margin: 0.5rem 0;
+          color: #666;
+        }
+      }
+
+      .teams-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .team-card {
+          display: flex;
+          align-items: center;
+          padding: 16px;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          &.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(25, 118, 210, 0.05);
+          }
+
+          .team-logo-container {
+            margin-right: 16px;
+
+            .team-logo {
+              width: 48px;
+              height: 48px;
+              border-radius: 8px;
+              object-fit: cover;
+            }
+          }
+
+          .team-info {
+            flex: 1;
+
+            .team-name {
+              font-weight: 600;
+              margin-bottom: 4px;
+            }
+
+            .team-short-name {
+              color: #666;
+              font-size: 0.875rem;
+            }
+          }
+
+          .check-icon {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+          }
+        }
+      }
+
+      .error-message {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        color: #f44336;
+        font-size: 0.875rem;
+
+        mat-icon {
+          font-size: 1rem;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+
+        .image-label {
+          display: block;
+          font-weight: 500;
+          color: rgba(0, 0, 0, 0.87);
+          margin-bottom: 0.75rem;
+          font-size: 0.875rem;
+        }
+      }
+
+      .category-section {
+        margin-bottom: 1.5rem;
+
+        mat-form-field {
+          width: 100%;
+        }
+
+        .loading-option {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 1rem;
+          color: #666;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
 }
