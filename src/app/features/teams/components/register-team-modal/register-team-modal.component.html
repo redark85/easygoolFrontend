@@ -17,6 +17,26 @@
       <!-- Tab 1: Equipo Existente -->
       <mat-tab label="Equipo Existente">
         <div class="tab-content">
+          <form [formGroup]="existingTeamForm">
+            <!-- Select de Categoría - Solo mostrar si hay token -->
+            <div class="category-section" *ngIf="data.tournamentToken">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Categoría del Torneo</mat-label>
+                <mat-select formControlName="categoryId">
+                  <div *ngIf="isLoadingCategories" class="loading-option">
+                    <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                    <span>Cargando categorías...</span>
+                  </div>
+                  <mat-option *ngFor="let category of categories" [value]="category.id">
+                    {{ category.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix>category</mat-icon>
+                <mat-error *ngIf="categoryErrors">{{ categoryErrors }}</mat-error>
+              </mat-form-field>
+            </div>
+          </form>
+
           <div *ngIf="isLoadingTeams" class="loading-container">
             <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
             <p>Cargando tus equipos...</p>
@@ -56,6 +76,22 @@
       <mat-tab label="Nuevo Equipo">
         <div class="tab-content">
           <form [formGroup]="newTeamForm">
+            <!-- Select de Categoría - Solo mostrar si hay token -->
+            <mat-form-field appearance="outline" class="w-100" *ngIf="data.tournamentToken">
+              <mat-label>Categoría del Torneo</mat-label>
+              <mat-select formControlName="categoryId">
+                <div *ngIf="isLoadingCategories" class="loading-option">
+                  <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                  <span>Cargando categorías...</span>
+                </div>
+                <mat-option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+              <mat-error *ngIf="categoryErrors">{{ categoryErrors }}</mat-error>
+            </mat-form-field>
+
             <!-- Logo Upload -->
             <div class="form-group">
               <label class="image-label">Logo del Equipo</label>

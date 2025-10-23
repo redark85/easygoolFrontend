@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
 import { TeamService as CoreTeamService, ToastService } from '@core/services';
-import { ManagerTeam } from '@core/models';
+import { ManagerTeam, TournamentCategory } from '@core/models';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { TeamService as TournamentTeamService } from '@features/tournaments/services/team.service';
 import { CreateTeamRequest } from '@features/tournaments/models/team.interface';
@@ -20,6 +20,7 @@ export interface RegisterTeamModalData {
   tournamentId: number;
   tournamentName: string;
   tournamentImageUrl: string;
+  tournamentToken?: string; // Token para obtener las categorías (opcional)
 }
 
 @Component({
@@ -45,7 +46,9 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
   existingTeamForm!: FormGroup;
   newTeamForm!: FormGroup;
   myTeams: ManagerTeam[] = [];
+  categories: TournamentCategory[] = [];
   isLoadingTeams = false;
+  isLoadingCategories = false;
   isSubmitting = false;
   selectedTabIndex = 0;
   private destroy$ = new Subject<void>();
@@ -62,6 +65,7 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForms();
     this.loadMyTeams();
+    this.loadCategories();
   }
 
   ngOnDestroy(): void {
@@ -72,14 +76,16 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
   private initializeForms(): void {
     // Formulario para equipo existente
     this.existingTeamForm = this.fb.group({
-      teamId: ['', Validators.required]
+      teamId: ['', Validators.required],
+      categoryId: ['', Validators.required]
     });
 
     // Formulario para nuevo equipo
     this.newTeamForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       shortName: ['', [Validators.maxLength(100)]],
-      logo: [null]
+      logo: [null],
+      categoryId: ['', Validators.required]
     });
   }
 
@@ -96,6 +102,57 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
           console.error('Error loading teams:', error);
           this.myTeams = [];
           this.isLoadingTeams = false;
+        }
+      });
+  }
+
+  private loadCategories(): void {
+    // Si no hay token, no cargar categorías y hacer el campo opcional
+    if (!this.data.tournamentToken) {
+      console.warn('No tournament token provided, categories will not be loaded');
+      this.categories = [];
+      this.isLoadingCategories = false;
+      
+      // Hacer el campo categoryId opcional si no hay categorías
+      this.existingTeamForm.get('categoryId')?.clearValidators();
+      this.existingTeamForm.get('categoryId')?.updateValueAndValidity();
+      this.newTeamForm.get('categoryId')?.clearValidators();
+      this.newTeamForm.get('categoryId')?.updateValueAndValidity();
+      return;
+    }
+
+    this.isLoadingCategories = true;
+    this.teamService.getTournamentCategories(this.data.tournamentToken)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories;
+          this.isLoadingCategories = false;
+          
+          // Seleccionar automáticamente la primera categoría si existe
+          if (categories.length > 0) {
+            const firstCategoryId = categories[0].id;
+            this.existingTeamForm.patchValue({ categoryId: firstCategoryId });
+            this.newTeamForm.patchValue({ categoryId: firstCategoryId });
+          } else {
+            // Si no hay categorías, hacer el campo opcional
+            this.existingTeamForm.get('categoryId')?.clearValidators();
+            this.existingTeamForm.get('categoryId')?.updateValueAndValidity();
+            this.newTeamForm.get('categoryId')?.clearValidators();
+            this.newTeamForm.get('categoryId')?.updateValueAndValidity();
+          }
+        },
+        error: (error) => {
+          console.error('Error loading categories:', error);
+          this.categories = [];
+          this.isLoadingCategories = false;
+          this.toastService.showError('Error al cargar las categorías del torneo');
+          
+          // En caso de error, hacer el campo opcional
+          this.existingTeamForm.get('categoryId')?.clearValidators();
+          this.existingTeamForm.get('categoryId')?.updateValueAndValidity();
+          this.newTeamForm.get('categoryId')?.clearValidators();
+          this.newTeamForm.get('categoryId')?.updateValueAndValidity();
         }
       });
   }
@@ -227,6 +284,22 @@ export class RegisterTeamModalComponent implements OnInit, OnDestroy {
     const control = this.existingTeamForm.get('teamId');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'Debes seleccionar un equipo';
+    }
+    return '';
+  }
+
+  get categoryErrors(): string {
+    // Si no hay token, no mostrar errores de categoría
+    if (!this.data.tournamentToken) {
+      return '';
+    }
+
+    const existingControl = this.existingTeamForm.get('categoryId');
+    const newControl = this.newTeamForm.get('categoryId');
+    const control = this.selectedTabIndex === 0 ? existingControl : newControl;
+    
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) return 'Debes seleccionar una categoría';
     }
     return '';
   }

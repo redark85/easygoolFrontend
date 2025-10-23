@@ -104,7 +104,8 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
     const dialogData: RegisterTeamModalData = {
       tournamentId: tournamentInfo.id,
       tournamentName: tournamentInfo.name,
-      tournamentImageUrl: tournamentInfo.imageUrl
+      tournamentImageUrl: tournamentInfo.imageUrl,
+      tournamentToken: this.tournamentToken || undefined // ✅ Agregando el token para mostrar categorías
     };
 
     const dialogRef = this.dialog.open(RegisterTeamModalComponent, {

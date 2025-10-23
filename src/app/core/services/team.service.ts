@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { ApiResponse } from '../models/api.interface';
-import { ManagerTeam, ManagerTeamsResponse } from '../models/team.interface';
+import { ManagerTeam, ManagerTeamsResponse, TournamentTokenValidationResult, TournamentCategory } from '../models/team.interface';
 import { MANAGER_GET_TEAMS_ENDPOINT, MANAGER_TOKEN_VALIDATION_ENDPOINT, MANAGER_GET_ALL_TEAMS_ENDPOINT, MANAGER_REGISTER_TOURNAMENT_TEAM_ENDPOINT } from '../config/endpoints';
 
 @Injectable({
@@ -27,17 +27,33 @@ export class TeamService {
   }
 
   /**
-   * Valida un token de torneo y obtiene información del torneo
+   * Valida un token de torneo y obtiene información del torneo incluyendo categorías
    * @param token Token del torneo a validar
-   * @returns Observable con la información del torneo
+   * @returns Observable con la información del torneo y sus categorías
    */
-  validateTournamentToken(token: string): Observable<{ id: number; name: string; imageUrl: string } | null> {
-    return this.apiService.get<ApiResponse<{ id: number; name: string; imageUrl: string }>>(`${MANAGER_TOKEN_VALIDATION_ENDPOINT}?token=${encodeURIComponent(token)}`).pipe(
+  validateTournamentToken(token: string): Observable<TournamentTokenValidationResult | null> {
+    return this.apiService.get<ApiResponse<TournamentTokenValidationResult>>(`${MANAGER_TOKEN_VALIDATION_ENDPOINT}?token=${encodeURIComponent(token)}`).pipe(
       map(response => {
         if (response.succeed && response.result) {
           return response.result;
         }
         return null;
+      })
+    );
+  }
+
+  /**
+   * Obtiene las categorías de un torneo específico usando el token
+   * @param token Token del torneo
+   * @returns Observable con las categorías del torneo
+   */
+  getTournamentCategories(token: string): Observable<TournamentCategory[]> {
+    return this.validateTournamentToken(token).pipe(
+      map(result => {
+        if (result && result.categories) {
+          return result.categories;
+        }
+        return [];
       })
     );
   }
