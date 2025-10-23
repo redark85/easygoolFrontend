@@ -20,7 +20,6 @@ import {
 export interface AddTeamPlayerRequest {
   playerId: number;
   tournamentTeamId: number;
-  isCapitan: boolean;
   position: string;
   jerseyNumber: number;
 }

@@ -108,8 +108,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       secondLastName: ['', [Validators.maxLength(50)]],
       identification: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20)]],
       position: ['', [Validators.required]],
-      jerseyNumber: ['', [Validators.required, Validators.min(1), Validators.max(99)]],
-      isCapitan: [false]
+      jerseyNumber: ['', [Validators.required, Validators.min(1), Validators.max(99)]]
     });
   }
 
@@ -127,8 +126,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
         secondLastName: player.secondLastName,
         identification: player.identification,
         position: player.position,
-        jerseyNumber: player.jerseyNumber,
-        isCapitan: player.isCapitan
+        jerseyNumber: player.jerseyNumber
       });
 
       // Cargar imagen si existe - usar setTimeout para asegurar que el componente esté listo
@@ -199,8 +197,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
               lastName: player.lastName,
               secondLastName: player.secondLastName,
               position: player.position,
-              jerseyNumber: player.jerseyNumber,
-              isCapitan: player.isCapitan
+              jerseyNumber: player.jerseyNumber
             });
 
             // Deshabilitar los campos de nombres
@@ -246,7 +243,6 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       secondLastName: '',
       position: '',
       jerseyNumber: '',
-      isCapitan: false,
       photo: ''
     });
 
@@ -297,7 +293,6 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     const addTeamPlayerRequest = {
       playerId: this.foundPlayerId,
       tournamentTeamId: this.data.tournamentTeamId,
-      isCapitan: formValue.isCapitan || false,
       position: formValue.position,
       jerseyNumber: parseInt(formValue.jerseyNumber, 10)
     };
@@ -343,7 +338,6 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       tournamentTeamId: this.data.tournamentTeamId,
       position: formValue.position,
       jerseyNumber: parseInt(formValue.jerseyNumber, 10),
-      isCapitan: formValue.isCapitan || false
     };
 
     this.playerService.createPlayer(createRequest).pipe(
@@ -382,8 +376,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       identification: formValue.identification.trim(),
       tournamentTeamId: this.data.tournamentTeamId,
       position: formValue.position,
-      jerseyNumber: parseInt(formValue.jerseyNumber, 10),
-      isCapitan: formValue.isCapitan || false
+      jerseyNumber: parseInt(formValue.jerseyNumber, 10)
     };
 
     // Solo incluir foto si se cambió
