@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -68,7 +68,7 @@ import { GroupFormData, GroupModalResult, CreateGroupRequest, UpdateGroupRequest
   styleUrls: ['./tournament-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TournamentManagementComponent implements OnInit, OnDestroy {
+export class TournamentManagementComponent implements OnInit, OnDestroy, AfterViewInit {
   tournament: TournamentDetail | null = null;
   phases: Phase[] = [];
   teams: Team[] = [];
@@ -79,6 +79,10 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
   registrationClosed = false; // Control para cerrar registro de equipos
   isUpdatingRegistration = false; // Estado de carga para el switch
   hasCategories = false; // Control para mostrar/ocultar tabs de Equipos y Partidos
+
+  // Referencias a componentes hijos
+  @ViewChild('teamsManagementComponent') teamsManagementComponent!: TeamsManagementComponent;
+  @ViewChild('matchesManagementComponent') matchesManagementComponent!: MatchesManagementComponent;
 
   private destroy$ = new Subject<void>();
 
@@ -107,6 +111,11 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tournaments']);
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Los ViewChild están disponibles después de AfterViewInit
+    console.log('🔗 Tournament-management ViewChild components initialized');
   }
 
   ngOnDestroy(): void {
@@ -144,6 +153,12 @@ export class TournamentManagementComponent implements OnInit, OnDestroy {
     
     // Resetear el índice del tab si es necesario
     this.resetTabIndexIfNeeded();
+    
+    // Si el tab de partidos está activo y hay categorías, refrescar datos
+    this.refreshMatchesIfActive('Categories Updated');
+    
+    // También refrescar equipos si el tab está activo
+    this.refreshTeamsIfActive('Categories Updated');
     
     this.cdr.detectChanges();
   }
@@ -835,6 +850,7 @@ trackByTeamId(index: number, team: Team): number {
    */
   onTabChange(event: any): void {
     this.selectedTabIndex = event.index;
+    console.log('🔄 Tab changed to index:', this.selectedTabIndex);
 
     // Ajustar índices según la visibilidad de tabs
     if (this.hasCategories) {
@@ -842,13 +858,17 @@ trackByTeamId(index: number, team: Team): number {
       switch (this.selectedTabIndex) {
         case 0:
           // Tab Categorías - se carga automáticamente en el componente hijo
+          console.log('📂 Categories tab activated');
           break;
         case 1:
-          // Tab Equipos - se carga automáticamente en el componente hijo
-          this.loadTeams();
+          // Tab Equipos - refrescar datos al activar
+          console.log('👥 Teams tab activated - refreshing data');
+          this.refreshTeamsIfActive('Tab Activation');
           break;
         case 2:
-          // Tab Partidos - se carga automáticamente en el componente hijo
+          // Tab Partidos - refrescar datos al activar
+          console.log('⚽ Matches tab activated - refreshing data');
+          this.refreshMatchesIfActive('Tab Activation');
           break;
         default:
           break;
@@ -858,6 +878,7 @@ trackByTeamId(index: number, team: Team): number {
       switch (this.selectedTabIndex) {
         case 0:
           // Tab Categorías - se carga automáticamente en el componente hijo
+          console.log('📂 Categories tab activated (no categories)');
           break;
         default:
           break;
@@ -876,6 +897,51 @@ trackByTeamId(index: number, team: Team): number {
       console.log('🔄 Reseteando tab index a 0 porque no hay categorías');
       this.selectedTabIndex = 0;
       this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Refresca los datos del componente teams-management si está activo
+   * @param context Contexto de la llamada para logging
+   */
+  private refreshTeamsIfActive(context: string): void {
+    // Verificar si el tab de equipos está activo
+    const isTeamsTabActive = this.hasCategories && this.selectedTabIndex === 1;
+    
+    if (isTeamsTabActive) {
+      console.log(`🔄 [${context}] Refreshing teams data`);
+      // Llamar al método loadTeams existente
+      this.loadTeams();
+    } else {
+      console.log(`⏭️ [${context}] Skipping teams refresh:`, {
+        isTeamsTabActive,
+        selectedTabIndex: this.selectedTabIndex,
+        hasCategories: this.hasCategories
+      });
+    }
+  }
+
+  /**
+   * Refresca los datos del componente matches-management si está activo
+   * @param context Contexto de la llamada para logging
+   */
+  private refreshMatchesIfActive(context: string): void {
+    // Verificar si el tab de partidos está activo
+    const isMatchesTabActive = this.hasCategories && this.selectedTabIndex === 2;
+    
+    if (isMatchesTabActive && this.matchesManagementComponent) {
+      console.log(`🔄 [${context}] Refreshing matches-management data`);
+      // Usar setTimeout para asegurar que el componente esté completamente inicializado
+      setTimeout(() => {
+        this.matchesManagementComponent.refreshData(true);
+      }, 100);
+    } else {
+      console.log(`⏭️ [${context}] Skipping matches refresh:`, {
+        isMatchesTabActive,
+        hasMatchesComponent: !!this.matchesManagementComponent,
+        selectedTabIndex: this.selectedTabIndex,
+        hasCategories: this.hasCategories
+      });
     }
   }
 

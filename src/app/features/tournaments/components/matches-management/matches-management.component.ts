@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -49,7 +49,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./matches-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges {
+export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
   @Input() tournamentId!: number;
   @Input() phases: Phase[] = [];
   @Input() teams: Team[] = [];
@@ -76,6 +76,12 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   matchStatusType = MatchStatusType;
   private destroy$ = new Subject<void>();
 
+  // Control de actualización automática
+  private isViewActive = false;
+  private lastDataRefresh = 0;
+  private readonly REFRESH_INTERVAL = 30000; // 30 segundos
+  private hasInitialLoad = false;
+
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -88,8 +94,16 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   ngOnInit(): void {
     console.log('🚀 Initializing matches-management with tournamentId:', this.tournamentId);
     if (this.tournamentId) {
-      this.loadCategories();
+      this.performInitialLoad();
     }
+  }
+
+  ngAfterViewInit(): void {
+    // Marcar la vista como activa después de la inicialización
+    setTimeout(() => {
+      this.isViewActive = true;
+      console.log('📱 Matches-management view is now active');
+    }, 100);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -97,7 +111,7 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     if (changes['tournamentId'] && this.tournamentId) {
       console.log('🔄 Tournament ID changed, reloading categories:', this.tournamentId);
       this.resetAllSelections();
-      this.loadCategories();
+      this.performInitialLoad();
     }
   }
 
@@ -147,6 +161,44 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
+   * Carga las categorías del torneo con restauración de selecciones previas
+   */
+  private loadCategoriesWithRestore(previousSelections: {categoryId: number | null, phaseId: number | null, groupId: number | null}): void {
+    console.log('📂 Loading categories with restore for tournament:', this.tournamentId, previousSelections);
+    this.loadingCategories = true;
+
+    this.categoryService.getCategoriesByTournament(this.tournamentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => {
+          console.log('✅ Categories loaded for restore:', categories.length);
+          this.categories = categories;
+          this.loadingCategories = false;
+
+          // Intentar restaurar selección previa o seleccionar primera categoría
+          if (categories.length > 0) {
+            const categoryToSelect = previousSelections.categoryId && 
+              categories.find(c => c.categoryId === previousSelections.categoryId) 
+              ? previousSelections.categoryId 
+              : categories[0].categoryId;
+
+            console.log('🎯 Restoring/selecting category:', categoryToSelect);
+            this.selectedCategoryId = categoryToSelect;
+            this.onCategoryChangeWithRestore(categoryToSelect, previousSelections);
+          }
+
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('❌ Error loading categories for restore:', error);
+          this.loadingCategories = false;
+          this.categories = [];
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
    * Maneja el cambio de categoría seleccionada
    */
   onCategoryChange(categoryId: number): void {
@@ -174,6 +226,42 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
     }
     
     // Forzar detección de cambios después de actualizar las selecciones
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Maneja el cambio de categoría con restauración de selecciones previas
+   */
+  private onCategoryChangeWithRestore(categoryId: number, previousSelections: {categoryId: number | null, phaseId: number | null, groupId: number | null}): void {
+    console.log('📂 Category changed with restore to:', categoryId, previousSelections);
+    this.selectedCategoryId = categoryId;
+    this.availableGroups = [];
+    this.matchDays = [];
+    this.loading = false;
+
+    // Obtener fases de la categoría seleccionada
+    const selectedCategory = this.categories.find(c => c.categoryId === categoryId);
+    if (selectedCategory && selectedCategory.phases) {
+      this.availablePhases = selectedCategory.phases;
+      console.log('🎯 Available phases for category restore:', this.availablePhases.length);
+
+      // Intentar restaurar fase previa o seleccionar primera
+      if (this.availablePhases.length > 0) {
+        const phaseToSelect = previousSelections.phaseId && 
+          this.availablePhases.find(p => p.id === previousSelections.phaseId) 
+          ? previousSelections.phaseId 
+          : this.availablePhases[0].id;
+
+        console.log('🎯 Restoring/selecting phase:', phaseToSelect);
+        this.selectedPhaseId = phaseToSelect;
+        this.onPhaseChangeWithRestore(phaseToSelect, previousSelections);
+      }
+    } else {
+      this.availablePhases = [];
+      this.selectedPhaseId = null;
+      this.selectedGroupId = null;
+    }
+    
     this.cdr.detectChanges();
   }
 
@@ -212,6 +300,46 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
+   * Maneja el cambio de fase con restauración de selecciones previas
+   */
+  private onPhaseChangeWithRestore(phaseId: number, previousSelections: {categoryId: number | null, phaseId: number | null, groupId: number | null}): void {
+    console.log('🎯 Phase changed with restore to:', phaseId, previousSelections);
+    this.selectedPhaseId = phaseId;
+    this.matchDays = [];
+    this.loading = false;
+
+    // Obtener grupos de la fase seleccionada
+    const selectedPhase = this.availablePhases.find(p => p.id === phaseId);
+    if (selectedPhase) {
+      const phaseGroups = this.getPhaseGroups(selectedPhase);
+      this.availableGroups = phaseGroups;
+      console.log('👥 Available groups for phase restore:', this.availableGroups.length);
+
+      if (phaseGroups.length > 0) {
+        // Intentar restaurar grupo previo o seleccionar primero
+        const groupToSelect = previousSelections.groupId && 
+          phaseGroups.find(g => g.id === previousSelections.groupId) 
+          ? previousSelections.groupId 
+          : phaseGroups[0].id;
+
+        console.log('👥 Restoring/selecting group:', groupToSelect);
+        this.selectedGroupId = groupToSelect;
+        this.onGroupChange(groupToSelect);
+      } else if (selectedPhase.phaseType === PhaseType.Knockout) {
+        // Fase eliminatoria sin grupos - cargar partidos directamente
+        console.log('🏆 Knockout phase without groups, loading matches by phase');
+        this.selectedGroupId = null;
+        this.loadMatchesByPhase(phaseId);
+      }
+    } else {
+      this.availableGroups = [];
+      this.selectedGroupId = null;
+    }
+    
+    this.cdr.detectChanges();
+  }
+
+  /**
    * Maneja el cambio de grupo seleccionado
    */
   onGroupChange(groupId: number): void {
@@ -225,8 +353,63 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnDestroy(): void {
+    this.isViewActive = false;
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Método público para refrescar datos desde el componente padre
+   * Se llama cuando el tab se activa o cuando hay cambios externos
+   */
+  public refreshData(force: boolean = false): void {
+    if (!this.isViewActive && !force) {
+      console.log('⏸️ View not active, skipping refresh');
+      return;
+    }
+
+    const now = Date.now();
+    const timeSinceLastRefresh = now - this.lastDataRefresh;
+
+    // Solo refrescar si ha pasado suficiente tiempo o es forzado
+    if (force || timeSinceLastRefresh > this.REFRESH_INTERVAL || !this.hasInitialLoad) {
+      console.log('🔄 Refreshing matches-management data...', {
+        force,
+        timeSinceLastRefresh,
+        hasInitialLoad: this.hasInitialLoad
+      });
+      
+      this.performDataRefresh();
+      this.lastDataRefresh = now;
+    } else {
+      console.log('⏭️ Skipping refresh - too recent:', timeSinceLastRefresh + 'ms');
+    }
+  }
+
+  /**
+   * Realiza la carga inicial de datos
+   */
+  private performInitialLoad(): void {
+    console.log('🎯 Performing initial data load');
+    this.loadCategories();
+    this.hasInitialLoad = true;
+  }
+
+  /**
+   * Realiza el refresco inteligente de datos
+   */
+  private performDataRefresh(): void {
+    console.log('🔄 Performing intelligent data refresh');
+    
+    // Guardar selecciones actuales
+    const currentSelections = {
+      categoryId: this.selectedCategoryId,
+      phaseId: this.selectedPhaseId,
+      groupId: this.selectedGroupId
+    };
+
+    // Recargar categorías y restaurar selecciones si es posible
+    this.loadCategoriesWithRestore(currentSelections);
   }
 
 

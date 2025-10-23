@@ -203,6 +203,7 @@
 
         <div class="tab-content">
           <app-teams-management
+            #teamsManagementComponent
             [tournamentId]="tournamentId"
             [teams]="teams"
             (teamsUpdated)="onTeamsUpdated($event)">
@@ -219,6 +220,7 @@
 
         <div class="tab-content">
           <app-matches-management
+            #matchesManagementComponent
             [tournamentId]="tournamentId"
             [phases]="phases"
             [teams]="teams">
