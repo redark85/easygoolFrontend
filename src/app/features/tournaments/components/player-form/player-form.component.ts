@@ -160,8 +160,8 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     const identificationControl = this.playerForm.get('identification');
     const identificationNumber = identificationControl?.value?.trim();
 
-    // Solo buscar si hay un valor y no estamos en modo edición
-    if (!identificationNumber || this.isEdit) {
+    // Solo buscar si hay un valor
+    if (!identificationNumber) {
       return;
     }
 
@@ -170,49 +170,68 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // En modo edición, solo validar si la identificación ha cambiado
+    if (this.isEdit && this.data.player && identificationNumber === this.data.player.identification) {
+      return; // No validar si es la misma identificación del jugador actual
+    }
+
     // Llamar al servicio para buscar el jugador
     this.playerService.getPlayerByIdentification(identificationNumber)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (player) => {
           if (player) {
-            // Si se encuentra un jugador, autocompletar el formulario
             console.log('Jugador encontrado:', player);
-            this.isPlayerFound = true;
-            this.foundPlayerId = player.id; // Guardar el ID del jugador encontrado
             
-            // Mostrar mensaje de éxito
-            Swal.fire({
-              title: '¡Jugador encontrado!',
-              text: `Hemos encontrado un jugador en nuestro sistema con el número de identificación ingresado.`,
-              icon: 'success',
-              timer: 5000,
-              showConfirmButton: false
-            });
+            if (this.isEdit) {
+              // En modo edición, mostrar advertencia de identificación duplicada
+              Swal.fire({
+                title: '¡Identificación ya existe!',
+                text: `Ya existe otro jugador con esta identificación: ${player.name} ${player.lastName}. Por favor, verifica el número ingresado.`,
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+              });
+              
+              // Marcar el campo como inválido
+              identificationControl?.setErrors({ 'duplicated': true });
+              this.cdr.detectChanges();
+            } else {
+              // En modo creación, autocompletar el formulario
+              this.isPlayerFound = true;
+              this.foundPlayerId = player.id;
+              
+              // Mostrar mensaje de éxito
+              Swal.fire({
+                title: '¡Jugador encontrado!',
+                text: `Hemos encontrado un jugador en nuestro sistema con el número de identificación ingresado.`,
+                icon: 'success',
+                timer: 5000,
+                showConfirmButton: false
+              });
 
-            // Autocompletar el formulario
-            this.playerForm.patchValue({
-              name: player.name,
-              secondName: player.secondName,
-              lastName: player.lastName,
-              secondLastName: player.secondLastName,
-              position: player.position,
-              jerseyNumber: player.jerseyNumber
-            });
+              // Autocompletar el formulario
+              this.playerForm.patchValue({
+                name: player.name,
+                secondName: player.secondName,
+                lastName: player.lastName,
+                secondLastName: player.secondLastName,
+                position: player.position,
+                jerseyNumber: player.jerseyNumber
+              });
 
-            // Deshabilitar los campos de nombres
-            this.playerForm.get('name')?.disable();
-            this.playerForm.get('secondName')?.disable();
-            this.playerForm.get('lastName')?.disable();
-            
-            this.playerForm.get('secondLastName')?.disable();
+              // Deshabilitar los campos de nombres
+              this.playerForm.get('name')?.disable();
+              this.playerForm.get('secondName')?.disable();
+              this.playerForm.get('lastName')?.disable();
+              this.playerForm.get('secondLastName')?.disable();
 
-            // Cargar la foto si existe
-            if (player.photoUrl) {
-              setTimeout(() => {
-                this.playerForm.get('photo')?.setValue(player.photoUrl);
-                this.cdr.detectChanges();
-              }, 100);
+              // Cargar la foto si existe
+              if (player.photoUrl) {
+                setTimeout(() => {
+                  this.playerForm.get('photo')?.setValue(player.photoUrl);
+                  this.cdr.detectChanges();
+                }, 100);
+              }
             }
           } else {
             // No se encontró jugador, limpiar y habilitar campos
@@ -222,11 +241,23 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          // No se encontró jugador, limpiar y habilitar campos
+          // No se encontró jugador
           console.log('No se encontró jugador con esa identificación');
-          this.isPlayerFound = false;
-          this.foundPlayerId = null;
-          this.clearAndEnableFields();
+          
+          if (this.isEdit) {
+            // En modo edición, limpiar errores de duplicación si los había
+            if (identificationControl?.hasError('duplicated')) {
+              const currentErrors = identificationControl.errors;
+              delete currentErrors!['duplicated'];
+              const hasOtherErrors = Object.keys(currentErrors!).length > 0;
+              identificationControl.setErrors(hasOtherErrors ? currentErrors : null);
+            }
+          } else {
+            // En modo creación, limpiar y habilitar campos
+            this.isPlayerFound = false;
+            this.foundPlayerId = null;
+            this.clearAndEnableFields();
+          }
         }
       });
   }
@@ -457,6 +488,7 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
       if (control.errors['required']) return 'La identificación es requerida';
       if (control.errors['minlength']) return 'La identificación debe tener al menos 8 caracteres';
       if (control.errors['maxlength']) return 'La identificación no puede exceder 20 caracteres';
+      if (control.errors['duplicated']) return 'Ya existe otro jugador con esta identificación';
     }
     return null;
   }
