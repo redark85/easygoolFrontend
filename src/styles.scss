@@ -624,55 +624,11 @@ html, body {
   background-color: rgba(0, 0, 0, 0.32) !important;
 }
 
-// SOLUCIÓN DEFINITIVA PARA MAT-SELECT - CONFIGURACIÓN COMPLETA
-// Remover todas las configuraciones anteriores y usar una aproximación más directa
-
-// 1. Backdrop del select - DEBE ser clickeable y transparente
-.cdk-overlay-backdrop {
-  // Para TODOS los backdrops, asegurar que sean clickeables
+// Backdrop específico para select
+.cdk-overlay-backdrop.mat-select-backdrop {
+  z-index: 1100 !important;
   pointer-events: auto !important;
-  
-  // Específicamente para mat-select
-  &.mat-select-backdrop {
-    background-color: transparent !important;
-    z-index: 1000 !important;
-  }
-}
-
-// 2. Panel del select - configuración específica
-.mat-select-panel {
-  z-index: 1001 !important;
-  pointer-events: auto !important;
-  max-height: 256px !important;
-}
-
-// 3. SOLUCIÓN CRÍTICA: Configurar el overlay pane correctamente
-.cdk-overlay-pane {
-  // Por defecto, el pane NO debe interceptar eventos
-  pointer-events: none !important;
-}
-
-// 4. Solo elementos específicos dentro del pane deben capturar eventos
-.cdk-overlay-pane .mat-select-panel,
-.cdk-overlay-pane .mat-datepicker-popup,
-.cdk-overlay-pane .mat-menu-panel,
-.cdk-overlay-pane .mat-dialog-container {
-  pointer-events: auto !important;
-}
-
-// 5. Configuración específica para el contenedor conectado
-.cdk-overlay-connected-position-bounding-box {
-  pointer-events: none !important;
-}
-
-// 6. Asegurar que el trigger del select funcione
-.mat-select-trigger {
-  pointer-events: auto !important;
-}
-
-// 7. Configuración global para mat-select
-.mat-select {
-  pointer-events: auto !important;
+  background-color: transparent !important;
 }
 
 // Clases personalizadas para el modal de fecha/hora
