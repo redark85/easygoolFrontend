@@ -79,18 +79,48 @@
           width: 100%;
           background-color: white;
 
-          .player-photo {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #f5f5f5;
+          .photo-container {
+            position: relative;
+            display: inline-block;
+
+            .player-photo {
+              width: 48px;
+              height: 48px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 2px solid #f5f5f5;
+            }
+
+            .captain-badge {
+              position: absolute;
+              bottom: -4px;
+              right: -4px;
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+              color: #ffd700;
+              background: white;
+              border-radius: 50%;
+              padding: 2px;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
           }
 
           .player-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
             .player-name {
               font-weight: 500;
               color: #1a1a1a;
+            }
+
+            .captain-icon {
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+              color: #ffd700;
             }
           }
 
@@ -153,10 +183,41 @@
 
           .player-row {
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.3s ease;
 
             &:hover {
               background-color: #f5f5f5;
+            }
+
+            &.captain-row {
+              background: linear-gradient(90deg, 
+                rgba(255, 215, 0, 0.08) 0%, 
+                rgba(255, 215, 0, 0.04) 50%, 
+                rgba(255, 215, 0, 0.08) 100%);
+              border-left: 4px solid #ffd700;
+              position: relative;
+
+              &::before {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background: linear-gradient(180deg, #ffd700 0%, #ffed4e 100%);
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+              }
+
+              &:hover {
+                background: linear-gradient(90deg, 
+                  rgba(255, 215, 0, 0.12) 0%, 
+                  rgba(255, 215, 0, 0.06) 50%, 
+                  rgba(255, 215, 0, 0.12) 100%);
+                box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+              }
+
+              td {
+                font-weight: 500;
+              }
             }
           }
 

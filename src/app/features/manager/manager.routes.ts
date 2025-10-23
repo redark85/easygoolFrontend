@@ -17,7 +17,7 @@ export const managerRoutes: Routes = [
     title: 'Información del Equipo - Manager'
   },
   {
-    path: 'team-players',
+    path: 'team-players/:teamId',
     loadComponent: () => import('./components/my-team/team-players/team-players.component').then(c => c.TeamPlayersComponent),
     title: 'Gestión de Jugadores - Manager'
   },

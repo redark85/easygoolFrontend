@@ -14,21 +14,43 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { Subject, takeUntil, debounceTime } from 'rxjs';
+import { Subject, takeUntil, debounceTime, finalize } from 'rxjs';
+import { ApiService, ToastService } from '@core/services';
+import { MANAGER_GET_PLAYER_LIST_ENDPOINT, PLAYER_SET_AS_TEAM_CAPITAN_ENDPOINT } from '@core/config/endpoints';
+import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
+
+// Enum de estados de jugadores
+enum TournamentTeamPlayerStatusType {
+  Active = 0,      // Activo
+  Suspended = 1,   // Suspendido varios partidos
+  Deleted = 2,     // Eliminado lógico
+  Expelled = 3,    // Expulsado del torneo
+  Injured = 4      // Lesionado
+}
 
 interface Player {
-  id: number;
-  photo: string;
-  name: string;
-  lastName: string;
+  tournamentTeamPlayerId: number;
+  playerId: number;
+  imageUrl: string;
+  fullName: string;
   position: string;
   jerseyNumber: number;
-  status: 'active' | 'injured' | 'suspended';
+  status: TournamentTeamPlayerStatusType;
   goals: number;
-  assists: number;
+  penalties: number;
   yellowCards: number;
   redCards: number;
-  matchesPlayed: number;
+  isCapitan: boolean;
+}
+
+interface PlayerListResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: Player[];
+  records: number;
 }
 
 /**
@@ -79,89 +101,39 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
 
   statuses = [
     { value: 'all', label: 'Todos los Estados' },
-    { value: 'active', label: 'Activo' },
-    { value: 'injured', label: 'Lesionado' },
-    { value: 'suspended', label: 'Suspendido' }
+    { value: TournamentTeamPlayerStatusType.Active, label: 'Activo' },
+    { value: TournamentTeamPlayerStatusType.Injured, label: 'Lesionado' },
+    { value: TournamentTeamPlayerStatusType.Suspended, label: 'Suspendido' },
+    { value: TournamentTeamPlayerStatusType.Expelled, label: 'Expulsado' },
+    { value: TournamentTeamPlayerStatusType.Deleted, label: 'Eliminado' }
   ];
 
-  players: Player[] = [
-    {
-      id: 1,
-      photo: 'assets/person.jpg',
-      name: 'Juan Carlos',
-      lastName: 'García López',
-      position: 'Delantero',
-      jerseyNumber: 9,
-      status: 'active',
-      goals: 8,
-      assists: 5,
-      yellowCards: 2,
-      redCards: 0,
-      matchesPlayed: 10
-    },
-    {
-      id: 2,
-      photo: 'assets/person.jpg',
-      name: 'Pedro',
-      lastName: 'Martínez Ruiz',
-      position: 'Mediocampista',
-      jerseyNumber: 10,
-      status: 'active',
-      goals: 5,
-      assists: 7,
-      yellowCards: 3,
-      redCards: 0,
-      matchesPlayed: 10
-    },
-    {
-      id: 3,
-      photo: 'assets/person.jpg',
-      name: 'Carlos',
-      lastName: 'Rodríguez Pérez',
-      position: 'Defensa',
-      jerseyNumber: 4,
-      status: 'suspended',
-      goals: 1,
-      assists: 2,
-      yellowCards: 5,
-      redCards: 1,
-      matchesPlayed: 9
-    },
-    {
-      id: 4,
-      photo: 'assets/person.jpg',
-      name: 'Miguel',
-      lastName: 'Hernández Silva',
-      position: 'Portero',
-      jerseyNumber: 1,
-      status: 'active',
-      goals: 0,
-      assists: 0,
-      yellowCards: 1,
-      redCards: 0,
-      matchesPlayed: 10
-    },
-    {
-      id: 5,
-      photo: 'assets/person.jpg',
-      name: 'Luis',
-      lastName: 'González Torres',
-      position: 'Delantero',
-      jerseyNumber: 7,
-      status: 'injured',
-      goals: 6,
-      assists: 3,
-      yellowCards: 1,
-      redCards: 0,
-      matchesPlayed: 8
-    }
-  ];
+  tournamentTeamId: number = 0;
+  isLoading = false;
+
+  players: Player[] = [];
 
   private destroy$ = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private apiService: ApiService,
+    private toastService: ToastService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    // Obtener tournamentTeamId de la ruta o de algún servicio
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const id = params.get('teamId');
+        if (id) {
+          this.tournamentTeamId = +id;
+          this.loadPlayers();
+        }
+      });
+    
     this.initDataSource();
     this.setupFilters();
   }
@@ -169,6 +141,49 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Carga los jugadores desde el API
+   */
+  private loadPlayers(): void {
+    if (!this.tournamentTeamId) {
+      console.warn('No hay tournamentTeamId disponible');
+      return;
+    }
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    this.apiService.get<PlayerListResponse>(
+      `${MANAGER_GET_PLAYER_LIST_ENDPOINT}/${this.tournamentTeamId}`
+    )
+    .pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (response) => {
+        if (response.succeed && response.result) {
+          this.players = response.result;
+          this.dataSource.data = this.players;
+          console.log('Jugadores cargados:', this.players);
+        } else {
+          this.toastService.showWarning(response.message || 'No se pudieron cargar los jugadores');
+          this.players = [];
+          this.dataSource.data = [];
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar jugadores:', error);
+        this.toastService.showError('Error al cargar los jugadores del equipo');
+        this.players = [];
+        this.dataSource.data = [];
+      }
+    });
   }
 
   /**
@@ -182,8 +197,7 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
     // Custom filter predicate
     this.dataSource.filterPredicate = (data: Player, filter: string) => {
       const searchTerm = filter.toLowerCase();
-      const fullName = `${data.name} ${data.lastName}`.toLowerCase();
-      return fullName.includes(searchTerm) || 
+      return data.fullName.toLowerCase().includes(searchTerm) || 
              data.position.toLowerCase().includes(searchTerm) ||
              data.jerseyNumber.toString().includes(searchTerm);
     };
@@ -228,8 +242,7 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
     const searchTerm = this.searchControl.value?.toLowerCase() || '';
     if (searchTerm) {
       filteredData = filteredData.filter(player => {
-        const fullName = `${player.name} ${player.lastName}`.toLowerCase();
-        return fullName.includes(searchTerm) ||
+        return player.fullName.toLowerCase().includes(searchTerm) ||
                player.position.toLowerCase().includes(searchTerm) ||
                player.jerseyNumber.toString().includes(searchTerm);
       });
@@ -244,7 +257,7 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
     // Status filter
     const status = this.statusFilter.value;
     if (status && status !== 'all') {
-      filteredData = filteredData.filter(player => player.status === status);
+      filteredData = filteredData.filter(player => player.status === +status);
     }
 
     this.dataSource.data = filteredData;
@@ -254,11 +267,13 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
   /**
    * Obtiene el color del estado
    */
-  getStatusColor(status: string): string {
-    const colors: { [key: string]: string } = {
-      active: 'primary',
-      injured: 'warn',
-      suspended: 'accent'
+  getStatusColor(status: TournamentTeamPlayerStatusType): string {
+    const colors: { [key: number]: string } = {
+      [TournamentTeamPlayerStatusType.Active]: 'primary',
+      [TournamentTeamPlayerStatusType.Injured]: 'warn',
+      [TournamentTeamPlayerStatusType.Suspended]: 'accent',
+      [TournamentTeamPlayerStatusType.Expelled]: 'warn',
+      [TournamentTeamPlayerStatusType.Deleted]: 'accent'
     };
     return colors[status] || 'primary';
   }
@@ -266,13 +281,15 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
   /**
    * Obtiene el label del estado
    */
-  getStatusLabel(status: string): string {
-    const labels: { [key: string]: string } = {
-      active: 'Activo',
-      injured: 'Lesionado',
-      suspended: 'Suspendido'
+  getStatusLabel(status: TournamentTeamPlayerStatusType): string {
+    const labels: { [key: number]: string } = {
+      [TournamentTeamPlayerStatusType.Active]: 'Activo',
+      [TournamentTeamPlayerStatusType.Injured]: 'Lesionado',
+      [TournamentTeamPlayerStatusType.Suspended]: 'Suspendido',
+      [TournamentTeamPlayerStatusType.Expelled]: 'Expulsado',
+      [TournamentTeamPlayerStatusType.Deleted]: 'Eliminado'
     };
-    return labels[status] || status;
+    return labels[status] || 'Desconocido';
   }
 
   /**
@@ -295,7 +312,7 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
    * Marcar como lesionado
    */
   onMarkAsInjured(player: Player): void {
-    player.status = 'injured';
+    player.status = TournamentTeamPlayerStatusType.Injured;
     this.cdr.detectChanges();
     // TODO: Guardar cambio en el servicio
   }
@@ -304,9 +321,69 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
    * Marcar como activo
    */
   onMarkAsActive(player: Player): void {
-    player.status = 'active';
+    player.status = TournamentTeamPlayerStatusType.Active;
     this.cdr.detectChanges();
     // TODO: Guardar cambio en el servicio
+  }
+
+  /**
+   * Marcar jugador como capitán
+   */
+  onSetAsCapitan(player: Player): void {
+    Swal.fire({
+      title: '¿Marcar como Capitán?',
+      html: `
+        <p>¿Estás seguro de que deseas marcar a <strong>${player.fullName}</strong> como capitán del equipo?</p>
+        <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+          Si ya existe un capitán, será reemplazado automáticamente.
+        </p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, marcar como capitán',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#1976d2',
+      cancelButtonColor: '#666'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.setAsCapitan(player);
+      }
+    });
+  }
+
+  /**
+   * Llama al servicio para marcar como capitán
+   */
+  private setAsCapitan(player: Player): void {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    this.apiService.post(
+      `${PLAYER_SET_AS_TEAM_CAPITAN_ENDPOINT}/${player.tournamentTeamPlayerId}`,
+      {}
+    )
+    .pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (response: any) => {
+        if (response.succeed) {
+          this.toastService.showSuccess('Capitán asignado correctamente');
+          // Recargar la lista de jugadores
+          this.loadPlayers();
+        } else {
+          this.toastService.showWarning(response.message || 'No se pudo asignar el capitán');
+        }
+      },
+      error: (error) => {
+        console.error('Error al asignar capitán:', error);
+        this.toastService.showError('Error al asignar el capitán del equipo');
+      }
+    });
   }
 
   /**
