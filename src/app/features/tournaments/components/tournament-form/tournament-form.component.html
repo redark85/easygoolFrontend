@@ -71,7 +71,8 @@
               <mat-label>Ubicación del Torneo</mat-label>
               <input matInput formControlName="location"
                      placeholder="Escribe una dirección o selecciona en el mapa"
-                     maxlength="250">
+                     maxlength="250"
+                     (input)="onLocationInputChange($event)">
               <button mat-icon-button matSuffix type="button" (click)="openLocationModal()"
                       matTooltip="Seleccionar ubicación en el mapa">
                 <mat-icon>location_on</mat-icon>

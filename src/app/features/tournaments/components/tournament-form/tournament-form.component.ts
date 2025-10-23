@@ -14,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImageUploaderComponent, ImageUploadData } from '@shared/components/image-uploader/image-uploader.component';
 import { LocationMapComponent, LocationData } from '@shared/components/location-map/location-map.component';
 import { TournamentService } from '../../services/tournament.service';
-import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType } from '../../models/tournament.interface';
+import { CreateTournamentRequest, UpdateTournamentRequest, TournamentModality, Tournament, TournamentStatusType, Address } from '../../models/tournament.interface';
 import { dateRangeValidator } from '@shared/validators/date-range.validator';
 import { convertCloudinaryToHttps } from '@shared/utils/url.utils';
 
@@ -161,6 +161,9 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
         cleanImageContentType = cleanImageContentType.replace('image/', '');
       }
 
+      // Construir objeto address según el escenario
+      const addressData = this.buildAddressData(formValue.location);
+
       if (this.isEditMode && this.data.tournament) {
         // Modo edición - usar updateTournament
         const updateData: UpdateTournamentRequest = {
@@ -171,13 +174,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
           allowTeamRegistration: this.data.tournament.status === TournamentStatusType.Active,
           imageBase64: cleanImageBase64,
           imageContentType: cleanImageContentType,
-          address: this.selectedLocationData ? {
-            address: formValue.location || '',
-            mainStreet: this.selectedLocationData.primaryStreet || '',
-            secondStreet: this.selectedLocationData.secondaryStreet || '',
-            latitude: this.selectedLocationData.latitude.toString() || '0',
-            longitude: this.selectedLocationData.longitude.toString() || '0'
-          } : undefined
+          address: addressData
         };
 
         // Solo agregar endDate si no está vacío
@@ -187,6 +184,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
 
         console.log('Sending updateData:', updateData);
         console.log('selectedLocationData at send:', this.selectedLocationData);
+        console.log('Built addressData:', addressData);
 
         this.tournamentService.updateTournament(this.data.tournament.id, updateData).subscribe({
           next: (response) => {
@@ -208,13 +206,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
           imageContentType: cleanImageContentType,
           hasPenaltyMode: false, // Default value
           modality: formValue.modality!,
-          address: this.selectedLocationData ? {
-            address: formValue.location || '',
-            mainStreet: this.selectedLocationData.primaryStreet || '',
-            secondStreet: this.selectedLocationData.secondaryStreet || '',
-            latitude: this.selectedLocationData.latitude.toString() || '0',
-            longitude: this.selectedLocationData.longitude.toString() || '0'
-          } : undefined
+          address: addressData
         };
 
         // Solo agregar endDate si no está vacío
@@ -224,6 +216,7 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
 
         console.log('Sending tournamentData:', tournamentData);
         console.log('selectedLocationData at create:', this.selectedLocationData);
+        console.log('Built addressData:', addressData);
 
         this.tournamentService.createTournament(tournamentData).subscribe({
           next: (response) => {
@@ -280,6 +273,23 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
   }
 
   /**
+   * Maneja los cambios en el input de ubicación
+   * Si el usuario borra el texto manualmente, limpia selectedLocationData
+   */
+  onLocationInputChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const currentValue = inputElement.value;
+    
+    // Si el input está vacío o solo tiene espacios, limpiar selectedLocationData
+    if (!currentValue || !currentValue.trim()) {
+      if (this.selectedLocationData) {
+        console.log('🗑️ Texto de ubicación borrado manualmente, limpiando selectedLocationData');
+        this.selectedLocationData = null;
+      }
+    }
+  }
+
+  /**
    * Abre el modal de selección de ubicación
    */
   openLocationModal(): void {
@@ -316,6 +326,14 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
           location: result.address.toUpperCase()
         });
         console.log('selectedLocationData updated:', this.selectedLocationData);
+      } else {
+        // Si el usuario cancela el modal, verificar si se borró la ubicación
+        const currentLocationText = this.tournamentForm.get('location')?.value;
+        if (!currentLocationText || !currentLocationText.trim()) {
+          // Si se borró el texto, limpiar también selectedLocationData
+          this.selectedLocationData = null;
+          console.log('Location text cleared, selectedLocationData reset to null');
+        }
       }
     });
   }
@@ -361,6 +379,42 @@ export class TournamentFormComponent implements OnInit, AfterViewInit {
       console.error('Error converting image URL to base64:', error);
       return { base64: '', contentType: 'jpeg' };
     }
+  }
+
+  /**
+   * Construye el objeto address según los diferentes escenarios:
+   * 1. Si hay selectedLocationData (ubicación seleccionada del mapa): objeto completo
+   * 2. Si no hay selectedLocationData pero hay texto en location: objeto básico con address y mainStreet
+   * 3. Si no hay nada: undefined
+   */
+  private buildAddressData(locationText: string): Address | undefined {
+    // Escenario 1: Ubicación seleccionada del mapa - enviar objeto completo
+    if (this.selectedLocationData) {
+      console.log('📍 Escenario 1: Ubicación seleccionada del mapa - objeto completo');
+      return {
+        address: locationText || this.selectedLocationData.address,
+        mainStreet: this.selectedLocationData.primaryStreet || '',
+        secondStreet: this.selectedLocationData.secondaryStreet || '',
+        latitude: this.selectedLocationData.latitude.toString() || '0',
+        longitude: this.selectedLocationData.longitude.toString() || '0'
+      };
+    }
+
+    // Escenario 2: Solo texto en el input (sin ubicación del mapa) - objeto básico
+    if (locationText && locationText.trim()) {
+      console.log('📝 Escenario 2: Solo texto en input - objeto básico con address y mainStreet');
+      return {
+        address: locationText.trim(),
+        mainStreet: locationText.trim(),
+        secondStreet: '',
+        latitude: '0',
+        longitude: '0'
+      };
+    }
+
+    // Escenario 3: No hay información de ubicación
+    console.log('❌ Escenario 3: Sin información de ubicación - undefined');
+    return undefined;
   }
 
   /**
