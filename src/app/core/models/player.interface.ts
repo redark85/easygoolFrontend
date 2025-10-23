@@ -2,21 +2,22 @@
  * Interface para la entidad Player
  */
 export interface Player {
-  id: number;
+  id: number; // Mapeo de tournamentTeamPlayerId para compatibilidad
   name: string;
   secondName: string;
   lastName: string;
   secondLastName: string;
   identification: string;
   photoUrl?: string;
-  tournamentTeamId: number;
+  tournamentTeamId?: number; // Opcional porque no viene del API
   position: string;
   jerseyNumber: number;
   isCapitan: boolean;
+  status?: number; // Campo del API
   createdAt?: Date;
   updatedAt?: Date;
-  tournamentTeamPlayerId : number;
-  allowUpdateInfo : boolean;
+  tournamentTeamPlayerId: number; // Campo real del API
+  allowUpdateInfo: boolean;
 }
 
 /**
@@ -39,17 +40,18 @@ export interface CreatePlayerRequest {
  * Request para actualizar un jugador existente
  */
 export interface UpdatePlayerRequest {
-  id: number;
-  name: string;
-  secondName: string;
-  lastName: string;
-  secondLastName: string;
-  identification: string;
-  photoBase64?: string;
-  photoContentType?: string;
-  tournamentTeamId: number;
+  tournamentTeamPlayerId: number;
   position: string;
   jerseyNumber: number;
+  player: {
+    name: string;
+    secondName: string;
+    lastName: string;
+    secondLastName: string;
+    identification: string;
+    photoBase64?: string;
+    photoContentType?: string;
+  };
 }
 
 /**

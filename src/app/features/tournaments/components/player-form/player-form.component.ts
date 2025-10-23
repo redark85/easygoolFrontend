@@ -361,6 +361,12 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
   private updatePlayer(): void {
     if (!this.data.player) return;
 
+    console.log('Updating player with data:', {
+      playerId: this.data.player.id,
+      playerName: this.data.player.name,
+      tournamentTeamId: this.data.tournamentTeamId
+    });
+
     this.cdr.detectChanges();
 
     // Usar getRawValue() para incluir campos deshabilitados
@@ -368,25 +374,31 @@ export class PlayerFormComponent implements OnInit, OnDestroy {
     const photoData = formValue.photo;
 
     const updateRequest: UpdatePlayerRequest = {
-      id: this.data.player.id,
-      name: formValue.name.trim(),
-      secondName: formValue.secondName?.trim() || '',
-      lastName: formValue.lastName.trim(),
-      secondLastName: formValue.secondLastName?.trim() || '',
-      identification: formValue.identification.trim(),
-      tournamentTeamId: this.data.tournamentTeamId,
+      tournamentTeamPlayerId: this.data.player.tournamentTeamPlayerId,
       position: formValue.position,
-      jerseyNumber: parseInt(formValue.jerseyNumber, 10)
+      jerseyNumber: parseInt(formValue.jerseyNumber, 10),
+      player: {
+        name: formValue.name.trim(),
+        secondName: formValue.secondName?.trim() || '',
+        lastName: formValue.lastName.trim(),
+        secondLastName: formValue.secondLastName?.trim() || '',
+        identification: formValue.identification.trim()
+      }
     };
 
     // Solo incluir foto si se cambió
     if (photoData && typeof photoData === 'object' && photoData.base64) {
       const { base64, extension } = this.processImageData(photoData);
-      updateRequest.photoBase64 = base64;
-      updateRequest.photoContentType = extension;
+      updateRequest.player.photoBase64 = base64;
+      updateRequest.player.photoContentType = extension;
     }
 
-    this.playerService.updatePlayer(this.data.player.id, updateRequest).pipe(
+    console.log('Sending updatePlayer request:', {
+      tournamentTeamPlayerId: this.data.player.tournamentTeamPlayerId,
+      updateRequest: updateRequest
+    });
+
+    this.playerService.updatePlayer(updateRequest).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (player) => {

@@ -223,6 +223,14 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
    * Abre el modal para editar un jugador existente
    */
   editPlayer(player: Player, team: Team): void {
+    console.log('Opening edit player modal:', {
+      playerId: player.id,
+      playerName: this.getPlayerFullName(player),
+      teamId: team.id,
+      teamName: team.name,
+      tournamentTeamId: team.tournamentTeamId
+    });
+    
     const dialogRef = this.dialog.open(PlayerFormComponent, {
       width: '700px',
       maxWidth: '90vw',
@@ -230,7 +238,7 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
       data: {
         mode: 'edit',
         player,
-        tournamentTeamId: team.id,
+        tournamentTeamId: team.tournamentTeamId,
         teamName: team.name,
         allowUpdateInfo: team.allowUpdateInfo
       } as PlayerFormData

@@ -3,6 +3,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiService } from '@core/services/api.service';
 import { ToastService } from '@core/services/toast.service';
+import { Player } from '@core/models/player.interface';
 import {
   TEAM_GET_ALL_TEAMS_ENDPOINT,
   TEAM_GET_BY_TOURNAMENT_ENDPOINT,
@@ -45,11 +46,19 @@ export class TeamService {
       map(response => {
         if (response.succeed && response.result) {
           console.log('📊 Equipos cargados desde API:', response.result.length);
-          // Log para verificar que los equipos tienen categoryId
-          response.result.forEach(team => {
-            console.log(`🏆 Equipo: ${team.name}, CategoryId: ${team.categoryId || 'Sin categoría'}`);
+          
+          // Mapear los equipos y sus jugadores
+          const mappedTeams = response.result.map(team => {
+            // Mapear jugadores si existen
+            if (team.players && Array.isArray(team.players)) {
+              team.players = team.players.map(player => this.mapPlayerFromApi(player));
+            }
+            
+            console.log(`🏆 Equipo: ${team.name}, CategoryId: ${team.categoryId || 'Sin categoría'}, Jugadores: ${team.players?.length || 0}`);
+            return team;
           });
-          return response.result;
+          
+          return mappedTeams;
         }
         this.toastService.showError(response.message || 'Error al obtener equipos');
         throw new Error(response.message || 'Error al obtener equipos');
@@ -295,7 +304,7 @@ export class TeamService {
   }
 
   /**
-   * Asigna equipos aelatoriamente
+   * Asigna equipos aleatoriamente
    * @param phaseId ID de la fase de grupos
    * @returns Observable con el resultado de la operación
    */
@@ -308,43 +317,48 @@ export class TeamService {
         }
         this.toastService.showError(response.message || 'Error al asignar equipos aleatoriamente');
         throw new Error(response.message || 'Error al asignar equipos aleatoriamente');
-      })
+      }),
+      catchError(this.handleError)
     );
   }
 
   /**
-   * Maneja errores HTTP
-   * @param error Error HTTP
-   * @returns Observable con error
+   * Mapea un jugador del API al formato esperado por la interfaz Player
+   * @param apiPlayer Jugador del API
+   * @returns Jugador mapeado
+   */
+  private mapPlayerFromApi(apiPlayer: any): Player {
+    const mappedPlayer = {
+      ...apiPlayer,
+      id: apiPlayer.tournamentTeamPlayerId, // Mapear tournamentTeamPlayerId a id
+      tournamentTeamId: apiPlayer.tournamentTeamId || 0 // Valor por defecto si no existe
+    } as Player;
+    
+    console.log('Mapping player from API:', {
+      original: {
+        tournamentTeamPlayerId: apiPlayer.tournamentTeamPlayerId,
+        name: apiPlayer.name,
+        lastName: apiPlayer.lastName
+      },
+      mapped: {
+        id: mappedPlayer.id,
+        name: mappedPlayer.name,
+        lastName: mappedPlayer.lastName
+      }
+    });
+    
+    return mappedPlayer;
+  }
+
+  /**
+   * Maneja errores de las peticiones HTTP
+   * @param error Error de la petición
+   * @returns Observable con el error
    */
   private handleError = (error: any): Observable<never> => {
-    let errorMessage = 'Error desconocido';
-
-    if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // Error del lado del servidor
-      if (error.status === 0) {
-        errorMessage = 'No se pudo conectar con el servidor';
-      } else if (error.status === 400) {
-        errorMessage = error.error?.message || 'Datos inválidos';
-      } else if (error.status === 401) {
-        errorMessage = 'No autorizado';
-      } else if (error.status === 403) {
-        errorMessage = 'Acceso denegado';
-      } else if (error.status === 404) {
-        errorMessage = 'Recurso no encontrado';
-      } else if (error.status === 409) {
-        errorMessage = error.error?.message || 'Conflicto en los datos';
-      } else if (error.status >= 500) {
-        errorMessage = 'Error interno del servidor';
-      } else {
-        errorMessage = error.error?.message || `Error HTTP: ${error.status}`;
-      }
-    }
-
-    console.error('TeamService Error:', error);
-    return throwError(() => new Error(errorMessage));
+    console.error('Error en TeamService:', error);
+    const errorMessage = error?.error?.message || error?.message || 'Error desconocido';
+    this.toastService.showError(errorMessage);
+    return throwError(() => error);
   };
 }

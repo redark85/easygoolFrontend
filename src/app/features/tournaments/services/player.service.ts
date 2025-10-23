@@ -6,9 +6,9 @@ import { map, catchError } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ApiResponse } from '../../../core/models/api.interface';
-import { 
-  Player, 
-  CreatePlayerRequest, 
+import {
+  Player,
+  CreatePlayerRequest,
   UpdatePlayerRequest,
   PLAYER_POSITIONS,
   PlayerPositionOption
@@ -23,7 +23,7 @@ export interface AddTeamPlayerRequest {
   position: string;
   jerseyNumber: number;
 }
-import { 
+import {
   PLAYER_CREATE_ENDPOINT,
   PLAYER_GET_BY_TEAM_ENDPOINT,
   PLAYER_UPDATE_ENDPOINT,
@@ -55,7 +55,7 @@ export class PlayerService {
    */
   getPlayersByTeam(teamId: number): Observable<Player[]> {
     const url = `${PLAYER_GET_BY_TEAM_ENDPOINT}/${teamId}`;
-    
+
     return this.apiService.get<ApiResponse<Player[]>>(url).pipe(
       map(response => {
         if (response.succeed && response.result) {
@@ -96,14 +96,16 @@ export class PlayerService {
 
   /**
    * Actualiza un jugador existente
-   * @param playerId ID del jugador
-   * @param playerData Datos actualizados del jugador
+   * @param playerData Datos actualizados del jugador (incluye tournamentTeamPlayerId)
    * @returns Observable con el jugador actualizado
    */
-  updatePlayer(playerId: number, playerData: UpdatePlayerRequest): Observable<Player> {
-    const url = `${PLAYER_UPDATE_ENDPOINT}/${playerId}`;
+  updatePlayer(playerData: UpdatePlayerRequest): Observable<Player> {
+    console.log('PlayerService.updatePlayer called with:', {
+      url: PLAYER_UPDATE_ENDPOINT,
+      playerData
+    });
     
-    return this.apiService.put<ApiResponse<Player>>(url, playerData).pipe(
+    return this.apiService.post<ApiResponse<Player>>(PLAYER_UPDATE_ENDPOINT, playerData).pipe(
       map(response => {
         if (response.succeed && response.result) {
           this.toastService.showSuccess('Jugador actualizado exitosamente');
@@ -127,7 +129,7 @@ export class PlayerService {
    */
   deletePlayer(playerId: number): Observable<any> {
     const url = `${PLAYER_REMOVE_ENDPOINT}/${playerId}`;
-    
+
     return this.apiService.delete<ApiResponse<any>>(url).pipe(
       map(response => {
         if (response.succeed) {
@@ -181,12 +183,12 @@ export class PlayerService {
    * @returns true si está disponible
    */
   isJerseyNumberAvailable(
-    jerseyNumber: number, 
-    players: Player[], 
+    jerseyNumber: number,
+    players: Player[],
     excludePlayerId?: number
   ): boolean {
-    return !players.some(player => 
-      player.jerseyNumber === jerseyNumber && 
+    return !players.some(player =>
+      player.jerseyNumber === jerseyNumber &&
       player.id !== excludePlayerId
     );
   }
@@ -198,7 +200,7 @@ export class PlayerService {
    */
   getPlayerByIdentification(identificationNumber: string): Observable<Player | null> {
     const url = `${PLAYER_GET_BY_IDENTIFICATION_ENDPOINT}?identificationNumber=${identificationNumber}`;
-    
+
     return this.apiService.get<ApiResponse<Player>>(url).pipe(
       map(response => {
         if (response.succeed && response.result) {
@@ -251,7 +253,7 @@ export class PlayerService {
     if (error?.error?.message) {
       return error.error.message;
     }
-    
+
     if (error?.message) {
       return error.message;
     }
