@@ -1040,12 +1040,21 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
     dialogRef.afterClosed().subscribe((result: DocumentUploadModalResult) => {
       if (result && result.success && result.document) {
-        // TODO: Integrar con API cuando esté disponible
-        console.log('Excel uploaded for team:', team.name, result.document);
+        console.log('📄 Excel uploaded successfully for team:', team.name, result.document);
         
-        // Marcar el equipo como que ya subió el excel
+        // Marcar el equipo como que ya subió el excel (actualización inmediata)
         team.hasExcelUploaded = true;
         this.cdr.detectChanges();
+        
+        // 🔄 ACTUALIZACIÓN CRÍTICA: Refrescar toda la data desde el API
+        // Los jugadores del Excel ahora están en el backend y necesitamos cargarlos
+        console.log('🔄 Refreshing teams data after Excel upload to load new players...');
+        
+        // Usar un delay para asegurar que el backend haya procesado completamente el archivo
+        setTimeout(() => {
+          console.log('⚡ Executing delayed refresh after Excel upload...');
+          this.refreshTeams();
+        }, 1000); // 1 segundo de delay para procesamiento del backend
       }
     });
   }
