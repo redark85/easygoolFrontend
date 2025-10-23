@@ -238,15 +238,13 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
     dialogRef.afterClosed().subscribe((result: PlayerModalResult) => {
       if (result && result.success && result.player) {
-        // Actualiza el jugador en la lista del equipo si existe localmente
-        const players = (team as any).players as Player[] | undefined;
-        if (players) {
-          const idx = players.findIndex(p => p.id === result.player!.id);
-          if (idx !== -1) {
-            players[idx] = result.player!;
-          }
-        }
-        this.cdr.detectChanges();
+        console.log('Player edited successfully, refreshing team data from API...');
+        
+        // Recargar datos completos desde el API con delay
+        setTimeout(() => {
+          console.log('Executing delayed refresh after player edit...');
+          this.refreshTeams();
+        }, 300);
       }
     });
   }
@@ -484,9 +482,32 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
 
     dialogRef.afterClosed().subscribe((result: PlayerModalResult) => {
       if (result && result.success) {
-        // Actualizar el contador de jugadores del equipo
+        console.log('Player created successfully, updating team data...');
+        
+        // Estrategia híbrida: Actualización inmediata + refresh del API
+        
+        // 1. Actualización inmediata para feedback instantáneo
         team.totalPlayers = (team.totalPlayers || 0) + 1;
+        this.ensurePlayersListExists(team);
+        
+        if (result.player) {
+          const players = (team as any).players as Player[];
+          players.push(result.player);
+        }
+        
+        // 2. Forzar actualización inmediata de la vista
+        this.cdr.markForCheck();
         this.cdr.detectChanges();
+        
+        // 3. Recargar datos completos del API para asegurar sincronización
+        // Usar un delay más largo para asegurar que el backend haya procesado el cambio
+        setTimeout(() => {
+          console.log('Executing delayed refresh of team data...');
+          
+          // Usar refresh completo para asegurar que se actualicen todos los datos
+          // incluyendo la lista completa de jugadores desde el API
+          this.refreshTeams();
+        }, 500);
       }
     });
   }
@@ -538,6 +559,56 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   /**
+   * Refresca los datos de un equipo específico desde el backend
+   * Útil cuando solo necesitamos actualizar un equipo sin recargar toda la lista
+   * @param team Equipo a refrescar
+   */
+  private refreshTeamData(team: Team): void {
+    console.log('Refreshing specific team data:', team.name);
+    
+    this.teamService.getTeamsByTournament(this.tournamentId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (teams) => {
+        console.log('Teams data received from API:', teams.length, 'teams');
+        
+        // Encontrar el equipo actualizado
+        const updatedTeam = teams.find(t => t.id === team.id);
+        if (updatedTeam) {
+          console.log('Updated team found:', updatedTeam.name, 'with', updatedTeam.totalPlayers, 'players');
+          
+          // Actualizar el equipo en la lista local
+          const teamIndex = this.teams.findIndex(t => t.id === team.id);
+          if (teamIndex !== -1) {
+            // Reemplazar completamente el equipo con los datos actualizados
+            this.teams[teamIndex] = updatedTeam;
+            
+            // Actualizar la lista filtrada
+            this.updateFilteredTeams();
+            
+            // Forzar detección de cambios
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+            
+            console.log('Team data refreshed successfully');
+          } else {
+            console.warn('Team not found in local list for update');
+          }
+        } else {
+          console.warn('Updated team not found in API response');
+        }
+      },
+      error: (error) => {
+        console.error('Error refreshing team data:', error);
+        
+        // Fallback: recargar toda la lista si falla la actualización específica
+        console.log('Falling back to full teams refresh...');
+        this.refreshTeams();
+      }
+    });
+  }
+
+  /**
    * TrackBy function para optimizar el renderizado de equipos
    */
   trackByTeamId(index: number, team: Team): number {
@@ -557,7 +628,24 @@ export class TeamsManagementComponent implements OnInit, OnDestroy, AfterViewIni
    */
   getPlayersForTeam(team: Team): Player[] {
     const players = (team as any).players as Player[] | undefined;
+    
+    // Si no hay lista de jugadores pero hay contador > 0, inicializar lista vacía
+    if (!players && team.totalPlayers > 0) {
+      (team as any).players = [];
+      return [];
+    }
+    
     return players ?? [];
+  }
+
+  /**
+   * Inicializa la lista de jugadores para un equipo si no existe
+   * @param team Equipo al que inicializar la lista
+   */
+  private ensurePlayersListExists(team: Team): void {
+    if (!(team as any).players) {
+      (team as any).players = [];
+    }
   }
 
   /**
