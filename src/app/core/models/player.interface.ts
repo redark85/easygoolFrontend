@@ -33,7 +33,6 @@ export interface CreatePlayerRequest {
   tournamentTeamId: number;
   position: string;
   jerseyNumber: number;
-  isCapitan: boolean;
 }
 
 /**
@@ -51,7 +50,6 @@ export interface UpdatePlayerRequest {
   tournamentTeamId: number;
   position: string;
   jerseyNumber: number;
-  isCapitan: boolean;
 }
 
 /**
