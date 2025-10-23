@@ -42,6 +42,7 @@ interface Player {
   yellowCards: number;
   redCards: number;
   isCapitan: boolean;
+  matchesToMiss: number;
 }
 
 interface PlayerListResponse {
@@ -255,8 +256,8 @@ export class TeamPlayersComponent implements OnInit, OnDestroy {
     }
 
     // Status filter
-    const status = this.statusFilter.value;
-    if (status && status !== 'all') {
+    const status = this.statusFilter.value || 0;
+    if (status !== 'all') {
       filteredData = filteredData.filter(player => player.status === +status);
     }
 

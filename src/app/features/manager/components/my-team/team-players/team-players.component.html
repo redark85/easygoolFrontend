@@ -155,11 +155,11 @@
                   <span>Marcar como Capitán</span>
                 </button>
                 <mat-divider *ngIf="!player.isCapitan"></mat-divider>
-                <button mat-menu-item (click)="onMarkAsActive(player)" *ngIf="player.status !== 0">
+                <button mat-menu-item (click)="onMarkAsActive(player)" *ngIf="player.status === 4">
                   <mat-icon>check_circle</mat-icon>
                   <span>Marcar como Activo</span>
                 </button>
-                <button mat-menu-item (click)="onMarkAsInjured(player)" *ngIf="player.status !== 4">
+                <button mat-menu-item (click)="onMarkAsInjured(player)" *ngIf="player.status !== 4 && player.matchesToMiss === 0">
                   <mat-icon>healing</mat-icon>
                   <span>Marcar como Lesionado</span>
                 </button>
