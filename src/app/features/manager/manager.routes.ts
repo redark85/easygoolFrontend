@@ -32,7 +32,7 @@ export const managerRoutes: Routes = [
     title: 'Historial de Partidos - Manager'
   },
   {
-    path: 'team-stats',
+    path: 'team-stats/:teamId',
     loadComponent: () => import('./components/statistics/team-stats/team-stats.component').then(c => c.TeamStatsComponent),
     title: 'Estadísticas del Equipo - Manager'
   },

@@ -764,3 +764,68 @@
     }
   }
 }
+
+// Loading and No Data States
+.loading-state,
+.no-data-state {
+  margin-top: 24px;
+
+  mat-card {
+    mat-card-content {
+      padding: 48px 24px;
+    }
+  }
+
+  .loading-content,
+  .no-data-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+
+    .loading-icon,
+    .no-data-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: #1976d2;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .no-data-icon {
+      color: #ff9800;
+      animation: none;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    p {
+      margin: 0;
+      font-size: 16px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .no-data-description {
+      max-width: 500px;
+      font-size: 14px;
+      color: #999;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

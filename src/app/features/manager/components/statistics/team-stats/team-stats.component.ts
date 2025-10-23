@@ -8,68 +8,84 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
+import { ApiService, ToastService } from '@core/services';
+import { MANAGER_GET_TEAM_PERFORMANCE_ENDPOINT } from '@core/config/endpoints';
+import { ActivatedRoute } from '@angular/router';
 
-interface TeamPerformance {
-  totalMatches: number;
+// Interfaces del API
+interface PerformanceData {
+  matches: number;
   wins: number;
   draws: number;
   losses: number;
   goalsFor: number;
   goalsAgainst: number;
-  averageGoalsFor: number;
-  averageGoalsAgainst: number;
-  averagePossession: number;
-  cleanSheets: number;
+  effectiveness: number;
 }
 
-interface ContextPerformance {
-  home: {
-    matches: number;
-    wins: number;
-    draws: number;
-    losses: number;
-    goalsFor: number;
-    goalsAgainst: number;
-  };
-  away: {
-    matches: number;
-    wins: number;
-    draws: number;
-    losses: number;
-    goalsFor: number;
-    goalsAgainst: number;
-  };
-}
-
-interface TournamentPhase {
-  phase: string;
-  matches: number;
+interface PhasePerformance {
+  phaseName: string;
+  played: number;
   wins: number;
   draws: number;
   losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
   points: number;
+  effectiveness: number;
+  goalDifference: number;
 }
 
-interface OpponentLevel {
-  level: 'top' | 'mid' | 'bottom';
-  matches: number;
-  wins: number;
-  draws: number;
-  losses: number;
-  winRate: number;
-}
-
-interface PositionHistory {
-  matchday: number;
+interface EvolutionPoint {
+  matchDayName: string;
   position: number;
   points: number;
+  goalsFor: number;
+  goalsAgainst: number;
 }
 
-interface ResultStreak {
-  type: 'win' | 'draw' | 'loss';
-  count: number;
-  matches: string[];
+interface MomentData {
+  startMatchDay: number;
+  endMatchDay: number;
+  points: number;
+  goalsFor: number;
+  goalsAgainst: number;
+}
+
+interface Evolution {
+  evolution: EvolutionPoint[];
+  currentStreak: number;
+  bestMoment: MomentData;
+  worstMoment: MomentData;
+}
+
+interface TeamPerformanceResult {
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  winPercentage: number;
+  drawPercentage: number;
+  lossPercentage: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  avgGoalsFor: number;
+  avgGoalsAgainst: number;
+  cleanSheets: number;
+  homePerformance: PerformanceData;
+  awayPerformance: PerformanceData;
+  phasePerformance: PhasePerformance[];
+  evolution: Evolution;
+}
+
+interface TeamPerformanceResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: TeamPerformanceResult | null;
 }
 
 /**
@@ -94,98 +110,77 @@ interface ResultStreak {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TeamStatsComponent implements OnInit, OnDestroy {
-  // General Performance
-  performance: TeamPerformance = {
-    totalMatches: 10,
-    wins: 7,
-    draws: 2,
-    losses: 1,
-    goalsFor: 25,
-    goalsAgainst: 8,
-    averageGoalsFor: 2.5,
-    averageGoalsAgainst: 0.8,
-    averagePossession: 58,
-    cleanSheets: 5
-  };
-
-  // Context Performance
-  contextPerformance: ContextPerformance = {
-    home: {
-      matches: 5,
-      wins: 4,
-      draws: 1,
-      losses: 0,
-      goalsFor: 15,
-      goalsAgainst: 3
-    },
-    away: {
-      matches: 5,
-      wins: 3,
-      draws: 1,
-      losses: 1,
-      goalsFor: 10,
-      goalsAgainst: 5
-    }
-  };
-
-  // Tournament Phases
-  tournamentPhases: TournamentPhase[] = [
-    { phase: 'Fase Inicial (J1-J4)', matches: 4, wins: 3, draws: 1, losses: 0, points: 10 },
-    { phase: 'Fase Media (J5-J7)', matches: 3, wins: 2, draws: 0, losses: 1, points: 6 },
-    { phase: 'Fase Final (J8-J10)', matches: 3, wins: 2, draws: 1, losses: 0, points: 7 }
-  ];
-
-  // Opponent Levels
-  opponentLevels: OpponentLevel[] = [
-    { level: 'top', matches: 3, wins: 1, draws: 1, losses: 1, winRate: 33.3 },
-    { level: 'mid', matches: 4, wins: 3, draws: 1, losses: 0, winRate: 75 },
-    { level: 'bottom', matches: 3, wins: 3, draws: 0, losses: 0, winRate: 100 }
-  ];
-
-  // Position History
-  positionHistory: PositionHistory[] = [
-    { matchday: 1, position: 5, points: 3 },
-    { matchday: 2, position: 4, points: 6 },
-    { matchday: 3, position: 3, points: 10 },
-    { matchday: 4, position: 3, points: 13 },
-    { matchday: 5, position: 2, points: 16 },
-    { matchday: 6, position: 2, points: 19 },
-    { matchday: 7, position: 3, points: 19 },
-    { matchday: 8, position: 3, points: 22 },
-    { matchday: 9, position: 3, points: 24 },
-    { matchday: 10, position: 3, points: 27 }
-  ];
-
-  // Current Streak
-  currentStreak: ResultStreak = {
-    type: 'win',
-    count: 3,
-    matches: ['3-1 vs Rival FC', '2-0 vs Deportivo', '1-0 vs Atlético']
-  };
-
-  // Best/Worst Moments
-  bestMoment = {
-    period: 'Jornadas 3-5',
-    description: '3 victorias consecutivas',
-    points: 9,
-    goalsFor: 8,
-    goalsAgainst: 1
-  };
-
-  worstMoment = {
-    period: 'Jornada 7',
-    description: 'Derrota 0-3',
-    points: 0,
-    goalsFor: 0,
-    goalsAgainst: 3
-  };
+  tournamentTeamId: number = 0;
+  isLoading = false;
+  hasData = false;
+  
+  // Datos del API
+  performanceData: TeamPerformanceResult | null = null;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private apiService: ApiService,
+    private toastService: ToastService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    // TODO: Cargar datos reales
+    // Obtener tournamentTeamId de la ruta
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const id = params.get('teamId');
+        if (id) {
+          this.tournamentTeamId = +id;
+          this.loadTeamPerformance();
+        }
+      });
+  }
+
+  /**
+   * Carga el rendimiento del equipo desde el API
+   */
+  private loadTeamPerformance(): void {
+    if (!this.tournamentTeamId) {
+      console.warn('No hay tournamentTeamId disponible');
+      return;
+    }
+
+    this.isLoading = true;
+    this.hasData = false;
+    this.cdr.detectChanges();
+
+    this.apiService.get<TeamPerformanceResponse>(
+      `${MANAGER_GET_TEAM_PERFORMANCE_ENDPOINT}/${this.tournamentTeamId}`
+    )
+    .pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (response) => {
+        if (response.succeed && response.result) {
+          this.performanceData = response.result;
+          this.hasData = true;
+          console.log('Rendimiento del equipo cargado:', this.performanceData);
+        } else {
+          this.performanceData = null;
+          this.hasData = false;
+          console.log('No hay datos de rendimiento disponibles');
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar rendimiento del equipo:', error);
+        this.toastService.showError('Error al cargar las estadísticas del equipo');
+        this.performanceData = null;
+        this.hasData = false;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -194,109 +189,63 @@ export class TeamStatsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Calcula el porcentaje de victorias
+   * Obtiene el tipo de racha actual
    */
-  get winPercentage(): number {
-    if (this.performance.totalMatches === 0) return 0;
-    return (this.performance.wins / this.performance.totalMatches) * 100;
+  getStreakType(): 'win' | 'draw' | 'loss' | null {
+    if (!this.performanceData?.evolution) return null;
+    const streak = this.performanceData.evolution.currentStreak;
+    if (streak > 0) return 'win';
+    if (streak < 0) return 'loss';
+    return 'draw';
   }
 
   /**
-   * Calcula el porcentaje de empates
+   * Obtiene el conteo de la racha actual
    */
-  get drawPercentage(): number {
-    if (this.performance.totalMatches === 0) return 0;
-    return (this.performance.draws / this.performance.totalMatches) * 100;
-  }
-
-  /**
-   * Calcula el porcentaje de derrotas
-   */
-  get lossPercentage(): number {
-    if (this.performance.totalMatches === 0) return 0;
-    return (this.performance.losses / this.performance.totalMatches) * 100;
-  }
-
-  /**
-   * Calcula la diferencia de goles
-   */
-  get goalDifference(): number {
-    return this.performance.goalsFor - this.performance.goalsAgainst;
-  }
-
-  /**
-   * Calcula el porcentaje de victorias en casa
-   */
-  getHomeWinRate(): number {
-    if (this.contextPerformance.home.matches === 0) return 0;
-    return (this.contextPerformance.home.wins / this.contextPerformance.home.matches) * 100;
-  }
-
-  /**
-   * Calcula el porcentaje de victorias fuera
-   */
-  getAwayWinRate(): number {
-    if (this.contextPerformance.away.matches === 0) return 0;
-    return (this.contextPerformance.away.wins / this.contextPerformance.away.matches) * 100;
-  }
-
-  /**
-   * Obtiene el color del nivel de oponente
-   */
-  getOpponentLevelColor(level: string): string {
-    const colors: { [key: string]: string } = {
-      top: '#f44336',
-      mid: '#ff9800',
-      bottom: '#4caf50'
-    };
-    return colors[level] || '#666';
-  }
-
-  /**
-   * Obtiene el label del nivel de oponente
-   */
-  getOpponentLevelLabel(level: string): string {
-    const labels: { [key: string]: string } = {
-      top: 'Top 5',
-      mid: 'Medio',
-      bottom: 'Bottom 5'
-    };
-    return labels[level] || level;
+  getStreakCount(): number {
+    if (!this.performanceData?.evolution) return 0;
+    return Math.abs(this.performanceData.evolution.currentStreak);
   }
 
   /**
    * Obtiene el icono de la racha
    */
   getStreakIcon(): string {
+    const type = this.getStreakType();
+    if (!type) return 'help';
     const icons: { [key: string]: string } = {
       win: 'trending_up',
       draw: 'trending_flat',
       loss: 'trending_down'
     };
-    return icons[this.currentStreak.type] || 'help';
+    return icons[type] || 'help';
   }
 
   /**
    * Obtiene el color de la racha
    */
   getStreakColor(): string {
+    const type = this.getStreakType();
+    if (!type) return '#666';
     const colors: { [key: string]: string } = {
       win: '#4caf50',
       draw: '#ff9800',
       loss: '#f44336'
     };
-    return colors[this.currentStreak.type] || '#666';
+    return colors[type] || '#666';
   }
 
   /**
    * Obtiene el label de la racha
    */
   getStreakLabel(): string {
+    const type = this.getStreakType();
+    if (!type) return '';
     const labels: { [key: string]: string } = {
       win: 'Victorias',
       draw: 'Empates',
       loss: 'Derrotas'
     };
-    return labels[this.currentStreak.type] || '';
+    return labels[type] || '';
   }
 }
