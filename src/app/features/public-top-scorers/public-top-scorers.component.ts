@@ -117,10 +117,11 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
             this.categories = tournamentDetails.categories || [];
             console.log('Categorías cargadas:', this.categories);
             
-            // Seleccionar la primera categoría por defecto
+            // ✅ NUEVA FUNCIONALIDAD: Seleccionar la primera categoría por defecto
             if (this.categories.length > 0) {
               this.selectedCategoryId = this.categories[0].id;
-              this.onCategoryChange();
+              console.log('🎯 Primera categoría seleccionada automáticamente:', this.categories[0]);
+              this.onCategoryChange(); // Esto ahora también preseleccionará la primera fase
             }
           }
           
@@ -142,11 +143,14 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
     
     console.log('Grupos cargados:', this.groups);
 
-    // Seleccionar el primer grupo por defecto
+    // ✅ NUEVA FUNCIONALIDAD: Seleccionar el primer grupo por defecto
     if (this.groups.length > 0) {
       this.selectedGroupId = this.groups[0].id;
+      console.log('🎯 Primer grupo seleccionado automáticamente:', this.groups[0]);
       this.loadData();
     } else {
+      // Si no hay grupos, cargar datos solo con fase
+      console.log('⚠️ No hay grupos disponibles, cargando datos solo con fase');
       this.loadData();
     }
     
@@ -158,7 +162,7 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
    */
   private loadData(): void {
     if (!this.selectedCategoryId) {
-      console.warn('No hay categoría seleccionada');
+      console.warn('❌ No hay categoría seleccionada');
       return;
     }
 
@@ -170,7 +174,13 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
       groupId: this.selectedGroupId || 0
     };
     
-    console.log('🏆 Cargando goleadores para:', params);
+    // ✅ LOGGING MEJORADO: Mostrar parámetros del API call
+    console.log('🚀 Consumiendo API de Top Scorers con parámetros:');
+    console.log(`   - TournamentId: ${this.tournamentId}`);
+    console.log(`   - CategoryId: ${this.selectedCategoryId}`);
+    console.log(`   - PhaseId: ${params.phaseId}`);
+    console.log(`   - GroupId: ${params.groupId}`);
+    console.log(`   - URL completa: ${FIXTURE_GET_TOP_SCORERS_ENDPOINT}?CategoryId=${this.selectedCategoryId}&PhaseId=${params.phaseId}&GroupId=${params.groupId}`);
     
     this.apiService.get<TopScorersApiResponse>(
       `${FIXTURE_GET_TOP_SCORERS_ENDPOINT}?CategoryId=${this.selectedCategoryId}&PhaseId=${params.phaseId}&GroupId=${params.groupId}`
@@ -314,11 +324,17 @@ export class PublicTopScorersComponent implements OnInit, OnDestroy {
       this.selectedPhaseId = null;
       this.selectedGroupId = null;
       this.groups = [];
-        this.loadData();
       
-      // Seleccionar la primera fase por defecto
+      // ✅ NUEVA FUNCIONALIDAD: Preseleccionar automáticamente la primera fase
       if (this.phases.length > 0) {
+        this.selectedPhaseId = this.phases[0].id;
+        console.log('🎯 Primera fase seleccionada automáticamente:', this.phases[0]);
+        
+        // Ejecutar el cambio de fase para cargar grupos si es necesario
         this.onPhaseChange();
+      } else {
+        // Si no hay fases, cargar datos con solo categoría
+        this.loadData();
       }
       
       this.cdr.detectChanges();
