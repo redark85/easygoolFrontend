@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { FixtureService, FixtureTeam } from '@core/services/fixture.service';
 import { ToastService, ManagerService, TournamentPhase, TournamentGroup, PhaseType, TournamentDetails } from '@core/services';
+import { PublicLoadingComponent } from '@shared/components';
 
 // Interfaces para Partidos y Goleadores
 interface Match {
@@ -52,7 +53,8 @@ interface TopScorer {
     MatSelectModule,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    PublicLoadingComponent
   ],
   templateUrl: './public-standings.component.html',
   styleUrls: ['./public-standings.component.scss']
@@ -154,10 +156,11 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
             this.categories = tournamentDetails.categories || [];
             console.log('Categorías cargadas:', this.categories);
             
-            // Seleccionar la primera categoría por defecto
+            // ✅ NUEVA FUNCIONALIDAD: Seleccionar la primera categoría por defecto
             if (this.categories.length > 0) {
               this.selectedCategoryId = this.categories[0].id;
-              this.onCategoryChange();
+              console.log('🎯 Primera categoría seleccionada automáticamente:', this.categories[0]);
+              this.onCategoryChange(); // Esto ahora también preseleccionará la primera fase
             } else {
               this.isLoading = false;
             }
@@ -193,12 +196,17 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
       this.groups = [];
       this.tournamentInfo.phase = '';
       this.tournamentInfo.group = '';
-      this.loadStandings();
       
-      // Seleccionar la primera fase por defecto
+      // ✅ NUEVA FUNCIONALIDAD: Preseleccionar automáticamente la primera fase
       if (this.phases.length > 0) {
+        this.selectedPhaseId = this.phases[0].id;
+        console.log('🎯 Primera fase seleccionada automáticamente:', this.phases[0]);
+        
+        // Ejecutar el cambio de fase para cargar grupos si es necesario
         this.onPhaseChange();
       } else {
+        // Si no hay fases, cargar datos con solo categoría
+        this.loadStandings();
         this.isLoading = false;
       }
       
@@ -238,14 +246,16 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
     
     console.log('Grupos cargados:', this.groups);
 
-    // Seleccionar el primer grupo por defecto
+    // ✅ NUEVA FUNCIONALIDAD: Seleccionar el primer grupo por defecto
     if (this.groups.length > 0) {
       this.selectedGroupId = this.groups[0].id;
       this.tournamentInfo.group = this.groups[0].name;
+      console.log('🎯 Primer grupo seleccionado automáticamente:', this.groups[0]);
       this.loadStandings();
     } else {
-      this.isLoading = false;
-      this.cdr.detectChanges();
+      // Si no hay grupos, cargar datos solo con fase
+      console.log('⚠️ No hay grupos disponibles, cargando datos solo con fase');
+      this.loadStandings();
     }
   }
 
@@ -287,10 +297,16 @@ export class PublicStandingsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.cdr.detectChanges();
     
-    // Por ahora usar IDs quemados
     const phaseId = this.selectedPhaseId || 0;
     const groupId = this.selectedGroupId || 0;
     const categoryId = this.selectedCategoryId;
+
+    // ✅ LOGGING MEJORADO: Mostrar parámetros del API call
+    console.log('🚀 Consumiendo API de Standings con parámetros:');
+    console.log(`   - TournamentId: ${this.tournamentId}`);
+    console.log(`   - CategoryId: ${categoryId}`);
+    console.log(`   - PhaseId: ${phaseId}`);
+    console.log(`   - GroupId: ${groupId}`);
 
     this.fixtureService.getFixture(categoryId!, phaseId, groupId)
       .pipe(takeUntil(this.destroy$))

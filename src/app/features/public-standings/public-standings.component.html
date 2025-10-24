@@ -1,4 +1,13 @@
 <div class="standings-container">
+  <!-- Loading Overlay -->
+  <app-public-loading 
+    [isVisible]="isLoading"
+    text="Cargando tabla de posiciones..."
+    subtext="Por favor espere"
+    [diameter]="60"
+    [strokeWidth]="4">
+  </app-public-loading>
+
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-background">
