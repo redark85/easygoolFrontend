@@ -28,12 +28,12 @@
       <div class="selection-container-centered" *ngIf="categories.length > 0 || loadingCategories">
         <div class="container-fluid">
           <div class="row align-items-center justify-content-center">
-            
+
             <!-- Category Selection - Always col-4 when groups exist, col-6 when no groups -->
             <div [class]="availableGroups.length > 0 ? 'col-4' : 'col-6'">
               <mat-form-field appearance="outline" class="category-select w-100">
                 <mat-label>Categoría</mat-label>
-                <mat-select [(value)]="selectedCategoryId" 
+                <mat-select [(value)]="selectedCategoryId"
                            (selectionChange)="onCategoryChange($event.value)"
                            [disabled]="loadingCategories">
                   <mat-option *ngFor="let category of categories; trackBy: trackByCategoryId" [value]="category.categoryId">
@@ -49,7 +49,7 @@
             <div [class]="availableGroups.length > 0 ? 'col-4' : 'col-6'" *ngIf="availablePhases.length > 0">
               <mat-form-field appearance="outline" class="phase-select w-100">
                 <mat-label>Fase</mat-label>
-                <mat-select [(value)]="selectedPhaseId" 
+                <mat-select [(value)]="selectedPhaseId"
                            (selectionChange)="onPhaseChange($event.value)"
                            [disabled]="loadingPhases">
                   <mat-option *ngFor="let phase of availablePhases; trackBy: trackByPhaseId" [value]="phase.id">
@@ -65,7 +65,7 @@
             <div class="col-4" *ngIf="availableGroups.length > 0">
               <mat-form-field appearance="outline" class="group-select w-100">
                 <mat-label>Grupo</mat-label>
-                <mat-select [(value)]="selectedGroupId" 
+                <mat-select [(value)]="selectedGroupId"
                            (selectionChange)="onGroupChange($event.value)"
                            [disabled]="loadingGroups">
                   <mat-option *ngFor="let group of availableGroups; trackBy: trackByGroupId" [value]="group.id">
@@ -226,9 +226,6 @@
                                 <div class="match-time">
                                   <mat-icon class="time-icon">schedule</mat-icon>
                                   <span class="time-text">{{ formatMatchTime(match.matchTime || match.matchDate) }}</span>
-                                </div>
-                                <div class="match-venue">
-                                  <span class="venue-text">{{ match.venue || 'Estadio Principal' }}</span>
                                 </div>
                               </div>
 

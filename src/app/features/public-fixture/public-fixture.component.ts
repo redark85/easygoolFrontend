@@ -26,7 +26,7 @@ interface UIMatch {
   awayTeamLogoUrl: string;
   homeScore: number | null;
   awayScore: number | null;
-  date: Date;
+  date: Date | null; // ✅ Permitir fechas null
   status: MatchStatusType;
   isLive: boolean;
   isFinished: boolean;
@@ -36,10 +36,9 @@ interface UIMatch {
 interface UIMatchday {
   id: number;
   name: string;
-  date: Date;
+  date: Date | null; // ✅ Permitir fechas null
   matches: UIMatch[];
 }
-
 
 /**
  * Componente para mostrar el fixture completo del torneo
@@ -224,7 +223,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
     this.matchdays = fixtureResult.matches.map((matchday: FixtureMatchDay) => ({
       id: matchday.matchDayId,
       name: matchday.matchDayName,
-      date: new Date(), // Se puede obtener de la primera fecha de partido si es necesario
+      date: this.getValidMatchdayDate(matchday.matches), // ✅ Obtener fecha real del primer partido o null
       matches: matchday.matches.map((match: FixtureMatch) => ({
         id: match.id,
         homeTeam: match.homeTeam,
@@ -233,7 +232,7 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
         awayTeamLogoUrl: match.awayTeamLogoUrl,
         homeScore: match.homeScore,
         awayScore: match.awayScore,
-        date: new Date(match.matchDate),
+        date: this.getValidMatchDate(match.matchDate), // ✅ Validar fecha del partido
         status: this.mapApiStatusToMatchStatusType(match.status),
         isLive: match.status === 1, // MatchStatusType.inProgress
         isFinished: match.status === 2, // MatchStatusType.played
@@ -243,6 +242,50 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
 
     this.filteredMatchdays = [...this.matchdays];
     this.applyFilters();
+  }
+
+  /**
+   * Obtiene una fecha válida para el partido o null si no es válida
+   */
+  private getValidMatchDate(matchDate: string | null | undefined): Date | null {
+    if (!matchDate) {
+      console.warn('⚠️ Fecha del partido no disponible:', matchDate);
+      return null;
+    }
+    
+    try {
+      const date = new Date(matchDate);
+      // Verificar si la fecha es válida
+      if (isNaN(date.getTime())) {
+        console.warn('⚠️ Fecha del partido inválida:', matchDate);
+        return null;
+      }
+      return date;
+    } catch (error) {
+      console.error('❌ Error al procesar fecha del partido:', matchDate, error);
+      return null;
+    }
+  }
+
+  /**
+   * Obtiene una fecha válida para la jornada basada en el primer partido con fecha válida
+   */
+  private getValidMatchdayDate(matches: any[]): Date | null {
+    if (!matches || matches.length === 0) {
+      console.warn('⚠️ No hay partidos en la jornada para obtener fecha');
+      return null;
+    }
+
+    // Buscar el primer partido con fecha válida
+    for (const match of matches) {
+      const validDate = this.getValidMatchDate(match.matchDate);
+      if (validDate) {
+        return validDate;
+      }
+    }
+
+    console.warn('⚠️ Ningún partido en la jornada tiene fecha válida');
+    return null;
   }
 
   /**

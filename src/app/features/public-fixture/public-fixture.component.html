@@ -221,7 +221,7 @@
           <mat-icon class="matchday-icon">calendar_today</mat-icon>
           <h2 class="matchday-title">{{ matchday.name }}</h2>
           <mat-chip class="matchday-date">
-            {{ matchday.date | date:'dd MMM yyyy' }}
+            {{ matchday.date ? (matchday.date | date:'dd MMM yyyy') : 'Fecha por definir' }}
           </mat-chip>
         </div>
         <div class="matchday-stats">

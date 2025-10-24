@@ -14,7 +14,7 @@ interface Match {
   awayTeamLogoUrl: string;
   homeScore: number | null;
   awayScore: number | null;
-  date: Date;
+  date: Date | null; // ✅ Permitir fechas null
   status: MatchStatusType;
   isLive: boolean;
   isFinished: boolean;
@@ -124,11 +124,22 @@ export class MatchCardComponent {
     if (this.match.isLive || this.match.isFinished) {
       return '';
     }
-    return this.match.date.toLocaleString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    // ✅ Validar si la fecha existe y es válida
+    if (!this.match.date) {
+      return 'Fecha por definir';
+    }
+    
+    try {
+      return this.match.date.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.warn('⚠️ Error al formatear fecha del partido:', error);
+      return 'Fecha por definir';
+    }
   }
 }
