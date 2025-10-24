@@ -8,6 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { PublicLoadingComponent } from '../../shared/components/public-loading/public-loading.component';
 import { PublicMatchDetailService } from './services/public-match-detail.service';
@@ -102,6 +103,7 @@ interface Match {
     MatChipsModule,
     MatProgressSpinnerModule,
     MatDividerModule,
+    MatTooltipModule,
     PublicLoadingComponent    
   ],
   templateUrl: './public-match-detail.component.html',
@@ -671,5 +673,85 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
       default:
         return 'status-unknown';
     }
+  }
+
+  /**
+   * Obtiene el ícono correspondiente a la posición del jugador
+   * @param position Posición del jugador
+   * @returns Nombre del ícono de Material Design
+   */
+  getPositionIcon(position: string): string {
+    if (!position) return 'person';
+    
+    const pos = position.toUpperCase();
+    
+    // Porteros
+    if (pos.includes('GK') || pos.includes('POR') || pos.includes('PORTERO')) {
+      return 'sports_handball';
+    }
+    
+    // Defensas
+    if (pos.includes('DF') || pos.includes('DEF') || pos.includes('CB') || 
+        pos.includes('LB') || pos.includes('RB') || pos.includes('LWB') || 
+        pos.includes('RWB') || pos.includes('DEFENSA')) {
+      return 'shield';
+    }
+    
+    // Mediocampistas
+    if (pos.includes('MF') || pos.includes('MED') || pos.includes('CM') || 
+        pos.includes('CDM') || pos.includes('CAM') || pos.includes('LM') || 
+        pos.includes('RM') || pos.includes('MEDIO')) {
+      return 'adjust';
+    }
+    
+    // Delanteros
+    if (pos.includes('FW') || pos.includes('DEL') || pos.includes('ST') || 
+        pos.includes('CF') || pos.includes('LW') || pos.includes('RW') || 
+        pos.includes('DELANTERO') || pos.includes('ATACANTE')) {
+      return 'sports_soccer';
+    }
+    
+    // Por defecto
+    return 'person';
+  }
+
+  /**
+   * Obtiene el texto completo de la posición para el tooltip
+   * @param position Posición del jugador
+   * @returns Texto descriptivo de la posición
+   */
+  getPositionTooltip(position: string): string {
+    if (!position) return 'Jugador';
+    
+    const pos = position.toUpperCase();
+    
+    // Porteros
+    if (pos.includes('GK') || pos.includes('POR')) return 'Portero';
+    
+    // Defensas
+    if (pos.includes('CB')) return 'Defensa Central';
+    if (pos.includes('LB')) return 'Lateral Izquierdo';
+    if (pos.includes('RB')) return 'Lateral Derecho';
+    if (pos.includes('LWB')) return 'Carrilero Izquierdo';
+    if (pos.includes('RWB')) return 'Carrilero Derecho';
+    if (pos.includes('DF') || pos.includes('DEF')) return 'Defensa';
+    
+    // Mediocampistas
+    if (pos.includes('CDM')) return 'Mediocampista Defensivo';
+    if (pos.includes('CM')) return 'Mediocampista Central';
+    if (pos.includes('CAM')) return 'Mediocampista Ofensivo';
+    if (pos.includes('LM')) return 'Mediocampista Izquierdo';
+    if (pos.includes('RM')) return 'Mediocampista Derecho';
+    if (pos.includes('MF') || pos.includes('MED')) return 'Mediocampista';
+    
+    // Delanteros
+    if (pos.includes('ST')) return 'Delantero Centro';
+    if (pos.includes('CF')) return 'Centrodelantero';
+    if (pos.includes('LW')) return 'Extremo Izquierdo';
+    if (pos.includes('RW')) return 'Extremo Derecho';
+    if (pos.includes('FW') || pos.includes('DEL')) return 'Delantero';
+    
+    // Retornar la posición original si no coincide con ningún patrón
+    return position;
   }
 }

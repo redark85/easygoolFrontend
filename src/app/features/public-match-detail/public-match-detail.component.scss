@@ -3,6 +3,73 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
 
+  .team-title-alignment {
+    color: #1976D2;
+    font-weight: bold;
+  }
+
+  .list-title {
+    margin-top: 15px !important; // Margin-top de 15px como solicitado
+    margin-bottom: 1rem;
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 1.125rem;
+    font-weight: 700 !important; // Bold como solicitado
+    color: #1976D2 !important; // Color primary directo (azul)
+  }
+
+  .player-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; // Reducido para acomodar el ícono
+    padding: 0.75rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #f0f0f0;
+      transform: translateX(4px);
+    }
+
+    .number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.875rem;
+      flex-shrink: 0; // No se encoge
+    }
+
+    .position-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #4CAF50 !important; // Color secondary directo (verde)
+      flex-shrink: 0; // No se encoge
+      cursor: help; // Cursor de ayuda para indicar tooltip
+    }
+
+    .name {
+      flex: 1;
+      font-size: 0.95rem;
+      font-weight: 700 !important; // Bold como solicitado
+      color: #4CAF50 !important; // Color secondary directo (verde)
+      margin-top: 5px !important; // Margin top de 5px como solicitado
+      margin-bottom: 5px !important; // Margin bottom de 5px como solicitado
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    // Eliminados estilos de .position-chip ya que se quitó el chip
+  }
+
   // Hero Section - Match Header
   .hero-section {
     position: relative;
@@ -504,7 +571,7 @@
             .minute {
               font-size: 1.125rem;
               font-weight: 700;
-              color: #1976d2;              
+              color: #1976d2;
             }
 
             .event-icon-wrapper {
@@ -647,56 +714,6 @@
 
       .players-list {
         margin-top: 1rem;
-
-        .list-title {
-          margin: 0 0 1rem 0;
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: #212121;
-        }
-
-        .player-item {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 0.75rem;
-          background-color: #f9f9f9;
-          border-radius: 8px;
-          margin-bottom: 0.5rem;
-          transition: all 0.3s ease;
-
-          &:hover {
-            background-color: #f0f0f0;
-            transform: translateX(4px);
-          }
-
-          .number {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background-color: #1976d2;
-            color: white;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.875rem;
-          }
-
-          .name {
-            flex: 1;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #212121;
-          }
-
-          .position-chip {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            font-size: 0.75rem;
-            font-weight: 600;
-          }
-        }
       }
     }
   }

@@ -148,7 +148,7 @@
                     <!-- Siempre mostrar imagen y nombre del equipo -->
                     <div class="team-header">
                       <div class="team-logo-container">
-                        <h2 class="team-name-overlay">{{ match.homeTeam.name || 'Equipo Local' }}</h2>
+                        <h1 class="team-name-overlay team-title-alignment">{{ match.homeTeam.name || 'Equipo Local' }}</h1>
                         <img
                           [src]="(match.homeTeam.logoUrl && match.homeTeam.logoUrl !== '') ? match.homeTeam.logoUrl : 'assets/default-team.png'"
                           [alt]="match.homeTeam.name || 'Equipo Local'" class="team-logo-small"
@@ -163,16 +163,24 @@
                       <h4 class="list-title">Titulares</h4>
                       <div class="player-item" *ngFor="let player of lineups.home.startingXI">
                         <span class="number">{{ player.number }}</span>
+                        <mat-icon class="position-icon"
+                                  [matTooltip]="getPositionTooltip(player.position)"
+                                  matTooltipPosition="above">
+                          {{ getPositionIcon(player.position) }}
+                        </mat-icon>
                         <span class="name">{{ player.name }}</span>
-                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
                       </div>
 
                       <h4 class="list-title" *ngIf="lineups.home.substitutes && lineups.home.substitutes.length > 0">
                         Suplentes</h4>
                       <div class="player-item" *ngFor="let player of lineups.home.substitutes">
                         <span class="number">{{ player.number }}</span>
+                        <mat-icon class="position-icon"
+                                  [matTooltip]="getPositionTooltip(player.position)"
+                                  matTooltipPosition="above">
+                          {{ getPositionIcon(player.position) }}
+                        </mat-icon>
                         <span class="name">{{ player.name }}</span>
-                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
                       </div>
                     </div>
 
@@ -193,7 +201,7 @@
                     <!-- Siempre mostrar imagen y nombre del equipo -->
                     <div class="team-header">
                       <div class="team-logo-container">
-                        <h2 class="team-name-overlay">{{ match.awayTeam.name || 'Equipo Visitante' }}</h2>
+                        <h1 class="team-name-overlay team-title-alignment">{{ match.awayTeam.name || 'Equipo Visitante' }}</h1>
                         <img
                           [src]="(match.awayTeam.logoUrl && match.awayTeam.logoUrl !== '') ? match.awayTeam.logoUrl : 'assets/default-team.png'"
                           [alt]="match.awayTeam.name || 'Equipo Visitante'" class="team-logo-small"
@@ -208,16 +216,24 @@
                       <h4 class="list-title">Titulares</h4>
                       <div class="player-item" *ngFor="let player of lineups.away.startingXI">
                         <span class="number">{{ player.number }}</span>
+                        <mat-icon class="position-icon"
+                                  [matTooltip]="getPositionTooltip(player.position)"
+                                  matTooltipPosition="above">
+                          {{ getPositionIcon(player.position) }}
+                        </mat-icon>
                         <span class="name">{{ player.name }}</span>
-                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
                       </div>
 
                       <h4 class="list-title" *ngIf="lineups.away.substitutes && lineups.away.substitutes.length > 0">
                         Suplentes</h4>
                       <div class="player-item" *ngFor="let player of lineups.away.substitutes">
                         <span class="number">{{ player.number }}</span>
+                        <mat-icon class="position-icon"
+                                  [matTooltip]="getPositionTooltip(player.position)"
+                                  matTooltipPosition="above">
+                          {{ getPositionIcon(player.position) }}
+                        </mat-icon>
                         <span class="name">{{ player.name }}</span>
-                        <mat-chip class="position-chip">{{ player.position }}</mat-chip>
                       </div>
                     </div>
 
