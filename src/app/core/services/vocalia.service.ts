@@ -72,6 +72,7 @@ export interface VocaliaMatchData {
   events: VocaliaEvent[];
   status : MatchStatusType;
   matchProgressType? : MatchInProgressStatusType;
+  vocalName? : string;
 }
 
 export enum MatchInProgressStatusType {
@@ -131,7 +132,7 @@ export class VocaliaService {
    * @returns Observable con los datos del partido
    */
   getMatchData(matchId: number): Observable<VocaliaMatchData> {
-    return this.apiService.get<VocaliaMatchResponse>(`${VOCALIA_GET_MATCH_ENDPOINT}/${matchId}`).pipe(
+        return this.apiService.get<VocaliaMatchResponse>(`${VOCALIA_GET_MATCH_ENDPOINT}/${matchId}`).pipe(
       map(response => {
         if (response.succeed && response.result) {
           return response.result;

@@ -8,6 +8,7 @@ export interface JwtToken extends JwtPayload {
   'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name': string;
   'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': string;
   'tegool.user.permissions': string;
+  'tegool.official.matchId': string;
   exp: number;
   iss: string;
   aud: string;
@@ -52,15 +53,17 @@ export class JwtService {
     return timeToExpire < minutesInMs;
   }
 
-  getUserInfo(token: string): { id: string; email: string; role: string; fullName: string; } | null {
+  getUserInfo(token: string): { id: string; email: string; role: string; fullName: string; matchId: string } | null {
     const decoded = this.decodeToken(token);
+    console.log('decoded', decoded);
     if (!decoded) return null;
 
     return {
       id: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || '',
       email: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || '',
       role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || '',
-      fullName: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || ''
+      fullName: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || '',
+      matchId: decoded['tegool.official.matchId'] || ''
     };
   }
 }
