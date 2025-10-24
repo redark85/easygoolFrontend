@@ -354,10 +354,11 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
             this.categories = tournamentDetails.categories || [];
             console.log('Categorías cargadas:', this.categories);
             
-            // Seleccionar la primera categoría por defecto
+            // ✅ NUEVA FUNCIONALIDAD: Seleccionar la primera categoría por defecto
             if (this.categories.length > 0) {
               this.selectedCategoryId = this.categories[0].id;
-              this.onCategoryChange();
+              console.log('🎯 Primera categoría seleccionada automáticamente:', this.categories[0]);
+              this.onCategoryChange(); // Esto ahora también preseleccionará la primera fase
             }
           }
           
@@ -387,7 +388,19 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
       this.selectedPhaseId = null;
       this.selectedGroupId = null;
       this.groups = [];
-      this.loadTournamentHomeData();
+      
+      // ✅ NUEVA FUNCIONALIDAD: Preseleccionar automáticamente la primera fase
+      if (this.phases.length > 0) {
+        this.selectedPhaseId = this.phases[0].id;
+        console.log('🎯 Primera fase seleccionada automáticamente:', this.phases[0]);
+        
+        // Ejecutar el cambio de fase para cargar grupos si es necesario
+        this.onPhaseChange();
+      } else {
+        // Si no hay fases, cargar datos con solo categoría
+        this.loadTournamentHomeData();
+      }
+      
       this.cdr.detectChanges();
     }
   }
@@ -424,9 +437,13 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
     
     console.log('Grupos cargados:', this.groups);
 
-    // Seleccionar el primer grupo por defecto
+    // ✅ NUEVA FUNCIONALIDAD: Seleccionar el primer grupo por defecto
     if (this.groups.length > 0) {
       this.selectedGroupId = this.groups[0].id;
+      console.log('🎯 Primer grupo seleccionado automáticamente:', this.groups[0]);
+      this.loadTournamentHomeData();
+    } else {
+      // Si no hay grupos, cargar datos solo con fase
       this.loadTournamentHomeData();
     }
     
@@ -471,14 +488,21 @@ export class TournamentHomeComponent implements OnInit, OnDestroy {
    */
   private loadTournamentHomeData(): void {
     if (!this.selectedCategoryId) {
-      console.warn('No hay fase seleccionada');
+      console.warn('❌ No hay categoría seleccionada');
       return;
     }
 
     this.isLoadingTournamentData = true;
     const groupId = this.selectedGroupId || 0; // 0 si no hay grupo seleccionado
+    const phaseId = this.selectedPhaseId || 0; // 0 si no hay fase seleccionada
 
-    const phaseId = this.selectedPhaseId || 0; // 0 si no hay grupo seleccionado
+    // ✅ LOGGING MEJORADO: Mostrar parámetros del API call
+    console.log('🚀 Consumiendo API /api/Fixture/GetTournamentHome con parámetros:');
+    console.log(`   - TournamentId: ${this.tournamentId}`);
+    console.log(`   - CategoryId: ${this.selectedCategoryId}`);
+    console.log(`   - PhaseId: ${phaseId}`);
+    console.log(`   - GroupId: ${groupId}`);
+    console.log(`   - URL completa: /api/Fixture/GetTournamentHome/${this.tournamentId}?CategoryId=${this.selectedCategoryId}&PhaseId=${phaseId}&GroupId=${groupId}`);
 
     this.tournamentHomeService.getTournamentHome(this.tournamentId, this.selectedCategoryId!, phaseId, groupId)
       .pipe(takeUntil(this.destroy$))
