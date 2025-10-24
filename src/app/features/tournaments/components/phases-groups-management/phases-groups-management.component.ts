@@ -55,6 +55,7 @@ export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDes
   // Loading states
   isLoadingPhases = false;
   deletingPhaseId: number | null = null; // ID de la fase que se está eliminando
+  assigningTeamsPhaseId: number | null = null; // ID de la fase que está asignando equipos aleatoriamente
 
   private destroy$ = new Subject<void>();
 
@@ -392,8 +393,18 @@ export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDes
         return;
     }
 
+    // Activar loading para esta fase específica
+    this.assigningTeamsPhaseId = phase.id;
+    this.cdr.detectChanges();
+
+    console.log('🎲 Asignando equipos aleatoriamente para fase:', phase.name, 'ID:', phase.id);
+
     this.teamService.assignRandomTeams(phase.id).subscribe({
           next: () => {
+            // Desactivar loading
+            this.assigningTeamsPhaseId = null;
+            this.cdr.detectChanges();
+
             Swal.fire({
               title: '¡Equipos asignados!',
               text: `Equipos asignados aleatoriamente`,
@@ -404,6 +415,10 @@ export class PhasesGroupsManagementComponent implements OnInit, OnChanges, OnDes
             this.refreshPhases();
           },
           error: (error) => {
+            // Desactivar loading en caso de error
+            this.assigningTeamsPhaseId = null;
+            this.cdr.detectChanges();
+
             const config = this.errorHandler.createConfig('Fase');
             this.errorHandler.handleResponseError(error, config);
           }

@@ -77,8 +77,14 @@
                           color="accent"
                           (click)="assignTeamsRandomly(phase)"
                           matTooltip="Asignar equipos aleatoriamente"
-                          class="phase-action-btn">
-                    <mat-icon>shuffle</mat-icon>
+                          class="phase-action-btn"
+                          [disabled]="assigningTeamsPhaseId === phase.id">
+                    <mat-progress-spinner 
+                      *ngIf="assigningTeamsPhaseId === phase.id"
+                      diameter="20" 
+                      mode="indeterminate">
+                    </mat-progress-spinner>
+                    <mat-icon *ngIf="assigningTeamsPhaseId !== phase.id">shuffle</mat-icon>
                   </button>
                   <button mat-icon-button
                           (click)="editPhase(phase)"
