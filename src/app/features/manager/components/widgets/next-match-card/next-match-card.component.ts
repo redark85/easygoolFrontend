@@ -20,6 +20,7 @@ interface NextMatch {
   date: Date;
   venue: string;
   matchday: number;
+  formattedDate : string;
 }
 
 /**
@@ -75,18 +76,26 @@ export class NextMatchCardComponent implements OnInit, OnDestroy, OnChanges {
   private updateNextMatch(): void {
     if (this.teamDetail && this.teamDetail.nextMatch) {
       const nextMatchData = this.teamDetail.nextMatch;
-      
+      const date = new Date(nextMatchData.matchDate);
+    // 👇 Esto genera "sábado, 25 de octubre de 2025"
+    var formattedDate = new Intl.DateTimeFormat('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
       this.nextMatch = {
         id: nextMatchData.matchId,
         homeTeam: {
           name: nextMatchData.isHome ? this.teamDetail.teamName : nextMatchData.opponent,
-          logoUrl: nextMatchData.isHome ? (this.teamDetail.logoUrl || 'assets/default-team.png') : 'assets/default-team.png'
+          logoUrl: nextMatchData.isHome ? (this.teamDetail.logoUrl || 'assets/default-team.png') : (this.teamDetail.nextMatch.imageUrl || 'assets/default-team.png')
         },
         awayTeam: {
           name: nextMatchData.isHome ? nextMatchData.opponent : this.teamDetail.teamName,
-          logoUrl: nextMatchData.isHome ? 'assets/default-team.png' : (this.teamDetail.logoUrl || 'assets/default-team.png')
+          logoUrl: nextMatchData.isHome ? (this.teamDetail.nextMatch.imageUrl || 'assets/default-team.png') : (this.teamDetail.logoUrl || 'assets/default-team.png')
         },
         date: new Date(nextMatchData.matchDate),
+        formattedDate: formattedDate,
         venue: nextMatchData.phaseName || 'Sin información de venue',
         matchday: 0 // No viene en el API
       };

@@ -16,6 +16,7 @@ export interface NextMatch {
   awayScore: number;
   phaseName: string;
   status: number;
+  imageUrl?: string;
 }
 
 export interface TeamDetail {
