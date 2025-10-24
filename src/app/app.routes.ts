@@ -126,7 +126,7 @@ export const routes: Routes = [
   
   // Public Match Detail (public access, no layout)
   {
-    path: 'public-match-detail/:matchId',
+    path: 'public-match-detail/:tournamentId/:matchId',
     loadComponent: () => import('./features/public-match-detail/public-match-detail.component').then(c => c.PublicMatchDetailComponent),
     title: 'Detalle del Partido'
   },

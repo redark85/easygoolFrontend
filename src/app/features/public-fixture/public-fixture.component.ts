@@ -402,20 +402,19 @@ export class PublicFixtureComponent implements OnInit, OnDestroy {
         return filterStatus !== null && match.status === filterStatus;
       })
     })).filter(matchday => matchday.matches.length > 0);
-
-    this.cdr.detectChanges();
   }
 
   /**
-   * Maneja el evento de ver detalles de un partido
+   * Navega al detalle del partido
    */
   onViewMatchDetails(match: UIMatch): void {
     console.log('Ver detalles del partido:', match);
-    this.router.navigate(['/public-match-detail', match.id]);
+    console.log('🚀 Navegando a public-match-detail con tournamentId:', this.tournamentId, 'y matchId:', match.id);
+    this.router.navigate(['/public-match-detail', this.tournamentId, match.id]);
   }
 
   /**
-   * Obtiene el badge de estado basado en MatchStatusType
+   * Obtiene el badge del estado
    */
   getStatusBadge(status: string): { label: string; color: string } {
     const badges: { [key: string]: { label: string; color: string } } = {

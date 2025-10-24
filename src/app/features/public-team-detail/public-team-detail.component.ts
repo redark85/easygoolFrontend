@@ -182,7 +182,11 @@ export class PublicTeamDetailComponent implements OnInit, OnDestroy {
    * Navega al detalle del partido
    */
   viewMatchDetail(matchId: number): void {
-    this.router.navigate(['/public-match-detail', matchId]);
+    // TODO: Obtener tournamentId real desde el contexto del equipo o modificar la ruta para incluirlo
+    // Por ahora usamos un ID por defecto hasta que se implemente la solución completa
+    const defaultTournamentId = 1;
+    console.log('🚀 Navegando a public-match-detail con tournamentId por defecto:', defaultTournamentId, 'y matchId:', matchId);
+    this.router.navigate(['/public-match-detail', defaultTournamentId, matchId]);
   }
 
   /**

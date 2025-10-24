@@ -113,6 +113,7 @@ interface Match {
 export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   match: Match | null = null;
   matchId: number = 0;
+  tournamentId: number = 0;
   isLoading = false;
   statsRows: StatRow[] = [];
   cardStatsRows: StatRow[] = [];
@@ -141,13 +142,21 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Obtener matchId de la ruta
+    // Obtener tournamentId y matchId de la ruta
     this.route.paramMap
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
-        const id = params.get('matchId');
-        if (id) {
-          this.matchId = +id;
+        const tournamentId = params.get('tournamentId');
+        const matchId = params.get('matchId');
+        
+        if (tournamentId) {
+          this.tournamentId = +tournamentId;
+          console.log('Tournament ID recibido:', this.tournamentId);
+        }
+        
+        if (matchId) {
+          this.matchId = +matchId;
+          console.log('Match ID recibido:', this.matchId);
           this.loadMatchDetail();
           this.initializeSignalR();
         }
@@ -621,7 +630,13 @@ export class PublicMatchDetailComponent implements OnInit, OnDestroy {
    * Navega hacia atrás
    */
   goBack(): void {
-    this.router.navigate(['/public-fixture', 1]); // TODO: Usar tournamentId real
+    if (this.tournamentId) {
+      console.log('🔙 Navegando de vuelta a public-fixture con tournamentId:', this.tournamentId);
+      this.router.navigate(['/public-fixture', this.tournamentId]);
+    } else {
+      console.warn('⚠️ No se encontró tournamentId, usando ID por defecto');
+      this.router.navigate(['/public-fixture', 1]);
+    }
   }
 
   /**
