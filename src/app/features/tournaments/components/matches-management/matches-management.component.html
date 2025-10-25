@@ -189,14 +189,31 @@
                               <div class="match-status-top">
                                 <div class="row">
                                   <div class="col-6">
-                                    <!-- Ícono de agregar vocal al lado del estado -->
-                                    <button *ngIf="match.status !== matchStatusType.played"
+                                    <!-- Botón de agregar vocal (solo si no tiene vocal y no está finalizado) -->
+                                    <button *ngIf="match.status !== matchStatusType.played && !hasVocal(match) && !isVocalLoading(match.id)"
                                             mat-icon-button
                                             (click)="addVocalToMatch(match)"
                                             matTooltip="Agregar vocal al partido"
                                             color="accent"
                                             class="action-btn-mini add-vocal referee-button">
                                       <mat-icon>record_voice_over</mat-icon>
+                                    </button>
+
+                                    <!-- Spinner de loading para vocal -->
+                                    <mat-progress-spinner *ngIf="isVocalLoading(match.id)"
+                                                          diameter="24"
+                                                          mode="indeterminate"
+                                                          color="accent">
+                                    </mat-progress-spinner>
+
+                                    <!-- Botón de ver datos del vocal (solo si tiene vocal asignado) -->
+                                    <button *ngIf="hasVocal(match)"
+                                            mat-icon-button
+                                            (click)="viewVocalData(match)"
+                                            matTooltip="Ver datos del vocal"
+                                            color="primary"
+                                            class="action-btn-mini view-vocal referee-button">
+                                      <mat-icon>visibility</mat-icon>
                                     </button>
                                   </div>
                                   <div class="col-6">

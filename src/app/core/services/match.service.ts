@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT, MATCH_CHANGE_STATUS_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT, MATCH_CHANGE_STATUS_ENDPOINT, MATCH_SET_VOCAL_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -24,6 +24,13 @@ export interface MatchInfo {
   venue?: string;
   homeScore?: number;
   awayScore?: number;
+  vocal?: MatchVocal | null;
+}
+
+export interface MatchVocal {
+  id: number;
+  userName: string;
+  password: string;
 }
 
 export enum MatchStatusType {
@@ -106,6 +113,14 @@ export interface ChangeMatchStatusResponse {
   succeed: boolean;
   message: string;
   result?: any;
+}
+
+export interface SetVocalMatchResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: boolean;
 }
 
 @Injectable({
@@ -333,6 +348,23 @@ export class MatchService {
           return response;
         }
         throw new Error(response.message || 'Error al actualizar la fecha del partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Establece un vocal para un partido
+   * @param matchId ID del partido
+   * @returns Observable con la respuesta de la operación
+   */
+  setVocalMatch(matchId: number): Observable<SetVocalMatchResponse> {
+    return this.apiService.post<SetVocalMatchResponse>(`${MATCH_SET_VOCAL_ENDPOINT}/${matchId}`, {}).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al establecer vocal para el partido');
       }),
       catchError(this.handleError)
     );

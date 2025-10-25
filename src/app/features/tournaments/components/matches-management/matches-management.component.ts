@@ -19,7 +19,7 @@ import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Category } from '../../models/category.interface';
 import { Team } from '../../models/team.interface';
-import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest } from '@core/services/match.service';
+import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest, SetVocalMatchResponse, MatchVocal } from '@core/services/match.service';
 import { CategoryService } from '../../services/category.service';
 import { PhaseService } from '../../services/phase.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
@@ -75,6 +75,9 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges,
   isCreatingMatchDay = false;
   matchStatusType = MatchStatusType;
   private destroy$ = new Subject<void>();
+  
+  // Estado de loading para vocales por partido
+  vocalLoadingStates: { [matchId: number]: boolean } = {};
 
   // Control de actualización automática
   private isViewActive = false;
@@ -1089,11 +1092,36 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges,
       confirmButtonText: '🎤 Agregar Vocal',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#ff9800',
-      cancelButtonColor: '#6c757d'
+      cancelButtonColor: '#6c757d',
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        // Activar loading state para este partido específico
+        this.vocalLoadingStates[match.id] = true;
+        this.cdr.detectChanges();
+        
+        return this.matchService.setVocalMatch(match.id)
+          .pipe(takeUntil(this.destroy$))
+          .toPromise()
+          .then((response: SetVocalMatchResponse | undefined) => {
+            this.vocalLoadingStates[match.id] = false;
+            
+            if (response && response.succeed && response.result) {
+              // Recargar los partidos para obtener los datos actualizados
+              this.reloadCurrentMatches('Vocal Added');
+              return response;
+            } else {
+              throw new Error(response?.message || 'No se pudo agregar el vocal');
+            }
+          })
+          .catch((error) => {
+            this.vocalLoadingStates[match.id] = false;
+            this.cdr.detectChanges();
+            throw error;
+          });
+      },
+      allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
-      if (result.isConfirmed) {
-        // TODO: Implementar lógica para agregar vocal
-        // Por ahora mostrar mensaje de éxito
+      if (result.isConfirmed && result.value) {
         Swal.fire({
           title: '¡Vocal Agregado!',
           text: `Se ha agregado un vocal al partido ${match.homeTeam} vs ${match.awayTeam}`,
@@ -1102,6 +1130,60 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges,
           showConfirmButton: false
         });
       }
+    }).catch((error) => {
+      console.error('Error adding vocal:', error);
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'No se pudo agregar el vocal al partido',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    });
+  }
+
+  /**
+   * Verifica si un partido tiene vocal asignado
+   */
+  hasVocal(match: any): boolean {
+    return match.vocal && match.vocal !== null;
+  }
+
+  /**
+   * Verifica si el partido está en estado de loading para vocal
+   */
+  isVocalLoading(matchId: number): boolean {
+    return this.vocalLoadingStates[matchId] || false;
+  }
+
+  /**
+   * Muestra los datos del vocal asignado al partido
+   */
+  viewVocalData(match: any): void {
+    if (!match.vocal) {
+      return;
+    }
+
+    console.log('👁️ Viewing vocal data for match:', match);
+    
+    Swal.fire({
+      title: 'Datos del Vocal',
+      html: `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h4><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></h4>
+        </div>
+        <div style="text-align: left; margin: 20px 0;">
+          <p><strong>ID:</strong> ${match.vocal.id}</p>
+          <p><strong>Usuario:</strong> ${match.vocal.userName}</p>
+          <p><strong>Contraseña:</strong> ${'*'.repeat(match.vocal.password.length)}</p>
+        </div>
+        <p style="color: #666; font-size: 14px; text-align: center;">
+          El usuario está bloqueado. Solo se puede actualizar la contraseña.
+        </p>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Cerrar',
+      confirmButtonColor: '#1976d2',
+      showCancelButton: false
     });
   }
 
