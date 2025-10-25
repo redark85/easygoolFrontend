@@ -3,7 +3,7 @@ import { VocaliaViewComponent } from './components/vocalia-view/vocalia-view.com
 
 export const VOCALIA_ROUTES: Routes = [
   {
-    path: ':id',
+    path: ':matchId',
     component: VocaliaViewComponent
   }
 ];

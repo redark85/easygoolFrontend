@@ -99,7 +99,6 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
   // Search Text
   homeTeamSearchText = '';
   awayTeamSearchText = '';
-  
   // Incidents
   incidents: MatchIncident[] = [];
   hasMatchStarted = false;
@@ -117,7 +116,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
     
     // Obtener el ID del partido de la ruta
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.matchId = params['id'] ? +params['id'] : null;
+      this.matchId = params['matchId'] ? +params['matchId'] : null;
       if (this.matchId) {
         this.loadMatchData(this.matchId);
         // Cargar estado guardado para este partido específico
@@ -177,7 +176,11 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
             this.matchProgressType = data.matchProgressType;
           }
           this.hasMatchStarted = data.status === MatchStatusType.inProgress;
-
+          //Mostrar modal para registrar el nombre del vocal
+          //solo un campo que diga nombre de la persona o nombre del equipo al que pertenece el vocal
+          if (!data.vocalName) {
+            console.log("Levantar modal para registrar el nombre del vocal");
+          }
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -188,7 +191,7 @@ export class VocaliaViewComponent implements OnInit, OnDestroy {
             icon: 'error',
             confirmButtonText: 'Aceptar'
           }).then(() => {
-            this.router.navigate(['/matches']);
+            this.router.navigate(['/']);
           });
         }
       });

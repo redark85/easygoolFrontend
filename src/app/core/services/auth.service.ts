@@ -261,14 +261,14 @@ export class AuthService implements OnDestroy {
 
     if (navigate) {
       // Redirigir según el rol del usuario
-      this.navigateByRole(mappedRole, tournamentToken);
+      this.navigateByRole(mappedRole, tournamentToken, userInfo.matchId);
     }
   }
 
   /**
    * Navega a la ruta correspondiente según el rol del usuario
    */
-  private navigateByRole(role: RoleType, tournamentToken?: string | null): void {
+  private navigateByRole(role: RoleType, tournamentToken?: string | null, matchId?: string| null): void {
     switch (role) {
       case RoleType.Superadmin:
         this.router.navigate(['/tournaments']);
@@ -285,7 +285,7 @@ export class AuthService implements OnDestroy {
         }
         break;
       case RoleType.Official:
-        this.router.navigate(['/matches']);
+        this.router.navigate(['/vocalia/'+ matchId]);
         break;
       default:
         this.router.navigate(['/tournaments']);
