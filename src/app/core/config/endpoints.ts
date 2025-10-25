@@ -71,6 +71,7 @@ export const MATCH_DELETE_MATCHDAY_ENDPOINT = '/api/Match/DeleteMatchDay';
 export const MATCH_UPDATE_DATE_ENDPOINT = '/api/Match/UpdateMatchDate';
 export const MATCH_CHANGE_STATUS_ENDPOINT = '/api/Match/ChangeMatchStatus';
 export const MATCH_SET_VOCAL_ENDPOINT = '/api/Match/SetVocalMatch';
+export const MATCH_UPDATE_VOCAL_ENDPOINT = '/api/Match/UpdateVocalMatch';
 
 // Vocalia Endpoints
 export const VOCALIA_GET_MATCH_ENDPOINT = '/api/Vocalia/GetMatch';
@@ -169,6 +170,7 @@ export const EndpointsConfig = {
   MATCH_UPDATE_DATE_ENDPOINT,
   MATCH_CHANGE_STATUS_ENDPOINT,
   MATCH_SET_VOCAL_ENDPOINT,
+  MATCH_UPDATE_VOCAL_ENDPOINT,
 
   // Vocalia
   VOCALIA_GET_MATCH_ENDPOINT,

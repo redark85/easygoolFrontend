@@ -19,12 +19,13 @@ import { Match, MatchStatus } from '../../models/match.interface';
 import { Phase, Group, PhaseType } from '../../models/phase.interface';
 import { Category } from '../../models/category.interface';
 import { Team } from '../../models/team.interface';
-import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest, SetVocalMatchResponse, MatchVocal } from '@core/services/match.service';
+import { MatchService, MatchDay, MatchStatusType, CreateRandomMatchesRequest, SetVocalMatchResponse, MatchVocal, UpdateVocalPasswordResponse } from '@core/services/match.service';
 import { CategoryService } from '../../services/category.service';
 import { PhaseService } from '../../services/phase.service';
 import { CreateMatchModalComponent } from '../create-match-modal/create-match-modal.component';
 import { MatchStatusModalComponent, MatchStatusModalData, MatchStatusModalResult } from '@shared/components/match-status-modal';
 import { MatchDatetimeModalComponent, MatchDateTimeData, MatchDateTimeResult } from '../match-datetime-modal/match-datetime-modal.component';
+import { VocalDataModalComponent, VocalDataModalData, VocalDataModalResult } from '../vocal-data-modal/vocal-data-modal.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -1165,26 +1166,28 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges,
 
     console.log('👁️ Viewing vocal data for match:', match);
     
-    Swal.fire({
-      title: 'Datos del Vocal',
-      html: `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h4><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></h4>
-        </div>
-        <div style="text-align: left; margin: 20px 0;">
-          <p><strong>ID:</strong> ${match.vocal.id}</p>
-          <p><strong>Usuario:</strong> ${match.vocal.userName}</p>
-          <p><strong>Contraseña:</strong> ${'*'.repeat(match.vocal.password.length)}</p>
-        </div>
-        <p style="color: #666; font-size: 14px; text-align: center;">
-          El usuario está bloqueado. Solo se puede actualizar la contraseña.
-        </p>
-      `,
-      icon: 'info',
-      confirmButtonText: 'Cerrar',
-      confirmButtonColor: '#1976d2',
-      showCancelButton: false
+    const dialogRef = this.dialog.open(VocalDataModalComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        matchId: match.id,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        vocal: match.vocal
+      } as VocalDataModalData
     });
+
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result: VocalDataModalResult) => {
+        if (result && result.success && result.updated) {
+          console.log('✅ Vocal password updated successfully');
+          
+          // Recargar los partidos para obtener los datos actualizados
+          this.reloadCurrentMatches('Vocal Password Updated');
+        }
+      });
   }
 
 }

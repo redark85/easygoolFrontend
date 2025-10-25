@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT, MATCH_CHANGE_STATUS_ENDPOINT, MATCH_SET_VOCAL_ENDPOINT } from '../config/endpoints';
+import { MATCH_GET_ALL_BY_GROUP_ENDPOINT, MATCH_GET_FREE_MATCHDAY_TEAMS_ENDPOINT, MATCH_CREATE_ENDPOINT, MATCH_CREATE_MATCHDAY_ENDPOINT, MATCH_CREATE_RANDOM_ENDPOINT, MATCH_CREATE_RANDOM_FOR_MATCHDAY_ENDPOINT, MATCH_DELETE_ENDPOINT, MATCH_DELETE_MATCHDAY_ENDPOINT, MATCH_GET_ALL_BY_PHASE_ENDPOINT, MATCH_UPDATE_DATE_ENDPOINT, MATCH_CHANGE_STATUS_ENDPOINT, MATCH_SET_VOCAL_ENDPOINT, MATCH_UPDATE_VOCAL_ENDPOINT } from '../config/endpoints';
 import { ApiService } from './api.service';
 
 export interface MatchDay {
@@ -116,6 +116,18 @@ export interface ChangeMatchStatusResponse {
 }
 
 export interface SetVocalMatchResponse {
+  succeed: boolean;
+  message: string;
+  messageId: string;
+  messageType: number;
+  result: boolean;
+}
+
+export interface UpdateVocalPasswordRequest {
+  password: string;
+}
+
+export interface UpdateVocalPasswordResponse {
   succeed: boolean;
   message: string;
   messageId: string;
@@ -365,6 +377,25 @@ export class MatchService {
           return response;
         }
         throw new Error(response.message || 'Error al establecer vocal para el partido');
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Actualiza la contraseña del vocal de un partido
+   * @param vocalId ID del vocal
+   * @param password Nueva contraseña
+   * @returns Observable con la respuesta de la operación
+   */
+  updateVocalPassword(vocalId: number, password: string): Observable<UpdateVocalPasswordResponse> {
+    const request: UpdateVocalPasswordRequest = { password };
+    return this.apiService.put<UpdateVocalPasswordResponse>(`${MATCH_UPDATE_VOCAL_ENDPOINT}/${vocalId}`, request).pipe(
+      map(response => {
+        if (response.succeed) {
+          return response;
+        }
+        throw new Error(response.message || 'Error al actualizar la contraseña del vocal');
       }),
       catchError(this.handleError)
     );
