@@ -38,7 +38,9 @@ export interface TeamDetail {
   totalPlayers: number;
   topScorer: TopScorer;
   nextMatch: NextMatch;
-  tournamentTeamId : number;
+  tournamentTeamId: number;
+  tournamentId: number;  // ✅ Agregado para navegación correcta
+  phaseId: number;       // ✅ Agregado para navegación correcta
 }
 
 export interface TeamDetailResponse {

@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 // Services
 import { ManagerService } from '../../../../core/services/manager.service';
@@ -48,16 +48,26 @@ export class ManagerDashboardComponent implements OnInit, OnDestroy {
   errorMessage = '';
   teamDetail: TeamDetail | null = null;
   tournamentTeamId: number = 0;
+  tournamentId: number = 0; // ✅ Agregado para capturar del state
   private destroy$ = new Subject<void>();
 
   constructor(
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router: Router,
     private managerService: ManagerService,
     private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
+    // Capturar tournamentId del state de navegación
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state || window.history.state;
+    if (state && state['tournamentId']) {
+      this.tournamentId = state['tournamentId'];
+      console.log('📊 Dashboard - Tournament ID from state:', this.tournamentId);
+    }
+
     // Obtener el tournamentTeamId de la ruta
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const tournamentTeamId = +params['tournamentTeamId']; // Convertir a número

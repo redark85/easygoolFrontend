@@ -38,6 +38,7 @@ interface TeamSummary {
 })
 export class TeamSummaryCardComponent implements OnInit, OnChanges {
   @Input() teamDetail: TeamDetail | null = null;
+  @Input() tournamentId: number = 0; // ✅ Agregado para recibir tournamentId desde el dashboard
   
   teamSummary: TeamSummary | null = null;
 

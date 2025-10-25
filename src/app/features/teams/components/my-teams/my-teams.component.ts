@@ -156,10 +156,12 @@ export class MyTeamsComponent implements OnInit, OnDestroy {
       });
   }
 
-  viewTeamDetails(tournamentTeamId: number): void {
-    console.log('🏈 Navigating to manager dashboard with tournamentTeamId:', tournamentTeamId);
-    // Navegar al dashboard del manager enviando el tournamentTeamId como parámetro de ruta
-    this.router.navigate(['/manager/dashboard', tournamentTeamId]);
+  viewTeamDetails(tournamentTeamId: number, tournamentId: number): void {
+    console.log('🏈 Navigating to manager dashboard with tournamentTeamId:', tournamentTeamId, 'tournamentId:', tournamentId);
+    // Navegar al dashboard del manager enviando ambos IDs como state
+    this.router.navigate(['/manager/dashboard', tournamentTeamId], {
+      state: { tournamentId: tournamentId }
+    });
   }
 
   getTeamLogo(logoUrl: string): string {

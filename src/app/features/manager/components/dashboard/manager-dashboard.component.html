@@ -36,7 +36,7 @@
     <!-- Row 1: Team Summary & Next Match -->
     <div class="dashboard-row">
       <div class="dashboard-col col-lg">
-        <app-team-summary-card [teamDetail]="teamDetail"></app-team-summary-card>
+        <app-team-summary-card [teamDetail]="teamDetail" [tournamentId]="tournamentId"></app-team-summary-card>
       </div>
       <div class="dashboard-col col-md">
         <app-next-match-card [teamDetail]="teamDetail"></app-next-match-card>
