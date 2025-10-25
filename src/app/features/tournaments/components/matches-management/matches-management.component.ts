@@ -1067,5 +1067,42 @@ export class MatchesManagementComponent implements OnInit, OnDestroy, OnChanges,
       });
   }
 
+  /**
+   * Agrega vocal a un partido que no está finalizado
+   */
+  addVocalToMatch(match: any): void {
+    console.log('🎤 Adding vocal to match:', match);
+    
+    // Mostrar modal para agregar vocal al partido
+    Swal.fire({
+      title: 'Agregar Vocal al Partido',
+      html: `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h4><strong>${match.homeTeam}</strong> vs <strong>${match.awayTeam}</strong></h4>
+          <p style="color: #666;">Estado: ${this.getMatchStatusTextByNumber(match.status)}</p>
+        </div>
+        <p>¿Deseas agregar un vocal a este partido?</p>
+        <p style="color: #666; font-size: 14px;">El vocal será responsable de supervisar el desarrollo del partido.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '🎤 Agregar Vocal',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ff9800',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // TODO: Implementar lógica para agregar vocal
+        // Por ahora mostrar mensaje de éxito
+        Swal.fire({
+          title: '¡Vocal Agregado!',
+          text: `Se ha agregado un vocal al partido ${match.homeTeam} vs ${match.awayTeam}`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
 
 }

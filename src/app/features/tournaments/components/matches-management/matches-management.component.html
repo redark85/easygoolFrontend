@@ -187,11 +187,26 @@
 
                               <!-- Status Badge Right -->
                               <div class="match-status-top">
-                                <div
-                                  [class]="getMatchStatusClassByNumber(match.status)"
-                                  [matTooltip]="getMatchStatusTextByNumber(match.status)"
-                                  class="status-circle">
-                                  <mat-icon class="check-icon">check</mat-icon>
+                                <div class="row">
+                                  <div class="col-6">
+                                    <!-- Ícono de agregar vocal al lado del estado -->
+                                    <button *ngIf="match.status !== matchStatusType.played"
+                                            mat-icon-button
+                                            (click)="addVocalToMatch(match)"
+                                            matTooltip="Agregar vocal al partido"
+                                            color="accent"
+                                            class="action-btn-mini add-vocal referee-button">
+                                      <mat-icon>record_voice_over</mat-icon>
+                                    </button>
+                                  </div>
+                                  <div class="col-6">
+                                    <div
+                                      [class]="getMatchStatusClassByNumber(match.status)"
+                                      [matTooltip]="getMatchStatusTextByNumber(match.status)"
+                                      class="status-circle">
+                                      <mat-icon class="check-icon">check</mat-icon>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </div>

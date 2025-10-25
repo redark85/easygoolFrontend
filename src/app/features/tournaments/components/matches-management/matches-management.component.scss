@@ -5,6 +5,13 @@
   position: relative;
 }
 
+.referee-button {
+  padding: 0;
+  position: absolute;
+  top: 3px;
+  right: 20px;
+}
+
 .matches-management-card {
   margin: 0;
   box-shadow: none;
@@ -816,14 +823,14 @@
 
       .row {
         margin: 0;
-        
+
         [class*="col-"] {
           padding: 0 8px;
-          
+
           &:first-child {
             padding-left: 0;
           }
-          
+
           &:last-child {
             padding-right: 0;
           }
@@ -852,11 +859,11 @@
       .row {
         flex-direction: column;
         gap: 16px;
-        
+
         [class*="col-"] {
           padding: 0;
           margin-bottom: 12px;
-          
+
           &:last-child {
             margin-bottom: 0;
           }
